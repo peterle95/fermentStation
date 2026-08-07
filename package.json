@@ -10,7 +10,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "cap:sync": "cap sync",
-    "tauri:dev": "tauri dev"
+    "android:build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/android-build.ps1",
+    "tauri": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tauri.ps1",
+    "tauri:dev": "npm run tauri -- dev",
+    "tauri:build": "npm run tauri -- build"
   },
   "dependencies": {
     "@capacitor/core": "^7.4.3",
