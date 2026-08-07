@@ -13,6 +13,9 @@ npm run dev
 npm test
 npm run build
 npm run cap:sync
+npm run android:build
+npm run tauri:build
 ```
 
-`npm run tauri:dev` requires Rust. Android builds require a JDK and Android SDK.
+`npm run tauri:dev` launches the desktop shell. Rust, MSVC Build Tools, the
+Android Studio JDK, and Android SDK paths are configured as user prerequisites.
