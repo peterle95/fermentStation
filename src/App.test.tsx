@@ -104,4 +104,33 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("Finish date"), { target: { value: "2026-08-08" } });
     expect(screen.getByText("Ready", { selector: ".status" })).toBeTruthy();
   });
+
+  it("surfaces recurring checks on Today and Calendar", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    fireEvent.change(screen.getByLabelText(/Expected duration/), { target: { value: "14" } });
+    fireEvent.change(screen.getByLabelText(/^Recurring checks/), {
+      target: { value: "Taste, 2" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.change(screen.getByLabelText(/start date/i), {
+      target: { value: "2026-08-01" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+
+    expect(screen.getByText(/Overdue 2026-08-03/)).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Taste interval days"), { target: { value: "3" } });
+    expect(screen.getByText(/Overdue 2026-08-04/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Complete Taste" }));
+    expect(screen.getByText("Completed check: Taste")).toBeTruthy();
+    expect(screen.getByText(/Next 2026-08-11/)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    expect(screen.getByText("Finish date")).toBeTruthy();
+    expect(screen.getByText("Taste")).toBeTruthy();
+    expect(screen.getByText("2026-08-11")).toBeTruthy();
+  });
 });

@@ -1,12 +1,16 @@
 import { useState } from "react";
 import {
   addTimelineEntry,
+  adjustBatchCheck,
   batchStatuses,
   createBatch,
+  calendarEvents,
+  completeBatchCheck,
   createBatchState,
   deleteBatch,
   deleteTimelineEntry,
   discardExpiredBatches,
+  dueBatchChecks,
   filterBatches,
   prioritizeToday,
   restoreBatch,
@@ -141,6 +145,8 @@ export function App() {
               profiles={profileState.profiles}
               trash={batchState.trash}
             />
+          ) : shell.destination === "calendar" ? (
+            <CalendarView batches={batchState.batches} />
           ) : shell.destination === "profiles" ? (
             <Profiles
               profiles={profileState.profiles}
@@ -168,6 +174,20 @@ function updateBatchDates(state: BatchState): BatchState {
   };
 }
 
+function CalendarView({ batches }: { batches: Batch[] }) {
+  const events = calendarEvents(batches);
+  return (
+    <section className="calendar" aria-label="Upcoming fermentation work">
+      {events.length === 0 ? <p className="empty-state">No finish dates or checks scheduled.</p> : events.map((event) => (
+        <article className="calendar-event" key={`${event.batchId}-${event.kind}-${event.label}`}>
+          <time dateTime={event.date}>{event.date}</time>
+          <div><strong>{event.batchName}</strong><span>{event.label}</span></div>
+        </article>
+      ))}
+    </section>
+  );
+}
+
 interface BatchViewProps {
   batches: Batch[];
   mode: "today" | "batches";
@@ -184,7 +204,7 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
   const [filter, setFilter] = useState<BatchFilter>("all");
   const [profileId, setProfileId] = useState(profiles[0]?.id ?? "");
   const selectedProfile = profiles.find(({ id }) => id === profileId) ?? profiles[0];
-  const visible = mode === "today" ? prioritizeToday(batches) : filterBatches(batches, filter);
+  const visible = mode === "today" ? prioritizeToday(batches, localDate()) : filterBatches(batches, filter);
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -307,7 +327,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
   function saveEntry(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const kind = String(data.get("kind")) as TimelineEntry["kind"];
+    const kind = String(data.get("kind")) as "note" | "measurement" | "status";
     const common = {
       id: editing?.id ?? crypto.randomUUID(),
       date: String(data.get("date") ?? ""),
@@ -315,7 +335,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
     const entry: TimelineEntry = kind === "status"
       ? { ...common, kind, status: String(data.get("status")) as BatchStatus }
       : { ...common, kind, text: String(data.get("text") ?? "").trim() };
-    if (!entry.date || (entry.kind !== "status" && !entry.text)) return;
+    if (!entry.date || ("text" in entry && !entry.text)) return;
     onChange(editing ? updateTimelineEntry(batch, entry) : addTimelineEntry(batch, entry));
     setEditing(null);
     event.currentTarget.reset();
@@ -380,6 +400,21 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
           </form>
         );
       })}
+      {batch.checks.length > 0 && (
+        <section className="checks" aria-label={`${batch.name} checks`}>
+          <h4>Checks</h4>
+          {batch.checks.map((check) => {
+            const due = dueBatchChecks(batch, localDate()).find(({ id }) => id === check.id);
+            return (
+              <div className="check" key={check.id}>
+                <span><strong>{check.name}</strong> <span>{batch.status === "active" ? `${due?.overdue ? "Overdue" : due ? "Due" : "Next"} ${check.nextDueDate}` : "Paused"}</span></span>
+                <label>Every <input aria-label={`${check.name} interval days`} min="1" onChange={(event) => onChange(adjustBatchCheck(batch, check.id, Number(event.target.value)))} type="number" value={check.intervalDays} /> days</label>
+                <button disabled={batch.status !== "active"} onClick={() => onChange(completeBatchCheck(batch, check.id, localDate(), crypto.randomUUID()))} type="button">Complete {check.name}</button>
+              </div>
+            );
+          })}
+        </section>
+      )}
       <div className="form-actions" aria-label={`Change ${batch.name} status`}>
         {batchStatuses.filter((status) => status !== batch.status).map((status) => (
           <button key={status} onClick={() => recordStatus(status)} type="button">
@@ -395,8 +430,8 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
         {batch.timeline.map((entry) => (
           <div className="timeline-entry" key={entry.id}>
             <time dateTime={entry.date}>{entry.date}</time>
-            <span>{entry.kind === "status" ? `Status: ${statusLabel(entry.status)}` : entry.text}</span>
-            <button aria-label={`Edit ${entry.kind} from ${entry.date}`} onClick={() => setEditing(entry)} type="button">Edit</button>
+            <span>{timelineEntryText(entry)}</span>
+            {entry.kind !== "check" && <button aria-label={`Edit ${entry.kind} from ${entry.date}`} onClick={() => setEditing(entry)} type="button">Edit</button>}
             <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
           </div>
         ))}
@@ -415,7 +450,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
           </label>
           <label>
             Note or measurement
-            <input defaultValue={editing && editing.kind !== "status" ? editing.text : ""} name="text" />
+            <input defaultValue={editing && (editing.kind === "note" || editing.kind === "measurement") ? editing.text : ""} name="text" />
           </label>
           <label>
             Activity status
@@ -468,6 +503,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
         : undefined,
       inputs: parseInputs(String(data.get("inputs") ?? "")),
       calculations: parseCalculations(String(data.get("calculations") ?? "")),
+      checks: parseChecks(String(data.get("checks") ?? "")),
     };
 
     const nextErrors = validateProfile(profile);
@@ -484,7 +520,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
     <section className="profiles" aria-label="Fermentation profiles">
       <button className="primary-action" onClick={() => {
         setErrors([]);
-        setEditing({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [] });
+        setEditing({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [] });
       }} type="button">
         Add profile
       </button>
@@ -497,6 +533,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
           <label>Expected duration (days) <input defaultValue={editing.expectedDurationDays} min="1" name="expectedDurationDays" type="number" /></label>
           <label>Inputs <span className="optional">One per line: name, unit, default</span><textarea defaultValue={editing.inputs.map((input) => `${input.name}, ${input.unit}, ${input.defaultValue ?? ""}`).join("\n")} name="inputs" /></label>
           <label>Calculations <span className="optional">One per line: name, unit, formula</span><textarea defaultValue={editing.calculations.map((calculation) => `${calculation.name}, ${calculation.unit}, ${calculation.formula}`).join("\n")} name="calculations" /></label>
+          <label>Recurring checks <span className="optional">One per line: name, interval days</span><textarea defaultValue={editing.checks.map((check) => `${check.name}, ${check.intervalDays}`).join("\n")} name="checks" /></label>
           {errors.length > 0 && <div className="notice" role="alert">{errors.join(" ")}</div>}
           <div className="form-actions">
             <button className="primary-action" type="submit">Save profile</button>
@@ -554,4 +591,17 @@ function parseCalculations(value: string): FermentationProfile["calculations"] {
     const [name = "", unit = "", ...formula] = line.split(",").map((part) => part.trim());
     return { name, unit: unit as FermentationProfile["calculations"][number]["unit"], formula: formula.join(",") };
   });
+}
+
+function parseChecks(value: string): FermentationProfile["checks"] {
+  return value.split("\n").filter((line) => line.trim()).map((line) => {
+    const [name = "", intervalDays = ""] = line.split(",").map((part) => part.trim());
+    return { name, intervalDays: Number(intervalDays) };
+  });
+}
+
+function timelineEntryText(entry: TimelineEntry): string {
+  if (entry.kind === "status") return `Status: ${statusLabel(entry.status)}`;
+  if (entry.kind === "check") return `Completed check: ${entry.checkName}`;
+  return entry.text;
 }

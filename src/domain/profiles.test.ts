@@ -37,6 +37,7 @@ describe("fermentation profiles", () => {
       instructions: "Taste weekly.",
       inputs: [],
       calculations: [],
+      checks: [],
     });
     const updated = updateProfile(added, {
       ...added.profiles.at(-1)!,

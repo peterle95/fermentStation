@@ -2,12 +2,16 @@ import { describe, expect, it } from "vitest";
 import { createProfileState } from "./profiles";
 import {
   addTimelineEntry,
+  adjustBatchCheck,
+  calendarEvents,
   changeBatchStatus,
   createBatch,
   createBatchState,
+  completeBatchCheck,
   deleteBatch,
   deleteTimelineEntry,
   discardExpiredBatches,
+  dueBatchChecks,
   filterBatches,
   prioritizeToday,
   restoreBatch,
@@ -42,6 +46,8 @@ describe("batches", () => {
       timelineTrash: [],
       inputValues: {},
       calculationValues: {},
+      checks: [],
+      finishDate: undefined,
       profileSnapshot: {
         id: "starter-kombucha-f1",
         name: "Kombucha F1",
@@ -49,6 +55,7 @@ describe("batches", () => {
         instructions: "Taste after 7 days, then bottle when pleasantly tart.",
         inputs: [],
         calculations: [],
+        checks: [],
       },
     });
   });
@@ -164,6 +171,51 @@ describe("batches", () => {
       status: "ready", finishDate: "2026-08-08",
     });
     expect(setFinishDate(earlyReady, "2026-08-10", "2026-08-08").status).toBe("active");
+  });
+
+  it("copies, adjusts, completes, and restarts recurring checks", () => {
+    const batch = createBatch(
+      { ...profile(), checks: [{ name: "Taste", intervalDays: 2 }] },
+      { id: "batch-1", startDate: "2026-08-01" },
+    );
+    const adjusted = adjustBatchCheck(batch, "Taste", 3);
+    const completed = completeBatchCheck(adjusted, "Taste", "2026-08-06", "entry-1");
+
+    expect(batch.checks[0].nextDueDate).toBe("2026-08-03");
+    expect(adjusted.checks[0].nextDueDate).toBe("2026-08-04");
+    expect(dueBatchChecks(adjusted, "2026-08-06")).toMatchObject([
+      { name: "Taste", overdue: true },
+    ]);
+    expect(completed.checks[0].nextDueDate).toBe("2026-08-09");
+    expect(completed.timeline[0]).toMatchObject({ kind: "check", checkName: "Taste" });
+  });
+
+  it("pauses checks outside active and emits sorted calendar work", () => {
+    const batch = createBatch(
+      { ...profile(), expectedDurationDays: 7, checks: [{ name: "Burp", intervalDays: 2 }] },
+      { id: "batch-1", startDate: "2026-08-01" },
+    );
+    const ready = changeBatchStatus(batch, "ready");
+
+    expect(dueBatchChecks(ready, "2026-08-10")).toEqual([]);
+    expect(() => completeBatchCheck(ready, "Burp", "2026-08-10", "entry-1"))
+      .toThrow("Checks are paused");
+    expect(calendarEvents([batch])).toEqual([
+      { batchId: "batch-1", batchName: "Kombucha F1", date: "2026-08-03", kind: "check", label: "Burp" },
+      { batchId: "batch-1", batchName: "Kombucha F1", date: "2026-08-08", kind: "finish", label: "Finish date" },
+    ]);
+    expect(calendarEvents([ready])).toHaveLength(1);
+  });
+
+  it("shifts the next check by time spent paused", () => {
+    const batch = createBatch(
+      { ...profile(), checks: [{ name: "Taste", intervalDays: 2 }] },
+      { id: "batch-1", startDate: "2026-08-01" },
+    );
+    const ready = changeBatchStatus(batch, "ready", "2026-08-02");
+    const resumed = changeBatchStatus(ready, "active", "2026-08-05");
+
+    expect(resumed.checks[0].nextDueDate).toBe("2026-08-06");
   });
 
   it("trashes and restores timeline entries for seven days", () => {
