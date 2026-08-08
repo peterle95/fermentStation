@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PROTOTYPE - FermentStation batch workflow</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #1e251c; background: #f7f5ed; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding-bottom: 86px; }
+    button { font: inherit; cursor: pointer; }
+    .app { max-width: 1180px; margin: auto; padding: 24px; }
+    .prototype-note { background: #fff4c8; border: 1px solid #d9bc53; border-radius: 10px; padding: 10px 13px; font-size: .86rem; margin-bottom: 20px; }
+    .topline, .row, .detail-head, .composer, .calendar-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.06em; margin-bottom: 6px; }
+    h2 { font-size: 1.35rem; letter-spacing: -.03em; }
+    h3 { font-size: 1rem; margin-bottom: 8px; }
+    .muted { color: #697061; }
+    .button, .chip, .icon-button { border: 0; border-radius: 9px; padding: 10px 13px; background: #dbe8d5; color: #253321; font-weight: 700; }
+    .button.primary { background: #2d572c; color: white; }
+    .button.warning { background: #9c431a; color: white; }
+    .icon-button { padding: 8px 10px; }
+    .chip { padding: 5px 9px; font-size: .78rem; display: inline-block; }
+    .chip.active { color: #1d572b; background: #d7edcc; }
+    .chip.ready { color: #8b3a16; background: #ffe0c5; }
+    .chip.fridge { color: #075a69; background: #ccecef; }
+    .card { background: white; border: 1px solid #e3e5dc; border-radius: 15px; padding: 17px; box-shadow: 0 2px 6px #41452a0a; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0; }
+    .batch-card { min-height: 196px; display: flex; flex-direction: column; gap: 12px; }
+    .batch-card .row:last-child { margin-top: auto; }
+    .metric { font-size: 1.6rem; font-weight: 800; letter-spacing: -.06em; }
+    .progress { height: 8px; background: #e8ece3; border-radius: 99px; overflow: hidden; }
+    .progress > span { display: block; height: 100%; background: #5f9655; border-radius: inherit; }
+    .split { display: grid; grid-template-columns: 1.3fr .7fr; gap: 18px; }
+    .list { padding: 0; margin: 0; list-style: none; }
+    .list li { border-top: 1px solid #edf0e9; padding: 12px 0; display: flex; justify-content: space-between; gap: 12px; }
+    .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .action-grid button { border: 1px solid #d6ddd1; background: #fbfcf9; padding: 13px 9px; border-radius: 10px; text-align: left; }
+    .action-grid strong { display: block; margin-bottom: 3px; }
+    .drawer-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 650px; background: white; border: 1px solid #e3e5dc; border-radius: 17px; overflow: hidden; }
+    .side-nav { background: #203726; color: #e9f0e7; padding: 22px 15px; }
+    .side-nav h2 { color: white; }
+    .side-nav button { width: 100%; text-align: left; border: 0; background: transparent; color: inherit; padding: 11px; border-radius: 8px; }
+    .side-nav button.selected { background: #456e47; }
+    .workbench { padding: 28px; }
+    .stepper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 22px 0; }
+    .step { border-top: 4px solid #dce2d6; padding-top: 8px; color: #697061; }
+    .step.current { border-color: #477943; color: #1e251c; font-weight: 700; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    label { display: grid; gap: 6px; font-size: .86rem; font-weight: 700; }
+    input, select, textarea { width: 100%; border: 1px solid #cfd7ca; border-radius: 8px; padding: 10px; font: inherit; background: white; }
+    textarea { min-height: 68px; resize: vertical; }
+    .timeline { border-left: 2px solid #c5d7bd; padding-left: 20px; margin-left: 8px; }
+    .timeline > div { position: relative; padding: 0 0 18px; }
+    .timeline > div::before { content: ''; position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #477943; left: -26px; top: 5px; }
+    .calendar-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); border-top: 1px solid #e5e9df; border-left: 1px solid #e5e9df; }
+    .day { min-height: 93px; padding: 8px; border-right: 1px solid #e5e9df; border-bottom: 1px solid #e5e9df; font-size: .85rem; }
+    .day.muted-day { color: #a6aba2; background: #fafbf8; }
+    .event { margin-top: 5px; padding: 4px 5px; border-radius: 5px; background: #d7edcc; color: #245b2c; font-size: .72rem; font-weight: 700; }
+    .event.ready-event { background: #ffe0c5; color: #8b3a16; }
+    .day.today { outline: 2px solid #477943; outline-offset: -2px; }
+    .state { margin-top: 18px; background: #1f2720; color: #e8f2e4; border-radius: 11px; padding: 12px; font: .78rem ui-monospace, monospace; white-space: pre-wrap; }
+    .switcher { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: #1d211b; color: white; border-radius: 999px; padding: 8px; box-shadow: 0 8px 25px #0005; z-index: 10; }
+    .switcher button { border: 0; width: 34px; height: 34px; border-radius: 50%; background: #e8f1e3; color: #1d211b; font-size: 1.15rem; }
+    .switcher span { min-width: 150px; text-align: center; font-size: .83rem; font-weight: 700; }
+    .hidden { display: none; }
+    @media (max-width: 760px) { .app { padding: 15px; } .cards, .split, .calendar-layout { grid-template-columns: 1fr; } .drawer-layout { grid-template-columns: 1fr; } .side-nav { display: flex; gap: 5px; overflow: auto; padding: 11px; } .side-nav h2 { display: none; } .side-nav button { white-space: nowrap; width: auto; } .workbench { padding: 18px; } .calendar { overflow-x: auto; grid-template-columns: repeat(7, 92px); } .form-row, .action-grid { grid-template-columns: 1fr; } .day { min-height: 76px; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="prototype-note"><strong>THROWAWAY PROTOTYPE.</strong> Three variants of the batch workflow, switchable with the bar below or Left/Right keys. Nothing persists; the state panel makes each interaction visible.</div>
+
+    <section id="variant-a">
+      <div class="topline"><div><h1>Good morning, Peter.</h1><p class="muted">Three batches are asking for attention today.</p></div><button class="button primary" data-action="create">+ Start batch</button></div>
+      <div class="cards">
+        <article class="card batch-card"><div class="row"><span class="chip active">ACTIVE</span><span class="muted">Day 8 of 10</span></div><div><h2>Kombucha F1</h2><p class="muted">2.0 L · finish Aug 9</p></div><div class="progress"><span style="width:80%"></span></div><div class="row"><span><strong>pH 3.4</strong> <small class="muted">today</small></span><button class="button" data-action="open">Open</button></div></article>
+        <article class="card batch-card"><div class="row"><span class="chip ready">READY</span><span class="muted">since Aug 6</span></div><div><h2>Sauerkraut</h2><p class="muted">1.8 kg · 2.1% salt</p></div><p><strong>Decision due:</strong><br><span class="muted">Taste, then move to fridge or extend.</span></p><div class="row"><button class="button warning" data-action="fridge">Move to fridge</button><button class="button" data-action="open">Open</button></div></article>
+        <article class="card batch-card"><div class="row"><span class="chip fridge">TO-FRIDGE</span><span class="muted">Day 16</span></div><div><h2>Jalapeno hot sauce</h2><p class="muted">700 g · started Jul 22</p></div><p class="muted">Cold storage paused its remaining checks.</p><div class="row"><span class="metric">3.7</span><span class="muted">last pH</span></div></article>
+      </div>
+      <div class="split">
+        <section class="card"><div class="detail-head"><h2>One tap, then observe</h2><span class="chip">Kombucha F1</span></div><div class="action-grid"><button data-action="photo"><strong>Add photo</strong><span class="muted">Visual change</span></button><button data-action="metric"><strong>Record metric</strong><span class="muted">pH, temperature, weight</span></button><button data-action="note"><strong>Timeline entry</strong><span class="muted">Note or check completed</span></button></div><div class="composer hidden" id="quick-composer"><textarea aria-label="Timeline note" placeholder="What did you observe?"></textarea><button class="button primary" data-action="save">Save to timeline</button></div></section>
+        <section class="card"><h2>Today</h2><ul class="list"><li><span><strong>Aug 7</strong><br><span class="muted">Taste sauerkraut</span></span><button class="button" data-action="open">Review</button></li><li><span><strong>Aug 9</strong><br><span class="muted">Kombucha expected ready</span></span><button class="button" data-action="calendar">Calendar</button></li></ul></section>
+      </div>
+    </section>
+
+    <section id="variant-b" class="hidden">
+      <div class="drawer-layout"><nav class="side-nav"><h2>FermentStation</h2><button class="selected">Batches</button><button>Calendar</button><button>Profiles</button><button>Trash</button></nav><div class="workbench">
+        <div class="topline"><div><p class="muted">Batch workbench</p><h1>Kombucha F1</h1></div><span class="chip active">ACTIVE · Day 8</span></div>
+        <div class="stepper"><div class="step current">1. Prepare<br><small>inputs copied from profile</small></div><div class="step">2. Observe<br><small>timeline and checks</small></div><div class="step">3. Finish<br><small>ready or to-fridge</small></div></div>
+        <section class="card"><div class="detail-head"><div><h2>Start a batch from a profile</h2><p class="muted">Profile values become suggestions; actual quantities stay with this batch.</p></div><button class="button primary" data-action="create">Start batch</button></div><div class="form-row"><label>Fermentation profile<select><option>Kombucha F1</option><option>Sauerkraut</option><option>Hot sauce</option></select></label><label>Start date<input value="2026-07-30" type="date"></label><label>Sweet tea volume<input value="2.0" type="number"><small class="muted">L actually used</small></label><label>Suggested sugar<input value="160" type="number"><small class="muted">g, calculated from volume</small></label></div></section>
+        <div class="split" style="margin-top:18px"><section class="card"><div class="detail-head"><h2>Timeline</h2><button class="button" data-action="note">+ Entry</button></div><div class="timeline"><div><strong>Today · pH 3.4</strong><br><span class="muted">Inside profile's safe zone. Photo attached.</span></div><div><strong>Aug 5 · Burped jar</strong><br><span class="muted">Scheduled profile check completed.</span></div><div><strong>Jul 30 · Batch started</strong><br><span class="muted">Copied from Kombucha F1.</span></div></div></section><section class="card"><h2>Finish decision</h2><p><strong>Expected finish:</strong> Aug 9</p><p class="muted">The finish date moves this batch to ready. Choosing Ready earlier or To-fridge remains explicit.</p><button class="button" data-action="ready">Mark ready now</button> <button class="button warning" data-action="fridge">To fridge</button></section></div>
+      </div></div>
+    </section>
+
+    <section id="variant-c" class="hidden">
+      <div class="topline"><div><p class="muted">August 2026</p><h1>Fermentation calendar</h1></div><button class="button primary" data-action="create">+ Start batch</button></div>
+      <div class="calendar-layout"><section class="card"><div class="calendar-title"><button class="icon-button">&larr;</button><h2>August</h2><button class="icon-button">&rarr;</button></div><div class="calendar"><div class="day muted-day">27</div><div class="day muted-day">28</div><div class="day muted-day">29</div><div class="day muted-day">30<div class="event">Kombucha started</div></div><div class="day muted-day">31</div><div class="day">1</div><div class="day">2</div><div class="day">3</div><div class="day">4</div><div class="day">5<div class="event">Burp kombucha</div></div><div class="day">6<div class="event ready-event">Sauerkraut ready</div></div><div class="day today">7<div class="event">Taste sauerkraut</div></div><div class="day">8</div><div class="day">9<div class="event ready-event">Kombucha ready</div></div><div class="day">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div><div class="day">15</div><div class="day">16</div></div></section>
+        <aside class="card"><p class="muted">Selected: Aug 7</p><h2>Sauerkraut</h2><span class="chip ready">READY</span><p>Finish date passed yesterday. Taste it and make the storage decision.</p><button class="button primary" data-action="open">Open batch</button><hr style="border:0;border-top:1px solid #edf0e9;margin:18px 0"><h3>Also today</h3><p><strong>Kombucha F1</strong><br><span class="muted">Record pH or photo</span></p><button class="button" data-action="metric">Record metric</button></aside>
+      </div>
+      <div class="card" style="margin-top:18px"><h2>Start from the schedule</h2><p class="muted">The profile determines suggested duration, checks, guidance, inputs, and calculations. The batch can override them.</p><button class="button" data-action="create">Choose profile and start date</button></div>
+    </section>
+
+    <pre class="state" id="state"></pre>
+  </main>
+  <div class="switcher" aria-label="Prototype variant switcher"><button id="previous" aria-label="Previous variant">&larr;</button><span id="variant-label"></span><button id="next" aria-label="Next variant">&rarr;</button></div>
+  <script>
+    // Three variants of the batch workflow, switchable via ?variant=A|B|C.
+    const variants = [
+      ['A', 'Dashboard-first'],
+      ['B', 'Batch workbench'],
+      ['C', 'Calendar-first'],
+    ];
+    const state = { selectedBatch: 'Kombucha F1', status: 'active', lastAction: 'Viewing prototype', timelineEntries: 3 };
+    let key = new URLSearchParams(location.search).get('variant') || 'A';
+    if (!variants.some(([id]) => id === key)) key = 'A';
+    const render = () => {
+      for (const [id] of variants) document.querySelector(`#variant-${id.toLowerCase()}`).classList.toggle('hidden', id !== key);
+      document.querySelector('#variant-label').textContent = `${key} - ${variants.find(([id]) => id === key)[1]}`;
+      document.querySelector('#state').textContent = `Visible state\n${JSON.stringify(state, null, 2)}`;
+      const url = new URL(location);
+      url.searchParams.set('variant', key);
+      history.replaceState({}, '', url);
+    };
+    const cycle = direction => { key = variants[(variants.findIndex(([id]) => id === key) + direction + variants.length) % variants.length][0]; render(); };
+    document.querySelector('#previous').onclick = () => cycle(-1);
+    document.querySelector('#next').onclick = () => cycle(1);
+    document.addEventListener('keydown', event => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) || document.activeElement.isContentEditable) return;
+      if (event.key === 'ArrowLeft') cycle(-1);
+      if (event.key === 'ArrowRight') cycle(1);
+    });
+    document.addEventListener('click', event => {
+      const action = event.target.closest('[data-action]')?.dataset.action;
+      if (!action) return;
+      if (action === 'note' || action === 'photo' || action === 'metric') {
+        document.querySelector('#quick-composer')?.classList.remove('hidden');
+        state.lastAction = `${action} entry opened`;
+      } else if (action === 'save') {
+        state.timelineEntries += 1;
+        state.lastAction = 'Timeline entry saved';
+      } else if (action === 'fridge') {
+        state.status = 'to-fridge';
+        state.lastAction = 'Moved selected batch to cold storage';
+      } else if (action === 'ready') {
+        state.status = 'ready';
+        state.lastAction = 'Marked selected batch ready';
+      } else {
+        state.lastAction = `${action} flow selected`;
+      }
+      render();
+    });
+    render();
+  </script>
+</body>
+</html>

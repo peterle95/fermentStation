@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "fileName": "fermentstation-v1-prototype.html",
+  "currentVersionId": "3da3395e-abb1-4807-819c-63e7fbb7d881",
+  "entries": [
+    {
+      "id": "3da3395e-abb1-4807-819c-63e7fbb7d881",
+      "fileName": "fermentstation-v1-prototype.html",
+      "version": 1,
+      "label": "Version 1",
+      "createdAt": 1786126113998,
+      "source": "ai",
+      "prompt": "Create a polished responsive visual prototype for FermentStation v1, a personal household fermentation tracker. This is a design concept only, not production application code. Build it as a browser-viewable artifact within this project.\n\nUse a calm workshop visual language: warm natural materials, practical tools, measurement clarity, grounded and non-generic. Avoid health-dashboard aesthetics.\n\nCreate concrete desktop and Android-responsive states for these core screens: Today dashboard, Batches, Calendar, Profiles, and an individual Batch workspace. Desktop navigation is a persistent sidebar; Android navigation uses bottom tabs. Primary destinations are Today, Batches, Calendar, Profiles; Settings belongs in an overflow/menu.\n\nToday prioritizes an action queue: overdue/due profile checks and batches ready today. Follow it with active batch cards and a compact upcoming calendar. Include a persistent Add observation action.\n\nThe Batch workspace uses a desktop two-column workbench: status/next action/key measurements beside the dated timeline entries. On Android, stack the same sections in one scrolling view without changing the workflow.\n\nUse established terminology precisely: batch, fermentation profile, profile input, profile guidance, profile check, profile calculation, suggested value, timeline entry, and statuses active, ready, to-fridge. Show optional pH readings and zones in a restrained, readable way. Status cues must use text labels plus accessible color and simple icons: amber active attention, green ready, blue to-fridge, neutral archived/trash. Color must not be the sole signal.\n\nMake desktop and phone layouts clearly inspectable. Use realistic content (e.g. kombucha F1, sauerkraut), good hierarchy, typography, responsive behavior, and accessible contrast. Do not add backend or production architecture.",
+      "size": 74493,
+      "mime": "text/html; charset=utf-8",
+      "kind": "html",
+      "contentPath": "0001-3da3395e-abb1-4807-819c-63e7fbb7d881.html",
+      "contentDigest": "bbfb9556e3c2e6a4e1663cda5d4ba4bb8128b29e4547dad24ffa2fa7220428f3",
+      "promptSource": "message"
+    }
+  ]
+}
