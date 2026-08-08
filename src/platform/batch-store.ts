@@ -140,17 +140,7 @@ export function createBatchStore(storage: KeyValueStore): BatchStore {
         if (Array.isArray(state) && state.every(isBatch)) {
           return createBatchState(state.map(normalizeBatch));
         }
-        if (!state || typeof state !== "object") return null;
-        const candidate = state as BatchState;
-        return Array.isArray(candidate.batches) && candidate.batches.every(isBatch) &&
-          Array.isArray(candidate.trash) && candidate.trash.every(
-            (batch) => isBatch(batch) && typeof batch.deletedAt === "number",
-          )
-          ? {
-              batches: candidate.batches.map(normalizeBatch),
-              trash: candidate.trash.map((batch) => ({ ...normalizeBatch(batch), deletedAt: batch.deletedAt })),
-            }
-          : null;
+        return parseBatchState(state);
       } catch {
         return null;
       }
@@ -163,6 +153,20 @@ export function createBatchStore(storage: KeyValueStore): BatchStore {
       }
     },
   };
+}
+
+export function parseBatchState(state: unknown): BatchState | null {
+  if (!state || typeof state !== "object") return null;
+  const candidate = state as BatchState;
+  return Array.isArray(candidate.batches) && candidate.batches.every(isBatch) &&
+    Array.isArray(candidate.trash) && candidate.trash.every(
+      (batch) => isBatch(batch) && typeof batch.deletedAt === "number",
+    )
+    ? {
+        batches: candidate.batches.map(normalizeBatch),
+        trash: candidate.trash.map((batch) => ({ ...normalizeBatch(batch), deletedAt: batch.deletedAt })),
+      }
+    : null;
 }
 
 export const browserBatchStore: BatchStore = {
