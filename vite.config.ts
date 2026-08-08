@@ -6,6 +6,9 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    watch: {
+      ignored: ["**/src-tauri/target/**"],
+    },
   },
   test: {
     environment: "node",
