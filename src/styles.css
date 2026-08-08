@@ -150,6 +150,19 @@ h2 {
   padding: 1.25rem;
 }
 
+.settings {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  max-width: 42rem;
+}
+
+.settings > label {
+  display: grid;
+  font-weight: 700;
+  gap: 0.4rem;
+}
+
 .profile-form label {
   display: grid;
   font-weight: 700;

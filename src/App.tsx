@@ -51,6 +51,12 @@ import {
 import { browserShellStore } from "./platform/shell-store";
 import { browserProfileStore } from "./platform/profile-store";
 import { browserBatchStore } from "./platform/batch-store";
+import {
+  createArchive,
+  importArchive,
+  resolveArchiveCollisions,
+  type ArchiveImport,
+} from "./platform/archive";
 
 const labels: Record<Destination, string> = {
   today: "Today",
@@ -163,6 +169,15 @@ export function App() {
               onRestore={(id) => saveProfiles(restoreProfile(profileState, id, Date.now()))}
               onSave={handleProfile}
             />
+          ) : shell.destination === "settings" ? (
+            <SettingsView
+              batchState={batchState}
+              profileState={profileState}
+              onImport={(profiles, importedBatches) => {
+                saveProfiles(profiles);
+                saveBatches(importedBatches);
+              }}
+            />
           ) : (
             <section aria-label={`${labels[shell.destination]} placeholder`} className="empty-state">
               <p>{descriptions[shell.destination]}</p>
@@ -172,6 +187,83 @@ export function App() {
         </main>
       </div>
     </div>
+  );
+}
+
+interface SettingsViewProps {
+  batchState: BatchState;
+  profileState: ReturnType<typeof createProfileState>;
+  onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
+}
+
+function SettingsView({ batchState, profileState, onImport }: SettingsViewProps) {
+  const [message, setMessage] = useState("");
+  const [pendingImport, setPendingImport] = useState<ArchiveImport | null>(null);
+
+  async function downloadArchive() {
+    const bytes = await createArchive(profileState, batchState);
+    const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: "application/zip" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `fermentstation-${localDate()}.zip`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setMessage("Archive exported locally.");
+  }
+
+  async function uploadArchive(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const imported = await importArchive(
+        new Uint8Array(await file.arrayBuffer()),
+        profileState,
+        batchState,
+      );
+      setPendingImport(imported.collisions.length > 0 ? imported : null);
+      if (imported.collisions.length > 0) {
+        setMessage("Import paused. Resolve the listed identifier collisions before changing local data.");
+      } else {
+        onImport(imported.profileState, imported.batchState);
+        setMessage("Archive imported.");
+      }
+    } catch (error) {
+      setPendingImport(null);
+      setMessage(`Import rejected: ${(error as Error).message}`);
+    } finally {
+      event.target.value = "";
+    }
+  }
+
+  return (
+    <section className="settings" aria-label="Local backup and transfer">
+      <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
+      <button className="primary-action" onClick={downloadArchive} type="button">Export ZIP archive</button>
+      <label>Import ZIP archive <input accept=".zip,application/zip" onChange={uploadArchive} type="file" /></label>
+      {message && <p className="notice" role="status">{message}</p>}
+      {pendingImport && (
+        <section className="trash" aria-label="Import collisions">
+          <h3>Identifier collisions</h3>
+          {pendingImport.collisions.map((collision) => (
+            <p key={`${collision.kind}-${collision.id}`}>{collision.kind}: {collision.id}</p>
+          ))}
+          <div className="form-actions">
+            <button onClick={() => {
+              const resolved = resolveArchiveCollisions(pendingImport, "local");
+              onImport(resolved.profileState, resolved.batchState);
+              setPendingImport(null);
+              setMessage("Archive imported with local records kept for collisions.");
+            }} type="button">Keep local versions</button>
+            <button onClick={() => {
+              const resolved = resolveArchiveCollisions(pendingImport, "archive");
+              onImport(resolved.profileState, resolved.batchState);
+              setPendingImport(null);
+              setMessage("Archive imported with archive records used for collisions.");
+            }} type="button">Use archive versions</button>
+          </div>
+        </section>
+      )}
+    </section>
   );
 }
 

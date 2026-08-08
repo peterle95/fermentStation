@@ -201,4 +201,14 @@ describe("batch workflow", () => {
       .toBe("Unsaved cover-screen observation");
     expect(screen.getByText("More")).toBeTruthy();
   });
+
+  it("exposes explicit local ZIP exchange without live database sync", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+
+    expect(screen.getByRole("button", { name: "Export ZIP archive" })).toBeTruthy();
+    expect(screen.getByLabelText("Import ZIP archive")).toBeTruthy();
+    expect(screen.getByText(/Live databases and app-private directories are never synchronized/))
+      .toBeTruthy();
+  });
 });

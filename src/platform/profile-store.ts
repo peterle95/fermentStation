@@ -85,13 +85,7 @@ export function createProfileStore(storage: KeyValueStore): ProfileStore {
           return null;
         }
 
-        const state: unknown = JSON.parse(value);
-        return isProfileState(state) ? {
-          profiles: state.profiles.map(normalizeProfile),
-          trash: state.trash.map((profile) => ({
-            ...normalizeProfile(profile), deletedAt: profile.deletedAt,
-          })),
-        } : null;
+        return parseProfileState(JSON.parse(value));
       } catch {
         return null;
       }
@@ -104,6 +98,15 @@ export function createProfileStore(storage: KeyValueStore): ProfileStore {
       }
     },
   };
+}
+
+export function parseProfileState(state: unknown): ProfileState | null {
+  return isProfileState(state) ? {
+    profiles: state.profiles.map(normalizeProfile),
+    trash: state.trash.map((profile) => ({
+      ...normalizeProfile(profile), deletedAt: profile.deletedAt,
+    })),
+  } : null;
 }
 
 export const browserProfileStore: ProfileStore = {
