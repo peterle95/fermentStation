@@ -113,6 +113,86 @@ h2 {
   margin-top: 0.75rem;
 }
 
+.profiles,
+.profile-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  max-width: 44rem;
+}
+
+.primary-action {
+  background: #9d4934;
+  border: 1px solid #9d4934;
+  border-radius: 0.6rem;
+  color: #fff9f1;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+  width: fit-content;
+}
+
+.profile-form,
+.profile-card,
+.trash {
+  background: #fffaf3;
+  border: 1px solid #dfd2c2;
+  border-radius: 0.9rem;
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.profile-form label {
+  display: grid;
+  font-weight: 700;
+  gap: 0.4rem;
+}
+
+input,
+textarea {
+  background: #fff;
+  border: 1px solid #bdaea0;
+  border-radius: 0.4rem;
+  font: inherit;
+  padding: 0.6rem;
+}
+
+textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.profile-card h3,
+.trash h3,
+.profile-card p,
+.trash p {
+  margin: 0;
+}
+
+.profile-card p,
+.trash p {
+  line-height: 1.5;
+}
+
+.form-actions,
+.trash-item {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.form-actions button:not(.primary-action),
+.trash-item button {
+  background: transparent;
+  border: 1px solid #9d4934;
+  border-radius: 0.6rem;
+  color: #9d4934;
+  cursor: pointer;
+  padding: 0.55rem 0.8rem;
+}
+
 @media (max-width: 700px) {
   .app-shell {
     padding-bottom: 6rem;
