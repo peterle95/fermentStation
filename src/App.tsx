@@ -93,6 +93,7 @@ export function App() {
       discardExpiredBatches(browserBatchStore.load() ?? createBatchState(), Date.now()),
     ),
   );
+  const [openBatchId, setOpenBatchId] = useState<string | null>(null);
 
   function saveProfiles(next: typeof profileState) {
     const current = discardExpiredProfiles(next, Date.now());
@@ -104,6 +105,7 @@ export function App() {
     const next = selectDestination(shell, destination);
     browserShellStore.save(next);
     setShell(next);
+    setOpenBatchId(null);
   }
 
   function saveBatches(next: BatchState) {
@@ -119,13 +121,11 @@ export function App() {
 
   return (
     <div className="app-shell">
-      <header className="masthead">
-        <p className="eyebrow">Household fermentation</p>
-        <h1>FermentStation</h1>
-        <p className="intro">Keep the next small action close at hand.</p>
-      </header>
-
-      <div className="layout">
+      <aside className="sidebar">
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true">FS</span>
+          <div><strong>FermentStation</strong><span>Household ferment log</span></div>
+        </div>
         <nav aria-label="Primary navigation" className="navigation">
           {destinations.map((destination) => (
             <button
@@ -136,20 +136,30 @@ export function App() {
               onClick={() => navigate(destination)}
               type="button"
             >
+              <span className="nav-mark" aria-hidden="true">{labels[destination][0]}</span>
               {destination === "settings" ? (
                 <><span className="desktop-label">Settings</span><span className="mobile-label">More</span></>
               ) : labels[destination]}
             </button>
           ))}
         </nav>
+      </aside>
 
-        <main>
-          <p className="eyebrow">{labels[shell.destination]}</p>
+      <div className="content-shell">
+        <header className="masthead">
+          <div><strong>FermentStation</strong><span>Household ferment log</span></div>
+        </header>
+
+        <main className="main-content">
+          <p className="eyebrow">{shell.destination === "today" ? formatToday() : labels[shell.destination]}</p>
           <h2>{labels[shell.destination]}</h2>
+          <p className="screen-intro">{screenDescription(shell.destination)}</p>
           {shell.destination === "today" || shell.destination === "batches" ? (
             <BatchView
               batches={batchState.batches}
               mode={shell.destination}
+              onOpen={setOpenBatchId}
+              openBatchId={openBatchId}
               onChange={(next) => saveBatches({
                 ...batchState,
                 batches: batchState.batches.map((batch) => batch.id === next.id ? next : batch),
@@ -198,6 +208,19 @@ export function App() {
       </div>
     </div>
   );
+}
+
+function formatToday() {
+  return new Intl.DateTimeFormat(undefined, { weekday: "long", month: "long", day: "numeric" })
+    .format(new Date(`${localDate()}T12:00:00`));
+}
+
+function screenDescription(destination: Destination) {
+  if (destination === "today") return "The next small actions for your active ferments.";
+  if (destination === "batches") return "Every jar and crock, with its own dated timeline.";
+  if (destination === "calendar") return "Finish dates and recurring profile checks.";
+  if (destination === "profiles") return "Reusable guidance, calculations, and check rhythms.";
+  return "Preferences and local data exchange.";
 }
 
 interface SettingsViewProps {
@@ -353,15 +376,22 @@ interface BatchViewProps {
   onChange(batch: Batch): void;
   onCreate(batch: Batch): void;
   onDelete(id: string): void;
+  onOpen(id: string | null): void;
   onRestore(id: string): void;
+  openBatchId: string | null;
 }
 
-function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelete, onRestore }: BatchViewProps) {
+function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelete, onOpen, onRestore, openBatchId }: BatchViewProps) {
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<BatchFilter>("all");
   const [profileId, setProfileId] = useState(profiles[0]?.id ?? "");
+  const overviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const selectedProfile = profiles.find(({ id }) => id === profileId) ?? profiles[0];
   const visible = mode === "today" ? prioritizeToday(batches, localDate()) : filterBatches(batches, filter);
+  const openBatch = visible.find(({ id }) => id === openBatchId);
+  const dueChecks = visible.flatMap((batch) => dueBatchChecks(batch, localDate()).map((check) => ({ batch, check })));
+  const readyBatches = visible.filter(({ status }) => status === "ready");
+  const upcoming = calendarEvents(batches).filter(({ date }) => date >= localDate()).slice(0, 7);
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -372,23 +402,35 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
       return;
     }
 
-    onCreate(
-      createBatch(profile, {
-        id: crypto.randomUUID(),
-        name: String(data.get("name") ?? ""),
-        startDate,
-        today: localDate(),
-        inputValues: Object.fromEntries(profile.inputs.map((input) => {
-          const raw = String(data.get(`input.${input.name}`) ?? "");
-          return [input.name, raw === "" ? undefined : Number(raw)];
-        })),
-      }),
-    );
+    const batch = createBatch(profile, {
+      id: crypto.randomUUID(),
+      name: String(data.get("name") ?? ""),
+      startDate,
+      today: localDate(),
+      inputValues: Object.fromEntries(profile.inputs.map((input) => {
+        const raw = String(data.get(`input.${input.name}`) ?? "");
+        return [input.name, raw === "" ? undefined : Number(raw)];
+      })),
+    });
+    onCreate(batch);
+    onOpen(batch.id);
     setCreating(false);
+  }
+
+  function closeBatch() {
+    onOpen(null);
+    requestAnimationFrame(() => overviewHeadingRef.current?.focus());
   }
 
   return (
     <section className="batches" aria-label={mode === "today" ? "Today batch queue" : "Batch list"}>
+      {openBatch ? (
+        <>
+          <button autoFocus className="back-link" onClick={closeBatch} type="button">← Back to {mode}</button>
+          <BatchCard batch={openBatch} onChange={onChange} onDelete={onDelete} />
+        </>
+      ) : (
+      <>
       <div className="batch-toolbar">
         <button
           className="primary-action"
@@ -398,17 +440,6 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
         >
           Start batch
         </button>
-        {mode === "batches" && (
-          <label className="batch-filter">
-            Status
-            <select onChange={(event) => setFilter(event.target.value as BatchFilter)} value={filter}>
-              <option value="all">All statuses</option>
-              {batchStatuses.map((status) => (
-                <option key={status} value={status}>{statusLabel(status)}</option>
-              ))}
-            </select>
-          </label>
-        )}
       </div>
 
       {profiles.length === 0 && <p className="notice">Restore or create a profile before starting a batch.</p>}
@@ -444,17 +475,70 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
         </form>
       )}
 
+      {mode === "today" && (dueChecks.length > 0 || readyBatches.length > 0) && (
+        <section className="action-queue" aria-labelledby="action-queue-heading">
+          <h3 className="section-heading" id="action-queue-heading">Action queue <span>due now</span></h3>
+          <div className="queue-grid">
+            {dueChecks.map(({ batch, check }) => (
+              <article className="queue-card attention" key={`${batch.id}-${check.id}`}>
+                <span className="queue-icon" aria-hidden="true">!</span>
+                <div><small>{check.overdue ? `Overdue · ${check.nextDueDate}` : "Due today"}</small><strong>{check.name} for {batch.name}</strong><p>{batch.profileSnapshot.guidance || "Open the batch and record what you find."}</p></div>
+                <button aria-label={`Open ${batch.name} for ${check.name}`} className="primary-action" onClick={() => onOpen(batch.id)} type="button">Open batch</button>
+              </article>
+            ))}
+            {readyBatches.map((batch) => (
+              <article className="queue-card ready" key={`ready-${batch.id}`}>
+                <span className="queue-icon" aria-hidden="true">✓</span>
+                <div><small>Ready</small><strong>{batch.name} reached its finish date</strong><p>Review the batch and choose its next status.</p></div>
+                <button aria-label={`Open ready batch ${batch.name}`} className="primary-action" onClick={() => onOpen(batch.id)} type="button">Open batch</button>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {mode === "batches" && (
+        <div className="filter-row" role="group" aria-label="Filter batches by status">
+          {(["all", ...batchStatuses] as BatchFilter[]).map((status) => (
+            <button aria-pressed={filter === status} key={status} onClick={() => setFilter(status)} type="button">
+              {status === "all" ? "All" : statusLabel(status)}
+            </button>
+          ))}
+        </div>
+      )}
+
       {visible.length === 0 ? (
         <section className="empty-state">
           <p>{batches.length === 0 ? "No batches yet." : "No batches match this status."}</p>
           <p>Start one from a fermentation profile when you are ready.</p>
         </section>
       ) : (
-        <div className="batch-list">
-          {visible.map((batch) => (
-            <BatchCard batch={batch} key={batch.id} onChange={onChange} onDelete={onDelete} />
-          ))}
-        </div>
+        <section aria-labelledby="batch-overview-heading">
+          <h3 className="section-heading" id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>{mode === "today" ? "Active batches" : "Batch overview"}</h3>
+          <div className="batch-overview">
+            {visible.map((batch) => <CompactBatchCard batch={batch} key={batch.id} onOpen={onOpen} />)}
+          </div>
+        </section>
+      )}
+
+      {mode === "today" && upcoming.length > 0 && (
+        <section aria-labelledby="upcoming-heading">
+          <h3 className="section-heading" id="upcoming-heading">Upcoming <span>next 7 events</span></h3>
+          <div className="upcoming-strip">
+            {upcoming.map((event) => {
+              const date = new Date(`${event.date}T12:00:00`);
+              return (
+                <button key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
+                  <time dateTime={event.date}><strong>{date.getDate()}</strong>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</time>
+                  <span className={`event-${event.kind}`}>{event.label}</span>
+                  <small>{event.batchName}</small>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+      </>
       )}
       {trash.length > 0 && (
         <section className="trash" aria-label="Deleted batches">
@@ -469,6 +553,22 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
         </section>
       )}
     </section>
+  );
+}
+
+function CompactBatchCard({ batch, onOpen }: { batch: Batch; onOpen(id: string): void }) {
+  const nextCheck = batch.status === "active" ? [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0] : undefined;
+  const latestPh = latestPhReading(batch);
+  const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
+  return (
+    <article className="batch-summary">
+      <div className="summary-heading"><span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span><small>{batch.id.slice(0, 8)}</small></div>
+      <h3>{batch.name}</h3>
+      <p>{batch.profileSnapshot.name}</p>
+      <div className="summary-metrics"><span>Day {day}</span>{latestPh && <span>pH {latestPh.value}</span>}</div>
+      <p className="summary-next"><strong>Next:</strong> {nextCheck ? `${nextCheck.name} · ${nextCheck.nextDueDate}` : batch.finishDate ? `Finish · ${batch.finishDate}` : "Review timeline"}</p>
+      <button aria-label={`Open ${batch.name}`} onClick={() => onOpen(batch.id)} type="button">Open batch</button>
+    </article>
   );
 }
 
