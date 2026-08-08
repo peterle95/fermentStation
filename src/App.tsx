@@ -30,6 +30,7 @@ import {
   type BatchState,
   type BatchStatus,
   type TimelineEntry,
+  type TrashedBatch,
   updateBatchForDate,
   updatePhReading,
 } from "./domain/batches";
@@ -82,6 +83,22 @@ function localDate() {
     .slice(0, 10);
 }
 
+function NavIcon({ destination }: { destination: Destination }) {
+  if (destination === "today") return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="4" /><path d="M12 9V5M10 5h4M12 2l1.5 3h-3zM2 13h3M19 13h3M5 5l2 2M19 5l-2 2" /></svg>;
+  if (destination === "batches") return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3h8M9 3v3l-3 9a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3l-3-9V3M7 14h10" /></svg>;
+  if (destination === "calendar") return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M8 3v4M16 3v4M3 10h18M8 14h2M14 14h2M8 17.5h2" /></svg>;
+  if (destination === "profiles") return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M11 3.5c2 1 3.5 3 3.5 5.5 0 1-.3 2-.8 2.8l7.3 7.3v1.4H14l-2-2h-2.5M4 5.5c1.8 1.6 3 3.8 3 6.2v1.8H4.5a2.5 2.5 0 0 1 0-5H5M5 19.5l-1-1.5" /></svg>;
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19 12a7 7 0 0 0-.1-1l2.1-1.6-2-3.4-2.5 1a7 7 0 0 0-1.7-1L14.4 3h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.5-1-2 3.4L6 11a7 7 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.5 1 2-3.4-2.1-1.6a7 7 0 0 0 .1-1z" /></svg>;
+}
+
+function StatusIcon({ status }: { status: BatchStatus | "attention" | "archived" }) {
+  if (status === "ready") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 12.5l5 5 10-11" /></svg>;
+  if (status === "to-fridge") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM8 9h.5M8 15.5h.5" /></svg>;
+  if (status === "archived") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M6 7l1.5 13h9L18 7M9 11v5M15 11v5M9 3h6l1 4H8z" /></svg>;
+  if (status === "attention") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7.5V12M12 15.8v.2" /></svg>;
+  return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3.2" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></svg>;
+}
+
 export function App() {
   const [shell, setShell] = useState(
     () => browserShellStore.load() ?? createShellState(),
@@ -124,8 +141,8 @@ export function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark" aria-hidden="true">FS</span>
-          <div><strong>FermentStation</strong><span>Household ferment log</span></div>
+          <span className="brand-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 3h4M12 3v6M6.5 9h11a.5.5 0 0 1 .5.5v1a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3v-1a.5.5 0 0 1 .5-.5zM7.5 13.5c0 2.5.9 4.2 2.5 5.2v1.8h4v-1.8c1.6-1 2.5-2.7 2.5-5.2M10 20.5h4" /></svg></span>
+          <div><strong>FermentStation</strong><span>Household · v1 concept</span></div>
         </div>
         <nav aria-label="Primary navigation" className="navigation">
           {destinations.map((destination) => (
@@ -137,9 +154,9 @@ export function App() {
               onClick={() => navigate(destination)}
               type="button"
             >
-              <span className="nav-mark" aria-hidden="true">{labels[destination][0]}</span>
+              <span className="nav-mark" aria-hidden="true"><NavIcon destination={destination} /></span>
               {destination === "settings" ? (
-                <><span className="desktop-label">Settings</span><span className="mobile-label">More</span></>
+                <span>More</span>
               ) : labels[destination]}
             </button>
           ))}
@@ -148,7 +165,8 @@ export function App() {
 
       <div className="content-shell">
         <header className="masthead">
-          <div><strong>FermentStation</strong><span>Household ferment log</span></div>
+          <div><strong>{labels[shell.destination]}</strong><span>{shell.destination === "batches" ? "6 batches · 3 fermenting" : "FermentStation · v1"}</span></div>
+          <button aria-label="More options" className="masthead-menu" type="button">•••</button>
         </header>
 
         <main className="main-content">
@@ -181,10 +199,14 @@ export function App() {
               />
             </section>
           ) : shell.destination === "batches" ? (
-            <>
-              <p className="eyebrow">Batches</p>
-              <h2>Batches</h2>
-              <p className="screen-intro">{screenDescription("batches")}</p>
+            <section className="batches-screen" aria-label="All batches">
+              <div className="screen-head">
+                <div>
+                  <p className="eyebrow">All jars &amp; crocks</p>
+                  <h1>Batches</h1>
+                  <p className="screen-intro">{screenDescription("batches")}</p>
+                </div>
+              </div>
             <BatchView
               batches={batchState.batches}
               mode="batches"
@@ -203,7 +225,7 @@ export function App() {
               profiles={profileState.profiles}
               trash={batchState.trash}
             />
-            </>
+            </section>
           ) : shell.destination === "calendar" ? (
             <section className="calendar-screen" aria-label="Fermentation calendar">
               <div className="screen-head">
@@ -265,7 +287,7 @@ function formatToday() {
 
 function screenDescription(destination: Destination) {
   if (destination === "today") return "The next small actions for your active ferments.";
-  if (destination === "batches") return "Every jar and crock, with its own dated timeline.";
+  if (destination === "batches") return "Every batch belongs to a fermentation profile and keeps its own dated timeline.";
   if (destination === "calendar") return "Finish dates and recurring profile checks.";
   if (destination === "profiles") return "Reusable guidance, calculations, and check rhythms.";
   return "Preferences and local data exchange.";
@@ -485,7 +507,7 @@ interface BatchViewProps {
   batches: Batch[];
   mode: "today" | "batches";
   profiles: FermentationProfile[];
-  trash: { id: string; name: string; deletedAt: number }[];
+  trash: TrashedBatch[];
   onChange(batch: Batch): void;
   onCreate(batch: Batch): void;
   onDelete(id: string): void;
@@ -495,13 +517,17 @@ interface BatchViewProps {
   openBatchId: string | null;
 }
 
+type BatchListFilter = BatchFilter | "attention" | "archived";
+
 function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelete, onNavigate, onOpen, onRestore, openBatchId }: BatchViewProps) {
   const [creating, setCreating] = useState(false);
-  const [filter, setFilter] = useState<BatchFilter>("all");
+  const [filter, setFilter] = useState<BatchListFilter>("all");
   const [profileId, setProfileId] = useState(profiles[0]?.id ?? "");
   const overviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const selectedProfile = profiles.find(({ id }) => id === profileId) ?? profiles[0];
-  const visible = mode === "today" ? prioritizeToday(batches, localDate()) : filterBatches(batches, filter);
+  const visible = mode === "today" ? prioritizeToday(batches, localDate()) : filter === "attention"
+    ? batches.filter((batch) => batch.status === "active" && dueBatchChecks(batch, localDate()).length > 0)
+    : filter === "archived" ? trash : filterBatches(batches, filter);
   const openBatch = visible.find(({ id }) => id === openBatchId);
   const dueChecks = visible.flatMap((batch) => dueBatchChecks(batch, localDate()).map((check) => ({ batch, check })));
   const readyBatches = visible.filter(({ status }) => status === "ready");
@@ -554,12 +580,13 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
       <>
       {mode === "batches" && <div className="batch-toolbar">
         <button
-          className="primary-action"
+          aria-label="Start batch"
+          className="primary-action batch-fab"
           disabled={profiles.length === 0}
           onClick={() => setCreating(true)}
           type="button"
         >
-          Start batch
+          <span aria-hidden="true">+</span><span>Start batch</span>
         </button>
       </div>}
 
@@ -632,9 +659,9 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
 
       {mode === "batches" && (
         <div className="filter-row" role="group" aria-label="Filter batches by status">
-          {(["all", ...batchStatuses] as BatchFilter[]).map((status) => (
+          {(["all", "attention", ...batchStatuses, "archived"] as BatchListFilter[]).map((status) => (
             <button aria-pressed={filter === status} key={status} onClick={() => setFilter(status)} type="button">
-              {status === "all" ? "All" : statusLabel(status)}
+              {status === "all" ? "All" : status === "attention" ? "Active · attention" : status === "archived" ? "Archived" : statusLabel(status)}
             </button>
           ))}
         </div>
@@ -646,15 +673,15 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
           <p>Start one from a fermentation profile when you are ready.</p>
         </section>
       ) : (
-        <section aria-labelledby="batch-overview-heading">
+        <section aria-label={mode === "batches" ? "Batch overview" : undefined} aria-labelledby={mode === "today" ? "batch-overview-heading" : undefined}>
           {mode === "today" ? (
             <div className="section-label">
               <h2 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>Active batches</h2>
               <a href="#batches" onClick={(event) => { event.preventDefault(); onNavigate("batches"); }}>All batches</a>
             </div>
-          ) : <h3 className="section-heading" id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>Batch overview</h3>}
+          ) : null}
           <div className="batch-overview">
-            {visible.map((batch) => <CompactBatchCard batch={batch} key={batch.id} onOpen={onOpen} />)}
+            {visible.map((batch) => <CompactBatchCard archived={filter === "archived"} batch={batch} key={batch.id} mode={mode} onOpen={onOpen} />)}
           </div>
         </section>
       )}
@@ -696,17 +723,20 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
   );
 }
 
-function CompactBatchCard({ batch, onOpen }: { batch: Batch; onOpen(id: string): void }) {
+function CompactBatchCard({ archived, batch, mode, onOpen }: { archived?: boolean; batch: Batch; mode: "today" | "batches"; onOpen(id: string): void }) {
   const nextCheck = batch.status === "active" ? [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0] : undefined;
   const latestPh = latestPhReading(batch);
   const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
+  const next = archived ? "" : nextCheck ? `${nextCheck.name} · ${nextCheck.nextDueDate}` : batch.finishDate ? `Finish · ${batch.finishDate}` : "Review timeline";
+  const isAttention = batch.status === "active" && dueBatchChecks(batch, localDate()).length > 0;
+  const statusText = archived ? "Archived" : isAttention ? "Active · attention" : statusLabel(batch.status);
   return (
-    <button aria-label={`Open ${batch.name}`} className="batch-summary" onClick={() => onOpen(batch.id)} type="button">
-      <div className="summary-heading"><small>{batch.id.slice(0, 8)}</small><span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span></div>
+    <button aria-label={`Open ${batch.name}`} className={mode === "batches" ? "batch-card" : "batch-summary"} onClick={() => onOpen(batch.id)} type="button">
+      <div className={mode === "batches" ? "bc-top" : "summary-heading"}><small className={mode === "batches" ? "bc-id" : undefined}>{batch.id.slice(0, 8)}</small><span className={`status status-${archived ? "archived" : isAttention ? "attention" : batch.status}`}><StatusIcon status={archived ? "archived" : isAttention ? "attention" : batch.status} />{statusText}</span></div>
       <h3>{batch.name}</h3>
-      <p>{batch.profileSnapshot.name}</p>
-      <div className="summary-metrics"><span>Day {day}</span>{latestPh && <span>pH {latestPh.value}</span>}</div>
-      <p className="summary-next"><strong>Next:</strong> {nextCheck ? `${nextCheck.name} · ${nextCheck.nextDueDate}` : batch.finishDate ? `Finish · ${batch.finishDate}` : "Review timeline"}</p>
+      <p className={mode === "batches" ? "bc-name" : undefined}>{batch.profileSnapshot.name}</p>
+      <div className={mode === "batches" ? "bc-metrics" : "summary-metrics"}><span>Day {day}</span>{latestPh && <span>pH {latestPh.value}</span>}</div>
+      {!archived && <p className={mode === "batches" ? "bc-next" : "summary-next"}><strong>Next:</strong> {next}</p>}
     </button>
   );
 }
