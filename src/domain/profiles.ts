@@ -112,11 +112,46 @@ const units: Record<MetricUnit, { family: Quantity["family"]; scale: number }> =
   l: { family: "volume", scale: 1000 },
 };
 
+export function parseSimpleFormula(formula: string): {
+  source: string;
+  operator: "+" | "-" | "*" | "/";
+  operand: string;
+  percentage: boolean;
+} | null {
+  const match = formula.match(/^([A-Za-z][A-Za-z0-9_]*)\s*([+\-*/])\s*((?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+\-]?\d+)?)(%)?$/);
+  return match ? {
+    source: match[1],
+    operator: match[2] as "+" | "-" | "*" | "/",
+    operand: match[3],
+    percentage: Boolean(match[4]),
+  } : null;
+}
+
 export function calculateProfileValue(
   profile: FermentationProfile,
   calculation: ProfileCalculation,
   values: Record<string, number | undefined>,
 ): number | null {
+  const simple = parseSimpleFormula(calculation.formula);
+  if (simple) {
+    const input = profile.inputs.find(({ name }) => name === simple.source);
+    if (!input) throw new Error(`Unknown input ${simple.source}`);
+    const value = values[input.name] ?? input.defaultValue;
+    if (value === undefined) return null;
+    let operand = Number(simple.operand);
+    if (simple.percentage) {
+      if (operand > 100) throw new Error("Percentage must be between 0% and 100%");
+      operand /= 100;
+    }
+    if (simple.operator === "/" && operand === 0) throw new Error("Formula cannot divide by zero");
+    const source = value * units[input.unit].scale;
+    const result = simple.operator === "+" ? source + operand
+      : simple.operator === "-" ? source - operand
+      : simple.operator === "*" ? source * operand
+      : source / operand;
+    if (result < 0) throw new Error("Calculation cannot be negative");
+    return result / units[calculation.unit].scale;
+  }
   const variables = new Map(profile.inputs.map((input) => {
     const value = values[input.name] ?? input.defaultValue;
     const unit = units[input.unit];

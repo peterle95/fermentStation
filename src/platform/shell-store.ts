@@ -1,4 +1,4 @@
-import { destinations, type ShellState } from "../domain/shell";
+import { defaultFormulaTerms, destinations, type ShellState } from "../domain/shell";
 
 export interface ShellStore {
   load(): ShellState | null;
@@ -12,14 +12,28 @@ interface KeyValueStore {
 
 const storageKey = "fermentstation.shell";
 
-function isShellState(value: unknown): value is ShellState {
+function normalizeShellState(value: unknown): ShellState | null {
   if (!value || typeof value !== "object") {
-    return false;
+    return null;
   }
 
-  const { destination } = value as { destination?: unknown };
+  const { destination, formulaTerms } = value as {
+    destination?: unknown;
+    formulaTerms?: unknown;
+  };
 
-  return destinations.some((validDestination) => validDestination === destination);
+  if (!destinations.some((validDestination) => validDestination === destination)) {
+    return null;
+  }
+  if (formulaTerms === undefined) {
+    return { destination: destination as ShellState["destination"], formulaTerms: [...defaultFormulaTerms] };
+  }
+  if (!Array.isArray(formulaTerms) || formulaTerms.length === 0 ||
+      formulaTerms.some((term) => typeof term !== "string" || !/^[A-Za-z][A-Za-z0-9_]*$/.test(term)) ||
+      new Set(formulaTerms).size !== formulaTerms.length) {
+    return null;
+  }
+  return { destination: destination as ShellState["destination"], formulaTerms };
 }
 
 export function createShellStore(storage: KeyValueStore): ShellStore {
@@ -33,7 +47,7 @@ export function createShellStore(storage: KeyValueStore): ShellStore {
         }
 
         const state: unknown = JSON.parse(value);
-        return isShellState(state) ? state : null;
+        return normalizeShellState(state);
       } catch {
         return null;
       }

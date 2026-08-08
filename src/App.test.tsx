@@ -3,6 +3,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "./App";
+import { createProfileState } from "./domain/profiles";
 
 describe("batch workflow", () => {
   beforeEach(() => localStorage.clear());
@@ -80,29 +81,105 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
     fireEvent.change(screen.getByLabelText(/Expected duration/), { target: { value: "7" } });
-    fireEvent.change(screen.getByLabelText(/^Inputs/), {
-      target: { value: "cabbage, kg, 2" },
-    });
-    fireEvent.change(screen.getByLabelText(/^Calculations/), {
-      target: { value: "salt, g, cabbage * 2%" },
-    });
+    fireEvent.change(screen.getByLabelText(/^Inputs/), { target: { value: "totalWeight, kg, 2" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
+    expect((screen.getByLabelText("Source unit row 1") as HTMLSelectElement).value).toBe("kg");
+    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
+    fireEvent.change(screen.getByLabelText("Source term row 2"), { target: { value: "water" } });
+    fireEvent.change(screen.getByLabelText("Source unit row 2"), { target: { value: "l" } });
+    fireEvent.change(screen.getByLabelText("Operator row 2"), { target: { value: "/" } });
+    fireEvent.change(screen.getByLabelText("Operand row 2"), { target: { value: "200" } });
+    fireEvent.change(screen.getByLabelText("Operand type row 2"), { target: { value: "number" } });
+    fireEvent.change(screen.getByLabelText("Result term row 2"), { target: { value: "tea" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
+    fireEvent.change(screen.getByLabelText("Source term row 3"), { target: { value: "water" } });
+    expect((screen.getByLabelText("Source unit row 3") as HTMLSelectElement).value).toBe("l");
+    fireEvent.change(screen.getByLabelText("Source unit row 2"), { target: { value: "ml" } });
+    expect((screen.getByLabelText("Source unit row 3") as HTMLSelectElement).value).toBe("ml");
+    fireEvent.change(screen.getByLabelText("Source unit row 2"), { target: { value: "l" } });
+    fireEvent.click(screen.getByRole("button", { name: "Remove calculation 3" }));
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    expect((screen.getByLabelText("Source term row 1") as HTMLSelectElement).value).toBe("totalWeight");
+    expect((screen.getByLabelText("Source unit row 1") as HTMLSelectElement).value).toBe("kg");
+    expect((screen.getByLabelText("Result term row 2") as HTMLSelectElement).value).toBe("tea");
+    expect((screen.getByLabelText(/^Inputs/) as HTMLTextAreaElement).value).toContain("totalWeight, kg, 2");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     fireEvent.click(screen.getByRole("button", { name: "Today" }));
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
-    fireEvent.change(screen.getByLabelText("cabbage (kg)"), { target: { value: "1.25" } });
+    fireEvent.change(screen.getByLabelText("totalWeight (kg)"), { target: { value: "1.25" } });
+    fireEvent.change(screen.getByLabelText("water (l)"), { target: { value: "1" } });
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
     expect(screen.getByText(/25 g suggested/)).toBeTruthy();
+    expect(screen.getByText("tea:").parentElement?.textContent).toContain("5 g suggested");
 
-    fireEvent.change(screen.getByLabelText("cabbage (kg)"), { target: { value: "2.5" } });
+    fireEvent.change(screen.getByLabelText("totalWeight (kg)"), { target: { value: "2.5" } });
     fireEvent.click(screen.getByRole("button", { name: "Update inputs" }));
     expect(screen.getByText(/50 g suggested/)).toBeTruthy();
-    fireEvent.change(screen.getByLabelText("Override salt"), { target: { value: "55.5" } });
-    fireEvent.click(screen.getByRole("button", { name: "Override" }));
+    const saltOverride = screen.getByLabelText("Override salt");
+    fireEvent.change(saltOverride, { target: { value: "55.5" } });
+    fireEvent.submit(saltOverride.closest("form")!);
     expect(screen.getByText(/55.5 g \(overridden\)/)).toBeTruthy();
 
     fireEvent.change(screen.getByLabelText("Finish date"), { target: { value: "2026-08-08" } });
     expect(screen.getByText("Ready", { selector: ".status" })).toBeTruthy();
+  });
+
+  it("persists editable device formula terms and uses them in profile dropdowns", () => {
+    const view = render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    fireEvent.change(screen.getByLabelText("Formula term 1"), { target: { value: "starterLiquid" } });
+    expect(screen.getByRole("button", { name: "Remove formula term 1: starterLiquid" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Save formula terms" }));
+    expect(screen.getByText("Formula terms saved on this device.")).toBeTruthy();
+
+    view.unmount();
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
+
+    const option = Array.from((screen.getByLabelText("Source term row 1") as HTMLSelectElement).options)
+      .find(({ value }) => value === "starterLiquid");
+    expect(option?.textContent).toBe("Starter Liquid");
+  });
+
+  it("keeps calculation-only results out of sources and chooses unused results", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
+
+    expect((screen.getByLabelText("Result term row 1") as HTMLSelectElement).value).toBe("salt");
+    expect((screen.getByLabelText("Result term row 2") as HTMLSelectElement).value).not.toBe("salt");
+    expect(Array.from((screen.getByLabelText("Source term row 2") as HTMLSelectElement).options).map(({ value }) => value))
+      .not.toContain("salt");
+    expect(Array.from((screen.getByLabelText("Result term row 2") as HTMLSelectElement).options).map(({ value }) => value))
+      .toContain("salt");
+  });
+
+  it("keeps complex legacy calculations unless they are removed", () => {
+    const state = createProfileState();
+    state.profiles[0].inputs = [{ name: "water", unit: "g" }];
+    state.profiles[0].calculations = [{ name: "tea", unit: "g", formula: "water / (20 + 2)" }];
+    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+
+    expect(screen.getByText(/cannot be edited here, but will be kept/)).toBeTruthy();
+    expect(screen.queryByLabelText(/^Calculations/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    expect(JSON.parse(localStorage.getItem("fermentstation.profiles")!).profiles[0].calculations[0].formula)
+      .toBe("water / (20 + 2)");
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove calculation 1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    expect(JSON.parse(localStorage.getItem("fermentstation.profiles")!).profiles[0].calculations).toEqual([]);
   });
 
   it("surfaces recurring checks on Today and Calendar", () => {
