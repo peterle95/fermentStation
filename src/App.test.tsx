@@ -178,4 +178,27 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: /Restore photo/ }));
     expect(await screen.findByRole("img", { name: "Jar day two" })).toBeTruthy();
   });
+
+  it("preserves destination and unsaved draft across Fold6 postures", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Batches" }));
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+    fireEvent.change(screen.getByLabelText("Note or measurement"), {
+      target: { value: "Unsaved cover-screen observation" },
+    });
+
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: 344 });
+    fireEvent(window, new Event("resize"));
+    expect(screen.getByRole("button", { name: "Batches" }).getAttribute("aria-current")).toBe("page");
+    expect((screen.getByLabelText("Note or measurement") as HTMLInputElement).value)
+      .toBe("Unsaved cover-screen observation");
+
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: 884 });
+    fireEvent(window, new Event("resize"));
+    expect(screen.getByRole("button", { name: "Batches" }).getAttribute("aria-current")).toBe("page");
+    expect((screen.getByLabelText("Note or measurement") as HTMLInputElement).value)
+      .toBe("Unsaved cover-screen observation");
+    expect(screen.getByText("More")).toBeTruthy();
+  });
 });

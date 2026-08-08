@@ -120,13 +120,16 @@ export function App() {
         <nav aria-label="Primary navigation" className="navigation">
           {destinations.map((destination) => (
             <button
+              aria-label={destination === "settings" ? "Settings" : undefined}
               aria-current={shell.destination === destination ? "page" : undefined}
               className={shell.destination === destination ? "selected" : undefined}
               key={destination}
               onClick={() => navigate(destination)}
               type="button"
             >
-              {labels[destination]}
+              {destination === "settings" ? (
+                <><span className="desktop-label">Settings</span><span className="mobile-label">More</span></>
+              ) : labels[destination]}
             </button>
           ))}
         </nav>
