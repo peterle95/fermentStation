@@ -13,13 +13,19 @@ The reusable method, recipe inputs, quantities, and conditions used to start a b
 _Avoid_: Typology, technique
 
 **Expected fermentation duration**:
-The whole-number count of days a fermentation profile uses to suggest when a batch should be ready.
+The whole-number count of days a fermentation profile uses to suggest a batch's finish date.
+
+**Finish date**:
+The date a batch is expected to finish. A batch becomes `ready` automatically on this date; changing the finish date to a future date makes the batch `active` again.
 
 **Profile input**:
 A value the user supplies for a batch, such as water volume, cabbage weight, or flour weight.
 
 **Profile guidance**:
 A fixed condition or recommendation supplied by a fermentation profile, such as temperature or salt percentage.
+
+**Profile check**:
+An optional named check supplied by a fermentation profile, such as tasting or burping a jar. A batch may use its copied checks on its own whole-day schedule; checks pause while the batch is not `active`.
 
 **Profile calculation**:
 A user-defined formula in a fermentation profile that derives a value from one or more batch inputs. Fermentation quantities use metric units.
@@ -35,7 +41,7 @@ A dated observation attached to a batch, such as a photo, note, measurement, or 
 _Avoid_: Update, log item
 
 **Batch status**:
-The current stage of a batch: `active` while fermenting, `ready` when fermentation should be finished and the batch needs tasting, and `to-fridge` when the batch is moved to cold storage to slow further fermentation.
+The current stage of a batch: `active` before its finish date, `ready` automatically on its finish date or earlier when the user chooses, and `to-fridge` when the user moves it to cold storage to slow further fermentation. A manually chosen status remains until changed; moving the finish date into the future returns the batch to `active`. A profile may suggest when to move a batch to the fridge, but does not do so automatically.
 
 **Trash**:
 A temporary holding state for deleted batches and fermentation profiles. Deleted records can be restored for seven days before permanent deletion.
