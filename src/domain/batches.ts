@@ -13,7 +13,16 @@ export type TimelineEntry =
   | { id: string; date: string; kind: "measurement"; text: string }
   | { id: string; date: string; kind: "status"; status: BatchStatus }
   | { id: string; date: string; kind: "check"; checkName: string }
-  | { id: string; date: string; kind: "ph"; value: number };
+  | { id: string; date: string; kind: "ph"; value: number }
+  | {
+      id: string;
+      date: string;
+      kind: "photo";
+      name: string;
+      mimeType: string;
+      dataUrl: string;
+      caption: string;
+    };
 
 export interface BatchCheck {
   id: string;

@@ -157,4 +157,25 @@ describe("batch workflow", () => {
     expect(screen.getByText("optimal")).toBeTruthy();
     expect(screen.getByText("Latest:").parentElement?.textContent).toContain("3.45 on 2026-08-02");
   });
+
+  it("attaches, displays, edits, deletes, and restores a local photo", async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+    const file = new File(["original photo bytes"], "jar.jpg", { type: "image/jpeg" });
+    fireEvent.change(screen.getByLabelText("Photo"), { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText("Caption"), { target: { value: "Jar day one" } });
+    fireEvent.submit(screen.getByRole("button", { name: "Attach photo" }).closest("form")!);
+
+    const image = await screen.findByRole("img", { name: "Jar day one" });
+    expect(image.getAttribute("src")).toContain("data:image/jpeg;base64,");
+    fireEvent.click(screen.getByRole("button", { name: /Edit photo/ }));
+    fireEvent.change(screen.getByLabelText("Caption"), { target: { value: "Jar day two" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save photo" }));
+    expect(await screen.findByRole("img", { name: "Jar day two" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /Delete photo/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Restore photo/ }));
+    expect(await screen.findByRole("img", { name: "Jar day two" })).toBeTruthy();
+  });
 });

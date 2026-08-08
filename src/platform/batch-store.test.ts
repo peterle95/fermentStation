@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createBatch, createBatchState, deleteBatch } from "../domain/batches";
+import { addTimelineEntry, createBatch, createBatchState, deleteBatch } from "../domain/batches";
 import { createProfileState } from "../domain/profiles";
 import { createBatchStore } from "./batch-store";
 
@@ -45,5 +45,29 @@ describe("batch store", () => {
     store.save(state);
 
     expect(store.load()).toEqual(state);
+  });
+
+  it("retains original local photo data through storage", () => {
+    const values = new Map<string, string>();
+    const store = createBatchStore({
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+    });
+    const batch = addTimelineEntry(
+      createBatch(createProfileState().profiles[0], { id: "batch-1", startDate: "2026-08-08" }),
+      {
+        id: "photo-1",
+        date: "2026-08-08",
+        kind: "photo",
+        name: "jar.jpg",
+        mimeType: "image/jpeg",
+        dataUrl: "data:image/jpeg;base64,b3JpZ2luYWw=",
+        caption: "Jar day one",
+      },
+    );
+
+    store.save(createBatchState([batch]));
+
+    expect(store.load()?.batches[0].timeline[0]).toEqual(batch.timeline[0]);
   });
 });

@@ -434,6 +434,31 @@ textarea {
   gap: 0.3rem;
 }
 
+.photo-form,
+.timeline-content {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.photo-form {
+  background: #f5ecdf;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0.75rem;
+}
+
+.photo-form label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.timeline-content img {
+  border-radius: 0.6rem;
+  height: auto;
+  max-height: 20rem;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .notice {
   background: #fff4d8;
   border-left: 4px solid #9d4934;
@@ -479,7 +504,8 @@ button:disabled {
   }
 
   .batch-form,
-  .timeline-form {
+  .timeline-form,
+  .photo-form {
     grid-template-columns: 1fr;
   }
 

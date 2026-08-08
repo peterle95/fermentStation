@@ -245,6 +245,20 @@ describe("batches", () => {
       .toThrow("two decimal places");
   });
 
+  it("retains photo bytes through timeline trash and restore", () => {
+    const batch = addTimelineEntry(
+      createBatch(profile(), { id: "batch-1", startDate: "2026-08-01" }),
+      {
+        id: "photo-1", date: "2026-08-02", kind: "photo", name: "jar.jpg",
+        mimeType: "image/jpeg", dataUrl: "data:image/jpeg;base64,b3JpZ2luYWw=", caption: "Jar",
+      },
+    );
+    const deleted = deleteTimelineEntry(batch, "photo-1", 100);
+    const restored = restoreTimelineEntry(deleted, "photo-1", 101);
+
+    expect(restored.timeline[0]).toEqual(batch.timeline[0]);
+  });
+
   it("trashes and restores timeline entries for seven days", () => {
     const day = 24 * 60 * 60 * 1000;
     const batch = addTimelineEntry(
