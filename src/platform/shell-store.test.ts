@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createShellState } from "../domain/shell";
+import { createShellState, defaultFormulaTerms } from "../domain/shell";
 import { browserShellStore, createShellStore } from "./shell-store";
 
 describe("shell store", () => {
@@ -16,9 +16,9 @@ describe("shell store", () => {
       },
     });
 
-    browserShellStore.save({ destination: "calendar" });
+    browserShellStore.save({ destination: "calendar", formulaTerms: ["water", "tea"] });
 
-    expect(browserShellStore.load()).toEqual({ destination: "calendar" });
+    expect(browserShellStore.load()).toEqual({ destination: "calendar", formulaTerms: ["water", "tea"] });
   });
 
   it("round-trips a selected destination", () => {
@@ -28,9 +28,32 @@ describe("shell store", () => {
       setItem: (key, value) => values.set(key, value),
     });
 
-    store.save({ destination: "batches" });
+    store.save({ destination: "batches", formulaTerms: ["totalWeight", "salt"] });
 
-    expect(store.load()).toEqual({ destination: "batches" });
+    expect(store.load()).toEqual({ destination: "batches", formulaTerms: ["totalWeight", "salt"] });
+  });
+
+  it("adds default formula terms to older persisted state", () => {
+    const store = createShellStore({
+      getItem: () => '{"destination":"profiles"}',
+      setItem: () => undefined,
+    });
+
+    expect(store.load()).toEqual({ destination: "profiles", formulaTerms: defaultFormulaTerms });
+  });
+
+  it.each([
+    '[]',
+    '["water","water"]',
+    '["water weight"]',
+    '[42]',
+  ])("rejects malformed formula terms: %s", (formulaTerms) => {
+    const store = createShellStore({
+      getItem: () => `{"destination":"profiles","formulaTerms":${formulaTerms}}`,
+      setItem: () => undefined,
+    });
+
+    expect(store.load()).toBeNull();
   });
 
   it("ignores an invalid persisted destination", () => {

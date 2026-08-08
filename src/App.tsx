@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   addTimelineEntry,
   addPhReading,
@@ -37,10 +37,13 @@ import {
   createProfileState,
   deleteProfile,
   discardExpiredProfiles,
+  parseSimpleFormula,
   restoreProfile,
   updateProfile,
   validateProfile,
   type FermentationProfile,
+  type MetricUnit,
+  type ProfileCalculation,
 } from "./domain/profiles";
 import {
   createShellState,
@@ -163,6 +166,7 @@ export function App() {
             <CalendarView batches={batchState.batches} />
           ) : shell.destination === "profiles" ? (
             <Profiles
+              formulaTerms={shell.formulaTerms}
               profiles={profileState.profiles}
               trash={profileState.trash}
               onDelete={(id) => saveProfiles(deleteProfile(profileState, id, Date.now()))}
@@ -172,7 +176,13 @@ export function App() {
           ) : shell.destination === "settings" ? (
             <SettingsView
               batchState={batchState}
+              formulaTerms={shell.formulaTerms}
               profileState={profileState}
+              onFormulaTermsChange={(formulaTerms) => {
+                const next = { ...shell, formulaTerms };
+                browserShellStore.save(next);
+                setShell(next);
+              }}
               onImport={(profiles, importedBatches) => {
                 saveProfiles(profiles);
                 saveBatches(importedBatches);
@@ -192,13 +202,44 @@ export function App() {
 
 interface SettingsViewProps {
   batchState: BatchState;
+  formulaTerms: string[];
   profileState: ReturnType<typeof createProfileState>;
+  onFormulaTermsChange(formulaTerms: string[]): void;
   onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
 }
 
-function SettingsView({ batchState, profileState, onImport }: SettingsViewProps) {
+function SettingsView({ batchState, formulaTerms, profileState, onFormulaTermsChange, onImport }: SettingsViewProps) {
   const [message, setMessage] = useState("");
   const [pendingImport, setPendingImport] = useState<ArchiveImport | null>(null);
+  const [terms, setTerms] = useState(formulaTerms);
+  const [newTerm, setNewTerm] = useState("");
+  const [termError, setTermError] = useState("");
+
+  function formulaTermError(next: string[]) {
+    if (next.length === 0) return "At least one formula term is required.";
+    if (next.some((term) => !/^[A-Za-z][A-Za-z0-9_]*$/.test(term))) {
+      return "Formula terms must start with a letter and use only letters, numbers, or underscores.";
+    }
+    if (new Set(next).size !== next.length) return "Formula terms must be unique.";
+    return "";
+  }
+
+  function addFormulaTerm() {
+    const next = [...terms, newTerm.trim()];
+    const error = formulaTermError(next);
+    if (error) return setTermError(error);
+    setTerms(next);
+    setNewTerm("");
+    setTermError("");
+  }
+
+  function saveFormulaTerms() {
+    const error = formulaTermError(terms);
+    if (error) return setTermError(error);
+    onFormulaTermsChange(terms);
+    setTermError("");
+    setMessage("Formula terms saved on this device.");
+  }
 
   async function downloadArchive() {
     const bytes = await createArchive(profileState, batchState);
@@ -237,6 +278,22 @@ function SettingsView({ batchState, profileState, onImport }: SettingsViewProps)
 
   return (
     <section className="settings" aria-label="Local backup and transfer">
+      <section className="formula-term-settings" aria-labelledby="formula-terms-heading">
+        <h3 id="formula-terms-heading">Formula dropdown terms</h3>
+        <p>These names stay on this device and are not included in archives.</p>
+        {terms.map((term, index) => (
+          <div className="formula-term" key={index}>
+            <label>Formula term {index + 1}<input onChange={(event) => setTerms(terms.map((value, termIndex) => termIndex === index ? event.target.value : value))} value={term} /></label>
+            <button aria-label={`Remove formula term ${index + 1}: ${term}`} disabled={terms.length === 1} onClick={() => setTerms(terms.filter((_, termIndex) => termIndex !== index))} type="button">Remove</button>
+          </div>
+        ))}
+        <div className="formula-term">
+          <label>New formula term<input onChange={(event) => setNewTerm(event.target.value)} value={newTerm} /></label>
+          <button onClick={addFormulaTerm} type="button">Add term</button>
+        </div>
+        {termError && <p className="notice" role="alert">{termError}</p>}
+        <button className="primary-action" onClick={saveFormulaTerms} type="button">Save formula terms</button>
+      </section>
       <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
       <button className="primary-action" onClick={downloadArchive} type="button">Export ZIP archive</button>
       <label>Import ZIP archive <input accept=".zip,application/zip" onChange={uploadArchive} type="file" /></label>
@@ -658,6 +715,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
 }
 
 interface ProfilesProps {
+  formulaTerms: string[];
   profiles: FermentationProfile[];
   trash: { id: string; name: string; deletedAt: number }[];
   onDelete(id: string): void;
@@ -665,13 +723,116 @@ interface ProfilesProps {
   onSave(profile: FermentationProfile): void;
 }
 
-function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProps) {
+interface StructuredFormulaRow {
+  id: string;
+  kind: "structured";
+  source: string;
+  sourceUnit: MetricUnit;
+  sourceUnitTouched: boolean;
+  operator: "+" | "-" | "*" | "/";
+  operand: string;
+  operandType: "number" | "percentage";
+  result: string;
+  resultUnit: MetricUnit;
+}
+
+interface LegacyFormulaRow {
+  id: string;
+  kind: "legacy";
+  calculation: ProfileCalculation;
+}
+
+type FormulaRow = StructuredFormulaRow | LegacyFormulaRow;
+
+const metricUnits: MetricUnit[] = ["g", "kg", "ml", "l"];
+
+function formulaRows(profile: FermentationProfile): FormulaRow[] {
+  return profile.calculations.map((calculation) => {
+    const parsed = parseSimpleFormula(calculation.formula);
+    if (!parsed) return { id: crypto.randomUUID(), kind: "legacy", calculation };
+    const input = profile.inputs.find(({ name }) => name === parsed.source);
+    return {
+      id: crypto.randomUUID(),
+      kind: "structured",
+      source: parsed.source,
+      sourceUnit: input?.unit ?? "g",
+      sourceUnitTouched: false,
+      operator: parsed.operator,
+      operand: parsed.operand,
+      operandType: parsed.percentage ? "percentage" : "number",
+      result: calculation.name,
+      resultUnit: calculation.unit,
+    };
+  });
+}
+
+function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }: ProfilesProps) {
   const [editing, setEditing] = useState<FermentationProfile | null>(null);
+  const [calculations, setCalculations] = useState<FormulaRow[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+  const inputsRef = useRef<HTMLTextAreaElement>(null);
+
+  function currentInputs() {
+    return inputsRef.current ? parseInputs(inputsRef.current.value) : editing?.inputs ?? [];
+  }
+
+  function edit(profile: FermentationProfile) {
+    setErrors([]);
+    setEditing(profile);
+    setCalculations(formulaRows(profile));
+  }
+
+  function addFormula() {
+    const terms = availableResultTerms(formulaTerms, editing, calculations);
+    const source = terms.includes("totalWeight") ? "totalWeight" : terms[0];
+    const matchingSource = calculations.find((row): row is StructuredFormulaRow => row.kind === "structured" && row.source === source);
+    const sourceUnit = matchingSource?.sourceUnit
+      ?? currentInputs().find(({ name }) => name === source)?.unit
+      ?? "g";
+    const usedResults = new Set(calculations.map((row) => row.kind === "structured" ? row.result : row.calculation.name));
+    const preferredResults = [...new Set([
+      ...["salt", "sugar", "tea"].filter((term) => terms.includes(term)),
+      ...terms,
+    ])];
+    setCalculations([...calculations, {
+      id: crypto.randomUUID(),
+      kind: "structured",
+      source,
+      sourceUnit,
+      sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false,
+      operator: "*",
+      operand: "2",
+      operandType: "percentage",
+      result: preferredResults.find((term) => !usedResults.has(term)) ?? preferredResults[0],
+      resultUnit: "g",
+    }]);
+  }
+
+  function updateFormula(id: string, update: Partial<StructuredFormulaRow>) {
+    setCalculations(calculations.map((row) => row.id === id && row.kind === "structured" ? { ...row, ...update } : row));
+  }
+
+  function updateSourceUnit(source: string, sourceUnit: MetricUnit) {
+    setCalculations(calculations.map((row) => row.kind === "structured" && row.source === source
+      ? { ...row, sourceUnit, sourceUnitTouched: true }
+      : row));
+  }
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const inputs = parseInputs(String(data.get("inputs") ?? ""));
+    const structuredRows = calculations.filter((row): row is StructuredFormulaRow => row.kind === "structured");
+    const resultNames = new Set(calculations.map((row) => row.kind === "structured" ? row.result : row.calculation.name));
+    for (const source of new Set(structuredRows.map((row) => row.source))) {
+      const matchingRows = structuredRows.filter((row) => row.source === source);
+      const index = inputs.findIndex(({ name }) => name === source);
+      if (index === -1 && !resultNames.has(source)) inputs.push({ name: source, unit: matchingRows[0].sourceUnit });
+      else if (index !== -1) {
+        const touched = matchingRows.find(({ sourceUnitTouched }) => sourceUnitTouched);
+        if (touched) inputs[index] = { ...inputs[index], unit: touched.sourceUnit };
+      }
+    }
     const profile = {
       id: editing?.id ?? crypto.randomUUID(),
       name: String(data.get("name") ?? "").trim(),
@@ -680,8 +841,12 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
       expectedDurationDays: data.get("expectedDurationDays")
         ? Number(data.get("expectedDurationDays"))
         : undefined,
-      inputs: parseInputs(String(data.get("inputs") ?? "")),
-      calculations: parseCalculations(String(data.get("calculations") ?? "")),
+      inputs,
+      calculations: calculations.map((row) => row.kind === "legacy" ? row.calculation : {
+        name: row.result,
+        unit: row.resultUnit,
+        formula: `${row.source} ${row.operator} ${row.operand}${row.operandType === "percentage" ? "%" : ""}`,
+      }),
       checks: parseChecks(String(data.get("checks") ?? "")),
       phZones: parsePhZones(String(data.get("phZones") ?? "")),
     };
@@ -699,8 +864,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
   return (
     <section className="profiles" aria-label="Fermentation profiles">
       <button className="primary-action" onClick={() => {
-        setErrors([]);
-        setEditing({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [], phZones: [] });
+        edit({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [], phZones: [] });
       }} type="button">
         Add profile
       </button>
@@ -711,8 +875,39 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
           <label>Guidance <textarea defaultValue={editing.guidance} name="guidance" /></label>
           <label>Instructions <textarea defaultValue={editing.instructions} name="instructions" /></label>
           <label>Expected duration (days) <input defaultValue={editing.expectedDurationDays} min="1" name="expectedDurationDays" type="number" /></label>
-          <label>Inputs <span className="optional">One per line: name, unit, default</span><textarea defaultValue={editing.inputs.map((input) => `${input.name}, ${input.unit}, ${input.defaultValue ?? ""}`).join("\n")} name="inputs" /></label>
-          <label>Calculations <span className="optional">One per line: name, unit, formula</span><textarea defaultValue={editing.calculations.map((calculation) => `${calculation.name}, ${calculation.unit}, ${calculation.formula}`).join("\n")} name="calculations" /></label>
+          <label>Inputs <span className="optional">One per line: name, unit, default</span><textarea defaultValue={editing.inputs.map((input) => `${input.name}, ${input.unit}, ${input.defaultValue ?? ""}`).join("\n")} name="inputs" ref={inputsRef} /></label>
+          <fieldset className="formula-builder">
+            <legend>Calculations</legend>
+            {calculations.map((row, index) => row.kind === "legacy" ? (
+              <div className="legacy-formula" key={row.id}>
+                <p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p>
+                <p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p>
+                <button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button>
+              </div>
+            ) : (
+              <div className="formula-row" key={row.id}>
+                <label>Source term row {index + 1}<select onChange={(event) => {
+                  const source = event.target.value;
+                  const matchingSource = calculations.find((candidate): candidate is StructuredFormulaRow => candidate.kind === "structured" && candidate.source === source);
+                  updateFormula(row.id, {
+                    source,
+                    sourceUnit: matchingSource?.sourceUnit ?? currentInputs().find(({ name }) => name === source)?.unit ?? row.sourceUnit,
+                    sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false,
+                  });
+                }} value={row.source}>{availableSourceTerms(formulaTerms, calculations, currentInputs()).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select></label>
+                <label>Source unit row {index + 1}<select onChange={(event) => updateSourceUnit(row.source, event.target.value as MetricUnit)} value={row.sourceUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
+                <label>Operator row {index + 1}<select onChange={(event) => updateFormula(row.id, { operator: event.target.value as StructuredFormulaRow["operator"] })} value={row.operator}>
+                  <option value="+">+</option><option value="-">-</option><option value="*">×</option><option value="/">/</option>
+                </select></label>
+                <label>Operand row {index + 1}<input min="0" onChange={(event) => updateFormula(row.id, { operand: event.target.value })} required step="any" type="number" value={row.operand} /></label>
+                <label>Operand type row {index + 1}<select onChange={(event) => updateFormula(row.id, { operandType: event.target.value as StructuredFormulaRow["operandType"] })} value={row.operandType}><option value="number">Number</option><option value="percentage">Percentage</option></select></label>
+                <label>Result term row {index + 1}<select onChange={(event) => updateFormula(row.id, { result: event.target.value })} value={row.result}>{availableResultTerms(formulaTerms, editing, calculations).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select></label>
+                <label>Result unit row {index + 1}<select onChange={(event) => updateFormula(row.id, { resultUnit: event.target.value as MetricUnit })} value={row.resultUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
+                <button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button>
+              </div>
+            ))}
+            <button onClick={addFormula} type="button">Add formula</button>
+          </fieldset>
           <label>Recurring checks <span className="optional">One per line: name, interval days</span><textarea defaultValue={editing.checks.map((check) => `${check.name}, ${check.intervalDays}`).join("\n")} name="checks" /></label>
           <label>pH zones <span className="optional">One per line: danger|safe|optimal, min, max</span><textarea defaultValue={editing.phZones.map((zone) => `${zone.label}, ${zone.min}, ${zone.max}`).join("\n")} name="phZones" /></label>
           {errors.length > 0 && <div className="notice" role="alert">{errors.join(" ")}</div>}
@@ -730,7 +925,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
             <p><strong>Guidance:</strong> {profile.guidance || "None yet."}</p>
             <p><strong>Instructions:</strong> {profile.instructions || "None yet."}</p>
             <div className="form-actions">
-              <button aria-label={`Edit ${profile.name}`} onClick={() => { setErrors([]); setEditing(profile); }} type="button">Edit</button>
+              <button aria-label={`Edit ${profile.name}`} onClick={() => edit(profile)} type="button">Edit</button>
               <button aria-label={`Delete ${profile.name}`} onClick={() => {
                 setEditing((current) => current?.id === profile.id ? null : current);
                 onDelete(profile.id);
@@ -756,6 +951,31 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
   );
 }
 
+function availableResultTerms(formulaTerms: string[], editing: FermentationProfile | null, rows: FormulaRow[]) {
+  return [...new Set([
+    ...formulaTerms,
+    ...(editing?.inputs.map(({ name }) => name) ?? []),
+    ...(editing?.calculations.map(({ name }) => name) ?? []),
+    ...rows.flatMap((row) => row.kind === "structured" ? [row.source, row.result] : [row.calculation.name]),
+  ])];
+}
+
+function availableSourceTerms(formulaTerms: string[], rows: FormulaRow[], inputs: FermentationProfile["inputs"]) {
+  const explicitInputs = new Set(inputs.map(({ name }) => name));
+  const selectedSources = new Set(rows.flatMap((row) => row.kind === "structured" ? [row.source] : []));
+  const results = new Set(rows.map((row) => row.kind === "structured" ? row.result : row.calculation.name));
+  return [...new Set([
+    ...formulaTerms.filter((term) => !results.has(term) || explicitInputs.has(term) || selectedSources.has(term)),
+    ...explicitInputs,
+    ...selectedSources,
+  ])];
+}
+
+function formulaTermLabel(term: string) {
+  const words = term.replace(/_/g, " ").replace(/([a-z0-9])([A-Z])/g, "$1 $2");
+  return words ? words[0].toUpperCase() + words.slice(1) : term;
+}
+
 function parseInputs(value: string): FermentationProfile["inputs"] {
   return value.split("\n").filter((line) => line.trim()).map((line) => {
     const [name = "", unit = "", defaultValue = ""] = line.split(",").map((part) => part.trim());
@@ -764,13 +984,6 @@ function parseInputs(value: string): FermentationProfile["inputs"] {
       unit: unit as FermentationProfile["inputs"][number]["unit"],
       defaultValue: defaultValue === "" ? undefined : Number(defaultValue),
     };
-  });
-}
-
-function parseCalculations(value: string): FermentationProfile["calculations"] {
-  return value.split("\n").filter((line) => line.trim()).map((line) => {
-    const [name = "", unit = "", ...formula] = line.split(",").map((part) => part.trim());
-    return { name, unit: unit as FermentationProfile["calculations"][number]["unit"], formula: formula.join(",") };
   });
 }
 

@@ -6,6 +6,7 @@ import {
   deleteProfile,
   discardExpiredProfiles,
   restoreProfile,
+  parseSimpleFormula,
   updateProfile,
   validateProfile,
 } from "./profiles";
@@ -61,6 +62,29 @@ describe("fermentation profiles", () => {
     expect(calculateProfileValue(profile, profile.calculations[0], { cabbage: 1.25 })).toBe(31.25);
   });
 
+  it("calculates structured recipe ratios across metric families", () => {
+    const profile = {
+      ...createProfileState().profiles[0],
+      inputs: [
+        { name: "totalWeight", unit: "kg" as const, defaultValue: 1 },
+        { name: "water", unit: "l" as const, defaultValue: 1 },
+      ],
+      calculations: [
+        { name: "salt", unit: "g" as const, formula: "totalWeight * 2%" },
+        { name: "tea", unit: "g" as const, formula: "water / 200" },
+        { name: "sugar", unit: "g" as const, formula: "water / 20" },
+        { name: "starterLiquid", unit: "ml" as const, formula: "water * 0.01" },
+      ],
+    };
+
+    expect(profile.calculations.map((calculation) => calculateProfileValue(profile, calculation, {})))
+      .toEqual([20, 5, 50, 10]);
+  });
+
+  it.each([".5", "5.", "1e3"])("parses browser-valid operand %s", (operand) => {
+    expect(parseSimpleFormula(`water * ${operand}`)?.operand).toBe(operand);
+  });
+
   it("leaves missing calculations incomplete and rejects invalid values and units", () => {
     const profile = {
       ...createProfileState().profiles[0],
@@ -77,6 +101,10 @@ describe("fermentation profiles", () => {
       { name: "salt", unit: "kg", formula: "weight * 2%" },
       {},
     )).toBeNull();
+    expect(() => calculateProfileValue(profile, { name: "salt", unit: "g", formula: "weight / 0" }, { weight: 1 }))
+      .toThrow("Formula cannot divide by zero");
+    expect(() => calculateProfileValue(profile, { name: "salt", unit: "g", formula: "weight - 1001" }, { weight: 1 }))
+      .toThrow("Calculation cannot be negative");
     expect(validateProfile(profile)).toEqual([
       "Expected duration must be a positive whole number.",
       "total: Formula combines incompatible units",

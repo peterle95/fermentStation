@@ -272,15 +272,18 @@ function recalculateBatch(batch: Batch): Batch {
     ...batch,
     calculationValues: Object.fromEntries(batch.profileSnapshot.calculations.map((calculation) => {
       const current = batch.calculationValues[calculation.name];
-      return [calculation.name, current?.override === undefined
-        ? {
-            suggested: calculateProfileValue(
-              batch.profileSnapshot,
-              calculation,
-              batch.inputValues,
-            ),
-          }
-        : current];
+      if (current?.override !== undefined) return [calculation.name, current];
+      try {
+        return [calculation.name, {
+          suggested: calculateProfileValue(
+            batch.profileSnapshot,
+            calculation,
+            batch.inputValues,
+          ),
+        }];
+      } catch {
+        return [calculation.name, { suggested: null }];
+      }
     })),
   };
 }

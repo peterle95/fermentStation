@@ -163,6 +163,50 @@ h2 {
   gap: 0.4rem;
 }
 
+.formula-term-settings,
+.formula-builder {
+  border: 1px solid #dfd2c2;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.formula-term-settings h3,
+.formula-term-settings p,
+.legacy-formula p {
+  margin: 0;
+}
+
+.formula-term,
+.formula-row {
+  align-items: end;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.formula-term {
+  grid-template-columns: 1fr auto;
+}
+
+.formula-term label,
+.formula-row label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.formula-row {
+  background: #f5ecdf;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0.75rem;
+}
+
+.legacy-formula {
+  background: #f5ecdf;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
 .profile-form label {
   display: grid;
   font-weight: 700;
@@ -555,7 +599,8 @@ button:disabled {
 
   .batch-form,
   .timeline-form,
-  .photo-form {
+  .photo-form,
+  .formula-row {
     grid-template-columns: 1fr;
   }
 

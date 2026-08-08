@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createProfileState } from "./profiles";
+import { createProfileState, validateProfile } from "./profiles";
 import {
   addTimelineEntry,
   addPhReading,
@@ -162,6 +162,24 @@ describe("batches", () => {
     expect(changedAgain.calculationValues.salt).toEqual({ suggested: 25, override: 26.5 });
     expect(second.calculationValues.salt.suggested).toBe(40);
     expect(first.profileSnapshot.inputs[0].defaultValue).toBe(2);
+  });
+
+  it("leaves runtime-invalid suggestions incomplete and preserves overrides", () => {
+    const source = {
+      ...profile(),
+      inputs: [{ name: "weight", unit: "kg" as const, defaultValue: 1 }],
+      calculations: [{ name: "remainder", unit: "g" as const, formula: "weight - 1000" }],
+    };
+
+    expect(validateProfile(source)).toEqual([]);
+    const batch = createBatch(source, {
+      id: "runtime-negative", startDate: "2026-08-01", inputValues: { weight: 0.5 },
+    });
+    expect(batch.calculationValues.remainder.suggested).toBeNull();
+
+    const overridden = overrideBatchCalculation(batch, "remainder", 10);
+    expect(setBatchInput(overridden, "weight", 0.25).calculationValues.remainder)
+      .toEqual({ suggested: null, override: 10 });
   });
 
   it("uses calendar finish dates for automatic and manual status transitions", () => {
