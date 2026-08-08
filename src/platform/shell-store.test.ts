@@ -16,9 +16,9 @@ describe("shell store", () => {
       },
     });
 
-    browserShellStore.save({ destination: "calendar", formulaTerms: ["water", "tea"] });
+    browserShellStore.save({ destination: "calendar", formulaTerms: ["water", "tea"], units: "imperial", checkReminders: false, suggestions: true });
 
-    expect(browserShellStore.load()).toEqual({ destination: "calendar", formulaTerms: ["water", "tea"] });
+    expect(browserShellStore.load()).toEqual({ destination: "calendar", formulaTerms: ["water", "tea"], units: "imperial", checkReminders: false, suggestions: true });
   });
 
   it("round-trips a selected destination", () => {
@@ -28,9 +28,9 @@ describe("shell store", () => {
       setItem: (key, value) => values.set(key, value),
     });
 
-    store.save({ destination: "batches", formulaTerms: ["totalWeight", "salt"] });
+    store.save({ destination: "batches", formulaTerms: ["totalWeight", "salt"], units: "metric", checkReminders: true, suggestions: false });
 
-    expect(store.load()).toEqual({ destination: "batches", formulaTerms: ["totalWeight", "salt"] });
+    expect(store.load()).toEqual({ destination: "batches", formulaTerms: ["totalWeight", "salt"], units: "metric", checkReminders: true, suggestions: false });
   });
 
   it("adds default formula terms to older persisted state", () => {
@@ -39,7 +39,7 @@ describe("shell store", () => {
       setItem: () => undefined,
     });
 
-    expect(store.load()).toEqual({ destination: "profiles", formulaTerms: defaultFormulaTerms });
+    expect(store.load()).toEqual({ destination: "profiles", formulaTerms: defaultFormulaTerms, units: "metric", checkReminders: true, suggestions: true });
   });
 
   it.each([

@@ -1,4 +1,4 @@
-import { defaultFormulaTerms, destinations, type ShellState } from "../domain/shell";
+import { defaultFormulaTerms, destinations, type ShellPreferences, type ShellState } from "../domain/shell";
 
 export interface ShellStore {
   load(): ShellState | null;
@@ -17,23 +17,36 @@ function normalizeShellState(value: unknown): ShellState | null {
     return null;
   }
 
-  const { destination, formulaTerms } = value as {
+  const { destination, formulaTerms, units, checkReminders, suggestions } = value as {
     destination?: unknown;
     formulaTerms?: unknown;
+    units?: unknown;
+    checkReminders?: unknown;
+    suggestions?: unknown;
   };
 
   if (!destinations.some((validDestination) => validDestination === destination)) {
     return null;
   }
-  if (formulaTerms === undefined) {
-    return { destination: destination as ShellState["destination"], formulaTerms: [...defaultFormulaTerms] };
-  }
-  if (!Array.isArray(formulaTerms) || formulaTerms.length === 0 ||
+  if (formulaTerms !== undefined && (!Array.isArray(formulaTerms) || formulaTerms.length === 0 ||
       formulaTerms.some((term) => typeof term !== "string" || !/^[A-Za-z][A-Za-z0-9_]*$/.test(term)) ||
-      new Set(formulaTerms).size !== formulaTerms.length) {
+      new Set(formulaTerms).size !== formulaTerms.length)) {
     return null;
   }
-  return { destination: destination as ShellState["destination"], formulaTerms };
+  if (units !== undefined && units !== "metric" && units !== "imperial") return null;
+  if (checkReminders !== undefined && typeof checkReminders !== "boolean") return null;
+  if (suggestions !== undefined && typeof suggestions !== "boolean") return null;
+
+  const preferences: ShellPreferences = {
+    units: units ?? "metric",
+    checkReminders: checkReminders ?? true,
+    suggestions: suggestions ?? true,
+  };
+  return {
+    destination: destination as ShellState["destination"],
+    formulaTerms: formulaTerms ?? [...defaultFormulaTerms],
+    ...preferences,
+  };
 }
 
 export function createShellStore(storage: KeyValueStore): ShellStore {
