@@ -150,6 +150,7 @@ h2 {
 }
 
 input,
+select,
 textarea {
   background: #fff;
   border: 1px solid #bdaea0;
@@ -164,13 +165,16 @@ textarea {
 }
 
 .profile-card h3,
+.batch-card h3,
 .trash h3,
 .profile-card p,
+.batch-card p,
 .trash p {
   margin: 0;
 }
 
 .profile-card p,
+.batch-card p,
 .trash p {
   line-height: 1.5;
 }
@@ -191,6 +195,94 @@ textarea {
   color: #9d4934;
   cursor: pointer;
   padding: 0.55rem 0.8rem;
+}
+
+.batches,
+.batch-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  max-width: 52rem;
+}
+
+.batch-toolbar,
+.batch-heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.batch-filter,
+.batch-form label {
+  display: grid;
+  font-weight: 700;
+  gap: 0.4rem;
+}
+
+.batch-filter {
+  grid-template-columns: auto minmax(10rem, 1fr);
+  align-items: center;
+}
+
+.batch-form,
+.batch-card {
+  background: #fffaf3;
+  border: 1px solid #dfd2c2;
+  border-radius: 0.9rem;
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.batch-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.batch-form label:last-of-type,
+.batch-form .form-actions {
+  grid-column: 1 / -1;
+}
+
+.batch-heading h3 {
+  font-family: Georgia, serif;
+  font-size: 1.45rem;
+  margin-top: 0.5rem;
+}
+
+.batch-heading time,
+.optional {
+  color: #695e56;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.status {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.55rem;
+  text-transform: uppercase;
+}
+
+.status-active { color: #376337; }
+.status-ready { color: #9d4934; }
+.status-to-fridge { color: #176274; }
+
+.notice {
+  background: #fff4d8;
+  border-left: 4px solid #9d4934;
+  margin: 0;
+  padding: 0.8rem 1rem;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 @media (max-width: 700px) {
@@ -223,5 +315,9 @@ textarea {
 
   main {
     padding-top: 2rem;
+  }
+
+  .batch-form {
+    grid-template-columns: 1fr;
   }
 }
