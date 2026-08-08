@@ -25,6 +25,7 @@ import {
   statusLabel,
   updateTimelineEntry,
   type Batch,
+  type CalendarEvent,
   type BatchFilter,
   type BatchState,
   type BatchStatus,
@@ -151,13 +152,43 @@ export function App() {
         </header>
 
         <main className="main-content">
-          <p className="eyebrow">{shell.destination === "today" ? formatToday() : labels[shell.destination]}</p>
-          <h2>{labels[shell.destination]}</h2>
-          <p className="screen-intro">{screenDescription(shell.destination)}</p>
-          {shell.destination === "today" || shell.destination === "batches" ? (
+          {shell.destination === "today" ? (
+            <section className="today-screen">
+              <div className="screen-head">
+                <div>
+                  <p className="eyebrow">{formatToday()}</p>
+                  <h1>Today</h1>
+                  <p className="screen-intro">{screenDescription("today")}</p>
+                </div>
+              </div>
+              <BatchView
+                batches={batchState.batches}
+                mode="today"
+                onNavigate={navigate}
+                onOpen={setOpenBatchId}
+                openBatchId={openBatchId}
+                onChange={(next) => saveBatches({
+                  ...batchState,
+                  batches: batchState.batches.map((batch) => batch.id === next.id ? next : batch),
+                })}
+                onCreate={(batch) => saveBatches({
+                  ...batchState, batches: [...batchState.batches, batch],
+                })}
+                onDelete={(id) => saveBatches(deleteBatch(batchState, id, Date.now()))}
+                onRestore={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
+                profiles={profileState.profiles}
+                trash={batchState.trash}
+              />
+            </section>
+          ) : shell.destination === "batches" ? (
+            <>
+              <p className="eyebrow">Batches</p>
+              <h2>Batches</h2>
+              <p className="screen-intro">{screenDescription("batches")}</p>
             <BatchView
               batches={batchState.batches}
-              mode={shell.destination}
+              mode="batches"
+              onNavigate={navigate}
               onOpen={setOpenBatchId}
               openBatchId={openBatchId}
               onChange={(next) => saveBatches({
@@ -172,9 +203,24 @@ export function App() {
               profiles={profileState.profiles}
               trash={batchState.trash}
             />
+            </>
           ) : shell.destination === "calendar" ? (
-            <CalendarView batches={batchState.batches} />
-          ) : shell.destination === "profiles" ? (
+            <section className="calendar-screen" aria-label="Fermentation calendar">
+              <div className="screen-head">
+                <div>
+                  <p className="eyebrow">Check-ins &amp; ready days</p>
+                  <h1>Calendar</h1>
+                  <p className="screen-intro">Amber marks a profile check, green a ready day, blue a shift to the fridge.</p>
+                </div>
+              </div>
+              <CalendarView batches={batchState.batches} />
+            </section>
+          ) : (
+            <>
+              <p className="eyebrow">{labels[shell.destination]}</p>
+              <h2>{labels[shell.destination]}</h2>
+              <p className="screen-intro">{screenDescription(shell.destination)}</p>
+          {shell.destination === "profiles" ? (
             <Profiles
               formulaTerms={shell.formulaTerms}
               profiles={profileState.profiles}
@@ -203,6 +249,8 @@ export function App() {
               <p>{descriptions[shell.destination]}</p>
               <p>Start with a fermentation profile to begin tracking a batch.</p>
             </section>
+          )}
+            </>
           )}
         </main>
       </div>
@@ -355,16 +403,81 @@ function updateBatchDates(state: BatchState): BatchState {
 }
 
 function CalendarView({ batches }: { batches: Batch[] }) {
+  const [viewDate, setViewDate] = useState(() => new Date(`${localDate()}T12:00:00`));
   const events = calendarEvents(batches);
+  const today = localDate();
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const leadingDays = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthLabel = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(firstDay);
+  const cells: Array<{ date?: string; events: CalendarEvent[] }> = [
+    ...Array.from({ length: leadingDays }, () => ({ events: [] })),
+    ...Array.from({ length: daysInMonth }, (_, index) => {
+      const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(index + 1).padStart(2, "0")}`;
+      return { date, events: events.filter((event) => event.date === date) };
+    }),
+  ];
+  const upcoming = events.filter(({ date }) => date >= today).slice(0, 5);
+
+  function shiftMonth(offset: number) {
+    setViewDate(new Date(year, month + offset, 1));
+  }
+
   return (
-    <section className="calendar" aria-label="Upcoming fermentation work">
-      {events.length === 0 ? <p className="empty-state">No finish dates or checks scheduled.</p> : events.map((event) => (
-        <article className="calendar-event" key={`${event.batchId}-${event.kind}-${event.label}`}>
-          <time dateTime={event.date}>{event.date}</time>
-          <div><strong>{event.batchName}</strong><span>{event.label}</span></div>
-        </article>
-      ))}
-    </section>
+    <div className="calendar-layout">
+      <div className="calendar-panel">
+        <div className="calendar-head">
+          <h2>{monthLabel}</h2>
+          <div className="calendar-nav">
+            <button aria-label="Previous month" onClick={() => shiftMonth(-1)} type="button">‹</button>
+            <button aria-label="Next month" onClick={() => shiftMonth(1)} type="button">›</button>
+          </div>
+        </div>
+        <div aria-hidden="true" className="calendar-weekdays">
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => <span key={day}>{day}</span>)}
+        </div>
+        <div className="calendar-grid" role="grid" aria-label={monthLabel}>
+          {cells.map((cell, index) => cell.date ? (
+            <div
+              aria-label={`${cell.date}${cell.events.length ? `, ${cell.events.map(({ label }) => label).join(", ")}` : ""}`}
+              className={`calendar-day${cell.date === today ? " today" : ""}`}
+              key={cell.date}
+              role="gridcell"
+            >
+              <span className="calendar-day-number">{Number(cell.date.slice(-2))}</span>
+              {cell.events.map((event) => (
+                <span className={`calendar-event event-${event.kind}`} key={`${event.batchId}-${event.kind}-${event.label}`} title={`${event.batchName}: ${event.label}`}>
+                  {event.label}
+                </span>
+              ))}
+            </div>
+          ) : <div aria-hidden="true" className="calendar-day other" key={`leading-${index}`} />)}
+        </div>
+        <div className="calendar-legend">
+          <span className="legend-check"><i />Profile check</span>
+          <span className="legend-ready"><i />Ready</span>
+          <span className="legend-fridge"><i />To fridge</span>
+        </div>
+      </div>
+      <div>
+        <div className="calendar-section-label"><h2>Upcoming checks</h2></div>
+        <div className="upcoming-list">
+          {upcoming.length === 0 ? <p className="calendar-empty">No finish dates or checks scheduled.</p> : upcoming.map((event) => {
+            const date = new Date(`${event.date}T12:00:00`);
+            const isFinish = event.kind === "finish";
+            return (
+              <article className="upcoming-item" key={`${event.batchId}-${event.kind}-${event.date}`}>
+                <div className="upcoming-date"><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</span></div>
+                <div className="upcoming-body"><b>{event.batchName} {isFinish ? "finish date" : event.label}</b><p>{isFinish ? "Ready to bottle or move on." : "Profile check · due"}</p></div>
+                <span className={`calendar-status ${isFinish ? "ready" : "attention"}`}><span className="status-dot" />{isFinish ? "ready" : "check"}</span>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -376,12 +489,13 @@ interface BatchViewProps {
   onChange(batch: Batch): void;
   onCreate(batch: Batch): void;
   onDelete(id: string): void;
+  onNavigate(destination: Destination): void;
   onOpen(id: string | null): void;
   onRestore(id: string): void;
   openBatchId: string | null;
 }
 
-function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelete, onOpen, onRestore, openBatchId }: BatchViewProps) {
+function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelete, onNavigate, onOpen, onRestore, openBatchId }: BatchViewProps) {
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<BatchFilter>("all");
   const [profileId, setProfileId] = useState(profiles[0]?.id ?? "");
@@ -391,7 +505,14 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
   const openBatch = visible.find(({ id }) => id === openBatchId);
   const dueChecks = visible.flatMap((batch) => dueBatchChecks(batch, localDate()).map((check) => ({ batch, check })));
   const readyBatches = visible.filter(({ status }) => status === "ready");
-  const upcoming = calendarEvents(batches).filter(({ date }) => date >= localDate()).slice(0, 7);
+  const today = localDate();
+  const upcoming = calendarEvents(batches).filter(({ date }) => date >= today);
+  const upcomingDays = Array.from({ length: 7 }, (_, offset) => {
+    const date = new Date(`${today}T12:00:00`);
+    date.setDate(date.getDate() + offset);
+    const dateValue = date.toISOString().slice(0, 10);
+    return { date: dateValue, events: upcoming.filter((event) => event.date === dateValue) };
+  });
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -431,7 +552,7 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
         </>
       ) : (
       <>
-      <div className="batch-toolbar">
+      {mode === "batches" && <div className="batch-toolbar">
         <button
           className="primary-action"
           disabled={profiles.length === 0}
@@ -440,7 +561,19 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
         >
           Start batch
         </button>
-      </div>
+      </div>}
+
+      {mode === "today" && (
+        <button
+          aria-label="Start batch"
+          className="today-fab primary-action"
+          disabled={profiles.length === 0}
+          onClick={() => setCreating(true)}
+          type="button"
+        >
+          <span aria-hidden="true">+</span><span>Start batch</span>
+        </button>
+      )}
 
       {profiles.length === 0 && <p className="notice">Restore or create a profile before starting a batch.</p>}
 
@@ -477,19 +610,19 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
 
       {mode === "today" && (dueChecks.length > 0 || readyBatches.length > 0) && (
         <section className="action-queue" aria-labelledby="action-queue-heading">
-          <h3 className="section-heading" id="action-queue-heading">Action queue <span>due now</span></h3>
+          <h2 className="queue-heading" id="action-queue-heading">Action queue · due now</h2>
           <div className="queue-grid">
             {dueChecks.map(({ batch, check }) => (
               <article className="queue-card attention" key={`${batch.id}-${check.id}`}>
                 <span className="queue-icon" aria-hidden="true">!</span>
-                <div><small>{check.overdue ? `Overdue · ${check.nextDueDate}` : "Due today"}</small><strong>{check.name} for {batch.name}</strong><p>{batch.profileSnapshot.guidance || "Open the batch and record what you find."}</p></div>
+                <div><small>{check.overdue ? `Overdue · was due ${check.nextDueDate}` : "Due today"}</small><h4>{check.name} for <span className="queue-batch">{batch.name}</span></h4><p>{batch.profileSnapshot.guidance || "Open the batch and record what you find."}</p></div>
                 <button aria-label={`Open ${batch.name} for ${check.name}`} className="primary-action" onClick={() => onOpen(batch.id)} type="button">Open batch</button>
               </article>
             ))}
             {readyBatches.map((batch) => (
               <article className="queue-card ready" key={`ready-${batch.id}`}>
                 <span className="queue-icon" aria-hidden="true">✓</span>
-                <div><small>Ready</small><strong>{batch.name} reached its finish date</strong><p>Review the batch and choose its next status.</p></div>
+                <div><small>Due today</small><h4><span className="queue-batch">{batch.name}</span> is ready</h4><p>Review the batch and choose its next status.</p></div>
                 <button aria-label={`Open ready batch ${batch.name}`} className="primary-action" onClick={() => onOpen(batch.id)} type="button">Open batch</button>
               </article>
             ))}
@@ -514,24 +647,31 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
         </section>
       ) : (
         <section aria-labelledby="batch-overview-heading">
-          <h3 className="section-heading" id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>{mode === "today" ? "Active batches" : "Batch overview"}</h3>
+          {mode === "today" ? (
+            <div className="section-label">
+              <h2 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>Active batches</h2>
+              <a href="#batches" onClick={(event) => { event.preventDefault(); onNavigate("batches"); }}>All batches</a>
+            </div>
+          ) : <h3 className="section-heading" id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>Batch overview</h3>}
           <div className="batch-overview">
             {visible.map((batch) => <CompactBatchCard batch={batch} key={batch.id} onOpen={onOpen} />)}
           </div>
         </section>
       )}
 
-      {mode === "today" && upcoming.length > 0 && (
-        <section aria-labelledby="upcoming-heading">
-          <h3 className="section-heading" id="upcoming-heading">Upcoming <span>next 7 events</span></h3>
+      {mode === "today" && (
+        <section aria-labelledby="upcoming-heading" className="upcoming">
+          <div className="section-label">
+            <h2 id="upcoming-heading">Upcoming · next 7 days</h2>
+            <a href="#calendar" onClick={(event) => { event.preventDefault(); onNavigate("calendar"); }}>Open calendar</a>
+          </div>
           <div className="upcoming-strip">
-            {upcoming.map((event) => {
-              const date = new Date(`${event.date}T12:00:00`);
+            {upcomingDays.map(({ date: dateValue, events }) => {
+              const date = new Date(`${dateValue}T12:00:00`);
               return (
-                <button key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
-                  <time dateTime={event.date}><strong>{date.getDate()}</strong>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</time>
-                  <span className={`event-${event.kind}`}>{event.label}</span>
-                  <small>{event.batchName}</small>
+                <button className={dateValue === today ? "today" : undefined} key={dateValue} onClick={() => events[0] && onOpen(events[0].batchId)} type="button">
+                  <time dateTime={dateValue}><strong>{date.getDate()}</strong>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</time>
+                  <div>{events.map((event) => <span className={`event-${event.kind}`} key={`${event.batchId}-${event.kind}-${event.label}`}>{event.label}</span>)}</div>
                 </button>
               );
             })}
@@ -561,14 +701,13 @@ function CompactBatchCard({ batch, onOpen }: { batch: Batch; onOpen(id: string):
   const latestPh = latestPhReading(batch);
   const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
   return (
-    <article className="batch-summary">
-      <div className="summary-heading"><span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span><small>{batch.id.slice(0, 8)}</small></div>
+    <button aria-label={`Open ${batch.name}`} className="batch-summary" onClick={() => onOpen(batch.id)} type="button">
+      <div className="summary-heading"><small>{batch.id.slice(0, 8)}</small><span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span></div>
       <h3>{batch.name}</h3>
       <p>{batch.profileSnapshot.name}</p>
       <div className="summary-metrics"><span>Day {day}</span>{latestPh && <span>pH {latestPh.value}</span>}</div>
       <p className="summary-next"><strong>Next:</strong> {nextCheck ? `${nextCheck.name} · ${nextCheck.nextDueDate}` : batch.finishDate ? `Finish · ${batch.finishDate}` : "Review timeline"}</p>
-      <button aria-label={`Open ${batch.name}`} onClick={() => onOpen(batch.id)} type="button">Open batch</button>
-    </article>
+    </button>
   );
 }
 

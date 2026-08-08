@@ -1,22 +1,386 @@
 :root {
-  --bg: #f7f4ee;
-  --surface: #fffdfa;
-  --panel: #eee9df;
-  --panel-deep: #e5ded2;
-  --ink: #342b25;
-  --muted: #756a61;
-  --border: #ddd5c9;
-  --accent: #a24f38;
-  --accent-dark: #743c2e;
-  --green: #34704d;
-  --green-bg: #e8f3e9;
-  --amber: #986315;
-  --amber-bg: #f8edcf;
-  --blue: #356886;
+  --bg: oklch(96.5% 0.006 80);
+  --surface: oklch(100% 0.002 85);
+  --panel: oklch(94% 0.01 78);
+  --panel-deep: oklch(90% 0.015 72);
+  --ink: oklch(24% 0.02 55);
+  --muted: oklch(49% 0.016 60);
+  --border: oklch(89% 0.01 80);
+  --accent: oklch(55% 0.115 42);
+  --accent-dark: oklch(38% 0.09 45);
+  --green: oklch(44% 0.1 150);
+  --green-bg: oklch(93% 0.045 150);
+  --amber: oklch(50% 0.135 58);
+  --amber-bg: oklch(93.5% 0.05 80);
+  --blue: oklch(42% 0.1 244);
   color: var(--ink);
   background: var(--bg);
-  font-family: "Segoe UI", system-ui, sans-serif;
+  font-family: "Karla", "Segoe UI", system-ui, sans-serif;
   font-synthesis: none;
+}
+
+/* Today follows the approved v1 concept while retaining the live batch data. */
+.today-screen .screen-head {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.today-screen .eyebrow,
+.queue-heading {
+  color: var(--muted);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.today-screen h1 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.625rem, 3.4vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.today-screen .screen-intro {
+  margin-top: 0.375rem;
+  max-width: 56ch;
+}
+
+.today-screen .screen-head {
+  margin-bottom: 2.5625rem;
+}
+
+.today-screen .batches {
+  gap: 0;
+  margin-top: 0;
+  min-width: 0;
+}
+
+.today-fab {
+  align-items: center;
+  border-radius: 1rem;
+  bottom: 1.625rem;
+  box-shadow: 0 0.25rem 0.875rem oklch(40% 0.08 45 / 35%);
+  display: grid;
+  font-size: 0;
+  height: 3.5rem;
+  padding: 0;
+  place-items: center;
+  position: fixed;
+  right: 1.125rem;
+  width: 3.5rem;
+  z-index: 30;
+}
+
+.today-fab span:first-child {
+  font-size: 1.875rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.today-fab span:last-child {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.action-queue {
+  margin-bottom: 0.4375rem;
+}
+
+.queue-heading {
+  margin: 0.125rem 0.125rem 0.625rem;
+}
+
+.today-screen .queue-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.today-screen .queue-card {
+  align-items: flex-start;
+  border-left: 3px solid var(--accent);
+  border-radius: 0.625rem;
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
+  gap: 0.875rem;
+  display: flex;
+  min-height: 13.125rem;
+  min-width: 0;
+  padding: 0.8125rem 1rem;
+  width: 100%;
+}
+
+.today-screen .queue-card > div,
+.today-screen .batch-overview,
+.today-screen .batch-summary {
+  min-width: 0;
+}
+
+.today-screen .queue-icon {
+  background: var(--amber-bg);
+  border-radius: 0.5625rem;
+  color: var(--amber);
+  flex: 0 0 auto;
+  font-family: "Source Serif 4", Georgia, serif;
+  height: 2.25rem;
+  width: 2.25rem;
+}
+
+.today-screen .queue-card.ready .queue-icon {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.today-screen .queue-card small {
+  color: oklch(60% 0.013 60);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.today-screen .queue-card h4 {
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+.today-screen .queue-card p {
+  font-size: 0.84375rem;
+  margin-top: 0.125rem;
+}
+
+.today-screen .queue-batch {
+  color: var(--accent-dark);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.today-screen .queue-card .primary-action {
+  align-self: center;
+  margin-left: auto;
+}
+
+.today-screen .primary-action {
+  background: var(--accent);
+  border-color: var(--accent);
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  min-height: 2.5rem;
+  padding: 0.5625rem 0.9375rem;
+}
+
+.today-screen .section-label {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  justify-content: space-between;
+  margin: 1.5rem 0.125rem 0.625rem;
+}
+
+.today-screen .section-label h2 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.today-screen .section-label a {
+  background: transparent;
+  border: 0;
+  color: var(--accent-dark);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  min-height: auto;
+  padding: 0;
+}
+
+.today-screen .section-label a:hover {
+  text-decoration: underline;
+}
+
+.today-screen .batch-overview {
+  gap: 0.875rem;
+  grid-template-columns: 1fr;
+}
+
+.today-screen .batch-summary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1rem 1.125rem;
+  text-align: left;
+  width: 100%;
+  min-height: 12rem;
+}
+
+.today-screen .batch-summary:hover {
+  border-color: oklch(82% 0.014 75);
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 8%), 0 0.75rem 1.625rem oklch(30% 0.02 60 / 10%);
+  transform: translateY(-1px);
+}
+
+.today-screen .batch-summary:nth-child(-n + 3) {
+  min-height: 13.125rem;
+}
+
+.today-screen .batch-summary h3 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.today-screen .batch-summary > p:not(.summary-next) {
+  font-size: 0.84375rem;
+}
+
+.today-screen .status {
+  background: var(--amber-bg);
+  border: 0;
+  color: var(--amber);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6875rem;
+}
+
+.today-screen .status-ready {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.today-screen .status-to-fridge {
+  background: oklch(93.5% 0.04 245);
+  color: var(--blue);
+}
+
+.today-screen .summary-heading small,
+.today-screen .summary-metrics span {
+  font-family: "IBM Plex Mono", Consolas, monospace;
+}
+
+.today-screen .summary-next {
+  font-size: 0.8125rem;
+  padding-top: 0.5625rem;
+}
+
+.today-screen .upcoming-strip {
+  gap: 0.625rem;
+  padding: 0.125rem 0.125rem 0.5rem;
+}
+
+.today-screen .upcoming .section-label {
+  margin-bottom: 1rem;
+}
+
+.today-screen .upcoming-strip button {
+  align-items: center;
+  border-radius: 0.625rem;
+  flex: 0 0 4.875rem;
+  gap: 0.375rem;
+  min-height: 0;
+  padding: 0.625rem 0.375rem 0.75rem;
+  text-align: center;
+}
+
+.today-screen .upcoming-strip button.today {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: oklch(97% 0.01 80);
+}
+
+.today-screen .upcoming-strip button.today time,
+.today-screen .upcoming-strip button.today time strong {
+  color: inherit;
+}
+
+.today-screen .upcoming-strip time {
+  align-items: center;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.65625rem;
+  letter-spacing: 0.08em;
+}
+
+.today-screen .upcoming-strip time strong {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.375rem;
+}
+
+.today-screen .upcoming-strip button > div {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.today-screen .upcoming-strip span {
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.625rem;
+  line-height: 1.3;
+  max-width: 100%;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .today-screen .batch-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .today-screen .batch-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .today-screen .queue-grid {
+    flex-direction: row;
+  }
+
+  .today-screen .queue-card {
+    flex: 1;
+  }
+
+  .today-screen .queue-card .primary-action {
+    align-self: center;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .today-fab {
+    bottom: 5.125rem;
+  }
+
+  .today-screen .queue-card .primary-action {
+    align-self: flex-start;
+  }
+
+  .navigation {
+    flex-direction: row;
+  }
 }
 
 * {
@@ -132,9 +496,9 @@ h2 {
 }
 
 .main-content {
-  margin: 0 auto;
-  max-width: 74rem;
-  padding: 2rem 2.2rem 4rem;
+  margin: 0;
+  max-width: none;
+  padding: 30px 34px 40px;
 }
 
 .screen-intro {
@@ -999,5 +1363,326 @@ button:disabled {
 
   .batch-list {
     max-width: none;
+  }
+}
+
+/* Calendar follows the v1 experience direction while reading live batch data. */
+.calendar-screen .screen-head {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.calendar-screen .eyebrow {
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.calendar-screen h1 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.625rem, 3.4vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.calendar-screen .screen-intro {
+  margin-top: 0.375rem;
+  max-width: 56ch;
+}
+
+.calendar-layout {
+  display: grid;
+  gap: 1.125rem;
+  grid-template-columns: 1fr;
+}
+
+.calendar-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
+  padding: 1rem;
+}
+
+.calendar-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.calendar-head h2,
+.calendar-section-label h2 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.1875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.calendar-nav button {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5625rem;
+  display: grid;
+  font-size: 1.5rem;
+  height: 2.375rem;
+  line-height: 1;
+  min-height: 2.375rem;
+  padding: 0;
+  place-items: center;
+  width: 2.375rem;
+}
+
+.calendar-nav button:hover {
+  background: var(--panel);
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.calendar-weekdays {
+  color: oklch(60% 0.013 60);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.65625rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
+}
+
+.calendar-weekdays span {
+  padding: 0.25rem 0;
+  text-align: center;
+}
+
+.calendar-day {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5625rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8125rem;
+  gap: 0.1875rem;
+  min-height: 4rem;
+  overflow: hidden;
+  padding: 0.375rem 0.4375rem;
+}
+
+.calendar-day.other {
+  background: var(--bg);
+  border-style: dashed;
+}
+
+.calendar-day.today {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.calendar-day-number {
+  color: var(--ink);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.71875rem;
+  font-weight: 500;
+}
+
+.calendar-day.today .calendar-day-number {
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.calendar-panel .calendar-event {
+  border: 0;
+  border-radius: 0.3125rem;
+  display: block;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.59375rem;
+  line-height: 1.25;
+  overflow: hidden;
+  padding: 0.125rem 0.3125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-panel .event-check {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.calendar-panel .event-finish {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.calendar-legend {
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.875rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.calendar-legend span {
+  align-items: center;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 0.78125rem;
+  gap: 0.4375rem;
+}
+
+.calendar-legend i {
+  border-radius: 50%;
+  height: 0.625rem;
+  width: 0.625rem;
+}
+
+.legend-check i { background: var(--amber); }
+.legend-ready i { background: var(--green); }
+.legend-fridge i { background: var(--blue); }
+
+.calendar-section-label {
+  align-items: baseline;
+  display: flex;
+  margin: 0 0 0.625rem;
+}
+
+.upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upcoming-item {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
+  display: flex;
+  gap: 0.8125rem;
+  padding: 0.75rem 0.875rem;
+}
+
+.upcoming-date {
+  flex: 0 0 3.625rem;
+  width: 3.625rem;
+}
+
+.upcoming-date b {
+  display: block;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.1875rem;
+  line-height: 1.1;
+}
+
+.upcoming-date span {
+  color: oklch(60% 0.013 60);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.upcoming-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.upcoming-body b {
+  font-size: 0.90625rem;
+}
+
+.upcoming-body p {
+  color: var(--muted);
+  font-size: 0.78125rem;
+  margin: 0;
+}
+
+.calendar-status {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  gap: 0.4375rem;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.6875rem 0.25rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.calendar-status.attention {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.calendar-status.ready {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.status-dot {
+  background: currentColor;
+  border-radius: 50%;
+  height: 0.5rem;
+  width: 0.5rem;
+}
+
+.calendar-empty {
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  border-radius: 0.5625rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  padding: 0.75rem;
+}
+
+@media (min-width: 900px) {
+  .calendar-layout {
+    grid-template-columns: 1.6fr 1fr;
+  }
+
+  .calendar-day {
+    min-height: 4.625rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .calendar-panel {
+    padding: 0.75rem;
+  }
+
+  .calendar-day {
+    min-height: 3.75rem;
+    padding-inline: 0.3125rem;
+  }
+
+  .calendar-panel .calendar-event {
+    font-size: 0.53125rem;
+    padding-inline: 0.1875rem;
+  }
+
+  .calendar-status {
+    font-size: 0;
+    gap: 0;
+    padding: 0.375rem;
   }
 }
