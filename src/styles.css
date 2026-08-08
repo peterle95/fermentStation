@@ -369,7 +369,7 @@
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 899px) {
   .today-fab {
     bottom: 5.125rem;
   }
@@ -1220,7 +1220,7 @@ button:disabled {
   opacity: 0.55;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 899px) {
   .app-shell {
     display: block;
     padding-bottom: 5rem;
@@ -1246,14 +1246,40 @@ button:disabled {
     border-bottom: 1px solid var(--border);
     display: flex;
     min-height: 4rem;
+    margin: 1.125rem 1rem 0;
     padding: 0.7rem 1rem;
     position: sticky;
     top: 0;
     z-index: 10;
   }
 
+  .masthead > div {
+    flex: 1;
+  }
+
+  .masthead strong {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.0625rem;
+    line-height: 1;
+  }
+
+  .masthead-menu {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: var(--muted);
+    display: grid;
+    font-size: 1.1rem;
+    height: 2.75rem;
+    letter-spacing: 0.12em;
+    min-height: 0;
+    padding: 0;
+    place-items: center;
+    width: 2.75rem;
+  }
+
   .main-content {
-    padding: 1.25rem 1rem 2rem;
+    padding: 0.25rem 1rem 2rem;
   }
 
   .navigation {
@@ -1263,11 +1289,12 @@ button:disabled {
     display: flex;
     gap: 0;
     left: 0;
-    padding: 0.5rem;
+    padding: 0;
     position: fixed;
     right: 0;
     top: auto;
     z-index: 20;
+    flex-direction: row;
   }
 
   .navigation button {
@@ -1277,13 +1304,15 @@ button:disabled {
     flex: 1;
     font-size: 0.75rem;
     gap: 0.15rem;
-    padding: 0.7rem 0.3rem;
+    min-height: 3.75rem;
+    padding: 0.5rem 0.3rem 0.625rem;
     text-align: center;
   }
 
   .navigation button:last-child {
     border-top: 0;
     border-radius: 0.6rem;
+    display: none;
     margin-top: 0;
   }
 
@@ -1694,5 +1723,226 @@ button:disabled {
     font-size: 0;
     gap: 0;
     padding: 0.375rem;
+  }
+}
+
+/* Batches follows the v1 concept card and filter treatment. */
+.batches-screen .screen-head {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.batches-screen h1 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.625rem, 3.4vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.batches-screen .screen-intro {
+  margin-top: 0.375rem;
+  max-width: 56ch;
+}
+
+.batches-screen .batches {
+  gap: 0;
+  margin-top: 0;
+}
+
+.batches-screen .filter-row {
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.batches-screen .filter-row button {
+  font-size: 0.84375rem;
+  font-weight: 500;
+  min-height: 2.25rem;
+  padding: 0.4375rem 0.8125rem;
+}
+
+.batches-screen .batch-overview {
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: 1fr;
+}
+
+.batches-screen .batch-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1rem 1.125rem;
+  text-align: left;
+  width: 100%;
+}
+
+.batches-screen .batch-card:hover {
+  border-color: oklch(82% 0.014 75);
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 8%), 0 0.75rem 1.625rem oklch(30% 0.02 60 / 10%);
+  transform: translateY(-1px);
+}
+
+.batches-screen .bc-top {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.625rem;
+  justify-content: space-between;
+}
+
+.batches-screen .bc-id {
+  color: oklch(60% 0.013 60);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+}
+
+.batches-screen .batch-card h3 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.batches-screen .bc-name {
+  color: var(--muted);
+  font-size: 0.84375rem;
+  margin: 0;
+}
+
+.batches-screen .bc-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.batches-screen .bc-metrics span {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.4375rem;
+  color: var(--ink);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.75rem;
+  padding: 0.1875rem 0.5rem;
+}
+
+.batches-screen .bc-next {
+  align-items: center;
+  border-top: 1px dashed var(--border);
+  color: var(--muted);
+  display: flex;
+  font-size: 0.8125rem;
+  gap: 0.4375rem;
+  margin: 0;
+  padding-top: 0.5625rem;
+}
+
+.batches-screen .bc-next strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.batches-screen .status {
+  align-items: center;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  gap: 0.4375rem;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.6875rem 0.25rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.batches-screen .status svg,
+.today-screen .status svg {
+  flex: 0 0 auto;
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+.batches-screen .status-attention,
+.batches-screen .status-active {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.batches-screen .status-ready {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.batches-screen .status-to-fridge {
+  background: oklch(93.5% 0.04 245);
+  color: var(--blue);
+}
+
+.batches-screen .status-archived {
+  background: oklch(95% 0.006 245);
+  color: oklch(47% 0.012 245);
+}
+
+.batch-fab {
+  align-items: center;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 1rem;
+  bottom: 1.625rem;
+  box-shadow: 0 0.25rem 0.875rem oklch(40% 0.08 45 / 35%);
+  display: grid;
+  font-size: 0;
+  height: 3.5rem;
+  padding: 0;
+  place-items: center;
+  position: fixed;
+  right: 1.125rem;
+  width: 3.5rem;
+  z-index: 30;
+}
+
+.batch-fab span:first-child {
+  font-size: 1.875rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.batch-fab span:last-child {
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .batches-screen .batch-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .batches-screen .batch-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 899px) {
+  .batch-fab {
+    bottom: 5.125rem;
   }
 }
