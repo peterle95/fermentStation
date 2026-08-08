@@ -9,6 +9,22 @@ describe("batch workflow", () => {
   beforeEach(() => localStorage.clear());
   afterEach(cleanup);
 
+  it("shows the profile cards and opens profile guidance", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+
+    expect(screen.getByRole("heading", { name: "Profiles" })).toBeTruthy();
+    expect(screen.getByText("Kombucha F1")).toBeTruthy();
+    expect(screen.getByText("Milk kefir")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "View Kombucha F1 guidance" }));
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.textContent).toContain("Profile calculation");
+    fireEvent.click(screen.getByRole("button", { name: "Done" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("starts, snapshots, monitors, and filters a batch", () => {
     render(<App />);
 

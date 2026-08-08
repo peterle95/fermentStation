@@ -21,10 +21,10 @@ describe("fermentation profiles", () => {
 
     expect(state.profiles.map((profile) => profile.name)).toEqual([
       "Kombucha F1",
-      "Kombucha F2",
+      "Kimchi",
       "Sauerkraut",
-      "Anaerobic fermentation",
-      "Sourdough",
+      "Milk kefir",
+      "Sourdough starter",
     ]);
     expect(updated.profiles[0].name).toBe("Daily kombucha");
   });

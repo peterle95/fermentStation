@@ -237,21 +237,30 @@ export function App() {
               </div>
               <CalendarView batches={batchState.batches} />
             </section>
+          ) : shell.destination === "profiles" ? (
+            <section className="profiles-screen" aria-label="Fermentation profiles">
+              <div className="screen-head">
+                <div>
+                  <p className="eyebrow">Recipes that remember</p>
+                  <h1>Profiles</h1>
+                  <p className="screen-intro">A fermentation profile carries the inputs, guidance, and calculations a batch follows until it's ready.</p>
+                </div>
+              </div>
+              <Profiles
+                formulaTerms={shell.formulaTerms}
+                profiles={profileState.profiles}
+                trash={profileState.trash}
+                onDelete={(id) => saveProfiles(deleteProfile(profileState, id, Date.now()))}
+                onRestore={(id) => saveProfiles(restoreProfile(profileState, id, Date.now()))}
+                onSave={handleProfile}
+              />
+            </section>
           ) : (
             <>
               <p className="eyebrow">{labels[shell.destination]}</p>
               <h2>{labels[shell.destination]}</h2>
               <p className="screen-intro">{screenDescription(shell.destination)}</p>
-          {shell.destination === "profiles" ? (
-            <Profiles
-              formulaTerms={shell.formulaTerms}
-              profiles={profileState.profiles}
-              trash={profileState.trash}
-              onDelete={(id) => saveProfiles(deleteProfile(profileState, id, Date.now()))}
-              onRestore={(id) => saveProfiles(restoreProfile(profileState, id, Date.now()))}
-              onSave={handleProfile}
-            />
-          ) : shell.destination === "settings" ? (
+          {shell.destination === "settings" ? (
             <SettingsView
               batchState={batchState}
               formulaTerms={shell.formulaTerms}
@@ -992,6 +1001,105 @@ interface ProfilesProps {
   onSave(profile: FermentationProfile): void;
 }
 
+interface ProfilePresentation {
+  tag: string;
+  description: string;
+  params: [string, string][];
+  inputs: string;
+  guidance: string[];
+  calculation: string;
+  batches: string;
+}
+
+const profilePresentations: Record<string, ProfilePresentation> = {
+  "Kombucha F1": {
+    tag: "Sweet tea · SCOBY · 7–12 days",
+    description: "Continuous sweet-tea ferment. The pellicle (SCOBY) converts sugar to acetic acid; you bottle when the tea turns dry and tart.",
+    params: [["18–28°C", "temperature zone"], ["pH 2.5–3.5", "zone"], ["7–12 d", "duration"], ["every 2 d", "check cadence"], ["3–4 L", "typical vessel"], ["0.9–1.2", "target gravity"]],
+    inputs: "pH, temperature, days elapsed, taste, pellicle condition",
+    guidance: [
+      "Add 100 g sugar per L of sweet tea; cool below 30°C before pouring over the SCOBY.",
+      "Keep the vessel covered with cotton; ferment in a warm, still spot away from direct sun.",
+      "Run a <b>profile check</b> every 2 days: read pH, temperature, and taste.",
+      "Bottle when pH lands below <b>3.5</b> or the tea turns pleasantly dry — the <b>suggested value</b> is pH 3.2–3.4.",
+    ],
+    calculation: "pH drop ≈ <b>(last pH − this pH)</b> ÷ days between reads. When the last two reads both sit inside the zone and drift has flattened to ≤ 0.1/day, the batch is ready.",
+    batches: "KB-004 · KB-003 · KB-002",
+  },
+  Sauerkraut: {
+    tag: "2% salt brine · 3–6 weeks",
+    description: "Cabbage weighted under its own brine. Salt pulls water out and selects for lactobacillus; no vinegar, no starter.",
+    params: [["16–22°C", "temperature zone"], ["pH 3.4–3.8", "zone"], ["21–42 d", "duration"], ["weekly", "check cadence"], ["2–3%", "salt weight"], ["2 L", "typical crock"]],
+    inputs: "pH, temperature, days elapsed, brine level, aroma",
+    guidance: [
+      "Mass cabbage at 2% salt; knead until the brine pools at the base of the bowl.",
+      "Pack into the crock and weight it so brine fully covers the cabbage — exposed leaves rot.",
+      "Run a <b>profile check</b> weekly: read pH, confirm the brine line, and sniff for clean sour.",
+      "Ready when pH sits between <b>3.4 and 3.8</b> — suggested value pH 3.6 — and the aroma is bright, not funky.",
+    ],
+    calculation: "Ferment speed = pH drop per 7 days. Two consecutive weekly reads inside the zone at ≤ 0.2/week drift means the batch is ready to move to the fridge.",
+    batches: "SK-012 · SK-009",
+  },
+  Kimchi: {
+    tag: "Fast ferment · 1–3 days out, then fridge",
+    description: "Napa cabbage and radish paste, briefly fermented warm, then parked in the fridge to ripen slowly for weeks.",
+    params: [["18–22°C", "temperature zone"], ["pH ≤ 4.2", "zone"], ["1–3 d", "out-of-fridge"], ["daily", "check cadence"], ["5–8 cm", "jar headspace"], ["3 L", "typical jar"]],
+    inputs: "pH, temperature, days elapsed, gas, aroma",
+    guidance: [
+      "Salt the cabbage 90 minutes, rinse, then rub with the gochujang paste.",
+      "Pack firmly so juice rises; leave headspace for CO₂ build-up.",
+      "A <b>profile check</b> daily while out: pH falls fast — first day is the loudest.",
+      "Shift <b>to fridge</b> once pH reaches <b>4.2</b>, before it turns mushy.",
+    ],
+    calculation: "Brine rise time ≈ (target pH 4.2 − current pH) ÷ daily drop. Below 4.2 it is technically ready; after that, fridge time is flavour, not safety.",
+    batches: "KK-211",
+  },
+  "Milk kefir": {
+    tag: "24-hour culture · room temperature",
+    description: "A daily rhythm: culture the milk, strain the grains, start the next jar. Stops being active the moment it hits the fridge.",
+    params: [["21–24°C", "temperature zone"], ["pH ~4.2", "zone"], ["24 h", "duration"], ["daily", "check cadence"], ["1:10", "grain:milk"], ["1 L", "typical jar"]],
+    inputs: "pH, temperature, hours elapsed, grain size",
+    guidance: [
+      "Add grains at about 1:10 of milk by volume.",
+      "Strain after <b>24 hours</b> — longer turns it tart and thin.",
+      "A <b>profile check</b> reads pH only; the grains set the rhythm.",
+      "Below pH <b>4.2</b> it is ready — keep the grains to start tomorrow's batch.",
+    ],
+    calculation: "The strain window is time-based: expected pH ≈ f(hours at 21–24°C). Suggested value pH 4.2 at 24 h; colder room ⇒ fewer hours.",
+    batches: "None yet — first batch pending",
+  },
+  "Sourdough starter": {
+    tag: "Feed 1:1:1 · 23–28°C · 4–8 h to peak",
+    description: "A living culture you feed on a schedule. The starter stays active as long as it is fed; sleeps in the fridge between bakes.",
+    params: [["23–28°C", "temperature zone"], ["peak 4–8 h", "rise time"], ["1:1:1", "feed ratio"], ["daily", "check cadence"], ["25 g", "base flour"], ["500 ml", "jar"]],
+    inputs: "Rise time, hours to peak, temperature, aroma",
+    guidance: [
+      "Feed 1:1:1 by weight: 25 g starter, 25 g flour, 25 g water — same time each day.",
+      "Discard most of it before feeding, or the jar overflows.",
+      "A <b>profile check</b> measures hours to peak; below <b>8 h</b> the starter is strong.",
+      "Bake when it peaks under <b>8 h</b> twice in a row — the suggested value is 4–6 h.",
+    ],
+    calculation: "Peak time trend = hours-to-peak across the last 3 feeds. Halved peak time ≈ doubled culture activity; steady under 8 h means bake-ready.",
+    batches: "None yet — first batch pending",
+  },
+};
+
+function presentationFor(profile: FermentationProfile): ProfilePresentation {
+  return profilePresentations[profile.name] ?? {
+    tag: profile.expectedDurationDays ? `${profile.expectedDurationDays} day profile` : "Custom fermentation profile",
+    description: profile.guidance || "A local fermentation profile with its own inputs and guidance.",
+    params: [[profile.expectedDurationDays ? `${profile.expectedDurationDays} d` : "—", "duration"], [profile.inputs.length ? String(profile.inputs.length) : "—", "inputs"], [profile.checks.length ? `${profile.checks.length}` : "—", "check rhythms"]],
+    inputs: profile.inputs.map(({ name }) => name).join(", ") || "No inputs defined",
+    guidance: [profile.instructions || "No guidance defined yet."],
+    calculation: profile.calculations[0]?.formula || "No calculation defined yet.",
+    batches: "No batches yet",
+  };
+}
+
+function RichProfileText({ value }: { value: string }) {
+  return <>{value.split(/(<b>.*?<\/b>)/g).map((part, index) => part.startsWith("<b>") ? <strong key={index}>{part.slice(3, -4)}</strong> : part)}</>;
+}
+
 interface StructuredFormulaRow {
   id: string;
   kind: "structured";
@@ -1037,6 +1145,7 @@ function formulaRows(profile: FermentationProfile): FormulaRow[] {
 
 function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }: ProfilesProps) {
   const [editing, setEditing] = useState<FermentationProfile | null>(null);
+  const [viewing, setViewing] = useState<FermentationProfile | null>(null);
   const [calculations, setCalculations] = useState<FormulaRow[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const inputsRef = useRef<HTMLTextAreaElement>(null);
@@ -1047,6 +1156,7 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
 
   function edit(profile: FermentationProfile) {
     setErrors([]);
+    setViewing(null);
     setEditing(profile);
     setCalculations(formulaRows(profile));
   }
@@ -1132,11 +1242,13 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
 
   return (
     <section className="profiles" aria-label="Fermentation profiles">
-      <button className="primary-action" onClick={() => {
-        edit({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [], phZones: [] });
-      }} type="button">
-        Add profile
-      </button>
+      <div className="profile-tools">
+        <button className="profile-add" onClick={() => {
+          edit({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [], phZones: [] });
+        }} type="button">
+          Add profile
+        </button>
+      </div>
 
       {editing && (
         <form className="profile-form" key={editing.id} onSubmit={save}>
@@ -1188,21 +1300,61 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
       )}
 
       <div className="profile-list">
-        {profiles.map((profile) => (
-          <article className="profile-card" key={profile.id}>
-            <h3>{profile.name}</h3>
-            <p><strong>Guidance:</strong> {profile.guidance || "None yet."}</p>
-            <p><strong>Instructions:</strong> {profile.instructions || "None yet."}</p>
-            <div className="form-actions">
-              <button aria-label={`Edit ${profile.name}`} onClick={() => edit(profile)} type="button">Edit</button>
-              <button aria-label={`Delete ${profile.name}`} onClick={() => {
-                setEditing((current) => current?.id === profile.id ? null : current);
-                onDelete(profile.id);
-              }} type="button">Delete</button>
-            </div>
-          </article>
-        ))}
+        {profiles.map((profile) => {
+          const presentation = presentationFor(profile);
+          const calculation = presentation.calculation.replace(/<[^>]+>/g, "");
+          return (
+            <article className="profile-card" key={profile.id}>
+              <button aria-label={`View ${profile.name} guidance`} className="profile-card-main" onClick={() => setViewing(profile)} type="button">
+                <span className="pc-id">Fermentation profile</span>
+                <h3>{profile.name}</h3>
+                <p className="pc-desc">{presentation.description}</p>
+                <div className="pc-params">
+                  {presentation.params.map(([value, label]) => <span className="pc-param" key={`${value}-${label}`}><b>{value}</b><span>{label}</span></span>)}
+                </div>
+                <div className="pc-rows">
+                  <p><b>Profile inputs</b> {presentation.inputs}</p>
+                  <p><b>Profile calculation</b> {calculation.slice(0, 86)}…</p>
+                </div>
+                <div className="pc-foot"><span className="mono">{presentation.batches}</span><span className="eyebrow">View guidance →</span></div>
+              </button>
+              <div className="profile-card-actions">
+                <button aria-label={`Edit ${profile.name}`} onClick={() => edit(profile)} type="button">Edit</button>
+                <button aria-label={`Delete ${profile.name}`} onClick={() => {
+                  setEditing((current) => current?.id === profile.id ? null : current);
+                  setViewing((current) => current?.id === profile.id ? null : current);
+                  onDelete(profile.id);
+                }} type="button">Delete</button>
+              </div>
+            </article>
+          );
+        })}
       </div>
+
+      {viewing && (() => {
+        const presentation = presentationFor(viewing);
+        return (
+          <div className="profile-overlay" onClick={(event) => { if (event.target === event.currentTarget) setViewing(null); }}>
+            <div aria-labelledby="profile-sheet-title" aria-modal="true" className="profile-sheet" role="dialog">
+              <h2 id="profile-sheet-title">{viewing.name}</h2>
+              <p className="sheet-sub">{presentation.tag}</p>
+              <div className="pc-params profile-sheet-params">
+                {presentation.params.map(([value, label]) => <span className="pc-param" key={`${value}-${label}`}><b>{value}</b><span>{label}</span></span>)}
+              </div>
+              <section className="profile-detail-panel">
+                <h3>Profile guidance</h3>
+                {presentation.guidance.map((guidance, index) => <div className="guide-step" key={guidance}><span className="g-n">{index + 1}</span><p><RichProfileText value={guidance} /></p></div>)}
+              </section>
+              <section className="profile-detail-panel">
+                <h3>Profile calculation</h3>
+                <p className="calc-line"><RichProfileText value={presentation.calculation} /></p>
+              </section>
+              <p className="profile-batch-hint">Batches on this profile: {presentation.batches}</p>
+              <div className="profile-sheet-actions"><button className="primary-action" onClick={() => setViewing(null)} type="button">Done</button></div>
+            </div>
+          </div>
+        );
+      })()}
 
       {trash.length > 0 && (
         <section className="trash" aria-label="Deleted profiles">
