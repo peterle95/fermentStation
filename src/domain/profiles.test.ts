@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   addProfile,
+  calculateProfileValue,
   createProfileState,
   deleteProfile,
   discardExpiredProfiles,
   restoreProfile,
   updateProfile,
+  validateProfile,
 } from "./profiles";
 
 const day = 24 * 60 * 60 * 1000;
@@ -33,6 +35,8 @@ describe("fermentation profiles", () => {
       name: "Kimchi",
       guidance: "Keep below brine.",
       instructions: "Taste weekly.",
+      inputs: [],
+      calculations: [],
     });
     const updated = updateProfile(added, {
       ...added.profiles.at(-1)!,
@@ -42,6 +46,48 @@ describe("fermentation profiles", () => {
     expect(state.profiles).toHaveLength(5);
     expect(added.profiles).toHaveLength(6);
     expect(updated.profiles.at(-1)?.instructions).toBe("Taste after 5 days.");
+  });
+
+  it("calculates compatible metric formulas, percentages, and parentheses", () => {
+    const profile = {
+      ...createProfileState().profiles[0],
+      inputs: [{ name: "cabbage", unit: "kg" as const, defaultValue: 2 }],
+      calculations: [{ name: "salt", unit: "g" as const, formula: "cabbage * (2% + 0.5%)" }],
+    };
+
+    expect(calculateProfileValue(profile, profile.calculations[0], {})).toBe(50);
+    expect(calculateProfileValue(profile, profile.calculations[0], { cabbage: 1.25 })).toBe(31.25);
+  });
+
+  it("leaves missing calculations incomplete and rejects invalid values and units", () => {
+    const profile = {
+      ...createProfileState().profiles[0],
+      inputs: [
+        { name: "weight", unit: "kg" as const },
+        { name: "water", unit: "l" as const },
+      ],
+      calculations: [{ name: "total", unit: "kg" as const, formula: "weight + water" }],
+      expectedDurationDays: 0,
+    };
+
+    expect(calculateProfileValue(
+      { ...profile, calculations: [{ name: "salt", unit: "kg", formula: "weight * 2%" }] },
+      { name: "salt", unit: "kg", formula: "weight * 2%" },
+      {},
+    )).toBeNull();
+    expect(validateProfile(profile)).toEqual([
+      "Expected duration must be a positive whole number.",
+      "total: Formula combines incompatible units",
+    ]);
+    expect(validateProfile({
+      ...profile,
+      expectedDurationDays: 7,
+      inputs: [{ name: "weight", unit: "kg", defaultValue: -1 }],
+      calculations: [{ name: "salt", unit: "kg", formula: "weight * 120%" }],
+    })).toEqual([
+      "weight cannot be negative.",
+      "salt: Percentage must be between 0% and 100%",
+    ]);
   });
 
   it("restores a deleted profile during the seven-day recovery period", () => {

@@ -1,4 +1,4 @@
-import { type ProfileState } from "../domain/profiles";
+import { type FermentationProfile, type ProfileState } from "../domain/profiles";
 
 export interface ProfileStore {
   load(): ProfileState | null;
@@ -18,9 +18,30 @@ function isProfile(value: unknown): boolean {
   }
 
   const profile = value as Record<string, unknown>;
+  const inputs = profile.inputs ?? [];
+  const calculations = profile.calculations ?? [];
   return ["id", "name", "guidance", "instructions"].every(
     (key) => typeof profile[key] === "string",
-  );
+  ) && Array.isArray(inputs) && inputs.every((input) => {
+    if (!input || typeof input !== "object") return false;
+    const candidate = input as Record<string, unknown>;
+    return typeof candidate.name === "string" && ["g", "kg", "ml", "l"].includes(String(candidate.unit)) &&
+      (candidate.defaultValue === undefined || typeof candidate.defaultValue === "number");
+  }) && Array.isArray(calculations) && calculations.every((calculation) => {
+    if (!calculation || typeof calculation !== "object") return false;
+    const candidate = calculation as Record<string, unknown>;
+    return ["name", "formula"].every((key) => typeof candidate[key] === "string") &&
+      ["g", "kg", "ml", "l"].includes(String(candidate.unit));
+  }) &&
+    (profile.expectedDurationDays === undefined || typeof profile.expectedDurationDays === "number");
+}
+
+function normalizeProfile(profile: FermentationProfile): FermentationProfile {
+  return {
+    ...profile,
+    inputs: profile.inputs ?? [],
+    calculations: profile.calculations ?? [],
+  };
 }
 
 function isProfileState(value: unknown): value is ProfileState {
@@ -51,7 +72,12 @@ export function createProfileStore(storage: KeyValueStore): ProfileStore {
         }
 
         const state: unknown = JSON.parse(value);
-        return isProfileState(state) ? state : null;
+        return isProfileState(state) ? {
+          profiles: state.profiles.map(normalizeProfile),
+          trash: state.trash.map((profile) => ({
+            ...normalizeProfile(profile), deletedAt: profile.deletedAt,
+          })),
+        } : null;
       } catch {
         return null;
       }

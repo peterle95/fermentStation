@@ -11,6 +11,9 @@ import {
   prioritizeToday,
   restoreBatch,
   restoreTimelineEntry,
+  overrideBatchCalculation,
+  setBatchInput,
+  setFinishDate,
   statusLabel,
   updateTimelineEntry,
   type Batch,
@@ -18,6 +21,7 @@ import {
   type BatchState,
   type BatchStatus,
   type TimelineEntry,
+  updateBatchForDate,
 } from "./domain/batches";
 import {
   addProfile,
@@ -26,6 +30,7 @@ import {
   discardExpiredProfiles,
   restoreProfile,
   updateProfile,
+  validateProfile,
   type FermentationProfile,
 } from "./domain/profiles";
 import {
@@ -66,7 +71,9 @@ export function App() {
     discardExpiredProfiles(browserProfileStore.load() ?? createProfileState(), Date.now()),
   );
   const [batchState, setBatchState] = useState(() =>
-    discardExpiredBatches(browserBatchStore.load() ?? createBatchState(), Date.now()),
+    updateBatchDates(
+      discardExpiredBatches(browserBatchStore.load() ?? createBatchState(), Date.now()),
+    ),
   );
 
   function saveProfiles(next: typeof profileState) {
@@ -82,7 +89,7 @@ export function App() {
   }
 
   function saveBatches(next: BatchState) {
-    const current = discardExpiredBatches(next, Date.now());
+    const current = updateBatchDates(discardExpiredBatches(next, Date.now()));
     browserBatchStore.save(current);
     setBatchState(current);
   }
@@ -154,6 +161,13 @@ export function App() {
   );
 }
 
+function updateBatchDates(state: BatchState): BatchState {
+  return {
+    ...state,
+    batches: state.batches.map((batch) => updateBatchForDate(batch, localDate())),
+  };
+}
+
 interface BatchViewProps {
   batches: Batch[];
   mode: "today" | "batches";
@@ -168,6 +182,8 @@ interface BatchViewProps {
 function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelete, onRestore }: BatchViewProps) {
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<BatchFilter>("all");
+  const [profileId, setProfileId] = useState(profiles[0]?.id ?? "");
+  const selectedProfile = profiles.find(({ id }) => id === profileId) ?? profiles[0];
   const visible = mode === "today" ? prioritizeToday(batches) : filterBatches(batches, filter);
 
   function save(event: React.FormEvent<HTMLFormElement>) {
@@ -184,6 +200,11 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
         id: crypto.randomUUID(),
         name: String(data.get("name") ?? ""),
         startDate,
+        today: localDate(),
+        inputValues: Object.fromEntries(profile.inputs.map((input) => {
+          const raw = String(data.get(`input.${input.name}`) ?? "");
+          return [input.name, raw === "" ? undefined : Number(raw)];
+        })),
       }),
     );
     setCreating(false);
@@ -219,7 +240,7 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
         <form className="batch-form" onSubmit={save}>
           <label>
             Fermentation profile
-            <select autoFocus name="profileId" required>
+            <select autoFocus name="profileId" onChange={(event) => setProfileId(event.target.value)} required value={selectedProfile?.id ?? ""}>
               {profiles.map((profile) => (
                 <option key={profile.id} value={profile.id}>{profile.name}</option>
               ))}
@@ -229,6 +250,12 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
             Start date
             <input defaultValue={localDate()} name="startDate" required type="date" />
           </label>
+          {selectedProfile?.inputs.map((input) => (
+            <label key={input.name}>
+              {input.name} ({input.unit})
+              <input defaultValue={input.defaultValue} min="0" name={`input.${input.name}`} step="any" type="number" />
+            </label>
+          ))}
           <label>
             Batch name <span className="optional">Optional</span>
             <input name="name" placeholder="Uses profile name if blank" />
@@ -300,6 +327,17 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
     }));
   }
 
+  function saveInputs(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    let next = batch;
+    for (const input of batch.profileSnapshot.inputs) {
+      const raw = String(data.get(input.name) ?? "");
+      next = setBatchInput(next, input.name, raw === "" ? undefined : Number(raw));
+    }
+    onChange(next);
+  }
+
   return (
     <article className="batch-card">
       <div className="batch-heading">
@@ -311,6 +349,37 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
       </div>
       <p><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
       {batch.profileSnapshot.guidance && <p>{batch.profileSnapshot.guidance}</p>}
+      {batch.finishDate && (
+        <label className="finish-date">
+          Finish date
+          <input onChange={(event) => onChange(setFinishDate(batch, event.target.value, localDate()))} type="date" value={batch.finishDate} />
+        </label>
+      )}
+      {batch.profileSnapshot.inputs.length > 0 && (
+        <form className="batch-values" onSubmit={saveInputs}>
+          {batch.profileSnapshot.inputs.map((input) => (
+            <label key={input.name}>
+              {input.name} ({input.unit})
+              <input defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" />
+            </label>
+          ))}
+          <button type="submit">Update inputs</button>
+        </form>
+      )}
+      {batch.profileSnapshot.calculations.map((calculation) => {
+        const value = batch.calculationValues[calculation.name];
+        return (
+          <form className="calculation" key={calculation.name} onSubmit={(event) => {
+            event.preventDefault();
+            const raw = String(new FormData(event.currentTarget).get("override") ?? "");
+            if (raw !== "") onChange(overrideBatchCalculation(batch, calculation.name, Number(raw)));
+          }}>
+            <span><strong>{calculation.name}:</strong> {value?.override ?? value?.suggested ?? "Incomplete"} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
+            <input aria-label={`Override ${calculation.name}`} min="0" name="override" step="any" type="number" />
+            <button type="submit">Override</button>
+          </form>
+        );
+      })}
       <div className="form-actions" aria-label={`Change ${batch.name} status`}>
         {batchStatuses.filter((status) => status !== batch.status).map((status) => (
           <button key={status} onClick={() => recordStatus(status)} type="button">
@@ -384,6 +453,7 @@ interface ProfilesProps {
 
 function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProps) {
   const [editing, setEditing] = useState<FermentationProfile | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -393,9 +463,16 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
       name: String(data.get("name") ?? "").trim(),
       guidance: String(data.get("guidance") ?? "").trim(),
       instructions: String(data.get("instructions") ?? "").trim(),
+      expectedDurationDays: data.get("expectedDurationDays")
+        ? Number(data.get("expectedDurationDays"))
+        : undefined,
+      inputs: parseInputs(String(data.get("inputs") ?? "")),
+      calculations: parseCalculations(String(data.get("calculations") ?? "")),
     };
 
-    if (!profile.name) {
+    const nextErrors = validateProfile(profile);
+    if (!profile.name || nextErrors.length > 0) {
+      setErrors(nextErrors);
       return;
     }
 
@@ -405,7 +482,10 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
 
   return (
     <section className="profiles" aria-label="Fermentation profiles">
-      <button className="primary-action" onClick={() => setEditing({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "" })} type="button">
+      <button className="primary-action" onClick={() => {
+        setErrors([]);
+        setEditing({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [] });
+      }} type="button">
         Add profile
       </button>
 
@@ -414,6 +494,10 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
           <label>Name <input autoFocus defaultValue={editing.name} name="name" required /></label>
           <label>Guidance <textarea defaultValue={editing.guidance} name="guidance" /></label>
           <label>Instructions <textarea defaultValue={editing.instructions} name="instructions" /></label>
+          <label>Expected duration (days) <input defaultValue={editing.expectedDurationDays} min="1" name="expectedDurationDays" type="number" /></label>
+          <label>Inputs <span className="optional">One per line: name, unit, default</span><textarea defaultValue={editing.inputs.map((input) => `${input.name}, ${input.unit}, ${input.defaultValue ?? ""}`).join("\n")} name="inputs" /></label>
+          <label>Calculations <span className="optional">One per line: name, unit, formula</span><textarea defaultValue={editing.calculations.map((calculation) => `${calculation.name}, ${calculation.unit}, ${calculation.formula}`).join("\n")} name="calculations" /></label>
+          {errors.length > 0 && <div className="notice" role="alert">{errors.join(" ")}</div>}
           <div className="form-actions">
             <button className="primary-action" type="submit">Save profile</button>
             <button onClick={() => setEditing(null)} type="button">Cancel</button>
@@ -428,7 +512,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
             <p><strong>Guidance:</strong> {profile.guidance || "None yet."}</p>
             <p><strong>Instructions:</strong> {profile.instructions || "None yet."}</p>
             <div className="form-actions">
-              <button aria-label={`Edit ${profile.name}`} onClick={() => setEditing(profile)} type="button">Edit</button>
+              <button aria-label={`Edit ${profile.name}`} onClick={() => { setErrors([]); setEditing(profile); }} type="button">Edit</button>
               <button aria-label={`Delete ${profile.name}`} onClick={() => {
                 setEditing((current) => current?.id === profile.id ? null : current);
                 onDelete(profile.id);
@@ -452,4 +536,22 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
       )}
     </section>
   );
+}
+
+function parseInputs(value: string): FermentationProfile["inputs"] {
+  return value.split("\n").filter((line) => line.trim()).map((line) => {
+    const [name = "", unit = "", defaultValue = ""] = line.split(",").map((part) => part.trim());
+    return {
+      name,
+      unit: unit as FermentationProfile["inputs"][number]["unit"],
+      defaultValue: defaultValue === "" ? undefined : Number(defaultValue),
+    };
+  });
+}
+
+function parseCalculations(value: string): FermentationProfile["calculations"] {
+  return value.split("\n").filter((line) => line.trim()).map((line) => {
+    const [name = "", unit = "", ...formula] = line.split(",").map((part) => part.trim());
+    return { name, unit: unit as FermentationProfile["calculations"][number]["unit"], formula: formula.join(",") };
+  });
 }
