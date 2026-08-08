@@ -163,6 +163,25 @@ describe("batch workflow", () => {
     expect(option?.textContent).toBe("Starter Liquid");
   });
 
+  it("persists the settings page preferences", () => {
+    const view = render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "°F / qt" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Off" })[0]);
+
+    expect(JSON.parse(localStorage.getItem("fermentstation.shell")!)).toMatchObject({
+      units: "imperial",
+      checkReminders: false,
+      suggestions: true,
+    });
+
+    view.unmount();
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    expect(screen.getByRole("button", { name: "°F / qt" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getAllByRole("button", { name: "Off" })[0].getAttribute("aria-pressed")).toBe("true");
+  });
+
   it("keeps calculation-only results out of sources and chooses unused results", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));

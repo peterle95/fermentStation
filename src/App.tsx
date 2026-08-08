@@ -52,6 +52,7 @@ import {
   destinations,
   selectDestination,
   type Destination,
+  type ShellPreferences,
 } from "./domain/shell";
 import { browserShellStore } from "./platform/shell-store";
 import { browserProfileStore } from "./platform/profile-store";
@@ -255,18 +256,27 @@ export function App() {
                 onSave={handleProfile}
               />
             </section>
-          ) : (
-            <>
-              <p className="eyebrow">{labels[shell.destination]}</p>
-              <h2>{labels[shell.destination]}</h2>
-              <p className="screen-intro">{screenDescription(shell.destination)}</p>
-          {shell.destination === "settings" ? (
+          ) : shell.destination === "settings" ? (
+            <section className="settings-screen" aria-label="Settings">
+              <div className="screen-head">
+                <div>
+                  <p className="eyebrow">Reached from the overflow menu</p>
+                  <h1>Settings</h1>
+                  <p className="screen-intro">Household preferences for how FermentStation talks to you. No data leaves this device.</p>
+                </div>
+              </div>
             <SettingsView
               batchState={batchState}
               formulaTerms={shell.formulaTerms}
+              preferences={shell}
               profileState={profileState}
               onFormulaTermsChange={(formulaTerms) => {
                 const next = { ...shell, formulaTerms };
+                browserShellStore.save(next);
+                setShell(next);
+              }}
+              onPreferencesChange={(preferences) => {
+                const next = { ...shell, ...preferences };
                 browserShellStore.save(next);
                 setShell(next);
               }}
@@ -275,12 +285,16 @@ export function App() {
                 saveBatches(importedBatches);
               }}
             />
+            </section>
           ) : (
+            <>
+              <p className="eyebrow">{labels[shell.destination]}</p>
+              <h2>{labels[shell.destination]}</h2>
+              <p className="screen-intro">{screenDescription(shell.destination)}</p>
             <section aria-label={`${labels[shell.destination]} placeholder`} className="empty-state">
               <p>{descriptions[shell.destination]}</p>
               <p>Start with a fermentation profile to begin tracking a batch.</p>
             </section>
-          )}
             </>
           )}
         </main>
@@ -305,12 +319,14 @@ function screenDescription(destination: Destination) {
 interface SettingsViewProps {
   batchState: BatchState;
   formulaTerms: string[];
+  preferences: ShellPreferences;
   profileState: ReturnType<typeof createProfileState>;
   onFormulaTermsChange(formulaTerms: string[]): void;
+  onPreferencesChange(preferences: ShellPreferences): void;
   onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
 }
 
-function SettingsView({ batchState, formulaTerms, profileState, onFormulaTermsChange, onImport }: SettingsViewProps) {
+function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport }: SettingsViewProps) {
   const [message, setMessage] = useState("");
   const [pendingImport, setPendingImport] = useState<ArchiveImport | null>(null);
   const [terms, setTerms] = useState(formulaTerms);
@@ -354,6 +370,28 @@ function SettingsView({ batchState, formulaTerms, profileState, onFormulaTermsCh
     setMessage("Archive exported locally.");
   }
 
+  function downloadJournal() {
+    const journal = [
+      "FermentStation journal",
+      `Exported ${localDate()}`,
+      ...batchState.batches.flatMap((batch) => [
+        "",
+        `${batch.name} (${batch.id})`,
+        `Profile: ${batch.profileSnapshot.name}`,
+        `Started: ${batch.startDate}`,
+        `Status: ${statusLabel(batch.status)}`,
+        ...batch.timeline.map((entry) => `${entry.date}: ${timelineEntryText(entry)}`),
+      ]),
+    ].join("\n");
+    const url = URL.createObjectURL(new Blob([journal], { type: "text/plain" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `fermentstation-journal-${localDate()}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setMessage("Journal exported locally.");
+  }
+
   async function uploadArchive(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -380,7 +418,38 @@ function SettingsView({ batchState, formulaTerms, profileState, onFormulaTermsCh
 
   return (
     <section className="settings" aria-label="Local backup and transfer">
-      <section className="formula-term-settings" aria-labelledby="formula-terms-heading">
+      <section className="settings-card" aria-label="Household preferences">
+        <div className="setting-row">
+          <div className="setting-body"><b>Units</b><p>Readouts for temperature and volume.</p></div>
+          <div className="setting-segment" aria-label="Units">
+            <button aria-pressed={preferences.units === "metric"} onClick={() => onPreferencesChange({ ...preferences, units: "metric" })} type="button">°C / L</button>
+            <button aria-pressed={preferences.units === "imperial"} onClick={() => onPreferencesChange({ ...preferences, units: "imperial" })} type="button">°F / qt</button>
+          </div>
+        </div>
+        <div className="setting-row">
+          <div className="setting-body"><b>Check reminders</b><p>A quiet nudge the morning a profile check is due.</p></div>
+          <div className="setting-segment" aria-label="Check reminders">
+            <button aria-pressed={preferences.checkReminders} onClick={() => onPreferencesChange({ ...preferences, checkReminders: true })} type="button">On</button>
+            <button aria-pressed={!preferences.checkReminders} onClick={() => onPreferencesChange({ ...preferences, checkReminders: false })} type="button">Off</button>
+          </div>
+        </div>
+        <div className="setting-row">
+          <div className="setting-body"><b>Suggestions</b><p>Show computed suggested values on timeline entries.</p></div>
+          <div className="setting-segment" aria-label="Suggestions">
+            <button aria-pressed={preferences.suggestions} onClick={() => onPreferencesChange({ ...preferences, suggestions: true })} type="button">On</button>
+            <button aria-pressed={!preferences.suggestions} onClick={() => onPreferencesChange({ ...preferences, suggestions: false })} type="button">Off</button>
+          </div>
+        </div>
+        <div className="setting-row">
+          <div className="setting-body"><b>Export</b><p>Draft a plain-text journal of every batch timeline.</p></div>
+          <button className="setting-export" onClick={downloadJournal} type="button">Export journal</button>
+        </div>
+        <div className="setting-row">
+          <div className="setting-body"><b>About</b><p>FermentStation v1 concept · not production software.</p></div>
+          <span className="settings-version">v1.0-concept</span>
+        </div>
+      </section>
+      <section className="settings-card formula-term-settings" aria-labelledby="formula-terms-heading">
         <h3 id="formula-terms-heading">Formula dropdown terms</h3>
         <p>These names stay on this device and are not included in archives.</p>
         {terms.map((term, index) => (
@@ -396,9 +465,12 @@ function SettingsView({ batchState, formulaTerms, profileState, onFormulaTermsCh
         {termError && <p className="notice" role="alert">{termError}</p>}
         <button className="primary-action" onClick={saveFormulaTerms} type="button">Save formula terms</button>
       </section>
-      <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
-      <button className="primary-action" onClick={downloadArchive} type="button">Export ZIP archive</button>
-      <label>Import ZIP archive <input accept=".zip,application/zip" onChange={uploadArchive} type="file" /></label>
+      <section className="settings-card settings-exchange">
+        <h3>Data exchange</h3>
+        <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
+        <button className="primary-action" onClick={downloadArchive} type="button">Export ZIP archive</button>
+        <label>Import ZIP archive <input accept=".zip,application/zip" onChange={uploadArchive} type="file" /></label>
+      </section>
       {message && <p className="notice" role="status">{message}</p>}
       {pendingImport && (
         <section className="trash" aria-label="Import collisions">

@@ -9,7 +9,13 @@ describe("shell state", () => {
 
     expect(today.destination).toBe("today");
     expect(today.formulaTerms).toEqual(defaultFormulaTerms);
-    expect(batches).toEqual({ destination: "batches", formulaTerms: defaultFormulaTerms });
+    expect(batches).toEqual({
+      destination: "batches",
+      formulaTerms: defaultFormulaTerms,
+      units: "metric",
+      checkReminders: true,
+      suggestions: true,
+    });
   });
 
   it("preserves state when selecting the current destination", () => {

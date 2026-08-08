@@ -16,13 +16,27 @@ export const defaultFormulaTerms = [
   "tea",
 ] as const;
 
-export interface ShellState {
+export type UnitSystem = "metric" | "imperial";
+
+export interface ShellPreferences {
+  units: UnitSystem;
+  checkReminders: boolean;
+  suggestions: boolean;
+}
+
+export interface ShellState extends ShellPreferences {
   destination: Destination;
   formulaTerms: string[];
 }
 
 export function createShellState(): ShellState {
-  return { destination: "today", formulaTerms: [...defaultFormulaTerms] };
+  return {
+    destination: "today",
+    formulaTerms: [...defaultFormulaTerms],
+    units: "metric",
+    checkReminders: true,
+    suggestions: true,
+  };
 }
 
 export function selectDestination(
