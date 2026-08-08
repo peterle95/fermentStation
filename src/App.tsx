@@ -1,14 +1,23 @@
 import { useState } from "react";
 import {
+  addTimelineEntry,
   batchStatuses,
-  changeBatchStatus,
   createBatch,
+  createBatchState,
+  deleteBatch,
+  deleteTimelineEntry,
+  discardExpiredBatches,
   filterBatches,
   prioritizeToday,
+  restoreBatch,
+  restoreTimelineEntry,
   statusLabel,
+  updateTimelineEntry,
   type Batch,
   type BatchFilter,
+  type BatchState,
   type BatchStatus,
+  type TimelineEntry,
 } from "./domain/batches";
 import {
   addProfile,
@@ -56,7 +65,9 @@ export function App() {
   const [profileState, setProfileState] = useState(() =>
     discardExpiredProfiles(browserProfileStore.load() ?? createProfileState(), Date.now()),
   );
-  const [batches, setBatches] = useState(() => browserBatchStore.load() ?? []);
+  const [batchState, setBatchState] = useState(() =>
+    discardExpiredBatches(browserBatchStore.load() ?? createBatchState(), Date.now()),
+  );
 
   function saveProfiles(next: typeof profileState) {
     const current = discardExpiredProfiles(next, Date.now());
@@ -70,9 +81,10 @@ export function App() {
     setShell(next);
   }
 
-  function saveBatches(next: Batch[]) {
-    browserBatchStore.save(next);
-    setBatches(next);
+  function saveBatches(next: BatchState) {
+    const current = discardExpiredBatches(next, Date.now());
+    browserBatchStore.save(current);
+    setBatchState(current);
   }
 
   function handleProfile(profile: FermentationProfile) {
@@ -108,17 +120,19 @@ export function App() {
           <h2>{labels[shell.destination]}</h2>
           {shell.destination === "today" || shell.destination === "batches" ? (
             <BatchView
-              batches={batches}
+              batches={batchState.batches}
               mode={shell.destination}
-              onCreate={(batch) => saveBatches([...batches, batch])}
-              onStatus={(id, status) =>
-                saveBatches(
-                  batches.map((batch) =>
-                    batch.id === id ? changeBatchStatus(batch, status) : batch,
-                  ),
-                )
-              }
+              onChange={(next) => saveBatches({
+                ...batchState,
+                batches: batchState.batches.map((batch) => batch.id === next.id ? next : batch),
+              })}
+              onCreate={(batch) => saveBatches({
+                ...batchState, batches: [...batchState.batches, batch],
+              })}
+              onDelete={(id) => saveBatches(deleteBatch(batchState, id, Date.now()))}
+              onRestore={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
               profiles={profileState.profiles}
+              trash={batchState.trash}
             />
           ) : shell.destination === "profiles" ? (
             <Profiles
@@ -144,11 +158,14 @@ interface BatchViewProps {
   batches: Batch[];
   mode: "today" | "batches";
   profiles: FermentationProfile[];
+  trash: { id: string; name: string; deletedAt: number }[];
+  onChange(batch: Batch): void;
   onCreate(batch: Batch): void;
-  onStatus(id: string, status: BatchStatus): void;
+  onDelete(id: string): void;
+  onRestore(id: string): void;
 }
 
-function BatchView({ batches, mode, profiles, onCreate, onStatus }: BatchViewProps) {
+function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelete, onRestore }: BatchViewProps) {
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<BatchFilter>("all");
   const visible = mode === "today" ? prioritizeToday(batches) : filterBatches(batches, filter);
@@ -231,28 +248,129 @@ function BatchView({ batches, mode, profiles, onCreate, onStatus }: BatchViewPro
       ) : (
         <div className="batch-list">
           {visible.map((batch) => (
-            <article className="batch-card" key={batch.id}>
-              <div className="batch-heading">
-                <div>
-                  <span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span>
-                  <h3>{batch.name}</h3>
-                </div>
-                <time dateTime={batch.startDate}>Started {batch.startDate}</time>
-              </div>
-              <p><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
-              {batch.profileSnapshot.guidance && <p>{batch.profileSnapshot.guidance}</p>}
-              <div className="form-actions" aria-label={`Change ${batch.name} status`}>
-                {batchStatuses.filter((status) => status !== batch.status).map((status) => (
-                  <button key={status} onClick={() => onStatus(batch.id, status)} type="button">
-                    {status === "active" ? "Return to active" : `Mark ${statusLabel(status).toLowerCase()}`}
-                  </button>
-                ))}
-              </div>
-            </article>
+            <BatchCard batch={batch} key={batch.id} onChange={onChange} onDelete={onDelete} />
           ))}
         </div>
       )}
+      {trash.length > 0 && (
+        <section className="trash" aria-label="Deleted batches">
+          <h3>Recently deleted batches</h3>
+          <p>Batches remain recoverable for seven days.</p>
+          {trash.map((batch) => (
+            <div className="trash-item" key={batch.id}>
+              <span>{batch.name}</span>
+              <button aria-label={`Restore ${batch.name}`} onClick={() => onRestore(batch.id)} type="button">Restore</button>
+            </div>
+          ))}
+        </section>
+      )}
     </section>
+  );
+}
+
+interface BatchCardProps {
+  batch: Batch;
+  onChange(batch: Batch): void;
+  onDelete(id: string): void;
+}
+
+function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
+  const [editing, setEditing] = useState<TimelineEntry | null>(null);
+
+  function saveEntry(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const kind = String(data.get("kind")) as TimelineEntry["kind"];
+    const common = {
+      id: editing?.id ?? crypto.randomUUID(),
+      date: String(data.get("date") ?? ""),
+    };
+    const entry: TimelineEntry = kind === "status"
+      ? { ...common, kind, status: String(data.get("status")) as BatchStatus }
+      : { ...common, kind, text: String(data.get("text") ?? "").trim() };
+    if (!entry.date || (entry.kind !== "status" && !entry.text)) return;
+    onChange(editing ? updateTimelineEntry(batch, entry) : addTimelineEntry(batch, entry));
+    setEditing(null);
+    event.currentTarget.reset();
+  }
+
+  function recordStatus(status: BatchStatus) {
+    onChange(addTimelineEntry(batch, {
+      id: crypto.randomUUID(), date: localDate(), kind: "status", status,
+    }));
+  }
+
+  return (
+    <article className="batch-card">
+      <div className="batch-heading">
+        <div>
+          <span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span>
+          <h3>{batch.name}</h3>
+        </div>
+        <time dateTime={batch.startDate}>Started {batch.startDate}</time>
+      </div>
+      <p><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
+      {batch.profileSnapshot.guidance && <p>{batch.profileSnapshot.guidance}</p>}
+      <div className="form-actions" aria-label={`Change ${batch.name} status`}>
+        {batchStatuses.filter((status) => status !== batch.status).map((status) => (
+          <button key={status} onClick={() => recordStatus(status)} type="button">
+            {status === "active" ? "Return to active" : `Mark ${statusLabel(status).toLowerCase()}`}
+          </button>
+        ))}
+        <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
+      </div>
+
+      <section className="timeline" aria-label={`${batch.name} timeline`}>
+        <h4>Timeline</h4>
+        {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
+        {batch.timeline.map((entry) => (
+          <div className="timeline-entry" key={entry.id}>
+            <time dateTime={entry.date}>{entry.date}</time>
+            <span>{entry.kind === "status" ? `Status: ${statusLabel(entry.status)}` : entry.text}</span>
+            <button aria-label={`Edit ${entry.kind} from ${entry.date}`} onClick={() => setEditing(entry)} type="button">Edit</button>
+            <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
+          </div>
+        ))}
+        <form className="timeline-form" key={editing?.id ?? "new"} onSubmit={saveEntry}>
+          <label>
+            Activity type
+            <select defaultValue={editing?.kind ?? "note"} name="kind">
+              <option value="note">Note</option>
+              <option value="measurement">Measurement</option>
+              <option value="status">Status change</option>
+            </select>
+          </label>
+          <label>
+            Activity date
+            <input defaultValue={editing?.date ?? localDate()} name="date" required type="date" />
+          </label>
+          <label>
+            Note or measurement
+            <input defaultValue={editing && editing.kind !== "status" ? editing.text : ""} name="text" />
+          </label>
+          <label>
+            Activity status
+            <select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">
+              {batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
+            </select>
+          </label>
+          <div className="form-actions">
+            <button className="primary-action" type="submit">{editing ? "Save activity" : "Add activity"}</button>
+            {editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}
+          </div>
+        </form>
+        {batch.timelineTrash.length > 0 && (
+          <div className="timeline-trash">
+            <strong>Recently deleted activity</strong>
+            {batch.timelineTrash.map((entry) => (
+              <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">
+                Restore {entry.kind} from {entry.date}
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+    </article>
   );
 }
 
