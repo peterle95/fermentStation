@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createProfileState } from "./profiles";
 import {
   addTimelineEntry,
+  addPhReading,
   adjustBatchCheck,
   calendarEvents,
   changeBatchStatus,
@@ -13,7 +14,10 @@ import {
   discardExpiredBatches,
   dueBatchChecks,
   filterBatches,
+  latestPhReading,
   prioritizeToday,
+  phWarning,
+  phZoneLabel,
   restoreBatch,
   restoreTimelineEntry,
   overrideBatchCalculation,
@@ -21,6 +25,7 @@ import {
   setFinishDate,
   statusLabel,
   updateTimelineEntry,
+  updatePhReading,
   updateBatchForDate,
 } from "./batches";
 
@@ -56,6 +61,7 @@ describe("batches", () => {
         inputs: [],
         calculations: [],
         checks: [],
+        phZones: [],
       },
     });
   });
@@ -216,6 +222,27 @@ describe("batches", () => {
     const resumed = changeBatchStatus(ready, "active", "2026-08-05");
 
     expect(resumed.checks[0].nextDueDate).toBe("2026-08-06");
+  });
+
+  it("records, orders, edits, warns, and labels pH readings", () => {
+    const batch = createBatch({
+      ...profile(),
+      phZones: [
+        { label: "safe", min: 2.5, max: 3.1 },
+        { label: "optimal", min: 3.2, max: 3.6 },
+      ],
+    }, { id: "batch-1", startDate: "2026-08-01" });
+    const first = addPhReading(batch, { id: "ph-1", date: "2026-08-03", kind: "ph", value: 3.45 });
+    const second = addPhReading(first, { id: "ph-2", date: "2026-08-02", kind: "ph", value: 15 });
+    const edited = updatePhReading(second, { id: "ph-2", date: "2026-08-04", kind: "ph", value: 3.05 });
+
+    expect(edited.timeline.map(({ id }) => id)).toEqual(["ph-1", "ph-2"]);
+    expect(latestPhReading(edited)?.value).toBe(3.05);
+    expect(phWarning(15)).toBe("Outside the usual pH range of 0-14");
+    expect(phZoneLabel(edited, 3.05)).toBe("safe");
+    expect(phZoneLabel(edited, 3.45)).toBe("optimal");
+    expect(() => addPhReading(batch, { id: "ph-3", date: "2026-08-05", kind: "ph", value: 3.456 }))
+      .toThrow("two decimal places");
   });
 
   it("trashes and restores timeline entries for seven days", () => {

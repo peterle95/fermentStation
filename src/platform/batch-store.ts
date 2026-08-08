@@ -61,6 +61,7 @@ function isProfileDetails(profile: Record<string, unknown>): boolean {
   const inputs = profile.inputs ?? [];
   const calculations = profile.calculations ?? [];
   const checks = profile.checks ?? [];
+  const phZones = profile.phZones ?? [];
   return Array.isArray(inputs) && inputs.every((input) => {
     if (!input || typeof input !== "object") return false;
     const value = input as Record<string, unknown>;
@@ -75,6 +76,11 @@ function isProfileDetails(profile: Record<string, unknown>): boolean {
     if (!check || typeof check !== "object") return false;
     const value = check as Record<string, unknown>;
     return typeof value.name === "string" && typeof value.intervalDays === "number";
+  }) && Array.isArray(phZones) && phZones.every((zone) => {
+    if (!zone || typeof zone !== "object") return false;
+    const value = zone as Record<string, unknown>;
+    return ["danger", "safe", "optimal"].includes(String(value.label)) &&
+      typeof value.min === "number" && typeof value.max === "number";
   });
 }
 
@@ -92,6 +98,7 @@ function isTimelineEntry(value: unknown): value is TimelineEntry {
     return typeof entry.status === "string" && batchStatuses.includes(entry.status as Batch["status"]);
   }
   if (entry.kind === "check") return typeof entry.checkName === "string";
+  if (entry.kind === "ph") return typeof entry.value === "number";
   return (entry.kind === "note" || entry.kind === "measurement") && typeof entry.text === "string";
 }
 
@@ -101,6 +108,7 @@ function normalizeBatch(batch: Batch): Batch {
     inputs: batch.profileSnapshot.inputs ?? [],
     calculations: batch.profileSnapshot.calculations ?? [],
     checks: batch.profileSnapshot.checks ?? [],
+    phZones: batch.profileSnapshot.phZones ?? [],
   };
   return {
     ...batch,

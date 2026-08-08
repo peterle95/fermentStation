@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   addTimelineEntry,
+  addPhReading,
   adjustBatchCheck,
   batchStatuses,
   createBatch,
@@ -12,7 +13,10 @@ import {
   discardExpiredBatches,
   dueBatchChecks,
   filterBatches,
+  latestPhReading,
   prioritizeToday,
+  phWarning,
+  phZoneLabel,
   restoreBatch,
   restoreTimelineEntry,
   overrideBatchCalculation,
@@ -26,6 +30,7 @@ import {
   type BatchStatus,
   type TimelineEntry,
   updateBatchForDate,
+  updatePhReading,
 } from "./domain/batches";
 import {
   addProfile,
@@ -323,6 +328,7 @@ interface BatchCardProps {
 
 function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
   const [editing, setEditing] = useState<TimelineEntry | null>(null);
+  const [editingPh, setEditingPh] = useState<Extract<TimelineEntry, { kind: "ph" }> | null>(null);
 
   function saveEntry(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -357,6 +363,23 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
     }
     onChange(next);
   }
+
+  function savePh(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const entry = {
+      id: editingPh?.id ?? crypto.randomUUID(),
+      date: String(data.get("date") ?? ""),
+      kind: "ph" as const,
+      value: Number(data.get("value")),
+    };
+    onChange(editingPh ? updatePhReading(batch, entry) : addPhReading(batch, entry));
+    setEditingPh(null);
+    event.currentTarget.reset();
+  }
+
+  const latestPh = latestPhReading(batch);
+  const phReadings = batch.timeline.filter((entry) => entry.kind === "ph");
 
   return (
     <article className="batch-card">
@@ -415,6 +438,26 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
           })}
         </section>
       )}
+      <section className="ph-log" aria-label={`${batch.name} pH log`}>
+        <h4>pH log</h4>
+        <p><strong>Latest:</strong> {latestPh ? `${latestPh.value} on ${latestPh.date}` : "No readings yet."}</p>
+        {phReadings.map((entry) => (
+          <div className="ph-reading" key={entry.id}>
+            <time dateTime={entry.date}>{entry.date}</time>
+            <span>pH {entry.value}</span>
+            {phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}
+            {phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}
+            <button aria-label={`Edit pH from ${entry.date}`} onClick={() => setEditingPh(entry)} type="button">Edit</button>
+            <button aria-label={`Delete pH from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
+          </div>
+        ))}
+        <form className="ph-form" key={editingPh?.id ?? "new-ph"} onSubmit={savePh}>
+          <label>pH date <input defaultValue={editingPh?.date ?? localDate()} name="date" required type="date" /></label>
+          <label>pH value <input defaultValue={editingPh?.value} name="value" required step="0.01" type="number" /></label>
+          <button type="submit">{editingPh ? "Save pH" : "Add pH"}</button>
+          {editingPh && <button onClick={() => setEditingPh(null)} type="button">Cancel</button>}
+        </form>
+      </section>
       <div className="form-actions" aria-label={`Change ${batch.name} status`}>
         {batchStatuses.filter((status) => status !== batch.status).map((status) => (
           <button key={status} onClick={() => recordStatus(status)} type="button">
@@ -427,7 +470,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
       <section className="timeline" aria-label={`${batch.name} timeline`}>
         <h4>Timeline</h4>
         {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
-        {batch.timeline.map((entry) => (
+        {batch.timeline.filter((entry) => entry.kind !== "ph").map((entry) => (
           <div className="timeline-entry" key={entry.id}>
             <time dateTime={entry.date}>{entry.date}</time>
             <span>{timelineEntryText(entry)}</span>
@@ -504,6 +547,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
       inputs: parseInputs(String(data.get("inputs") ?? "")),
       calculations: parseCalculations(String(data.get("calculations") ?? "")),
       checks: parseChecks(String(data.get("checks") ?? "")),
+      phZones: parsePhZones(String(data.get("phZones") ?? "")),
     };
 
     const nextErrors = validateProfile(profile);
@@ -520,7 +564,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
     <section className="profiles" aria-label="Fermentation profiles">
       <button className="primary-action" onClick={() => {
         setErrors([]);
-        setEditing({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [] });
+        setEditing({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [], phZones: [] });
       }} type="button">
         Add profile
       </button>
@@ -534,6 +578,7 @@ function Profiles({ profiles, trash, onDelete, onRestore, onSave }: ProfilesProp
           <label>Inputs <span className="optional">One per line: name, unit, default</span><textarea defaultValue={editing.inputs.map((input) => `${input.name}, ${input.unit}, ${input.defaultValue ?? ""}`).join("\n")} name="inputs" /></label>
           <label>Calculations <span className="optional">One per line: name, unit, formula</span><textarea defaultValue={editing.calculations.map((calculation) => `${calculation.name}, ${calculation.unit}, ${calculation.formula}`).join("\n")} name="calculations" /></label>
           <label>Recurring checks <span className="optional">One per line: name, interval days</span><textarea defaultValue={editing.checks.map((check) => `${check.name}, ${check.intervalDays}`).join("\n")} name="checks" /></label>
+          <label>pH zones <span className="optional">One per line: danger|safe|optimal, min, max</span><textarea defaultValue={editing.phZones.map((zone) => `${zone.label}, ${zone.min}, ${zone.max}`).join("\n")} name="phZones" /></label>
           {errors.length > 0 && <div className="notice" role="alert">{errors.join(" ")}</div>}
           <div className="form-actions">
             <button className="primary-action" type="submit">Save profile</button>
@@ -600,8 +645,20 @@ function parseChecks(value: string): FermentationProfile["checks"] {
   });
 }
 
+function parsePhZones(value: string): FermentationProfile["phZones"] {
+  return value.split("\n").filter((line) => line.trim()).map((line) => {
+    const [label = "", min = "", max = ""] = line.split(",").map((part) => part.trim());
+    return {
+      label: label as FermentationProfile["phZones"][number]["label"],
+      min: Number(min),
+      max: Number(max),
+    };
+  });
+}
+
 function timelineEntryText(entry: TimelineEntry): string {
   if (entry.kind === "status") return `Status: ${statusLabel(entry.status)}`;
   if (entry.kind === "check") return `Completed check: ${entry.checkName}`;
+  if (entry.kind === "ph") return `pH ${entry.value}`;
   return entry.text;
 }

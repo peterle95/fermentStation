@@ -6,12 +6,19 @@ export interface FermentationProfile {
   inputs: ProfileInput[];
   calculations: ProfileCalculation[];
   checks: ProfileCheck[];
+  phZones: PhZone[];
   expectedDurationDays?: number;
 }
 
 export interface ProfileCheck {
   name: string;
   intervalDays: number;
+}
+
+export interface PhZone {
+  label: "danger" | "safe" | "optimal";
+  min: number;
+  max: number;
 }
 
 export interface ProfileInput {
@@ -39,7 +46,7 @@ export interface ProfileState {
 
 const recoveryPeriodMs = 7 * 24 * 60 * 60 * 1000;
 
-const emptyProfileFields = { inputs: [], calculations: [], checks: [] };
+const emptyProfileFields = { inputs: [], calculations: [], checks: [], phZones: [] };
 
 const starterProfiles: FermentationProfile[] = [
   {
@@ -89,6 +96,7 @@ export function cloneProfile(profile: FermentationProfile): FermentationProfile 
     inputs: profile.inputs.map((input) => ({ ...input })),
     calculations: profile.calculations.map((calculation) => ({ ...calculation })),
     checks: profile.checks.map((check) => ({ ...check })),
+    phZones: profile.phZones.map((zone) => ({ ...zone })),
   };
 }
 
@@ -166,6 +174,19 @@ export function validateProfile(profile: FermentationProfile): string[] {
     checkNames.add(check.name);
     if (!Number.isInteger(check.intervalDays) || check.intervalDays < 1) {
       errors.push(`${check.name || "Check"} interval must be a positive whole number.`);
+    }
+  }
+  const sortedZones = [...profile.phZones].sort((left, right) => left.min - right.min);
+  for (let index = 0; index < sortedZones.length; index += 1) {
+    const zone = sortedZones[index];
+    if (!["danger", "safe", "optimal"].includes(zone.label)) {
+      errors.push("pH zone labels must be danger, safe, or optimal.");
+    }
+    if (zone.min < 0 || zone.max > 14 || zone.min > zone.max) {
+      errors.push(`${zone.label} pH zone must be between 0 and 14.`);
+    }
+    if (index > 0 && sortedZones[index - 1].max >= zone.min) {
+      errors.push("pH zones cannot overlap.");
     }
   }
   return errors;
