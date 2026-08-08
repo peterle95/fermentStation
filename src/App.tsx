@@ -411,7 +411,7 @@ function CalendarView({ batches }: { batches: Batch[] }) {
   const firstDay = new Date(year, month, 1);
   const leadingDays = (firstDay.getDay() + 6) % 7;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const monthLabel = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(firstDay);
+  const monthLabel = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(firstDay);
   const cells: Array<{ date?: string; events: CalendarEvent[] }> = [
     ...Array.from({ length: leadingDays }, () => ({ events: [] })),
     ...Array.from({ length: daysInMonth }, (_, index) => {
@@ -431,8 +431,8 @@ function CalendarView({ batches }: { batches: Batch[] }) {
         <div className="calendar-head">
           <h2>{monthLabel}</h2>
           <div className="calendar-nav">
-            <button aria-label="Previous month" onClick={() => shiftMonth(-1)} type="button">‹</button>
-            <button aria-label="Next month" onClick={() => shiftMonth(1)} type="button">›</button>
+            <button aria-label="Previous month" onClick={() => shiftMonth(-1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button>
+            <button aria-label="Next month" onClick={() => shiftMonth(1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg></button>
           </div>
         </div>
         <div aria-hidden="true" className="calendar-weekdays">
@@ -469,8 +469,8 @@ function CalendarView({ batches }: { batches: Batch[] }) {
             const isFinish = event.kind === "finish";
             return (
               <article className="upcoming-item" key={`${event.batchId}-${event.kind}-${event.date}`}>
-                <div className="upcoming-date"><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</span></div>
-                <div className="upcoming-body"><b>{event.batchName} {isFinish ? "finish date" : event.label}</b><p>{isFinish ? "Ready to bottle or move on." : "Profile check · due"}</p></div>
+                <div className="upcoming-date"><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span></div>
+                <div className="upcoming-body"><time className="calendar-event-date" dateTime={event.date}>{event.date}</time><b>{event.batchName} {isFinish ? "finish date" : event.label}</b><p>{isFinish ? "Ready to bottle or move on." : "Profile check · due"}</p></div>
                 <span className={`calendar-status ${isFinish ? "ready" : "attention"}`}><span className="status-dot" />{isFinish ? "ready" : "check"}</span>
               </article>
             );

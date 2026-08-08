@@ -1605,6 +1605,16 @@ button:disabled {
   min-width: 0;
 }
 
+.calendar-event-date {
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .upcoming-body b {
   font-size: 0.90625rem;
 }
