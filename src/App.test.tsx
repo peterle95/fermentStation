@@ -133,4 +133,28 @@ describe("batch workflow", () => {
     expect(screen.getByText("Taste")).toBeTruthy();
     expect(screen.getByText("2026-08-11")).toBeTruthy();
   });
+
+  it("records editable pH readings with warnings and profile zones", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    fireEvent.change(screen.getByLabelText(/^pH zones/), {
+      target: { value: "safe, 2.5, 3.1\noptimal, 3.2, 3.6" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+
+    fireEvent.change(screen.getByLabelText("pH value"), { target: { value: "15" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add pH" }));
+    expect(screen.getByText("Outside the usual pH range of 0-14")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /Edit pH/ }));
+    fireEvent.change(screen.getByLabelText("pH date"), { target: { value: "2026-08-02" } });
+    fireEvent.change(screen.getByLabelText("pH value"), { target: { value: "3.45" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save pH" }));
+    expect(screen.getByText("optimal")).toBeTruthy();
+    expect(screen.getByText("Latest:").parentElement?.textContent).toContain("3.45 on 2026-08-02");
+  });
 });

@@ -38,6 +38,7 @@ describe("fermentation profiles", () => {
       inputs: [],
       calculations: [],
       checks: [],
+      phZones: [],
     });
     const updated = updateProfile(added, {
       ...added.profiles.at(-1)!,
@@ -89,6 +90,18 @@ describe("fermentation profiles", () => {
       "weight cannot be negative.",
       "salt: Percentage must be between 0% and 100%",
     ]);
+  });
+
+  it("rejects overlapping pH zones", () => {
+    const profile = {
+      ...createProfileState().profiles[0],
+      phZones: [
+        { label: "safe" as const, min: 3, max: 4 },
+        { label: "optimal" as const, min: 3.5, max: 3.8 },
+      ],
+    };
+
+    expect(validateProfile(profile)).toContain("pH zones cannot overlap.");
   });
 
   it("restores a deleted profile during the seven-day recovery period", () => {

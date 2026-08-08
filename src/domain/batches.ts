@@ -12,7 +12,8 @@ export type TimelineEntry =
   | { id: string; date: string; kind: "note"; text: string }
   | { id: string; date: string; kind: "measurement"; text: string }
   | { id: string; date: string; kind: "status"; status: BatchStatus }
-  | { id: string; date: string; kind: "check"; checkName: string };
+  | { id: string; date: string; kind: "check"; checkName: string }
+  | { id: string; date: string; kind: "ph"; value: number };
 
 export interface BatchCheck {
   id: string;
@@ -151,6 +152,37 @@ export function updateBatchForDate(batch: Batch, today: string): Batch {
   return batch.finishDate && batch.finishDate <= today && batch.status === "active"
     ? changeBatchStatus(batch, "ready", batch.finishDate)
     : batch;
+}
+
+export function addPhReading(batch: Batch, entry: Extract<TimelineEntry, { kind: "ph" }>): Batch {
+  validatePhValue(entry.value);
+  return addTimelineEntry(batch, entry);
+}
+
+export function updatePhReading(batch: Batch, entry: Extract<TimelineEntry, { kind: "ph" }>): Batch {
+  validatePhValue(entry.value);
+  return updateTimelineEntry(batch, entry);
+}
+
+export function latestPhReading(batch: Batch): Extract<TimelineEntry, { kind: "ph" }> | undefined {
+  for (let index = batch.timeline.length - 1; index >= 0; index -= 1) {
+    const entry = batch.timeline[index];
+    if (entry.kind === "ph") return entry;
+  }
+}
+
+export function phZoneLabel(batch: Batch, value: number): string | undefined {
+  return batch.profileSnapshot.phZones.find((zone) => value >= zone.min && value <= zone.max)?.label;
+}
+
+export function phWarning(value: number): string | undefined {
+  return value < 0 || value > 14 ? "Outside the usual pH range of 0-14" : undefined;
+}
+
+function validatePhValue(value: number): void {
+  if (!Number.isFinite(value) || Math.abs(value * 100 - Math.round(value * 100)) > 1e-8) {
+    throw new Error("pH readings support up to two decimal places");
+  }
 }
 
 export function adjustBatchCheck(batch: Batch, id: string, intervalDays: number): Batch {
