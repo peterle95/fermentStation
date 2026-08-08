@@ -13,6 +13,7 @@
   --amber: oklch(50% 0.135 58);
   --amber-bg: oklch(93.5% 0.05 80);
   --blue: oklch(42% 0.1 244);
+  --border-2: oklch(82% 0.014 75);
   color: var(--ink);
   background: var(--bg);
   font-family: "Karla", "Segoe UI", system-ui, sans-serif;
@@ -1944,5 +1945,390 @@ button:disabled {
 @media (max-width: 899px) {
   .batch-fab {
     bottom: 5.125rem;
+  }
+}
+
+/* Profiles follows the v1 concept card and guidance sheet. */
+.profiles-screen {
+  position: relative;
+}
+
+.profiles-screen .screen-head {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.profiles-screen h1 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.625rem, 3.4vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.profiles-screen .screen-intro {
+  margin-top: 0.375rem;
+  max-width: 56ch;
+}
+
+.profiles-screen .profiles,
+.profiles-screen .profile-list {
+  max-width: none;
+}
+
+.profiles-screen .profiles {
+  margin-top: 0;
+}
+
+.profile-tools {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.profile-add {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.625rem;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.45rem 0.65rem;
+}
+
+.profile-add:hover,
+.profile-add:focus-visible {
+  background: var(--panel);
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+.profiles-screen .profile-list {
+  display: grid;
+  gap: 0.875rem;
+  margin-top: 0;
+}
+
+.profiles-screen .profile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
+  display: block;
+  min-width: 0;
+  padding: 0;
+  position: relative;
+}
+
+.profiles-screen .profile-card:hover {
+  border-color: oklch(82% 0.014 75);
+}
+
+.profile-card-main {
+  align-items: stretch;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.125rem;
+  text-align: left;
+  width: 100%;
+}
+
+.profile-card-main:hover {
+  background: transparent;
+}
+
+.profile-card-main:focus-visible {
+  border-radius: 0.875rem;
+  outline-offset: -3px;
+}
+
+.profiles-screen .pc-id {
+  color: oklch(60% 0.013 60);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.65625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.profiles-screen .profile-card h3 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.1875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.profiles-screen .profile-card .pc-desc {
+  color: var(--muted);
+  font-size: 0.84375rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.profiles-screen .pc-params {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.profiles-screen .pc-param {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  display: block;
+  min-width: 0;
+  padding: 0.4375rem 0.5625rem;
+}
+
+.profiles-screen .pc-param b {
+  display: block;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.8125rem;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.profiles-screen .pc-param span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  line-height: 1.35;
+  margin-top: 0.1rem;
+}
+
+.profiles-screen .pc-rows {
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+  padding-top: 0.625rem;
+}
+
+.profiles-screen .pc-rows p {
+  color: var(--ink);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.profiles-screen .pc-rows p b {
+  color: var(--muted);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.71875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-right: 0.25rem;
+  text-transform: uppercase;
+}
+
+.profiles-screen .pc-foot {
+  align-items: center;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  font-size: 0.6875rem;
+  gap: 0.5rem;
+  justify-content: space-between;
+  padding-top: 0.625rem;
+  width: 100%;
+}
+
+.profiles-screen .pc-foot .eyebrow {
+  color: var(--muted);
+  font-size: 0.625rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.profile-card-actions {
+  display: flex;
+  gap: 0.45rem;
+  opacity: 0;
+  position: absolute;
+  right: 0.625rem;
+  top: 0.625rem;
+  transition: opacity 0.15s ease;
+}
+
+.profile-card:hover .profile-card-actions,
+.profile-card:focus-within .profile-card-actions {
+  opacity: 1;
+}
+
+.profile-card-actions button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.55rem;
+}
+
+.profile-card-actions button:hover {
+  border-color: var(--border-2);
+  color: var(--ink);
+}
+
+.profile-overlay {
+  align-items: center;
+  background: oklch(15% 0.01 60 / 45%);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 1.25rem;
+  position: fixed;
+  z-index: 60;
+}
+
+.profile-sheet {
+  background: var(--surface);
+  border-radius: 1.25rem;
+  box-shadow: 0 0.5rem 1.875rem oklch(30% 0.02 60 / 18%);
+  max-height: 88vh;
+  max-width: 35rem;
+  overflow: auto;
+  padding: 1.25rem;
+  width: 100%;
+}
+
+.profile-sheet h2 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.3125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.profile-sheet .sheet-sub {
+  color: var(--muted);
+  font-size: 0.84375rem;
+  margin: 0.125rem 0 1rem;
+}
+
+.profile-sheet-params {
+  margin-bottom: 0.875rem;
+}
+
+.profile-detail-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
+  margin-bottom: 0.875rem;
+  padding: 1rem 1.125rem;
+}
+
+.profile-detail-panel h3 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.profile-detail-panel .guide-step {
+  border-top: 1px dashed var(--border);
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem 0;
+}
+
+.profile-detail-panel .guide-step:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.profile-detail-panel .guide-step:last-child {
+  padding-bottom: 0;
+}
+
+.profile-detail-panel .g-n {
+  color: var(--accent-dark);
+  flex: 0 0 1.375rem;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.profile-detail-panel .guide-step p {
+  color: var(--ink);
+  font-size: 0.84375rem;
+  margin: 0;
+}
+
+.profile-detail-panel .calc-line {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+}
+
+.profile-batch-hint {
+  background: var(--panel);
+  border: 1px dashed var(--border-2);
+  border-radius: 0.5rem;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.6875rem;
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.6875rem;
+}
+
+.profile-sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.profile-sheet-actions .primary-action {
+  min-width: 5rem;
+}
+
+@media (min-width: 640px) {
+  .profiles-screen .pc-params {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .profiles-screen .profile-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .profiles-screen .profile-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 899px) {
+  .profile-tools {
+    right: 0;
+    top: -0.25rem;
+  }
+
+  .profile-card-actions {
+    opacity: 1;
+  }
+
+  .profile-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .profile-sheet {
+    border-radius: 1.25rem 1.25rem 0 0;
+    max-height: 88vh;
   }
 }
