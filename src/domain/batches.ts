@@ -1,4 +1,8 @@
-import { type FermentationProfile } from "./profiles";
+import {
+  calculateProfileValue,
+  cloneProfile,
+  type FermentationProfile,
+} from "./profiles";
 
 export const batchStatuses = ["active", "ready", "to-fridge"] as const;
 export type BatchStatus = (typeof batchStatuses)[number];
@@ -19,6 +23,9 @@ export interface Batch {
   profileSnapshot: FermentationProfile;
   timeline: TimelineEntry[];
   timelineTrash: TrashedTimelineEntry[];
+  inputValues: Record<string, number | undefined>;
+  calculationValues: Record<string, { suggested: number | null; override?: number }>;
+  finishDate?: string;
 }
 
 export interface TrashedBatch extends Batch {
@@ -34,25 +41,103 @@ interface NewBatch {
   id: string;
   name?: string;
   startDate: string;
+  inputValues?: Record<string, number | undefined>;
+  today?: string;
 }
 
 export function createBatch(
   profile: FermentationProfile,
-  { id, name, startDate }: NewBatch,
+  { id, name, startDate, inputValues = {}, today }: NewBatch,
 ): Batch {
-  return {
+  const profileSnapshot = cloneProfile(profile);
+  const values = Object.fromEntries(profile.inputs.map((input) => [
+    input.name,
+    inputValues[input.name] ?? input.defaultValue,
+  ]));
+  for (const [inputName, value] of Object.entries(values)) {
+    if (value !== undefined && (!Number.isFinite(value) || value < 0)) {
+      throw new Error(`${inputName} cannot be negative`);
+    }
+  }
+  const finishDate = profile.expectedDurationDays
+    ? addCalendarDays(startDate, profile.expectedDurationDays)
+    : undefined;
+  const batch: Batch = {
     id,
     name: name?.trim() || profile.name,
     startDate,
     status: "active",
-    profileSnapshot: { ...profile },
+    profileSnapshot,
     timeline: [],
     timelineTrash: [],
+    inputValues: values,
+    calculationValues: {},
+    finishDate,
   };
+  const calculated = recalculateBatch(batch);
+  return today ? updateBatchForDate(calculated, today) : calculated;
 }
 
 export function changeBatchStatus(batch: Batch, status: BatchStatus): Batch {
   return { ...batch, status };
+}
+
+export function setBatchInput(batch: Batch, name: string, value?: number): Batch {
+  if (!batch.profileSnapshot.inputs.some((input) => input.name === name)) {
+    throw new Error(`Unknown input ${name}`);
+  }
+  if (value !== undefined && value < 0) throw new Error(`${name} cannot be negative`);
+  return recalculateBatch({
+    ...batch,
+    inputValues: { ...batch.inputValues, [name]: value },
+  });
+}
+
+export function overrideBatchCalculation(batch: Batch, name: string, value: number): Batch {
+  if (value < 0) throw new Error(`${name} cannot be negative`);
+  const calculation = batch.calculationValues[name];
+  if (!calculation) throw new Error(`Unknown calculation ${name}`);
+  return {
+    ...batch,
+    calculationValues: {
+      ...batch.calculationValues,
+      [name]: { ...calculation, override: value },
+    },
+  };
+}
+
+export function setFinishDate(batch: Batch, finishDate: string, today: string): Batch {
+  return { ...batch, finishDate, status: finishDate > today ? "active" : "ready" };
+}
+
+export function updateBatchForDate(batch: Batch, today: string): Batch {
+  return batch.finishDate && batch.finishDate <= today && batch.status === "active"
+    ? { ...batch, status: "ready" }
+    : batch;
+}
+
+function recalculateBatch(batch: Batch): Batch {
+  return {
+    ...batch,
+    calculationValues: Object.fromEntries(batch.profileSnapshot.calculations.map((calculation) => {
+      const current = batch.calculationValues[calculation.name];
+      return [calculation.name, current?.override === undefined
+        ? {
+            suggested: calculateProfileValue(
+              batch.profileSnapshot,
+              calculation,
+              batch.inputValues,
+            ),
+          }
+        : current];
+    })),
+  };
+}
+
+function addCalendarDays(date: string, days: number): string {
+  const value = new Date(`${date}T00:00:00Z`);
+  value.setUTCDate(value.getUTCDate() + days);
+  return value.toISOString().slice(0, 10);
 }
 
 const recoveryPeriodMs = 7 * 24 * 60 * 60 * 1000;

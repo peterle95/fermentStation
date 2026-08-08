@@ -36,10 +36,36 @@ function isBatch(value: unknown): value is Batch {
     ["id", "name", "guidance", "instructions"].every(
       (key) => typeof (profile as Record<string, unknown>)[key] === "string",
     ) &&
+    isProfileDetails(profile as Record<string, unknown>) &&
+    (batch.finishDate === undefined || typeof batch.finishDate === "string") &&
+    (batch.inputValues === undefined || isNumberRecord(batch.inputValues)) &&
+    (batch.calculationValues === undefined || typeof batch.calculationValues === "object") &&
     Array.isArray(timeline) && timeline.every(isTimelineEntry) &&
     Array.isArray(timelineTrash) && timelineTrash.every(
       (entry) => isTimelineEntry(entry) && typeof (entry as Record<string, unknown>).deletedAt === "number",
     )
+  );
+}
+
+function isProfileDetails(profile: Record<string, unknown>): boolean {
+  const inputs = profile.inputs ?? [];
+  const calculations = profile.calculations ?? [];
+  return Array.isArray(inputs) && inputs.every((input) => {
+    if (!input || typeof input !== "object") return false;
+    const value = input as Record<string, unknown>;
+    return typeof value.name === "string" && ["g", "kg", "ml", "l"].includes(String(value.unit)) &&
+      (value.defaultValue === undefined || typeof value.defaultValue === "number");
+  }) && Array.isArray(calculations) && calculations.every((calculation) => {
+    if (!calculation || typeof calculation !== "object") return false;
+    const value = calculation as Record<string, unknown>;
+    return typeof value.name === "string" && typeof value.formula === "string" &&
+      ["g", "kg", "ml", "l"].includes(String(value.unit));
+  });
+}
+
+function isNumberRecord(value: unknown): boolean {
+  return !!value && typeof value === "object" && Object.values(value).every(
+    (item) => item === undefined || typeof item === "number",
   );
 }
 
@@ -54,7 +80,21 @@ function isTimelineEntry(value: unknown): value is TimelineEntry {
 }
 
 function normalizeBatch(batch: Batch): Batch {
-  return { ...batch, timeline: batch.timeline ?? [], timelineTrash: batch.timelineTrash ?? [] };
+  const profileSnapshot = {
+    ...batch.profileSnapshot,
+    inputs: batch.profileSnapshot.inputs ?? [],
+    calculations: batch.profileSnapshot.calculations ?? [],
+  };
+  return {
+    ...batch,
+    profileSnapshot,
+    timeline: batch.timeline ?? [],
+    timelineTrash: batch.timelineTrash ?? [],
+    inputValues: batch.inputValues ?? Object.fromEntries(
+      profileSnapshot.inputs.map((input) => [input.name, input.defaultValue]),
+    ),
+    calculationValues: batch.calculationValues ?? {},
+  };
 }
 
 export function createBatchStore(storage: KeyValueStore): BatchStore {

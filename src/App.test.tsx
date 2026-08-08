@@ -74,4 +74,34 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Restore Kombucha F1" }));
     expect(screen.getByText("Tasted pleasantly tart")).toBeTruthy();
   });
+
+  it("uses profile calculations, batch overrides, and finish dates", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    fireEvent.change(screen.getByLabelText(/Expected duration/), { target: { value: "7" } });
+    fireEvent.change(screen.getByLabelText(/^Inputs/), {
+      target: { value: "cabbage, kg, 2" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Calculations/), {
+      target: { value: "salt, g, cabbage * 2%" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.change(screen.getByLabelText("cabbage (kg)"), { target: { value: "1.25" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+    expect(screen.getByText(/25 g suggested/)).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText("cabbage (kg)"), { target: { value: "2.5" } });
+    fireEvent.click(screen.getByRole("button", { name: "Update inputs" }));
+    expect(screen.getByText(/50 g suggested/)).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Override salt"), { target: { value: "55.5" } });
+    fireEvent.click(screen.getByRole("button", { name: "Override" }));
+    expect(screen.getByText(/55.5 g \(overridden\)/)).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText("Finish date"), { target: { value: "2026-08-08" } });
+    expect(screen.getByText("Ready", { selector: ".status" })).toBeTruthy();
+  });
 });
