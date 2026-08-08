@@ -67,6 +67,17 @@ describe("FermentStation archive boundary", () => {
       .rejects.toThrow("Photo hash mismatch");
   });
 
+  it("rejects structurally valid records that violate domain rules", async () => {
+    const source = statesWithPhoto();
+    source.batchState.batches[0].checks = [{
+      id: "bad-check", name: "Bad", intervalDays: -2, nextDueDate: "not-a-date",
+    }];
+    const archive = await createArchive(source.profileState, source.batchState);
+
+    await expect(importArchive(archive, emptyProfiles, emptyBatches))
+      .rejects.toThrow("invalid batch check");
+  });
+
   it("preserves both sides of identifier collisions without changing local state", async () => {
     const source = statesWithPhoto();
     const archive = await createArchive(source.profileState, source.batchState);

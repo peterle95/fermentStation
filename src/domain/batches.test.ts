@@ -224,6 +224,25 @@ describe("batches", () => {
     expect(resumed.checks[0].nextDueDate).toBe("2026-08-06");
   });
 
+  it("keeps check pauses correct when status timeline entries are edited or deleted", () => {
+    const batch = createBatch(
+      { ...profile(), checks: [{ name: "Taste", intervalDays: 2 }] },
+      { id: "batch-1", startDate: "2026-08-01" },
+    );
+    const ready = addTimelineEntry(batch, {
+      id: "status-1", date: "2026-08-02", kind: "status", status: "ready",
+    });
+    const redated = updateTimelineEntry(ready, {
+      id: "status-1", date: "2026-08-03", kind: "status", status: "ready",
+    }, "2026-08-03");
+    const restoredActive = deleteTimelineEntry(redated, "status-1", Date.parse("2026-08-05T12:00:00Z"));
+
+    expect(redated.checksPausedAt).toBe("2026-08-03");
+    expect(restoredActive.status).toBe("active");
+    expect(restoredActive.checksPausedAt).toBeUndefined();
+    expect(restoredActive.checks[0].nextDueDate).toBe("2026-08-05");
+  });
+
   it("records, orders, edits, warns, and labels pH readings", () => {
     const batch = createBatch({
       ...profile(),

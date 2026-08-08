@@ -311,7 +311,11 @@ export function addTimelineEntry(batch: Batch, entry: TimelineEntry): Batch {
     : next;
 }
 
-export function updateTimelineEntry(batch: Batch, entry: TimelineEntry): Batch {
+export function updateTimelineEntry(
+  batch: Batch,
+  entry: TimelineEntry,
+  changedDate = entry.date,
+): Batch {
   if (!batch.timeline.some(({ id }) => id === entry.id)) {
     return batch;
   }
@@ -320,12 +324,13 @@ export function updateTimelineEntry(batch: Batch, entry: TimelineEntry): Batch {
   const timeline = batch.timeline
     .map((current) => current.id === entry.id ? entry : current)
     .sort((left, right) => left.date.localeCompare(right.date));
-  return {
-    ...batch,
-    status: previous.kind === "status" || entry.kind === "status"
-      ? latestTimelineStatus(timeline)
-      : batch.status,
-    timeline,
+  const next = { ...batch, timeline };
+  if (previous.kind !== "status" && entry.kind !== "status") return next;
+  const status = latestTimelineStatus(timeline);
+  if (status !== batch.status) return changeBatchStatus(next, status, changedDate);
+  return status === "active" ? next : {
+    ...next,
+    checksPausedAt: latestPauseDate(timeline) ?? batch.checksPausedAt,
   };
 }
 
@@ -333,12 +338,17 @@ export function deleteTimelineEntry(batch: Batch, id: string, deletedAt: number)
   const current = discardExpiredTimelineEntries(batch, deletedAt);
   const entry = current.timeline.find((candidate) => candidate.id === id);
   const timeline = current.timeline.filter((candidate) => candidate.id !== id);
-  return entry ? {
+  if (!entry) return current;
+  const next = {
     ...current,
-    status: entry.kind === "status" ? latestTimelineStatus(timeline) : current.status,
     timeline,
     timelineTrash: [...current.timelineTrash, { ...entry, deletedAt }],
-  } : current;
+  };
+  if (entry.kind !== "status") return next;
+  const status = latestTimelineStatus(timeline);
+  return status === current.status
+    ? next
+    : changeBatchStatus(next, status, new Date(deletedAt).toISOString().slice(0, 10));
 }
 
 function latestTimelineStatus(timeline: TimelineEntry[]): BatchStatus {
@@ -347,6 +357,18 @@ function latestTimelineStatus(timeline: TimelineEntry[]): BatchStatus {
     if (entry.kind === "status") return entry.status;
   }
   return "active";
+}
+
+function latestPauseDate(timeline: TimelineEntry[]): string | undefined {
+  let status: BatchStatus = "active";
+  let pausedAt: string | undefined;
+  for (const entry of timeline) {
+    if (entry.kind !== "status") continue;
+    if (status === "active" && entry.status !== "active") pausedAt = entry.date;
+    if (entry.status === "active") pausedAt = undefined;
+    status = entry.status;
+  }
+  return pausedAt;
 }
 
 export function restoreTimelineEntry(batch: Batch, id: string, now: number): Batch {

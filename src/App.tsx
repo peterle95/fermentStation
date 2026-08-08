@@ -438,7 +438,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
       ? { ...common, kind, status: String(data.get("status")) as BatchStatus }
       : { ...common, kind, text: String(data.get("text") ?? "").trim() };
     if (!entry.date || ("text" in entry && !entry.text)) return;
-    onChange(editing ? updateTimelineEntry(batch, entry) : addTimelineEntry(batch, entry));
+    onChange(editing ? updateTimelineEntry(batch, entry, localDate()) : addTimelineEntry(batch, entry));
     setEditing(null);
     event.currentTarget.reset();
   }

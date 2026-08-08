@@ -1,6 +1,6 @@
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { type Batch, type BatchState } from "../domain/batches";
-import { type ProfileState } from "../domain/profiles";
+import { validateProfile, type ProfileState } from "../domain/profiles";
 import { parseBatchState } from "./batch-store";
 import { parseProfileState } from "./profile-store";
 
@@ -110,6 +110,7 @@ export async function importArchive(
   const profileState = parseProfileState(records.profileState);
   const batchState = parseBatchState(records.batchState);
   if (!profileState || !batchState) throw new Error("Archive records do not match the schema");
+  validateImportedRecords(profileState, batchState);
   validateStableIds(profileState, batchState);
 
   const collisions = findCollisions(localProfiles, localBatches, profileState, batchState);
@@ -213,6 +214,66 @@ function validateStableIds(profiles: ProfileState, batches: BatchState): void {
   for (const batch of [...batches.batches, ...batches.trash]) {
     uniqueIds([...batch.timeline, ...batch.timelineTrash], `timeline entries in ${batch.id}`);
   }
+}
+
+function validateImportedRecords(profiles: ProfileState, batches: BatchState): void {
+  for (const profile of [...profiles.profiles, ...profiles.trash]) {
+    if (validateProfile(profile).length > 0) throw new Error("Archive contains an invalid profile");
+    if ("deletedAt" in profile &&
+        (typeof profile.deletedAt !== "number" || !validTimestamp(profile.deletedAt))) {
+      throw new Error("Archive contains an invalid profile trash timestamp");
+    }
+  }
+  for (const batch of [...batches.batches, ...batches.trash]) {
+    if (!validDate(batch.startDate) || batch.finishDate !== undefined && !validDate(batch.finishDate) ||
+        batch.checksPausedAt !== undefined && !validDate(batch.checksPausedAt)) {
+      throw new Error("Archive contains an invalid batch date");
+    }
+    if (validateProfile(batch.profileSnapshot).length > 0) {
+      throw new Error("Archive contains an invalid profile snapshot");
+    }
+    if (Object.values(batch.inputValues).some((value) => value !== undefined && !nonnegative(value))) {
+      throw new Error("Archive contains an invalid batch input");
+    }
+    if (Object.values(batch.calculationValues).some((value) =>
+      !value || typeof value !== "object" ||
+      value.suggested !== null && !nonnegative(value.suggested) ||
+      value.override !== undefined && !nonnegative(value.override))) {
+      throw new Error("Archive contains an invalid batch calculation");
+    }
+    if (batch.checks.some((check) => !Number.isInteger(check.intervalDays) || check.intervalDays < 1 ||
+        !validDate(check.nextDueDate) || check.lastCompletedDate !== undefined && !validDate(check.lastCompletedDate))) {
+      throw new Error("Archive contains an invalid batch check");
+    }
+    for (const entry of [...batch.timeline, ...batch.timelineTrash]) {
+      if (!validDate(entry.date) || entry.kind === "ph" &&
+          (!Number.isFinite(entry.value) || Math.abs(entry.value * 100 - Math.round(entry.value * 100)) > 1e-8)) {
+        throw new Error("Archive contains an invalid timeline entry");
+      }
+      if ("deletedAt" in entry &&
+          (typeof entry.deletedAt !== "number" || !validTimestamp(entry.deletedAt))) {
+        throw new Error("Archive contains an invalid timeline trash timestamp");
+      }
+    }
+    if ("deletedAt" in batch &&
+        (typeof batch.deletedAt !== "number" || !validTimestamp(batch.deletedAt))) {
+      throw new Error("Archive contains an invalid batch trash timestamp");
+    }
+  }
+}
+
+function validDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+function validTimestamp(value: number): boolean {
+  return Number.isFinite(value) && value >= 0;
+}
+
+function nonnegative(value: number): boolean {
+  return Number.isFinite(value) && value >= 0;
 }
 
 function uniqueIds(records: Array<{ id: string }>, label: string): void {
