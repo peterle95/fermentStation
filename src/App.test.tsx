@@ -29,6 +29,7 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Renamed profile" } });
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
     fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Kitchen kombucha" }));
 
     expect(screen.getByText("Profile snapshot:").parentElement?.textContent).toContain(
       "Kombucha F1",
@@ -38,9 +39,9 @@ describe("batch workflow", () => {
     expect(screen.getByText("Ready", { selector: ".status" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Batches" }));
-    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "active" } });
+    fireEvent.click(screen.getByRole("button", { name: "Active" }));
     expect(screen.getByText("No batches match this status.")).toBeTruthy();
-    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "ready" } });
+    fireEvent.click(screen.getByRole("button", { name: "Ready" }));
     expect(screen.getByText("Kitchen kombucha")).toBeTruthy();
   });
 
@@ -199,6 +200,9 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
 
     expect(screen.getByText(/Overdue 2026-08-03/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Back to today/i }));
+    expect(screen.getByRole("heading", { name: /Action queue/i })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Open Kombucha F1 for Taste" }));
     fireEvent.change(screen.getByLabelText("Taste interval days"), { target: { value: "3" } });
     expect(screen.getByText(/Overdue 2026-08-04/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Complete Taste" }));
