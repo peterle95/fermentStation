@@ -329,6 +329,7 @@ interface BatchCardProps {
 function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
   const [editing, setEditing] = useState<TimelineEntry | null>(null);
   const [editingPh, setEditingPh] = useState<Extract<TimelineEntry, { kind: "ph" }> | null>(null);
+  const [editingPhoto, setEditingPhoto] = useState<Extract<TimelineEntry, { kind: "photo" }> | null>(null);
 
   function saveEntry(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -376,6 +377,35 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
     onChange(editingPh ? updatePhReading(batch, entry) : addPhReading(batch, entry));
     setEditingPh(null);
     event.currentTarget.reset();
+  }
+
+  async function savePhoto(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const file = (form.elements.namedItem("photo") as HTMLInputElement).files?.[0];
+    if (!file || file.size === 0) {
+      if (!editingPhoto) return;
+    } else if (!file.type.startsWith("image/")) {
+      return;
+    }
+    const replacement = file && file.size > 0 ? {
+      name: file.name,
+      mimeType: file.type,
+      dataUrl: await fileToDataUrl(file),
+    } : editingPhoto!;
+    const entry = {
+      id: editingPhoto?.id ?? crypto.randomUUID(),
+      date: String(data.get("date") ?? ""),
+      kind: "photo" as const,
+      name: replacement.name,
+      mimeType: replacement.mimeType,
+      dataUrl: replacement.dataUrl,
+      caption: String(data.get("caption") ?? "").trim(),
+    };
+    onChange(editingPhoto ? updateTimelineEntry(batch, entry) : addTimelineEntry(batch, entry));
+    setEditingPhoto(null);
+    form.reset();
   }
 
   const latestPh = latestPhReading(batch);
@@ -473,8 +503,12 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
         {batch.timeline.filter((entry) => entry.kind !== "ph").map((entry) => (
           <div className="timeline-entry" key={entry.id}>
             <time dateTime={entry.date}>{entry.date}</time>
-            <span>{timelineEntryText(entry)}</span>
-            {entry.kind !== "check" && <button aria-label={`Edit ${entry.kind} from ${entry.date}`} onClick={() => setEditing(entry)} type="button">Edit</button>}
+            <span className="timeline-content">
+              {timelineEntryText(entry)}
+              {entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}
+            </span>
+            {(entry.kind === "note" || entry.kind === "measurement" || entry.kind === "status") && <button aria-label={`Edit ${entry.kind} from ${entry.date}`} onClick={() => setEditing(entry)} type="button">Edit</button>}
+            {entry.kind === "photo" && <button aria-label={`Edit photo from ${entry.date}`} onClick={() => setEditingPhoto(entry)} type="button">Edit</button>}
             <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
           </div>
         ))}
@@ -505,6 +539,13 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
             <button className="primary-action" type="submit">{editing ? "Save activity" : "Add activity"}</button>
             {editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}
           </div>
+        </form>
+        <form className="photo-form" key={editingPhoto?.id ?? "new-photo"} onSubmit={savePhoto}>
+          <label>Photo date <input defaultValue={editingPhoto?.date ?? localDate()} name="date" required type="date" /></label>
+          <label>Photo <input accept="image/*" capture="environment" name="photo" required={!editingPhoto} type="file" /></label>
+          <label>Caption <input defaultValue={editingPhoto?.caption} name="caption" /></label>
+          <button type="submit">{editingPhoto ? "Save photo" : "Attach photo"}</button>
+          {editingPhoto && <button onClick={() => setEditingPhoto(null)} type="button">Cancel</button>}
         </form>
         {batch.timelineTrash.length > 0 && (
           <div className="timeline-trash">
@@ -660,5 +701,15 @@ function timelineEntryText(entry: TimelineEntry): string {
   if (entry.kind === "status") return `Status: ${statusLabel(entry.status)}`;
   if (entry.kind === "check") return `Completed check: ${entry.checkName}`;
   if (entry.kind === "ph") return `pH ${entry.value}`;
+  if (entry.kind === "photo") return entry.caption || entry.name;
   return entry.text;
+}
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => resolve(String(reader.result)));
+    reader.addEventListener("error", () => reject(reader.error));
+    reader.readAsDataURL(file);
+  });
 }
