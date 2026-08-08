@@ -40,6 +40,8 @@ function isBatch(value: unknown): value is Batch {
     (batch.finishDate === undefined || typeof batch.finishDate === "string") &&
     (batch.inputValues === undefined || isNumberRecord(batch.inputValues)) &&
     (batch.calculationValues === undefined || typeof batch.calculationValues === "object") &&
+    (batch.checks === undefined || Array.isArray(batch.checks) && batch.checks.every(isBatchCheck)) &&
+    (batch.checksPausedAt === undefined || typeof batch.checksPausedAt === "string") &&
     Array.isArray(timeline) && timeline.every(isTimelineEntry) &&
     Array.isArray(timelineTrash) && timelineTrash.every(
       (entry) => isTimelineEntry(entry) && typeof (entry as Record<string, unknown>).deletedAt === "number",
@@ -47,9 +49,18 @@ function isBatch(value: unknown): value is Batch {
   );
 }
 
+function isBatchCheck(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const check = value as Record<string, unknown>;
+  return ["id", "name", "nextDueDate"].every((key) => typeof check[key] === "string") &&
+    typeof check.intervalDays === "number" &&
+    (check.lastCompletedDate === undefined || typeof check.lastCompletedDate === "string");
+}
+
 function isProfileDetails(profile: Record<string, unknown>): boolean {
   const inputs = profile.inputs ?? [];
   const calculations = profile.calculations ?? [];
+  const checks = profile.checks ?? [];
   return Array.isArray(inputs) && inputs.every((input) => {
     if (!input || typeof input !== "object") return false;
     const value = input as Record<string, unknown>;
@@ -60,6 +71,10 @@ function isProfileDetails(profile: Record<string, unknown>): boolean {
     const value = calculation as Record<string, unknown>;
     return typeof value.name === "string" && typeof value.formula === "string" &&
       ["g", "kg", "ml", "l"].includes(String(value.unit));
+  }) && Array.isArray(checks) && checks.every((check) => {
+    if (!check || typeof check !== "object") return false;
+    const value = check as Record<string, unknown>;
+    return typeof value.name === "string" && typeof value.intervalDays === "number";
   });
 }
 
@@ -76,6 +91,7 @@ function isTimelineEntry(value: unknown): value is TimelineEntry {
   if (entry.kind === "status") {
     return typeof entry.status === "string" && batchStatuses.includes(entry.status as Batch["status"]);
   }
+  if (entry.kind === "check") return typeof entry.checkName === "string";
   return (entry.kind === "note" || entry.kind === "measurement") && typeof entry.text === "string";
 }
 
@@ -84,6 +100,7 @@ function normalizeBatch(batch: Batch): Batch {
     ...batch.profileSnapshot,
     inputs: batch.profileSnapshot.inputs ?? [],
     calculations: batch.profileSnapshot.calculations ?? [],
+    checks: batch.profileSnapshot.checks ?? [],
   };
   return {
     ...batch,
@@ -94,6 +111,7 @@ function normalizeBatch(batch: Batch): Batch {
       profileSnapshot.inputs.map((input) => [input.name, input.defaultValue]),
     ),
     calculationValues: batch.calculationValues ?? {},
+    checks: batch.checks ?? [],
   };
 }
 

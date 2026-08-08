@@ -11,7 +11,16 @@ export type BatchFilter = BatchStatus | "all";
 export type TimelineEntry =
   | { id: string; date: string; kind: "note"; text: string }
   | { id: string; date: string; kind: "measurement"; text: string }
-  | { id: string; date: string; kind: "status"; status: BatchStatus };
+  | { id: string; date: string; kind: "status"; status: BatchStatus }
+  | { id: string; date: string; kind: "check"; checkName: string };
+
+export interface BatchCheck {
+  id: string;
+  name: string;
+  intervalDays: number;
+  nextDueDate: string;
+  lastCompletedDate?: string;
+}
 
 export type TrashedTimelineEntry = TimelineEntry & { deletedAt: number };
 
@@ -26,6 +35,8 @@ export interface Batch {
   inputValues: Record<string, number | undefined>;
   calculationValues: Record<string, { suggested: number | null; override?: number }>;
   finishDate?: string;
+  checks: BatchCheck[];
+  checksPausedAt?: string;
 }
 
 export interface TrashedBatch extends Batch {
@@ -73,12 +84,34 @@ export function createBatch(
     inputValues: values,
     calculationValues: {},
     finishDate,
+    checks: profile.checks.map((check) => ({
+      id: check.name,
+      name: check.name,
+      intervalDays: check.intervalDays,
+      nextDueDate: addCalendarDays(startDate, check.intervalDays),
+    })),
   };
   const calculated = recalculateBatch(batch);
   return today ? updateBatchForDate(calculated, today) : calculated;
 }
 
-export function changeBatchStatus(batch: Batch, status: BatchStatus): Batch {
+export function changeBatchStatus(batch: Batch, status: BatchStatus, date?: string): Batch {
+  if (!date || status === batch.status) return { ...batch, status };
+  if (batch.status === "active" && status !== "active") {
+    return { ...batch, status, checksPausedAt: date };
+  }
+  if (batch.status !== "active" && status === "active" && batch.checksPausedAt) {
+    const pausedDays = calendarDaysBetween(batch.checksPausedAt, date);
+    return {
+      ...batch,
+      status,
+      checksPausedAt: undefined,
+      checks: batch.checks.map((check) => ({
+        ...check,
+        nextDueDate: addCalendarDays(check.nextDueDate, Math.max(0, pausedDays)),
+      })),
+    };
+  }
   return { ...batch, status };
 }
 
@@ -107,13 +140,90 @@ export function overrideBatchCalculation(batch: Batch, name: string, value: numb
 }
 
 export function setFinishDate(batch: Batch, finishDate: string, today: string): Batch {
-  return { ...batch, finishDate, status: finishDate > today ? "active" : "ready" };
+  return changeBatchStatus(
+    { ...batch, finishDate },
+    finishDate > today ? "active" : "ready",
+    today,
+  );
 }
 
 export function updateBatchForDate(batch: Batch, today: string): Batch {
   return batch.finishDate && batch.finishDate <= today && batch.status === "active"
-    ? { ...batch, status: "ready" }
+    ? changeBatchStatus(batch, "ready", batch.finishDate)
     : batch;
+}
+
+export function adjustBatchCheck(batch: Batch, id: string, intervalDays: number): Batch {
+  if (!Number.isInteger(intervalDays) || intervalDays < 1) {
+    throw new Error("Check interval must be a positive whole number");
+  }
+  return {
+    ...batch,
+    checks: batch.checks.map((check) => check.id === id ? {
+      ...check,
+      intervalDays,
+      nextDueDate: addCalendarDays(check.lastCompletedDate ?? batch.startDate, intervalDays),
+    } : check),
+  };
+}
+
+export function completeBatchCheck(
+  batch: Batch,
+  id: string,
+  completedDate: string,
+  timelineEntryId: string,
+): Batch {
+  if (batch.status !== "active") throw new Error("Checks are paused while the batch is not active");
+  const check = batch.checks.find((candidate) => candidate.id === id);
+  if (!check) throw new Error(`Unknown check ${id}`);
+  return addTimelineEntry({
+    ...batch,
+    checks: batch.checks.map((candidate) => candidate.id === id ? {
+      ...candidate,
+      lastCompletedDate: completedDate,
+      nextDueDate: addCalendarDays(completedDate, candidate.intervalDays),
+    } : candidate),
+  }, {
+    id: timelineEntryId,
+    date: completedDate,
+    kind: "check",
+    checkName: check.name,
+  });
+}
+
+export function dueBatchChecks(batch: Batch, today: string): Array<BatchCheck & { overdue: boolean }> {
+  return batch.status === "active"
+    ? batch.checks
+      .filter((check) => check.nextDueDate <= today)
+      .map((check) => ({ ...check, overdue: check.nextDueDate < today }))
+    : [];
+}
+
+export interface CalendarEvent {
+  batchId: string;
+  batchName: string;
+  date: string;
+  kind: "finish" | "check";
+  label: string;
+}
+
+export function calendarEvents(batches: Batch[]): CalendarEvent[] {
+  return batches.flatMap((batch) => [
+    ...(batch.finishDate ? [{
+      batchId: batch.id,
+      batchName: batch.name,
+      date: batch.finishDate,
+      kind: "finish" as const,
+      label: "Finish date",
+    }] : []),
+    ...(batch.status === "active" ? batch.checks.map((check) => ({
+      batchId: batch.id,
+      batchName: batch.name,
+      date: check.nextDueDate,
+      kind: "check" as const,
+      label: check.name,
+    })) : []),
+  ]).sort((left, right) => left.date.localeCompare(right.date));
 }
 
 function recalculateBatch(batch: Batch): Batch {
@@ -140,6 +250,10 @@ function addCalendarDays(date: string, days: number): string {
   return value.toISOString().slice(0, 10);
 }
 
+function calendarDaysBetween(start: string, end: string): number {
+  return (Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86_400_000;
+}
+
 const recoveryPeriodMs = 7 * 24 * 60 * 60 * 1000;
 
 export function createBatchState(batches: Batch[] = []): BatchState {
@@ -150,11 +264,10 @@ export function addTimelineEntry(batch: Batch, entry: TimelineEntry): Batch {
   const timeline = [...batch.timeline, entry].sort((left, right) =>
     left.date.localeCompare(right.date),
   );
-  return {
-    ...batch,
-    status: entry.kind === "status" ? latestTimelineStatus(timeline) : batch.status,
-    timeline,
-  };
+  const next = { ...batch, timeline };
+  return entry.kind === "status"
+    ? changeBatchStatus(next, latestTimelineStatus(timeline), entry.date)
+    : next;
 }
 
 export function updateTimelineEntry(batch: Batch, entry: TimelineEntry): Batch {
@@ -253,9 +366,17 @@ export function filterBatches(batches: Batch[], filter: BatchFilter): Batch[] {
   return filter === "all" ? batches : batches.filter(({ status }) => status === filter);
 }
 
-export function prioritizeToday(batches: Batch[]): Batch[] {
+export function prioritizeToday(batches: Batch[], today?: string): Batch[] {
   const priority: Record<BatchStatus, number> = { ready: 0, active: 1, "to-fridge": 2 };
-  return [...batches].sort((left, right) => priority[left.status] - priority[right.status]);
+  return [...batches].sort((left, right) => {
+    if (today) {
+      const leftDue = dueBatchChecks(left, today)[0];
+      const rightDue = dueBatchChecks(right, today)[0];
+      if (leftDue?.overdue !== rightDue?.overdue) return leftDue?.overdue ? -1 : 1;
+      if (!!leftDue !== !!rightDue) return leftDue ? -1 : 1;
+    }
+    return priority[left.status] - priority[right.status];
+  });
 }
 
 export function statusLabel(status: BatchStatus): string {

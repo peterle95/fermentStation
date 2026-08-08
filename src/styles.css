@@ -350,6 +350,52 @@ textarea {
   flex: 1 1 14rem;
 }
 
+.checks,
+.calendar {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.checks h4 {
+  margin: 0;
+}
+
+.check,
+.calendar-event {
+  align-items: center;
+  background: #f5ecdf;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.75rem;
+}
+
+.check label {
+  align-items: center;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.check input {
+  width: 4rem;
+}
+
+.calendar {
+  margin-top: 1.5rem;
+  max-width: 42rem;
+}
+
+.calendar-event time {
+  font-family: Consolas, monospace;
+}
+
+.calendar-event div {
+  display: grid;
+  flex: 1;
+  gap: 0.2rem;
+}
+
 .notice {
   background: #fff4d8;
   border-left: 4px solid #9d4934;

@@ -5,7 +5,13 @@ export interface FermentationProfile {
   instructions: string;
   inputs: ProfileInput[];
   calculations: ProfileCalculation[];
+  checks: ProfileCheck[];
   expectedDurationDays?: number;
+}
+
+export interface ProfileCheck {
+  name: string;
+  intervalDays: number;
 }
 
 export interface ProfileInput {
@@ -33,7 +39,7 @@ export interface ProfileState {
 
 const recoveryPeriodMs = 7 * 24 * 60 * 60 * 1000;
 
-const emptyProfileFields = { inputs: [], calculations: [] };
+const emptyProfileFields = { inputs: [], calculations: [], checks: [] };
 
 const starterProfiles: FermentationProfile[] = [
   {
@@ -82,6 +88,7 @@ export function cloneProfile(profile: FermentationProfile): FermentationProfile 
     ...profile,
     inputs: profile.inputs.map((input) => ({ ...input })),
     calculations: profile.calculations.map((calculation) => ({ ...calculation })),
+    checks: profile.checks.map((check) => ({ ...check })),
   };
 }
 
@@ -149,6 +156,16 @@ export function validateProfile(profile: FermentationProfile): string[] {
       );
     } catch (error) {
       errors.push(`${calculation.name}: ${(error as Error).message}`);
+    }
+  }
+  const checkNames = new Set<string>();
+  for (const check of profile.checks) {
+    if (!check.name.trim() || checkNames.has(check.name)) {
+      errors.push("Check names must be present and unique.");
+    }
+    checkNames.add(check.name);
+    if (!Number.isInteger(check.intervalDays) || check.intervalDays < 1) {
+      errors.push(`${check.name || "Check"} interval must be a positive whole number.`);
     }
   }
   return errors;

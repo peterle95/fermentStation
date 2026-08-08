@@ -20,6 +20,7 @@ function isProfile(value: unknown): boolean {
   const profile = value as Record<string, unknown>;
   const inputs = profile.inputs ?? [];
   const calculations = profile.calculations ?? [];
+  const checks = profile.checks ?? [];
   return ["id", "name", "guidance", "instructions"].every(
     (key) => typeof profile[key] === "string",
   ) && Array.isArray(inputs) && inputs.every((input) => {
@@ -33,6 +34,11 @@ function isProfile(value: unknown): boolean {
     return ["name", "formula"].every((key) => typeof candidate[key] === "string") &&
       ["g", "kg", "ml", "l"].includes(String(candidate.unit));
   }) &&
+    Array.isArray(checks) && checks.every((check) => {
+      if (!check || typeof check !== "object") return false;
+      const candidate = check as Record<string, unknown>;
+      return typeof candidate.name === "string" && typeof candidate.intervalDays === "number";
+    }) &&
     (profile.expectedDurationDays === undefined || typeof profile.expectedDurationDays === "number");
 }
 
@@ -41,6 +47,7 @@ function normalizeProfile(profile: FermentationProfile): FermentationProfile {
     ...profile,
     inputs: profile.inputs ?? [],
     calculations: profile.calculations ?? [],
+    checks: profile.checks ?? [],
   };
 }
 
