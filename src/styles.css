@@ -16,6 +16,7 @@ body {
 
 button {
   font: inherit;
+  min-height: 2.75rem;
 }
 
 .app-shell {
@@ -69,6 +70,12 @@ h2 {
   align-content: start;
   display: grid;
   gap: 0.4rem;
+  position: sticky;
+  top: 2rem;
+}
+
+.mobile-label {
+  display: none;
 }
 
 .navigation button {
@@ -473,7 +480,27 @@ button:disabled {
 
 @media (max-width: 700px) {
   .app-shell {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0;
     padding-bottom: 6rem;
+  }
+
+  .masthead {
+    background: #f4eee4;
+    padding: 0.75rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .masthead .eyebrow,
+  .masthead .intro {
+    display: none;
+  }
+
+  .masthead h1 {
+    font-size: 1.5rem;
   }
 
   .layout {
@@ -490,6 +517,8 @@ button:disabled {
     padding: 0.5rem;
     position: fixed;
     right: 0;
+    top: auto;
+    z-index: 20;
   }
 
   .navigation button {
@@ -497,6 +526,14 @@ button:disabled {
     font-size: 0.75rem;
     padding: 0.7rem 0.3rem;
     text-align: center;
+  }
+
+  .desktop-label {
+    display: none;
+  }
+
+  .mobile-label {
+    display: inline;
   }
 
   main {
@@ -515,5 +552,37 @@ button:disabled {
 
   .timeline-entry time {
     grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 400px) {
+  main > .eyebrow {
+    display: none;
+  }
+
+  main > h2 {
+    font-size: 1.75rem;
+  }
+
+  .batch-card {
+    padding: 1rem;
+  }
+
+  .batch-heading {
+    align-items: start;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 9rem minmax(0, 1fr);
+  }
+
+  .navigation button {
+    padding-inline: 0.75rem;
+  }
+
+  .batch-list {
+    max-width: none;
   }
 }
