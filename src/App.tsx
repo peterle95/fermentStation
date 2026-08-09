@@ -184,7 +184,6 @@ export function App() {
                 <div>
                   <p className="eyebrow">{formatToday()}</p>
                   <h1>Today</h1>
-                  <p className="screen-intro">{screenDescription("today")}</p>
                 </div>
               </div>
               <BatchView
@@ -703,8 +702,6 @@ function BatchView({ batches, mode, profiles, onChange, onCreate, onDelete, onNa
         <>
           <div className="batch-breadcrumb">
             <button autoFocus className="back-link" onClick={closeBatch} type="button">← Back to {mode}</button>
-            <span aria-hidden="true">/</span>
-            <span>{openBatch.id}</span>
           </div>
           <BatchCard batch={openBatch} onChange={onChange} onDelete={onDelete} />
         </>
@@ -1009,7 +1006,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
     <article className="batch-workspace">
       <div className="batch-workspace-head">
         <div>
-          <p className="eyebrow">{batch.id} · {batch.profileSnapshot.name} · started {batch.startDate}</p>
+          <p className="eyebrow">{batch.profileSnapshot.name} · started {batch.startDate}</p>
           <div className="batch-title-row">
             <h3>{batch.name}</h3>
             <span className={`status status-${batch.status}`}><StatusIcon status={batch.status} />{statusLabel(batch.status)}</span>
