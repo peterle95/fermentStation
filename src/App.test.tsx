@@ -112,7 +112,9 @@ describe("batch workflow", () => {
       "Kombucha F1",
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Mark ready" }));
+    fireEvent.change(screen.getByLabelText("Activity type"), { target: { value: "status" } });
+    fireEvent.change(screen.getByLabelText("Activity status"), { target: { value: "ready" } });
+    fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
     expect(screen.getByText("Ready", { selector: ".status" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Batches" }));
@@ -133,8 +135,9 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("Note or measurement"), {
       target: { value: "Tasted tart" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Add activity" }));
+    fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
     expect(screen.getByText("Tasted tart")).toBeTruthy();
+    expect(screen.getByRole("region", { name: /timeline$/i }).querySelector("form")).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Edit note from 2026-08-02" }));
     fireEvent.change(screen.getByLabelText("Note or measurement"), {
@@ -147,7 +150,9 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Restore note from 2026-08-02" }));
     expect(screen.getByText("Tasted pleasantly tart")).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: "Mark ready" }));
+    fireEvent.change(screen.getByLabelText("Activity type"), { target: { value: "status" } });
+    fireEvent.change(screen.getByLabelText("Activity status"), { target: { value: "ready" } });
+    fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
     expect(screen.getByText("Status: Ready")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Delete batch" }));
     expect(screen.queryByText("Recently deleted batches")).toBeNull();
@@ -309,7 +314,8 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("Taste interval days"), { target: { value: "3" } });
     const adjustedDateValue = addDaysForTest(today, 3);
     expect(screen.getByText(new RegExp(`Next ${adjustedDateValue}|Overdue ${adjustedDateValue}`))).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Complete Taste" }));
+    fireEvent.change(screen.getByLabelText("Activity type"), { target: { value: "check" } });
+    fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
     expect(screen.getByText("Completed check: Taste")).toBeTruthy();
     const expectedNextDate = addDaysForTest(today, 3);
     expect(screen.getByText(new RegExp(`Next ${expectedNextDate}`))).toBeTruthy();
@@ -347,32 +353,52 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
 
+    fireEvent.change(screen.getByLabelText("Activity type"), { target: { value: "ph" } });
     fireEvent.change(screen.getByLabelText("pH value"), { target: { value: "15" } });
-    fireEvent.click(screen.getByRole("button", { name: "Add pH" }));
+    fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
     expect(screen.getByText("Outside the usual pH range of 0-14")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Edit pH/ }));
-    fireEvent.change(screen.getByLabelText("pH date"), { target: { value: "2026-08-02" } });
+    fireEvent.change(screen.getByLabelText("Activity date"), { target: { value: "2026-08-02" } });
     fireEvent.change(screen.getByLabelText("pH value"), { target: { value: "3.45" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save pH" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save activity" }));
     expect(screen.getByText("optimal")).toBeTruthy();
     expect(screen.getByText("Latest:").parentElement?.textContent).toContain("3.45 on 2026-08-02");
+  });
+
+  it("logs temperature in the selected unit and stores Celsius", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "°F / qt" }));
+    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+
+    fireEvent.change(screen.getByLabelText("Activity type"), { target: { value: "temperature" } });
+    expect(screen.getByLabelText("Temperature (°F)")).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Temperature (°F)"), { target: { value: "68" } });
+    fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
+
+    expect(screen.getByText("Temperature 68°F")).toBeTruthy();
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline)
+      .toContainEqual(expect.objectContaining({ kind: "temperature", value: 20 }));
   });
 
   it("attaches, displays, edits, deletes, and restores a local photo", async () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+    fireEvent.change(screen.getByLabelText("Activity type"), { target: { value: "photo" } });
     const file = new File(["original photo bytes"], "jar.jpg", { type: "image/jpeg" });
     fireEvent.change(screen.getByLabelText("Photo"), { target: { files: [file] } });
     fireEvent.change(screen.getByLabelText("Caption"), { target: { value: "Jar day one" } });
-    fireEvent.submit(screen.getByRole("button", { name: "Attach photo" }).closest("form")!);
+    fireEvent.submit(screen.getByRole("button", { name: "Log activity" }).closest("form")!);
 
     const image = await screen.findByRole("img", { name: "Jar day one" });
     expect(image.getAttribute("src")).toContain("data:image/jpeg;base64,");
     fireEvent.click(screen.getByRole("button", { name: /Edit photo/ }));
     fireEvent.change(screen.getByLabelText("Caption"), { target: { value: "Jar day two" } });
-    fireEvent.click(screen.getByRole("button", { name: "Save photo" }));
+    fireEvent.submit(screen.getByRole("button", { name: "Save activity" }).closest("form")!);
     expect(await screen.findByRole("img", { name: "Jar day two" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Delete photo/ }));

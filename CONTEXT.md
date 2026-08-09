@@ -52,8 +52,14 @@ A profile-provided or calculated recommendation for a batch. It can be overridde
 An initial fermentation profile supplied to help a user begin tracking common fermentation methods. It is otherwise an ordinary user-managed profile and may be modified or deleted.
 
 **Timeline entry**:
-A dated observation attached to a batch, such as a photo, note, measurement, or status change.
+A dated observation attached to a batch, such as a photo, note, measurement, temperature reading, check completion, or status change.
 _Avoid_: Update, log item
+
+**Temperature reading**:
+A dated numeric observation of a batch's temperature. It is historical evidence distinct from the batch's current profile input and is stored in Celsius even when the user works in imperial units.
+
+**Observation logger**:
+The single interaction surface for creating or editing a batch's dated observations, including readings, notes, photos, status changes, and check completions.
 
 **Batch status**:
 The current stage of a batch: `active` before its finish date, `ready` automatically on its finish date or earlier when the user chooses, and `to-fridge` when the user moves it to cold storage to slow further fermentation. A manually chosen status remains until changed; moving the finish date into the future returns the batch to `active`. A profile may suggest when to move a batch to the fridge, but does not do so automatically.

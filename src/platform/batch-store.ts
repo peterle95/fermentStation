@@ -104,6 +104,7 @@ function isTimelineEntry(value: unknown): value is TimelineEntry {
   }
   if (entry.kind === "check") return typeof entry.checkName === "string";
   if (entry.kind === "ph") return typeof entry.value === "number";
+  if (entry.kind === "temperature") return typeof entry.value === "number" && Number.isFinite(entry.value);
   if (entry.kind === "photo") return typeof entry.name === "string" &&
     typeof entry.mimeType === "string" && entry.mimeType.startsWith("image/") &&
     typeof entry.dataUrl === "string" && entry.dataUrl.startsWith("data:image/") &&
