@@ -3,14 +3,14 @@ import { createProfileState, deleteProfile } from "../domain/profiles";
 import { createProfileStore } from "./profile-store";
 
 describe("profile store", () => {
-  it("round-trips profiles and trash", () => {
+  it("round-trips profiles", () => {
     const values = new Map<string, string>();
     const store = createProfileStore({
       getItem: (key) => values.get(key) ?? null,
       setItem: (key, value) => values.set(key, value),
     });
 
-    const state = deleteProfile(createProfileState(), "starter-sauerkraut", 100);
+    const state = deleteProfile(createProfileState(), "starter-sauerkraut");
     store.save(state);
 
     expect(store.load()).toEqual(state);
@@ -23,5 +23,28 @@ describe("profile store", () => {
     });
 
     expect(store.load()).toBeNull();
+  });
+
+  it("ignores legacy profile trash while loading", () => {
+    const store = createProfileStore({
+      getItem: () => JSON.stringify({ profiles: [createProfileState().profiles[0]], trash: [{ id: "deleted" }] }),
+      setItem: () => undefined,
+    });
+
+    expect(store.load()).toEqual({ profiles: [createProfileState().profiles[0]] });
+  });
+
+  it("migrates profile checks without IDs", () => {
+    const profile = createProfileState().profiles[0];
+    profile.checks = [{ name: " Taste ", intervalDays: 2 }];
+    const store = createProfileStore({
+      getItem: () => JSON.stringify({ profiles: [profile] }),
+      setItem: () => undefined,
+    });
+
+    const loaded = store.load()!;
+    expect(loaded.profiles[0].checks[0]).toMatchObject({ name: "Taste", intervalDays: 2 });
+    expect(loaded.profiles[0].checks[0].id).toEqual(expect.any(String));
+    expect(store.load()?.profiles[0].checks[0].id).toBe(loaded.profiles[0].checks[0].id);
   });
 });

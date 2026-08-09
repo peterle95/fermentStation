@@ -4,14 +4,10 @@ import {
   calculateProfileValue,
   createProfileState,
   deleteProfile,
-  discardExpiredProfiles,
-  restoreProfile,
   parseSimpleFormula,
   updateProfile,
   validateProfile,
 } from "./profiles";
-
-const day = 24 * 60 * 60 * 1000;
 
 describe("fermentation profiles", () => {
   it("provides the five editable starter profiles", () => {
@@ -132,40 +128,31 @@ describe("fermentation profiles", () => {
     expect(validateProfile(profile)).toContain("pH zones cannot overlap.");
   });
 
-  it("restores a deleted profile during the seven-day recovery period", () => {
+  it("allows empty checks and normalizes check names for uniqueness", () => {
+    const base = createProfileState().profiles[0];
+    expect(validateProfile({ ...base, checks: [] })).toEqual([]);
+    expect(validateProfile({
+      ...base,
+      checks: [
+        { name: " Taste ", intervalDays: 2 },
+        { name: "taste", intervalDays: 3 },
+      ],
+    })).toContain("Check names must be present and unique.");
+  });
+
+  it("deletes a profile permanently", () => {
     const state = createProfileState();
-    const deleted = deleteProfile(state, "starter-sauerkraut", 100 * day);
-    const restored = restoreProfile(deleted, "starter-sauerkraut", 106 * day);
+    const deleted = deleteProfile(state, "starter-sauerkraut");
 
     expect(deleted.profiles.some(({ id }) => id === "starter-sauerkraut")).toBe(false);
-    expect(restored.profiles.some(({ id }) => id === "starter-sauerkraut")).toBe(true);
-    expect(restored.trash).toHaveLength(0);
+    expect(deleted.profiles).toHaveLength(state.profiles.length - 1);
   });
 
-  it("permanently discards profiles after seven days", () => {
-    const deleted = deleteProfile(createProfileState(), "starter-sauerkraut", 100 * day);
-    const expired = discardExpiredProfiles(deleted, 107 * day);
-    const restored = restoreProfile(deleted, "starter-sauerkraut", 107 * day);
-
-    expect(restored.profiles.some(({ id }) => id === "starter-sauerkraut")).toBe(false);
-    expect(restored.trash).toHaveLength(0);
-    expect(expired.trash).toHaveLength(0);
-  });
-
-  it("cleans expired trash when another profile is deleted", () => {
-    const deleted = deleteProfile(createProfileState(), "starter-sauerkraut", 100 * day);
-    const laterDeleted = deleteProfile(deleted, "starter-sourdough", 107 * day);
-
-    expect(laterDeleted.trash.map(({ id }) => id)).toEqual(["starter-sourdough"]);
-  });
-
-  it("does not duplicate a profile that already exists when restoring", () => {
+  it("does not duplicate a profile that already exists when re-adding", () => {
     const state = createProfileState();
-    const deleted = deleteProfile(state, "starter-sauerkraut", 100 * day);
+    const deleted = deleteProfile(state, "starter-sauerkraut");
     const readded = addProfile(deleted, state.profiles[2]);
-    const restored = restoreProfile(readded, "starter-sauerkraut", 106 * day);
 
-    expect(restored.profiles.filter(({ id }) => id === "starter-sauerkraut")).toHaveLength(1);
-    expect(restored.trash).toHaveLength(0);
+    expect(readded.profiles.filter(({ id }) => id === "starter-sauerkraut")).toHaveLength(1);
   });
 });

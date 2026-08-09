@@ -4,7 +4,7 @@ import { addTimelineEntry, createBatch, createBatchState } from "../domain/batch
 import { createProfileState } from "../domain/profiles";
 import { createArchive, importArchive, resolveArchiveCollisions } from "./archive";
 
-const emptyProfiles = { profiles: [], trash: [] };
+const emptyProfiles = { profiles: [] };
 const emptyBatches = createBatchState();
 
 function statesWithPhoto() {
@@ -52,7 +52,7 @@ describe("FermentStation archive boundary", () => {
       .rejects.toThrow("structure does not match");
 
     await expect(createArchive(
-      { profiles: [source.profileState.profiles[0], source.profileState.profiles[0]], trash: [] },
+      { profiles: [source.profileState.profiles[0], source.profileState.profiles[0]] },
       emptyBatches,
     )).rejects.toThrow("duplicate profile IDs");
   });

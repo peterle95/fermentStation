@@ -5,6 +5,18 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "./App";
 import { createProfileState } from "./domain/profiles";
 
+function localDateForTest() {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+}
+
+function addDaysForTest(date: string, days: number) {
+  const value = new Date(`${date}T00:00:00`);
+  value.setDate(value.getDate() + days);
+  return [value.getFullYear(), value.getMonth() + 1, value.getDate()]
+    .map((part) => String(part).padStart(2, "0")).join("-");
+}
+
 describe("batch workflow", () => {
   beforeEach(() => localStorage.clear());
   afterEach(cleanup);
@@ -23,6 +35,22 @@ describe("batch workflow", () => {
     expect(dialog.textContent).toContain("Profile calculation");
     fireEvent.click(screen.getByRole("button", { name: "Done" }));
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("supports an empty profile check list and stable check editing", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+
+    expect((screen.getByLabelText(/Expected duration/) as HTMLInputElement).value).toBe("");
+    expect(screen.getByText(/No recurring checks yet/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Add check" }));
+    const name = screen.getByLabelText("Check name 1");
+    expect(document.activeElement).toBe(name);
+    fireEvent.change(name, { target: { value: "Taste" } });
+    fireEvent.change(screen.getByLabelText("Check interval 1"), { target: { value: "2" } });
+    fireEvent.click(screen.getByRole("button", { name: "Remove Taste" }));
+    expect(screen.getByText(/No recurring checks yet/)).toBeTruthy();
   });
 
   it("starts, snapshots, monitors, and filters a batch", () => {
@@ -89,7 +117,12 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Mark ready" }));
     expect(screen.getByText("Status: Ready")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Delete batch" }));
+    expect(screen.queryByText("Recently deleted batches")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open recently deleted batches" }));
     fireEvent.click(screen.getByRole("button", { name: "Restore Kombucha F1" }));
+    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Kombucha F1" }));
     expect(screen.getByText("Tasted pleasantly tart")).toBeTruthy();
   });
 
@@ -223,31 +256,51 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
     fireEvent.change(screen.getByLabelText(/Expected duration/), { target: { value: "14" } });
-    fireEvent.change(screen.getByLabelText(/^Recurring checks/), {
-      target: { value: "Taste, 2" },
-    });
+    fireEvent.click(screen.getByRole("button", { name: "Add check" }));
+    fireEvent.change(screen.getByLabelText("Check name 1"), { target: { value: "Taste" } });
+    fireEvent.change(screen.getByLabelText("Check interval 1"), { target: { value: "2" } });
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
     fireEvent.click(screen.getByRole("button", { name: "Today" }));
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    const today = localDateForTest();
+    const startDate = addDaysForTest(today, -8);
     fireEvent.change(screen.getByLabelText(/start date/i), {
-      target: { value: "2026-08-01" },
+      target: { value: startDate },
     });
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
 
-    expect(screen.getByText(/Overdue 2026-08-03/)).toBeTruthy();
+    expect(screen.getByText(new RegExp(`Overdue ${addDaysForTest(startDate, 2)}`))).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Back to today/i }));
     expect(screen.getByRole("heading", { name: /Action queue/i })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Open Kombucha F1 for Taste" }));
     fireEvent.change(screen.getByLabelText("Taste interval days"), { target: { value: "3" } });
-    expect(screen.getByText(/Overdue 2026-08-04/)).toBeTruthy();
+    const adjustedDateValue = addDaysForTest(today, 3);
+    expect(screen.getByText(new RegExp(`Next ${adjustedDateValue}|Overdue ${adjustedDateValue}`))).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Complete Taste" }));
     expect(screen.getByText("Completed check: Taste")).toBeTruthy();
-    expect(screen.getByText(/Next 2026-08-11/)).toBeTruthy();
+    const expectedNextDate = addDaysForTest(today, 3);
+    expect(screen.getByText(new RegExp(`Next ${expectedNextDate}`))).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
     expect(screen.getByText("Finish date")).toBeTruthy();
     expect(screen.getByText("Taste")).toBeTruthy();
-    expect(screen.getByText("2026-08-11")).toBeTruthy();
+    expect(screen.getByText(expectedNextDate)).toBeTruthy();
+  });
+
+  it("adds, renames, and removes a batch-local check", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add check" }));
+    fireEvent.change(screen.getByLabelText("Check name"), { target: { value: "Burp" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add recurring check" }));
+
+    const name = screen.getByDisplayValue("Burp");
+    fireEvent.change(name, { target: { value: "Gas release" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save name" }));
+    expect(screen.getByDisplayValue("Gas release")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Remove Gas release" }));
+    expect(screen.getByText("No recurring checks yet.")).toBeTruthy();
   });
 
   it("records editable pH readings with warnings and profile zones", () => {

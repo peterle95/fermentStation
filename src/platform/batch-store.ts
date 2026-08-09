@@ -5,6 +5,7 @@ import {
   type BatchState,
   type TimelineEntry,
 } from "../domain/batches";
+import { normalizeProfileChecks } from "../domain/profiles";
 
 export interface BatchStore {
   load(): BatchState | null;
@@ -52,7 +53,8 @@ function isBatch(value: unknown): value is Batch {
 function isBatchCheck(value: unknown): boolean {
   if (!value || typeof value !== "object") return false;
   const check = value as Record<string, unknown>;
-  return ["id", "name", "nextDueDate"].every((key) => typeof check[key] === "string") &&
+  return (check.id === undefined || typeof check.id === "string") &&
+    ["name", "nextDueDate"].every((key) => typeof check[key] === "string") &&
     typeof check.intervalDays === "number" &&
     (check.lastCompletedDate === undefined || typeof check.lastCompletedDate === "string");
 }
@@ -111,7 +113,7 @@ function normalizeBatch(batch: Batch): Batch {
     ...batch.profileSnapshot,
     inputs: batch.profileSnapshot.inputs ?? [],
     calculations: batch.profileSnapshot.calculations ?? [],
-    checks: batch.profileSnapshot.checks ?? [],
+    checks: normalizeProfileChecks(batch.profileSnapshot.checks ?? [], `profile-check-${batch.profileSnapshot.id}`),
     phZones: batch.profileSnapshot.phZones ?? [],
   };
   return {
@@ -123,8 +125,20 @@ function normalizeBatch(batch: Batch): Batch {
       profileSnapshot.inputs.map((input) => [input.name, input.defaultValue]),
     ),
     calculationValues: batch.calculationValues ?? {},
-    checks: batch.checks ?? [],
+    checks: normalizeBatchChecks(batch.checks ?? [], `batch-check-${batch.id}`),
   };
+}
+
+function normalizeBatchChecks(checks: Batch["checks"], prefix: string): Batch["checks"] {
+  const ids = new Set<string>();
+  return checks.map((check, index) => {
+    const fallback = `${prefix}-${index}`;
+    let id = check.id?.trim() || fallback;
+    let suffix = 1;
+    while (ids.has(id)) id = `${fallback}-${suffix++}`;
+    ids.add(id);
+    return { ...check, id, name: check.name.trim() };
+  });
 }
 
 export function createBatchStore(storage: KeyValueStore): BatchStore {

@@ -25,7 +25,16 @@ A value the user supplies for a batch, such as water volume, cabbage weight, or 
 A fixed condition or recommendation supplied by a fermentation profile, such as temperature or salt percentage.
 
 **Profile check**:
-An optional named check supplied by a fermentation profile, such as tasting or burping a jar. A batch may use its copied checks on its own whole-day schedule; checks pause while the batch is not `active`.
+An optional named recurring check supplied by a fermentation profile, such as tasting or burping a jar. A profile may have no checks. When a batch is created, its profile checks are copied into that batch; later profile edits do not change existing batches. Profile checks use positive whole-day intervals and unique normalized names.
+
+**Batch check**:
+A recurring check attached to one batch. It may have been copied from the batch's profile or added later as a batch-local check. Batch-local checks use positive whole-day intervals, start their first schedule from the day they are added, and never change the profile.
+
+**Check schedule**:
+The next date on which a batch check should be noticed. A copied check first falls due after its interval from the batch start date. A newly added check first falls due after its interval from the day it is added. Changing an uncompleted check's interval anchors the next date from today; changing a completed check's interval anchors it from its latest completion. Completing a check, including an early completion, starts its next interval from the completion date.
+
+**Check completion**:
+A dated timeline event recording that a batch check was completed. Completion is immediate and does not require a note, measurement, or photo; those observations may be recorded separately.
 
 **Profile calculation**:
 A user-defined formula in a fermentation profile that derives a value from one or more batch inputs. Fermentation quantities use metric units.
@@ -43,5 +52,7 @@ _Avoid_: Update, log item
 **Batch status**:
 The current stage of a batch: `active` before its finish date, `ready` automatically on its finish date or earlier when the user chooses, and `to-fridge` when the user moves it to cold storage to slow further fermentation. A manually chosen status remains until changed; moving the finish date into the future returns the batch to `active`. A profile may suggest when to move a batch to the fridge, but does not do so automatically.
 
+Checks are scheduled only while a batch is `active`; they pause in `ready` and `to-fridge` and resume when the batch becomes active again.
+
 **Trash**:
-A temporary holding state for deleted batches and fermentation profiles. Deleted records can be restored for seven days before permanent deletion.
+A temporary holding state for deleted batches and timeline entries. Deleted records can be restored for seven days before permanent deletion. Deleted profiles are removed immediately.

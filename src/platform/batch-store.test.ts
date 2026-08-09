@@ -70,4 +70,22 @@ describe("batch store", () => {
 
     expect(store.load()?.batches[0].timeline[0]).toEqual(batch.timeline[0]);
   });
+
+  it("migrates batch checks without IDs", () => {
+    const values = new Map<string, string>();
+    const store = createBatchStore({
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+    });
+    const batch = createBatch({
+      ...createProfileState().profiles[0],
+      checks: [{ name: "Taste", intervalDays: 2 }],
+    }, { id: "batch-1", startDate: "2026-08-08" });
+    delete (batch.checks[0] as { id?: string }).id;
+    values.set("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+
+    const loaded = store.load()!;
+    expect(loaded.batches[0].checks[0].id).toEqual(expect.any(String));
+    expect(store.load()?.batches[0].checks[0].id).toBe(loaded.batches[0].checks[0].id);
+  });
 });

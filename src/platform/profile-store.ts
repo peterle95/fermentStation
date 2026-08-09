@@ -1,4 +1,4 @@
-import { type FermentationProfile, type ProfileState } from "../domain/profiles";
+import { normalizeProfileChecks, type FermentationProfile, type ProfileState } from "../domain/profiles";
 
 export interface ProfileStore {
   load(): ProfileState | null;
@@ -38,7 +38,8 @@ function isProfile(value: unknown): boolean {
     Array.isArray(checks) && checks.every((check) => {
       if (!check || typeof check !== "object") return false;
       const candidate = check as Record<string, unknown>;
-      return typeof candidate.name === "string" && typeof candidate.intervalDays === "number";
+      return (candidate.id === undefined || typeof candidate.id === "string") &&
+        typeof candidate.name === "string" && typeof candidate.intervalDays === "number";
     }) && Array.isArray(phZones) && phZones.every((zone) => {
       if (!zone || typeof zone !== "object") return false;
       const candidate = zone as Record<string, unknown>;
@@ -53,7 +54,7 @@ function normalizeProfile(profile: FermentationProfile): FermentationProfile {
     ...profile,
     inputs: profile.inputs ?? [],
     calculations: profile.calculations ?? [],
-    checks: profile.checks ?? [],
+    checks: normalizeProfileChecks(profile.checks ?? [], `profile-check-${profile.id}`),
     phZones: profile.phZones ?? [],
   };
 }
@@ -63,17 +64,8 @@ function isProfileState(value: unknown): value is ProfileState {
     return false;
   }
 
-  const state = value as { profiles?: unknown; trash?: unknown };
-  return (
-    Array.isArray(state.profiles) &&
-    state.profiles.every(isProfile) &&
-    Array.isArray(state.trash) &&
-    state.trash.every(
-      (profile) =>
-        isProfile(profile) &&
-        typeof (profile as { deletedAt?: unknown }).deletedAt === "number",
-    )
-  );
+  const state = value as { profiles?: unknown };
+  return Array.isArray(state.profiles) && state.profiles.every(isProfile);
 }
 
 export function createProfileStore(storage: KeyValueStore): ProfileStore {
@@ -103,9 +95,6 @@ export function createProfileStore(storage: KeyValueStore): ProfileStore {
 export function parseProfileState(state: unknown): ProfileState | null {
   return isProfileState(state) ? {
     profiles: state.profiles.map(normalizeProfile),
-    trash: state.trash.map((profile) => ({
-      ...normalizeProfile(profile), deletedAt: profile.deletedAt,
-    })),
   } : null;
 }
 
