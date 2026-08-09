@@ -164,8 +164,8 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
     fireEvent.change(screen.getByLabelText(/Expected duration/), { target: { value: "7" } });
-    fireEvent.change(screen.getByLabelText(/^Inputs/), { target: { value: "totalWeight, kg, 2" } });
     fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
+    fireEvent.change(screen.getByLabelText("Source unit row 1"), { target: { value: "kg" } });
     expect((screen.getByLabelText("Source unit row 1") as HTMLSelectElement).value).toBe("kg");
     fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
     fireEvent.change(screen.getByLabelText("Source term row 2"), { target: { value: "water" } });
@@ -187,7 +187,7 @@ describe("batch workflow", () => {
     expect((screen.getByLabelText("Source term row 1") as HTMLSelectElement).value).toBe("totalWeight");
     expect((screen.getByLabelText("Source unit row 1") as HTMLSelectElement).value).toBe("kg");
     expect((screen.getByLabelText("Result term row 2") as HTMLSelectElement).value).toBe("tea");
-    expect((screen.getByLabelText(/^Inputs/) as HTMLTextAreaElement).value).toContain("totalWeight, kg, 2");
+    expect(screen.queryByLabelText(/^Inputs/)).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
     fireEvent.click(screen.getByRole("button", { name: "Today" }));
@@ -340,9 +340,8 @@ describe("batch workflow", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
-    fireEvent.change(screen.getByLabelText(/^pH zones/), {
-      target: { value: "safe, 2.5, 3.1\noptimal, 3.2, 3.6" },
-    });
+    fireEvent.change(screen.getByLabelText("pH minimum"), { target: { value: "3.2" } });
+    fireEvent.change(screen.getByLabelText("pH maximum"), { target: { value: "3.6" } });
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
     fireEvent.click(screen.getByRole("button", { name: "Today" }));
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
