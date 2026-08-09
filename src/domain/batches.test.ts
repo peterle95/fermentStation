@@ -59,8 +59,10 @@ describe("batches", () => {
       profileSnapshot: {
         id: "starter-kombucha-f1",
         name: "Kombucha F1",
-        guidance: "Keep at room temperature and cover with a breathable cloth.",
-        instructions: "Taste after 7 days, then bottle when pleasantly tart.",
+        guidance: [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart.",
+        ],
         inputs: [],
         calculations: [],
         checks: [],

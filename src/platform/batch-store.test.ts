@@ -88,4 +88,24 @@ describe("batch store", () => {
     expect(loaded.batches[0].checks[0].id).toEqual(expect.any(String));
     expect(store.load()?.batches[0].checks[0].id).toBe(loaded.batches[0].checks[0].id);
   });
+
+  it("migrates legacy guidance in profile snapshots", () => {
+    const values = new Map<string, string>();
+    const store = createBatchStore({
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+    });
+    const batch = createBatch(createProfileState().profiles[0], { id: "batch-1", startDate: "2026-08-08" });
+    const legacyBatch = {
+      ...batch,
+      profileSnapshot: {
+        ...batch.profileSnapshot,
+        guidance: batch.profileSnapshot.guidance[0],
+        instructions: batch.profileSnapshot.guidance[1],
+      },
+    };
+    values.set("fermentstation.batches", JSON.stringify({ batches: [legacyBatch], trash: [] }));
+
+    expect(store.load()?.batches[0].profileSnapshot.guidance).toEqual(batch.profileSnapshot.guidance);
+  });
 });

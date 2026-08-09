@@ -59,7 +59,7 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
 
     expect(screen.getByLabelText("Name").closest("h1")).toBeTruthy();
-    fireEvent.change(screen.getByLabelText("Guidance"), { target: { value: "Keep it warm and shaded." } });
+    fireEvent.change(screen.getByLabelText("Guidance step 1"), { target: { value: "Keep it warm and shaded." } });
     fireEvent.change(screen.getByLabelText("Temperature minimum"), { target: { value: "18" } });
     fireEvent.change(screen.getByLabelText("Temperature maximum"), { target: { value: "22" } });
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
@@ -68,6 +68,22 @@ describe("batch workflow", () => {
     expect(card?.textContent).toContain("Keep it warm and shaded.");
     expect(card?.textContent).toContain("18–22°C");
     expect(card?.textContent).not.toContain("Sweet tea · SCOBY");
+  });
+
+  it("starts new profile guidance empty and adds numbered steps", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add profile" }));
+
+    expect(screen.getByText(/No guidance steps yet/)).toBeTruthy();
+    expect(screen.queryByText("Instructions")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Add step" }));
+    fireEvent.change(screen.getByLabelText("Guidance step 1"), { target: { value: "Start below 25°C." } });
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "New profile" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "View New profile guidance" }));
+    expect(screen.getByRole("dialog").textContent).toContain("Start below 25°C.");
   });
 
   it("starts, snapshots, monitors, and filters a batch", () => {

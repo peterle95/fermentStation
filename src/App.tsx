@@ -775,7 +775,7 @@ function BatchView({ batches, mode, profiles, onChange, onCreate, onDelete, onNa
             {dueChecks.map(({ batch, check }) => (
               <article className="queue-card attention" key={`${batch.id}-${check.id}`}>
                 <span className="queue-icon" aria-hidden="true">!</span>
-                <div><small>{check.overdue ? `Overdue · was due ${check.nextDueDate}` : "Due today"}</small><h4>{check.name} for <span className="queue-batch">{batch.name}</span></h4><p>{batch.profileSnapshot.guidance || "Open the batch and record what you find."}</p></div>
+                <div><small>{check.overdue ? `Overdue · was due ${check.nextDueDate}` : "Due today"}</small><h4>{check.name} for <span className="queue-batch">{batch.name}</span></h4><p>{batch.profileSnapshot.guidance[0] || "Open the batch and record what you find."}</p></div>
                 <button aria-label={`Open ${batch.name} for ${check.name}`} className="primary-action" onClick={() => onOpen(batch.id)} type="button">Open batch</button>
               </article>
             ))}
@@ -1062,9 +1062,8 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
           <section className="wb-panel batch-guidance" aria-labelledby="guidance-heading">
             <h4 id="guidance-heading">Profile guidance <span>{batch.profileSnapshot.name}</span></h4>
             <p className="snapshot-line"><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
-            {batch.profileSnapshot.guidance && <div className="guide-step"><span>01</span><p><RichProfileText value={batch.profileSnapshot.guidance} /></p></div>}
-            {batch.profileSnapshot.instructions && <div className="guide-step"><span>02</span><p><RichProfileText value={batch.profileSnapshot.instructions} /></p></div>}
-            {batch.profileSnapshot.guidance === "" && batch.profileSnapshot.instructions === "" && <p className="muted-copy">No active guidance in this profile snapshot.</p>}
+            {batch.profileSnapshot.guidance.map((guidance, index) => <div className="guide-step" key={`${guidance}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><p><RichProfileText value={guidance} /></p></div>)}
+            {batch.profileSnapshot.guidance.length === 0 && <p className="muted-copy">No active guidance in this profile snapshot.</p>}
           </section>
 
           {batch.finishDate && (
@@ -1235,7 +1234,7 @@ function presentationFor(profile: FermentationProfile): ProfilePresentation {
   const intervals = new Set(profile.checks.map(({ intervalDays }) => intervalDays));
   const cadence = intervals.size === 0 ? "—" : intervals.size > 1 ? `${profile.checks.length} checks` : formatCheckInterval(profile.checks[0].intervalDays);
   return {
-    description: profile.guidance || "No guidance defined yet.",
+    description: profile.guidance[0] || "No guidance defined yet.",
     params: [
       [temperature, "temperature zone"],
       [ph, "pH zone"],
@@ -1312,6 +1311,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
   const [calculations, setCalculations] = useState<FormulaRow[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [checkRows, setCheckRows] = useState<ProfileCheckRow[]>([]);
+  const [guidanceRows, setGuidanceRows] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const inputsRef = useRef<HTMLTextAreaElement>(null);
   const checkInputsRef = useRef<Record<string, HTMLInputElement | null>>({});
@@ -1333,6 +1333,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
     setViewing(null);
     setEditing(profile);
     setCalculations(formulaRows(profile));
+    setGuidanceRows(profile.guidance);
     setCheckRows(profile.checks.map((check) => ({
       id: check.id ?? createClientId(), name: check.name, intervalDays: check.intervalDays,
     })));
@@ -1343,6 +1344,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
     setEditing(null);
     setErrors([]);
     setCheckRows([]);
+    setGuidanceRows([]);
     setFocusCheckId(null);
     onEditingChange(null);
   }
@@ -1359,6 +1361,18 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
 
   function removeCheck(index: number) {
     setCheckRows(checkRows.filter((_, checkIndex) => checkIndex !== index));
+  }
+
+  function addGuidanceStep() {
+    setGuidanceRows([...guidanceRows, ""]);
+  }
+
+  function updateGuidanceStep(index: number, value: string) {
+    setGuidanceRows(guidanceRows.map((step, stepIndex) => stepIndex === index ? value : step));
+  }
+
+  function removeGuidanceStep(index: number) {
+    setGuidanceRows(guidanceRows.filter((_, stepIndex) => stepIndex !== index));
   }
 
   function addFormula() {
@@ -1415,8 +1429,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
     const profile = {
       id: editing?.id ?? createClientId(),
       name: String(data.get("name") ?? "").trim(),
-      guidance: String(data.get("guidance") ?? "").trim(),
-      instructions: String(data.get("instructions") ?? "").trim(),
+      guidance: guidanceRows.map((step) => step.trim()).filter(Boolean),
       temperatureMinC: String(data.get("temperatureMinC") ?? "").trim() === ""
         ? undefined
         : Number(data.get("temperatureMinC")),
@@ -1451,7 +1464,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
     <section className="profiles" aria-label="Fermentation profiles">
       <div className="profile-tools">
         <button className="profile-add" onClick={() => {
-          edit({ id: createClientId(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [], phZones: [] });
+          edit({ id: createClientId(), name: "", guidance: [], inputs: [], calculations: [], checks: [], phZones: [] });
         }} type="button">
           Add profile
         </button>
@@ -1476,10 +1489,14 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
             <div className="profile-editor-grid">
               <form className="profile-editor-form" id="profile-editor-form" key={editing.id} onSubmit={save}>
                 <section className="profile-editor-section">
-                  <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">01 / The profile</p><h2>Give it a clear name</h2><p className="profile-editor-intro">A profile is a reusable practice, not a recipe card. Keep its description grounded in what you will actually observe.</p></div></div>
                   <div className="profile-editor-fields">
-                     <label className="profile-editor-field wide"><span>Guidance</span><textarea defaultValue={editing.guidance} name="guidance" /></label>
-                     <label className="profile-editor-field wide"><span>Instructions</span><textarea defaultValue={editing.instructions} name="instructions" /></label>
+                    <div className="profile-editor-guidance">
+                      <div className="profile-editor-guidance-head"><span>Guidance (optional)</span><button className="profile-editor-text-button" onClick={addGuidanceStep} type="button">Add step</button></div>
+                      {guidanceRows.length === 0 && <p className="profile-editor-check-empty">No guidance steps yet. Add one when this profile needs a sequence to follow.</p>}
+                      <div className="profile-editor-guidance-rows">
+                        {guidanceRows.map((step, index) => <label className="profile-editor-guidance-row" key={index}><span>Guidance step {index + 1}</span><textarea aria-label={`Guidance step ${index + 1}`} onChange={(event) => updateGuidanceStep(index, event.target.value)} value={step} /><button className="profile-editor-text-button" onClick={() => removeGuidanceStep(index)} type="button">Remove step</button></label>)}
+                      </div>
+                    </div>
                      <label className="profile-editor-field"><span>Temperature minimum</span><span className="profile-editor-suffix"><input aria-label="Temperature minimum" defaultValue={editing.temperatureMinC ?? ""} min="0" max="100" name="temperatureMinC" step="any" type="number" /><i>°C</i></span></label>
                      <label className="profile-editor-field"><span>Temperature maximum</span><span className="profile-editor-suffix"><input aria-label="Temperature maximum" defaultValue={editing.temperatureMaxC ?? ""} min="0" max="100" name="temperatureMaxC" step="any" type="number" /><i>°C</i></span></label>
                      <label className="profile-editor-field"><span>Expected duration</span><span className="profile-editor-suffix"><input defaultValue={editing.expectedDurationDays ?? ""} min="1" name="expectedDurationDays" type="number" /><i>days</i></span></label>
@@ -1583,7 +1600,8 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
               </div>
                <section className="profile-detail-panel">
                  <h3>Profile guidance</h3>
-                 {[viewing.guidance, viewing.instructions].filter(Boolean).map((guidance, index) => <div className="guide-step" key={guidance}><span className="g-n">{index + 1}</span><p><RichProfileText value={guidance} /></p></div>)}
+                 {viewing.guidance.map((guidance, index) => <div className="guide-step" key={`${guidance}-${index}`}><span className="g-n">{index + 1}</span><p><RichProfileText value={guidance} /></p></div>)}
+                 {viewing.guidance.length === 0 && <p className="muted-copy">No guidance steps yet.</p>}
                </section>
                <section className="profile-detail-panel">
                  <h3>Profile calculations</h3>

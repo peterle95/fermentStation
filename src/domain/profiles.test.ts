@@ -30,8 +30,7 @@ describe("fermentation profiles", () => {
     const added = addProfile(state, {
       id: "kimchi",
       name: "Kimchi",
-      guidance: "Keep below brine.",
-      instructions: "Taste weekly.",
+      guidance: ["Keep below brine.", "Taste weekly."],
       inputs: [],
       calculations: [],
       checks: [],
@@ -39,12 +38,12 @@ describe("fermentation profiles", () => {
     });
     const updated = updateProfile(added, {
       ...added.profiles.at(-1)!,
-      instructions: "Taste after 5 days.",
+      guidance: ["Keep below brine.", "Taste after 5 days."],
     });
 
     expect(state.profiles).toHaveLength(5);
     expect(added.profiles).toHaveLength(6);
-    expect(updated.profiles.at(-1)?.instructions).toBe("Taste after 5 days.");
+    expect(updated.profiles.at(-1)?.guidance).toEqual(["Keep below brine.", "Taste after 5 days."]);
   });
 
   it("calculates compatible metric formulas, percentages, and parentheses", () => {
