@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FermentStation | Sauerkraut profile</title>
+  <style>
+:root {
+  --bg: #f5f4ed;
+  --surface: #faf9f5;
+  --surface-warm: #e8e6dc;
+  --fg: #141413;
+  --fg-2: #3d3d3a;
+  --muted: #5e5d59;
+  --meta: #87867f;
+  --border: #f0eee6;
+  --border-soft: #e8e6dc;
+  --accent: #c96442;
+  --accent-on: #faf9f5;
+  --accent-hover: color-mix(in oklab, var(--accent), black 8%);
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --success: #17a34a;
+  --warn: #eab308;
+  --danger: #b53333;
+  --font-display: "Anthropic Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Anthropic Sans", "Arial", system-ui, -apple-system, sans-serif;
+  --font-mono: "Anthropic Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+  --text-xs: 10px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 25px;
+  --text-2xl: 32px;
+  --text-3xl: 52px;
+  --text-4xl: 64px;
+  --leading-body: 1.6;
+  --leading-tight: 1.1;
+  --tracking-display: 0em;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --section-y-desktop: 96px;
+  --section-y-tablet: 64px;
+  --section-y-phone: 48px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+  --elev-flat: none;
+  --elev-ring: 0 0 0 1px var(--border);
+  --elev-raised: rgba(0, 0, 0, 0.05) 0px 4px 24px;
+  --focus-ring: 0 0 0 3px rgba(56, 152, 236, 0.3);
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --container-max: 1200px;
+  --container-gutter-desktop: 24px;
+  --container-gutter-tablet: 16px;
+  --container-gutter-phone: 12px;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 var(--text-base)/var(--leading-body) var(--font-body); }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+.app-shell { min-height: 100vh; display: grid; grid-template-columns: 252px minmax(0, 1fr); }
+.sidebar { position: sticky; top: 0; height: 100vh; padding: var(--space-5) var(--space-3); border-right: 1px solid var(--border-soft); display: flex; flex-direction: column; }
+.brand { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2); text-decoration: none; color: inherit; }
+.brand-mark { width: 34px; height: 34px; border-radius: var(--radius-md); display: grid; place-items: center; background: var(--fg); color: var(--surface); }
+.brand-copy { display: grid; line-height: 1.1; }
+.brand-name { font-family: var(--font-display); font-size: 22px; font-weight: 500; }
+.brand-sub, .eyebrow, .field-label, .section-kicker { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .09em; text-transform: uppercase; }
+.brand-sub { color: var(--meta); margin-top: 3px; }
+.nav { display: grid; gap: var(--space-1); margin-top: var(--space-12); }
+.nav a { min-height: 44px; display: flex; align-items: center; gap: 11px; padding: 0 var(--space-3); border-radius: var(--radius-sm); color: var(--muted); text-decoration: none; font-size: 15px; font-weight: 500; }
+.nav a:hover { color: var(--fg); background: var(--surface-warm); }
+.nav a[aria-current="page"] { color: var(--fg); background: var(--surface); box-shadow: var(--elev-ring); }
+.nav svg { width: 18px; height: 18px; }
+.sidebar-foot { margin-top: auto; color: var(--meta); padding: var(--space-3) var(--space-2); border-top: 1px solid var(--border-soft); font-size: var(--text-sm); }
+
+.main { min-width: 0; padding: 40px 56px 72px; }
+.page { max-width: 1080px; margin: 0 auto; }
+.crumbs { display: flex; align-items: center; gap: var(--space-2); color: var(--muted); font-size: var(--text-sm); }
+.crumbs a { color: inherit; text-decoration: none; }
+.crumbs a:hover { color: var(--fg); text-decoration: underline; }
+.crumbs span { color: var(--meta); }
+.page-head { display: flex; justify-content: space-between; align-items: end; gap: var(--space-6); margin: 34px 0 var(--space-8); }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.015em; line-height: var(--leading-tight); }
+h1 { font-size: clamp(38px, 5vw, var(--text-3xl)); max-width: 10ch; }
+.lead { max-width: 52ch; margin-top: var(--space-3); color: var(--muted); font-size: var(--text-lg); }
+.status { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: var(--radius-pill); background: var(--surface-warm); color: var(--fg-2); font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.status i { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+
+.content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 286px; align-items: start; gap: var(--space-8); }
+.editor { min-width: 0; }
+.section { padding: 0 0 var(--space-8); margin-bottom: var(--space-8); border-bottom: 1px solid var(--border-soft); }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-6); }
+.section-kicker { color: var(--meta); margin-bottom: var(--space-2); }
+.section h2 { font-size: var(--text-xl); }
+.section-intro { max-width: 54ch; margin-top: var(--space-2); color: var(--muted); font-size: var(--text-sm); }
+.field-grid { display: grid; gap: var(--space-4); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.field { display: grid; gap: 7px; }
+.field.wide { grid-column: 1 / -1; }
+.field-label { color: var(--fg-2); }
+.field-help { color: var(--meta); font-size: 12px; line-height: 1.45; }
+input, textarea { width: 100%; border: 1px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--surface); color: var(--fg); padding: 11px 12px; transition: border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard); }
+input:hover, textarea:hover { border-color: var(--meta); }
+input:focus-visible, textarea:focus-visible { border-color: var(--fg-2); }
+textarea { min-height: 102px; resize: vertical; line-height: var(--leading-body); }
+.input-with-suffix { position: relative; }
+.input-with-suffix input { padding-right: 55px; }
+.input-suffix { position: absolute; right: 13px; top: 50%; color: var(--meta); font: 12px/1 var(--font-mono); transform: translateY(-50%); pointer-events: none; }
+
+.checks { display: grid; gap: var(--space-3); }
+.check-row { display: grid; grid-template-columns: 1.15fr .8fr .7fr 42px; gap: var(--space-2); align-items: end; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); }
+.check-row .field { gap: 5px; }
+.check-row input { padding: 9px 10px; }
+.icon-button { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--surface); color: var(--muted); }
+.icon-button:hover { color: var(--danger); border-color: var(--danger); }
+.icon-button svg { width: 17px; height: 17px; }
+.text-button { border: 0; padding: 0; background: none; color: var(--fg-2); font: 500 var(--text-sm)/1 var(--font-body); text-decoration: underline; text-underline-offset: 3px; }
+.text-button:hover { color: var(--fg); }
+
+.formula { padding: var(--space-5); border-radius: var(--radius-md); background: var(--surface-warm); }
+.formula p { color: var(--fg-2); font-size: var(--text-sm); }
+.formula .field-label { display: block; margin-bottom: var(--space-2); }
+.formula code { font-family: var(--font-mono); font-size: 13px; color: var(--fg); }
+.formula .edit-formula { margin-top: var(--space-3); }
+
+.aside { position: sticky; top: 32px; display: grid; gap: var(--space-4); }
+.card { padding: var(--space-5); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--elev-raised); }
+.card h3 { font-size: 21px; }
+.card p { color: var(--muted); font-size: var(--text-sm); margin-top: var(--space-2); }
+.profile-meta { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+.profile-meta div { display: flex; justify-content: space-between; gap: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border); font-size: var(--text-sm); }
+.profile-meta span { color: var(--meta); }
+.profile-meta strong { font-family: var(--font-mono); font-weight: 500; text-align: right; }
+.note { border-left: 1px solid var(--fg); padding: var(--space-2) 0 var(--space-2) var(--space-3); }
+.note h3 { font-family: var(--font-body); font-size: var(--text-sm); font-weight: 500; letter-spacing: 0; }
+.note p { margin-top: var(--space-1); }
+
+.actions { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-8); }
+.actions-right { display: flex; gap: var(--space-2); }
+.btn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: 0 16px; border: 1px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--surface); color: var(--fg-2); font-size: var(--text-sm); font-weight: 500; transition: background var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard); }
+.btn:hover { background: var(--surface-warm); border-color: var(--meta); }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-on); }
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--accent-on); }
+.btn-primary:active { background: var(--accent-active); border-color: var(--accent-active); }
+.btn svg { width: 16px; height: 16px; }
+
+.mobile-bar { display: none; }
+.toast { position: fixed; z-index: 10; left: 50%; bottom: 24px; transform: translate(-50%, 140px); opacity: 0; padding: 12px 16px; border-radius: var(--radius-sm); background: var(--fg); color: var(--surface); box-shadow: var(--elev-raised); font-size: var(--text-sm); transition: transform var(--motion-base) var(--ease-standard), opacity var(--motion-base) var(--ease-standard); }
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+@media (max-width: 960px) {
+  .app-shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .mobile-bar { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-4); border-bottom: 1px solid var(--border-soft); }
+  .mobile-bar .brand { padding: 0; }
+  .mobile-bar .brand-sub { display: none; }
+  .main { padding: 32px var(--container-gutter-tablet) 96px; }
+  .content-grid { grid-template-columns: 1fr; }
+  .aside { position: static; grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 620px) {
+  .main { padding: var(--space-6) var(--container-gutter-phone) 112px; }
+  .page-head { display: block; margin: var(--space-6) 0 var(--space-8); }
+  h1 { font-size: 40px; }
+  .status { margin-top: var(--space-4); }
+  .field-grid, .aside { grid-template-columns: 1fr; }
+  .check-row { grid-template-columns: 1fr 1fr 42px; }
+  .check-row .field:first-child { grid-column: 1 / -1; }
+  .actions { position: fixed; z-index: 5; bottom: 0; left: 0; right: 0; padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border-soft); }
+  .actions .text-button { display: none; }
+  .actions-right { flex: 1; }
+  .actions-right .btn { flex: 1; }
+}
+  </style>
+</head>
+<body>
+  <div class="app-shell" data-od-id="ferment-profile-editor">
+    <aside class="sidebar" data-od-id="sidebar-navigation">
+      <a class="brand" href="#" data-od-id="brand-home" aria-label="FermentStation home">
+        <span class="brand-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3h8M9 3v4l-3 4v7a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-7l-3-4V3"></path><path d="M8 13h8M10 17h4"></path></svg></span>
+        <span class="brand-copy"><span class="brand-name">FermentStation</span><span class="brand-sub">Household journal</span></span>
+      </a>
+      <nav class="nav" aria-label="Primary navigation" data-od-id="primary-navigation">
+        <a href="#today" data-od-id="nav-today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M12 4v16"></path></svg>Today</a>
+        <a href="#batches" data-od-id="nav-batches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14v16H5zM8 8h8M8 12h8"></path></svg>Batches</a>
+        <a href="#calendar" data-od-id="nav-calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg>Calendar</a>
+        <a href="#profiles" aria-current="page" data-od-id="nav-profiles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h3"></path></svg>Profiles</a>
+      </nav>
+      <p class="sidebar-foot">A quiet record of what is changing, and what to do next.</p>
+    </aside>
+
+    <header class="mobile-bar" data-od-id="mobile-navigation">
+      <a class="brand" href="#" aria-label="FermentStation home"><span class="brand-mark" aria-hidden="true">F</span><span class="brand-name">FermentStation</span></a>
+      <button class="icon-button" data-od-id="mobile-menu" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+    </header>
+
+    <main class="main" data-od-id="profile-editor-main">
+      <div class="page">
+        <nav class="crumbs" aria-label="Breadcrumb" data-od-id="profile-breadcrumb"><a href="#profiles">Profiles</a></nav>
+        <header class="page-head" data-od-id="profile-heading">
+          <div>
+            <p class="eyebrow">Fermentation profile</p>
+            <h1>&lt;Profile Name&gt;</h1>
+            
+          </div>
+          <span class="status" data-od-id="profile-status"><i></i>Used by 2 batches</span>
+        </header>
+
+        <div class="content-grid">
+          <form class="editor" id="profile-form" data-od-id="profile-form">
+            <section class="section" data-od-id="profile-basics">
+              <div class="section-head"><div><p class="section-kicker">01 / The profile</p><h2>Give it a clear name</h2><p class="section-intro">A profile is a reusable practice, not a recipe card. Keep its description grounded in what you will actually observe.</p></div></div>
+              <div class="field-grid">
+                <label class="field wide" data-od-id="profile-name-field"><span class="field-label">Name</span><input id="profile-name" name="profile-name" value="Sauerkraut" required=""></label>
+                <label class="field wide" data-od-id="profile-guidance-field"><span class="field-label">Guidance</span><textarea id="profile-guidance" name="profile-guidance">Use 2% salt by cabbage weight and keep cabbage below brine.</textarea></label>
+                <label class="field wide" data-od-id="profile-instructions-field"><span class="field-label">Instructions</span><textarea id="profile-instructions" name="profile-instructions">Pack tightly, weight the cabbage, and taste after 7 days.</textarea></label>
+                <label class="field" data-od-id="profile-duration-field"><span class="field-label">Expected duration</span><span class="input-with-suffix"><input id="duration" name="duration" type="number" min="1" value="21" required=""><span class="input-suffix">days</span></span></label>
+                <label class="field" data-od-id="profile-salt-field"></label>
+              </div>
+            </section>
+
+            <section class="section" data-od-id="recurring-checks">
+              <div class="section-head"><div><p class="section-kicker">02 / Recurring checks</p><h2>What should be noticed?</h2><p class="section-intro">A small number of checks is easier to sustain. These appear in the daily queue when due.</p></div><button type="button" class="text-button" id="add-check" data-od-id="add-check">Add check</button></div>
+              <div class="checks" id="checks-list" data-od-id="checks-list">
+                <div class="check-row" data-od-id="recurring-check-brine">
+                  <label class="field"><span class="field-label">Check</span><input value="Confirm brine line" aria-label="Check name"></label>
+                  <label class="field"><span class="field-label">Every</span><input value="7" type="number" min="1" aria-label="Check interval"></label>
+                  <label class="field"><span class="field-label">Unit</span><input value="days" aria-label="Check interval unit"></label>
+                  <button type="button" class="icon-button remove-check" aria-label="Remove brine line check" data-od-id="remove-brine-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path></svg></button>
+                </div>
+                <div class="check-row" data-od-id="recurring-check-ph">
+                  <label class="field"><span class="field-label">Check</span><input value="Read pH" aria-label="Check name"></label>
+                  <label class="field"><span class="field-label">Every</span><input value="7" type="number" min="1" aria-label="Check interval"></label>
+                  <label class="field"><span class="field-label">Unit</span><input value="days" aria-label="Check interval unit"></label>
+                  <button type="button" class="icon-button remove-check" aria-label="Remove pH check" data-od-id="remove-ph-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"></path></svg></button>
+                </div>
+              </div>
+            </section>
+
+            <section class="section" data-od-id="profile-calculation">
+              <div class="section-head"><div><p class="section-kicker">03 / Calculations</p><h2>&lt;Formulas&gt;</h2></div></div>
+              <div class="formula" data-od-id="ph-drift-calculation">
+                
+                <div class="field-grid">
+                  
+                  
+                  <label class="field wide" data-od-id="days-between-reads-field"><button type="button" class="btn" data-od-id="add-formula">Add formula</button></label>
+                </div>
+                <p style="margin-top: var(--space-5);"><br></p>
+                
+              </div>
+            </section>
+
+            <div class="actions" data-od-id="profile-actions">
+              <button type="button" class="text-button" id="cancel" data-od-id="cancel-profile-edit">Cancel changes</button>
+              <div class="actions-right"><button type="button" class="btn" id="preview" data-od-id="preview-profile">Preview</button><button type="submit" class="btn btn-primary" data-od-id="save-profile">Save profile <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button></div>
+            </div>
+          </form>
+
+          <aside class="aside" aria-label="Profile context" data-od-id="profile-context">
+            <article class="card" data-od-id="profile-summary-card"><p class="eyebrow">At a glance</p><h3>Sauerkraut</h3><p>Salted cabbage fermented at room temperature, then held cold when the sourness settles.</p><div class="profile-meta"><div><span>Active batches</span><strong style="width: 156.773px;">&lt;batch-1&gt;, &lt;batch-2&gt;</strong></div><div><span>Expected duration</span><strong>7-10 days</strong></div><div><span>Next check</span><strong>Today</strong></div></div></article>
+            <article class="card note" data-od-id="profile-notice"><h3>Practical note</h3><p>Brine is the first thing to check. If leaves rise above the surface, record it and top up with 2% salt water.</p></article>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const toast = document.getElementById('toast');
+    let toastTimer;
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    const checksList = document.getElementById('checks-list');
+    document.getElementById('add-check').addEventListener('click', () => {
+      const count = checksList.children.length + 1;
+      const row = document.createElement('div');
+      row.className = 'check-row';
+      row.dataset.odId = `recurring-check-${count}`;
+      row.innerHTML = `<label class="field"><span class="field-label">Check</span><input placeholder="e.g. Taste and smell" aria-label="Check name"></label><label class="field"><span class="field-label">Every</span><input value="7" type="number" min="1" aria-label="Check interval"></label><label class="field"><span class="field-label">Unit</span><input value="days" aria-label="Check interval unit"></label><button type="button" class="icon-button remove-check" aria-label="Remove check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg></button>`;
+      checksList.append(row);
+      row.querySelector('input').focus();
+    });
+    checksList.addEventListener('click', event => {
+      const button = event.target.closest('.remove-check');
+      if (!button) return;
+      if (checksList.children.length === 1) return showToast('Keep at least one recurring check.');
+      button.closest('.check-row').remove();
+    });
+    document.getElementById('profile-form').addEventListener('submit', event => {
+      event.preventDefault();
+      if (!event.currentTarget.reportValidity()) return;
+      showToast('Sauerkraut profile saved.');
+    });
+    document.getElementById('preview').addEventListener('click', () => showToast('Preview reflects the current profile settings.'));
+    document.getElementById('cancel').addEventListener('click', () => {
+      document.getElementById('profile-form').reset();
+      showToast('Unsaved changes cleared.');
+    });
+  </script>
+
+
+
+</body></html>

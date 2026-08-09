@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FermentStation — v1 concept prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Karla:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:oklch(96.5% 0.006 80);
+  --surface:oklch(100% 0.002 85);
+  --panel:oklch(94% 0.010 78);
+  --panel-deep:oklch(90% 0.015 72);
+  --fg:oklch(24% 0.02 55);
+  --muted:oklch(49% 0.016 60);
+  --faint:oklch(60% 0.013 60);
+  --border:oklch(89% 0.010 80);
+  --border-2:oklch(82% 0.014 75);
+  --accent:oklch(55% 0.115 42);
+  --accent-ink:oklch(38% 0.09 45);
+  --on-accent:oklch(97% 0.01 80);
+  --amber:oklch(50% 0.135 58);  --amber-bg:oklch(93.5% 0.05 80);
+  --green:oklch(44% 0.10 150);  --green-bg:oklch(93% 0.045 150);
+  --blue:oklch(42% 0.10 244);   --blue-bg:oklch(93.5% 0.04 245);
+  --gray:oklch(47% 0.012 245);  --gray-bg:oklch(95% 0.006 245);
+  --radius:10px; --radius-lg:14px;
+  --shadow:0 1px 2px oklch(30% 0.02 60 / 0.06),0 6px 18px oklch(30% 0.02 60 / 0.06);
+  --font-display:'Source Serif 4',Georgia,'Times New Roman',serif;
+  --font-body:'Karla','Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'Cascadia Code',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+a{color:var(--accent-ink)}
+::selection{background:oklch(82% 0.09 75)}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:-0.01em}
+.eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- app frame ---------- */
+.app{display:flex;min-height:100vh}
+.shell{flex:1;min-width:0;padding:20px 22px 96px}
+.wrap{max-width:1180px;margin:0 auto}
+
+/* ---------- sidebar (desktop) ---------- */
+.sidebar{width:252px;flex:0 0 252px;border-right:1px solid var(--border);background:var(--panel);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:20px 14px 14px}
+.brand{display:flex;align-items:center;gap:11px;padding:2px 8px 18px}
+.brand-mark{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;box-shadow:var(--shadow)}
+.brand-name{font-family:var(--font-display);font-weight:700;font-size:19px;line-height:1.05}
+.brand-sub{font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.nav button{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border-radius:var(--radius);color:var(--muted);font-weight:500;font-size:15px;text-align:left;min-height:44px}
+.nav button:hover{background:var(--panel-deep);color:var(--fg)}
+.nav button[aria-current="true"]{background:var(--surface);color:var(--fg);box-shadow:0 0 0 1px var(--border);font-weight:700}
+.nav button svg{flex:0 0 auto}
+.side-footer{border-top:1px solid var(--border);padding-top:10px;display:flex;gap:6px}
+.side-footer button{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--radius);color:var(--muted);font-size:14px;min-height:44px;flex:1}
+.side-footer button:hover{background:var(--panel-deep);color:var(--fg)}
+
+/* ---------- mobile top bar ---------- */
+.topbar{display:none}
+
+/* ---------- bottom tabs (android) ---------- */
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:40;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 10px;min-height:60px;color:var(--faint);font-size:11px;font-weight:500}
+.tabbar button svg{width:23px;height:23px}
+.tabbar button[aria-current="true"]{color:var(--accent-ink);font-weight:700}
+
+/* ---------- screens ---------- */
+.screen{display:none}
+.screen.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.screen-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.screen-head h1{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,36px);letter-spacing:-0.01em;line-height:1.1}
+.screen-head p{color:var(--muted);max-width:56ch;margin-top:6px}
+.screen-head .head-actions{display:flex;gap:8px;align-items:center}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:var(--radius);padding:9px 15px;font-weight:700;font-size:14px;border:1px solid var(--border);background:var(--surface);color:var(--fg);min-height:40px}
+.btn:hover{border-color:var(--border-2);background:var(--panel)}
+.btn svg{flex:0 0 auto}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{background:oklch(52% 0.11 42);border-color:oklch(52% 0.11 42)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted);padding-left:10px;padding-right:10px}
+.btn.ghost:hover{background:var(--panel);color:var(--fg)}
+.btn.tiny{padding:5px 10px;font-size:12.5px;min-height:32px}
+
+/* status pill */
+.status{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:4px 11px 4px 8px;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase}
+.status svg{width:14px;height:14px}
+.status .dot{width:8px;height:8px;border-radius:50%}
+.st-attention{background:var(--amber-bg);color:var(--amber)}
+.st-active{background:var(--amber-bg);color:var(--amber)}
+.st-ready{background:var(--green-bg);color:var(--green)}
+.st-fridge{background:var(--blue-bg);color:var(--blue)}
+.st-archived{background:var(--gray-bg);color:var(--gray)}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow)}
+.card h3{font-family:var(--font-display);font-weight:600;font-size:17px;letter-spacing:-0.01em}
+.card p{color:var(--muted);font-size:14px}
+
+/* ---------- Today ---------- */
+.queue{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.queue-item{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:13px 16px;box-shadow:var(--shadow)}
+.queue-item .qi-ic{width:36px;height:36px;border-radius:9px;background:var(--panel);display:grid;place-items:center;flex:0 0 auto;color:var(--accent-ink)}
+.queue-item .qi-ic.warn{background:var(--amber-bg);color:var(--amber)}
+.queue-item .qi-ic.good{background:var(--green-bg);color:var(--green)}
+.queue-item h4{font-size:15px;font-weight:700}
+.queue-item .qi-when{font-family:var(--font-mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:0.05em}
+.queue-item .qi-body p{color:var(--muted);font-size:13.5px;margin-top:2px}
+.queue-item .qi-batch{color:var(--accent-ink);font-family:var(--font-mono);font-size:12px;font-weight:600}
+.queue-item button{align-self:center;margin-left:auto}
+.queue-item .qi-body{flex:1;min-width:0}
+
+.section-label{display:flex;align-items:baseline;justify-content:space-between;margin:24px 2px 10px;gap:10px;flex-wrap:wrap}
+.section-label h2{font-family:var(--font-display);font-weight:600;font-size:20px;letter-spacing:-0.01em}
+.section-label a{font-size:13px;font-weight:700;text-decoration:none}
+.section-label a:hover{text-decoration:underline}
+
+.batch-grid{display:grid;grid-template-columns:1fr;gap:14px}
+.batch-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow);text-align:left;width:100%;display:flex;flex-direction:column;gap:10px}
+.batch-card:hover{border-color:var(--border-2);box-shadow:0 1px 2px oklch(30% 0.02 60/0.08),0 12px 26px oklch(30% 0.02 60/0.10);transform:translateY(-1px)}
+.batch-card .bc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.batch-card .bc-id{font-family:var(--font-mono);font-size:11px;color:var(--faint);letter-spacing:0.08em}
+.batch-card h3{font-size:18px}
+.batch-card .bc-name{color:var(--muted);font-size:13.5px}
+.batch-card .bc-metrics{display:flex;gap:6px;flex-wrap:wrap}
+.batch-card .bc-metrics span{font-family:var(--font-mono);font-size:12px;background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:3px 8px;color:var(--fg)}
+.batch-card .bc-next{font-size:13px;color:var(--muted);border-top:1px dashed var(--border);padding-top:9px;display:flex;align-items:center;gap:7px}
+.batch-card .bc-next b{color:var(--fg);font-weight:700}
+
+/* mini upcoming strip */
+.mini-upcoming{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px}
+.mini-day{flex:0 0 auto;width:78px;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 6px 12px}
+.mini-day.today{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.mini-day .md-dow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase}
+.mini-day .md-date{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.15}
+.mini-day .md-items{margin-top:6px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.mini-item{font-family:var(--font-mono);font-size:10px;line-height:1.3;letter-spacing:0.02em;background:var(--amber-bg);color:var(--amber);border-radius:6px;padding:2px 7px;max-width:100%}
+.mini-item.ready{background:var(--green-bg);color:var(--green)}
+.mini-item.fridge{background:var(--blue-bg);color:var(--blue)}
+
+/* ---------- Batches ---------- */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filter-row button{padding:7px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:13.5px;font-weight:500;min-height:36px}
+.filter-row button:hover{border-color:var(--border-2);color:var(--fg)}
+.filter-row button[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--surface);font-weight:700}
+
+/* ---------- Calendar ---------- */
+.cal-layout{display:grid;gap:18px;grid-template-columns:1fr}
+.cal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow)}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cal-head h2{font-family:var(--font-display);font-weight:600;font-size:19px}
+.cal-head .cal-nav{display:flex;gap:6px}
+.cal-nav button{width:38px;height:38px;border-radius:9px;border:1px solid var(--border);display:grid;place-items:center;background:var(--surface)}
+.cal-nav button:hover{background:var(--panel)}
+.cal-weekdays,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-weekdays{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.cal-weekdays span{text-align:center;padding:4px 0}
+.cal-day{min-height:64px;border:1px solid var(--border);border-radius:9px;padding:6px 7px;background:var(--surface);display:flex;flex-direction:column;gap:3px;font-size:13px}
+.cal-day.other{background:var(--bg);color:var(--faint);border-style:dashed}
+.cal-day.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.cal-day .d-num{font-family:var(--font-mono);font-size:11.5px;font-weight:500}
+.cal-day.today .d-num{color:var(--accent-ink);font-weight:600}
+.cal-event{font-family:var(--font-mono);font-size:9.5px;line-height:1.25;border-radius:5px;padding:2px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-active{background:var(--amber-bg);color:var(--amber)}
+.ev-ready{background:var(--green-bg);color:var(--green)}
+.ev-fridge{background:var(--blue-bg);color:var(--blue)}
+.cal-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.cal-legend span{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+.cal-legend i{width:10px;height:10px;border-radius:50%}
+.legend-active i{background:var(--amber)}.legend-ready i{background:var(--green)}.legend-fridge i{background:var(--blue)}
+.upcoming-list{display:flex;flex-direction:column;gap:8px}
+.upcoming-item{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow)}
+.upcoming-item .up-date{width:58px;flex:0 0 auto}
+.upcoming-item .up-date b{font-family:var(--font-display);font-size:19px;display:block;line-height:1.1}
+.upcoming-item .up-date span{font-family:var(--font-mono);font-size:10px;color:var(--faint);letter-spacing:0.06em;text-transform:uppercase}
+.upcoming-item .up-body{flex:1;min-width:0}
+.upcoming-item .up-body b{font-size:14.5px}
+.upcoming-item .up-body p{color:var(--muted);font-size:12.5px}
+
+/* ---------- Profiles ---------- */
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow);text-align:left;width:100%;display:flex;flex-direction:column;gap:12px}
+.profile-card:hover{border-color:var(--border-2)}
+.profile-card .pc-id{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--faint)}
+.profile-card h3{font-size:19px}
+.profile-card .pc-desc{color:var(--muted);font-size:13.5px}
+.pc-params{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pc-param{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:7px 9px}
+.pc-param b{display:block;font-family:var(--font-mono);font-size:13px;letter-spacing:-0.01em}
+.pc-param span{font-size:11px;color:var(--muted);letter-spacing:0.03em}
+.pc-rows{border-top:1px dashed var(--border);padding-top:10px;display:flex;flex-direction:column;gap:5px}
+.pc-rows p{font-size:13px;color:var(--fg)}
+.pc-rows p b{color:var(--muted);font-weight:500;font-size:11.5px;font-family:var(--font-mono);letter-spacing:0.05em;text-transform:uppercase}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:10px;font-size:12.5px;color:var(--muted)}
+
+/* ---------- Batch workspace ---------- */
+.workbench{display:grid;gap:18px;grid-template-columns:1fr}
+.wb-main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.wb-rail{display:flex;flex-direction:column;gap:16px;min-width:0}
+.wb-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow)}
+.wb-panel h3{font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.wb-panel h3 .count{font-family:var(--font-mono);font-size:11px;color:var(--faint);font-weight:500}
+.wb-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.wb-meta span{font-family:var(--font-mono);font-size:12px;background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:3px 9px}
+
+/* next action */
+.next-action{display:flex;align-items:flex-start;gap:13px;background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius);padding:14px 15px}
+.next-action .na-ic{width:38px;height:38px;border-radius:9px;background:var(--amber);color:var(--on-accent);display:grid;place-items:center;flex:0 0 auto}
+.next-action .na-body{flex:1;min-width:0}
+.next-action .na-body .na-kick{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.next-action .na-body b{display:block;font-size:16px;margin-top:2px}
+.next-action .na-body p{font-size:13px;color:var(--fg);opacity:0.85;margin-top:2px}
+.next-action .na-body button{margin-top:9px}
+
+/* key measurements */
+.meas-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.meas{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:11px 12px}
+.meas .m-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:6px}
+.meas .m-value{font-family:var(--font-mono);font-weight:600;font-size:26px;letter-spacing:-0.03em;line-height:1.15;margin-top:3px}
+.meas .m-value small{font-size:13px;color:var(--muted);font-weight:400}
+.meas .m-note{font-size:12px;color:var(--fg);margin-top:4px;display:flex;align-items:center;gap:6px}
+.zone{height:6px;border-radius:4px;background:var(--border-2);margin-top:9px;position:relative}
+.zone .z-band{position:absolute;top:0;bottom:0;left:0;width:100%;background:var(--green);opacity:0.3;border-radius:4px}
+.zone .z-marker{position:absolute;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--surface)}
+.zone .z-marker.out{background:var(--amber)}
+
+/* timeline */
+.timeline{position:relative;display:flex;flex-direction:column}
+.timeline:before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:1px;background:var(--border-2)}
+.tl-entry{position:relative;padding:0 0 18px 44px}
+.tl-entry .tl-dot{position:absolute;left:9px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:2px solid var(--border-2);display:grid;place-items:center}
+.tl-entry .tl-dot svg{width:7px;height:7px;color:var(--muted)}
+.tl-entry.check .tl-dot{border-color:var(--amber);background:var(--amber-bg)}
+.tl-entry.check .tl-dot svg{color:var(--amber)}
+.tl-entry.input .tl-dot{border-color:var(--accent);background:var(--accent)}
+.tl-entry.input .tl-dot svg{color:var(--on-accent)}
+.tl-entry.ready .tl-dot{border-color:var(--green);background:var(--green)}
+.tl-entry.ready .tl-dot svg{color:var(--on-accent)}
+.tl-entry.note .tl-dot{border-color:var(--border-2);background:var(--panel)}
+.tl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow)}
+.tl-card:hover{border-color:var(--border-2)}
+.tl-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tl-type{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-ink);font-weight:600}
+.tl-date{font-family:var(--font-mono);font-size:11px;color:var(--faint)}
+.tl-text{font-size:14px;margin-top:5px}
+.tl-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.tl-chips span{font-family:var(--font-mono);font-size:11.5px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
+
+/* guidance */
+.guide-step{display:flex;gap:12px;padding:10px 0;border-top:1px dashed var(--border)}
+.guide-step:first-of-type{border-top:0}
+.guide-step .g-n{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--accent-ink);width:22px;flex:0 0 auto}
+.guide-step p{font-size:13.5px;color:var(--fg)}
+.guide-step p b{font-family:var(--font-mono);font-weight:500;font-size:12.5px;background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:1px 6px}
+.calc-line{font-family:var(--font-mono);font-size:13px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 12px;line-height:1.7}
+.calc-line b{color:var(--accent-ink)}
+
+/* ---------- settings ---------- */
+.setting-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 4px;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:0}
+.setting-row .s-body b{font-size:15px}
+.setting-row .s-body p{color:var(--muted);font-size:13px;margin-top:1px}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:3px}
+.seg button{padding:5px 12px;border-radius:7px;font-size:13px;color:var(--muted);min-height:32px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);font-weight:700;box-shadow:0 0 0 1px var(--border)}
+
+/* ---------- fab + composer + menu ---------- */
+.fab{position:fixed;right:18px;bottom:82px;z-index:45;width:56px;height:56px;border-radius:16px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;box-shadow:0 4px 14px oklch(40% 0.08 45/0.35);border:0}
+.fab:hover{background:oklch(52% 0.11 42)}
+.overlay{position:fixed;inset:0;background:oklch(15% 0.01 60/0.45);z-index:60;display:none;align-items:flex-end;justify-content:stretch}
+.overlay.open{display:flex}
+.sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;width:100%}
+.sheet h2{font-family:var(--font-display);font-weight:600;font-size:21px;margin-bottom:2px}
+.sheet .sheet-sub{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:500}
+.field select,.field input,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--surface);font:inherit;font-size:14.5px;color:var(--fg)}
+.field select:focus,.field input:focus,.field textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px oklch(55% 0.115 42/0.2)}
+.field textarea{min-height:86px;resize:vertical}
+.seg-type{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.seg-type button{border:1px solid var(--border);border-radius:9px;padding:9px 4px;font-size:12.5px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:center;min-height:52px}
+.seg-type button svg{width:17px;height:17px}
+.seg-type button[aria-pressed="true"]{border-color:var(--accent);background:var(--panel);color:var(--accent-ink)}
+.sheet-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+.sheet-actions .btn{flex:1;justify-content:center;min-height:46px}
+.menu{position:fixed;top:14px;right:14px;z-index:70;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 30px oklch(30% 0.02 60/0.18);padding:6px;display:none;min-width:220px}
+.menu.open{display:block}
+.menu button{display:flex;gap:10px;align-items:center;width:100%;padding:10px 12px;border-radius:8px;font-size:14px;text-align:left;min-height:40px}
+.menu button:hover{background:var(--panel)}
+.menu hr{border:0;border-top:1px solid var(--border);margin:5px 6px}
+.menu .m-note{font-family:var(--font-mono);font-size:10.5px;color:var(--faint);letter-spacing:0.05em;padding:6px 12px}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--fg);color:var(--surface);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;z-index:80;display:none;box-shadow:var(--shadow);white-space:nowrap}
+.toast.show{display:block;animation:fade .25s ease}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
+.breadcrumb a{color:var(--muted);font-weight:600;text-decoration:none}
+.breadcrumb a:hover{color:var(--accent-ink);text-decoration:underline}
+
+.hint{font-family:var(--font-mono);font-size:11px;color:var(--faint);border:1px dashed var(--border-2);border-radius:8px;padding:8px 11px;background:var(--panel)}
+
+/* ---------- breakpoints ---------- */
+@media (min-width:640px){
+  .batch-grid{grid-template-columns:repeat(2,1fr)}
+  .pc-params{grid-template-columns:repeat(3,1fr)}
+}
+@media (min-width:900px){
+  .topbar{display:none}
+  .shell{padding:30px 34px 40px}
+  .tabbar{display:none}
+  .fab{bottom:26px}
+  .batch-grid{grid-template-columns:repeat(3,1fr)}
+  .queue{flex-direction:row}
+  .queue-item{flex:1}
+  .workbench{grid-template-columns:320px 1fr}
+  .cal-layout{grid-template-columns:1.6fr 1fr}
+  .cal-day{min-height:74px}
+  .sheet{width:min(560px,100vw);margin:0 auto;border-radius:20px;align-self:center}
+  .overlay{align-items:center;justify-content:center;padding:20px}
+  .sheet-actions .btn{flex:0 0 auto}
+}
+@media (min-width:1200px){
+  .batch-grid{grid-template-columns:repeat(3,1fr)}
+  .meas-grid{grid-template-columns:repeat(2,1fr)}
+}
+/* mobile top bar */
+@media (max-width:899px){
+  .sidebar{display:none}
+  .topbar{display:flex;position:sticky;top:0;z-index:50;background:color-mix(in oklch,var(--panel) 88%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:10px 16px;align-items:center;gap:10px}
+  .topbar .tb-title{font-family:var(--font-display);font-weight:700;font-size:17px;flex:1;line-height:1}
+  .topbar .tb-sub{font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+  .topbar button{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;color:var(--muted)}
+  .topbar button:hover{background:var(--panel-deep);color:var(--fg)}
+  .shell{padding:18px 16px 120px}
+  .meas-grid{grid-template-columns:repeat(2,1fr)}
+  .queue-item button{align-self:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- desktop sidebar -->
+  <aside class="sidebar" id="sidebar" aria-label="Primary">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h4"/><path d="M12 3v6"/><path d="M6.5 9h11a.5.5 0 0 1 .5.5v1a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3v-1a.5.5 0 0 1 .5-.5z"/><path d="M7.5 13.5c0 2.5.9 4.2 2.5 5.2v1.8h4v-1.8c1.6-1 2.5-2.7 2.5-5.2"/><path d="M10 20.5h4"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">FermentStation</div>
+        <div class="brand-sub">Household · v1 concept</div>
+      </div>
+    </div>
+    <nav class="nav" id="desktop-nav">
+      <button data-screen="today" aria-current="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="4"/><path d="M12 9V5"/><path d="M10 5h4"/><path d="M12 2l1.5 3h-3z"/><path d="M2 13h3"/><path d="M19 13h3"/><path d="M5 5l2 2"/><path d="M19 5l-2 2"/></svg>Today</button>
+      <button data-screen="batches"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"/><path d="M9 3v3l-3 9a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3l-3-9V3"/><path d="M7 14h10"/></svg>Batches</button>
+      <button data-screen="calendar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M3 10h18"/><path d="M8 14h2"/><path d="M14 14h2"/><path d="M8 17.5h2"/></svg>Calendar</button>
+      <button data-screen="profiles"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5c2 1 3.5 3 3.5 5.5 0 1-.3 2-.8 2.8l7.3 7.3v1.4H14l-2-2h-2.5"/><path d="M4 5.5c1.8 1.6 3 3.8 3 6.2v1.8H4.5a2.5 2.5 0 0 1 0-5H5"/><path d="M5 19.5l-1-1.5"/></svg>Profiles</button>
+    </nav>
+    <div class="side-footer">
+      <button id="btn-menu-desktop" aria-haspopup="true" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg>More</button>
+    </div>
+  </aside>
+
+  <div class="shell">
+    <!-- mobile top bar -->
+    <header class="topbar">
+      <div style="display:flex;flex-direction:column;flex:1;gap:3px">
+        <span class="tb-title" id="tb-title">Today</span>
+        <span class="tb-sub" id="tb-sub">FermentStation · v1</span>
+      </div>
+      <button id="btn-menu-mobile" aria-label="More options" aria-haspopup="true" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button>
+    </header>
+
+    <div class="wrap">
+      <main>
+        <!-- ============ TODAY ============ -->
+        <section class="screen active" id="screen-today" data-title="Today" data-sub="Friday, August 7" data-od-id="screen-today">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Friday · August 7, 2026</div>
+              <h1>Today</h1>
+              <p>Your counter needs three things. The rest of the shelf can wait until the morning.</p>
+            </div>
+          </div>
+
+          <h2 class="eyebrow" style="margin:2px 2px 10px">Action queue · due now</h2>
+          <div class="queue">
+            <article class="queue-item" data-od-id="queue-kb004-overdue">
+              <div class="qi-ic warn" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12"/><path d="M12 15.8v.2"/></svg></div>
+              <div class="qi-body">
+                <div class="qi-when">Overdue · was due Tuesday</div>
+                <h4>Profile check for <span class="qi-batch">KB-004</span></h4>
+                <p>Kombucha F1 · berry batch. pH drifted to 3.1 — confirm the vessel still sits in the 2.5–3.5 zone before bottling day.</p>
+              </div>
+              <button class="btn primary" data-open-batch="KB-004">Open batch</button>
+            </article>
+            <article class="queue-item" data-od-id="queue-kb003-ready">
+              <div class="qi-ic good" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.2l2.3 2.3 4.7-4.7"/></svg></div>
+              <div class="qi-body">
+                <div class="qi-when">Due today</div>
+                <h4><span class="qi-batch">KB-003</span> is ready</h4>
+                <p>Ginger kombucha held pH 3.2 for three days. Suggested value reached — bottle and start the F2 phase.</p>
+              </div>
+              <button class="btn primary" data-open-batch="KB-003">Open batch</button>
+            </article>
+            <article class="queue-item" data-od-id="queue-sk012-due">
+              <div class="qi-ic warn" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h11l3 6v8H4z"/><path d="M8 11v5"/><path d="M12 11v5"/><path d="M15 11v5"/><path d="M4 9h14"/></svg></div>
+              <div class="qi-body">
+                <div class="qi-when">Due today</div>
+                <h4>Profile check for <span class="qi-batch">SK-012</span></h4>
+                <p>Sauerkraut · caraway. Day 12 — read pH and check the brine still covers the cabbage line.</p>
+              </div>
+              <button class="btn primary" data-open-batch="SK-012">Open batch</button>
+            </article>
+          </div>
+
+          <div class="section-label"><h2>Active batches</h2><a href="#" data-goto="batches">All batches</a></div>
+          <div class="batch-grid" id="today-batches"></div>
+
+          <div class="section-label"><h2>Upcoming · next 7 days</h2><a href="#" data-goto="calendar">Open calendar</a></div>
+          <div class="mini-upcoming" id="mini-upcoming"></div>
+        </section>
+
+        <!-- ============ BATCHES ============ -->
+        <section class="screen" id="screen-batches" data-title="Batches" data-sub="6 batches · 3 fermenting" data-od-id="screen-batches">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">All jars &amp; crocks</div>
+              <h1>Batches</h1>
+              <p>Every batch belongs to a fermentation profile and keeps its own dated timeline.</p>
+            </div>
+          </div>
+          <div class="filter-row" id="batch-filters" role="group" aria-label="Filter batches by status">
+            <button aria-pressed="true" data-filter="all">All</button>
+            <button aria-pressed="false" data-filter="attention">Active · attention</button>
+            <button aria-pressed="false" data-filter="active">Active</button>
+            <button aria-pressed="false" data-filter="ready">Ready</button>
+            <button aria-pressed="false" data-filter="fridge">To fridge</button>
+            <button aria-pressed="false" data-filter="archived">Archived</button>
+          </div>
+          <div class="batch-grid" id="all-batches"></div>
+        </section>
+
+        <!-- ============ CALENDAR ============ -->
+        <section class="screen" id="screen-calendar" data-title="Calendar" data-sub="August 2026" data-od-id="screen-calendar">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Check-ins &amp; ready days</div>
+              <h1>Calendar</h1>
+              <p>Amber marks a profile check, green a ready day, blue a shift to the fridge.</p>
+            </div>
+          </div>
+          <div class="cal-layout">
+            <div class="cal">
+              <div class="cal-head">
+                <h2 id="cal-title">August 2026</h2>
+                <div class="cal-nav"><button id="cal-prev" aria-label="Previous month" disabled><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><button id="cal-next" aria-label="Next month"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></div>
+              </div>
+              <div class="cal-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+              <div class="cal-grid" id="cal-grid"></div>
+              <div class="cal-legend">
+                <span class="legend-active"><i></i>Profile check</span>
+                <span class="legend-ready"><i></i>Ready</span>
+                <span class="legend-fridge"><i></i>To fridge</span>
+              </div>
+            </div>
+            <div>
+              <div class="section-label" style="margin-top:0"><h2>Upcoming checks</h2></div>
+              <div class="upcoming-list" id="upcoming-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ PROFILES ============ -->
+        <section class="screen" id="screen-profiles" data-title="Profiles" data-sub="5 fermentation profiles" data-od-id="screen-profiles">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Recipes that remember</div>
+              <h1>Profiles</h1>
+              <p>A fermentation profile carries the inputs, guidance, and calculations a batch follows until it's ready.</p>
+            </div>
+          </div>
+          <div class="batch-grid" id="profile-grid"></div>
+        </section>
+
+        <!-- ============ SETTINGS ============ -->
+        <section class="screen" id="screen-settings" data-title="Settings" data-sub="Concept only" data-od-id="screen-settings">
+          <div class="screen-head">
+            <div>
+              <div class="eyebrow">Reached from the overflow menu</div>
+              <h1>Settings</h1>
+              <p>Household preferences for how FermentStation talks to you. Concept surface — no data leaves this device.</p>
+            </div>
+          </div>
+          <div class="card" style="max-width:640px">
+            <div class="setting-row">
+              <div class="s-body"><b>Units</b><p>Readouts for temperature and volume.</p></div>
+              <div class="seg"><button aria-pressed="true">°C / L</button><button aria-pressed="false">°F / qt</button></div>
+            </div>
+            <div class="setting-row">
+              <div class="s-body"><b>Check reminders</b><p>A quiet nudge the morning a profile check is due.</p></div>
+              <div class="seg"><button aria-pressed="true">On</button><button aria-pressed="false">Off</button></div>
+            </div>
+            <div class="setting-row">
+              <div class="s-body"><b>Suggestions</b><p>Show computed suggested values on timeline entries.</p></div>
+              <div class="seg"><button aria-pressed="true">On</button><button aria-pressed="false">Off</button></div>
+            </div>
+            <div class="setting-row">
+              <div class="s-body"><b>Export</b><p>Draft a plain-text journal of every batch timeline.</p></div>
+              <button class="btn tiny">Export journal</button>
+            </div>
+            <div class="setting-row">
+              <div class="s-body"><b>About</b><p>FermentStation v1 concept · not production software.</p></div>
+              <span class="mono" style="font-size:12px;color:var(--faint)">v1.0-concept</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ BATCH WORKSPACE ============ -->
+        <section class="screen" id="screen-batch" data-title="Batch" data-sub="Workspace" data-od-id="screen-batch">
+          <div class="breadcrumb"><a href="#" data-goto="today">Today</a><span>/</span><a href="#" data-goto="batches">Batches</a><span>/</span><span id="bc-batch">KB-004</span></div>
+          <div id="wb-root"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- android bottom tabs -->
+<nav class="tabbar" id="mobile-nav" aria-label="Primary">
+  <button data-screen="today" aria-current="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="4"/><path d="M12 9V5"/><path d="M10 5h4"/><path d="M12 2l1.5 3h-3z"/><path d="M2 13h3"/><path d="M19 13h3"/><path d="M5 5l2 2"/><path d="M19 5l-2 2"/></svg>Today</button>
+  <button data-screen="batches"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8"/><path d="M9 3v3l-3 9a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3l-3-9V3"/><path d="M7 14h10"/></svg>Batches</button>
+  <button data-screen="calendar"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M3 10h18"/><path d="M8 14h2"/><path d="M14 14h2"/><path d="M8 17.5h2"/></svg>Calendar</button>
+  <button data-screen="profiles"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5c2 1 3.5 3 3.5 5.5 0 1-.3 2-.8 2.8l7.3 7.3v1.4H14l-2-2h-2.5"/><path d="M4 5.5c1.8 1.6 3 3.8 3 6.2v1.8H4.5a2.5 2.5 0 0 1 0-5H5"/><path d="M5 19.5l-1-1.5"/></svg>Profiles</button>
+</nav>
+
+<!-- fab: persistent add observation -->
+<button class="fab" id="fab" aria-label="Add observation" data-open-composer data-od-id="fab-add-observation"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+
+<!-- overflow menu -->
+<div class="menu" id="menu" role="menu">
+  <div class="m-note">FermentStation · v1</div>
+  <button data-menu-go="settings"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2.1-1.6-2-3.4-2.5 1a7 7 0 0 0-1.7-1L14.4 3h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.5-1-2 3.4L6 11a7 7 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.5 1 2-3.4-2.1-1.6a7 7 0 0 0 .1-1z"/></svg>Settings</button>
+  <button data-menu-go="settings"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5v8l-9 5-9-5V8z"/><path d="M12 8v8"/><path d="M8 10v4"/><path d="M16 10v4"/></svg>Data export</button>
+  <hr>
+  <button data-menu-go="settings"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5v.2"/></svg>About FermentStation</button>
+</div>
+
+<!-- composer -->
+<div class="overlay" id="composer">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="composer-title">
+    <h2 id="composer-title">Add observation</h2>
+    <p class="sheet-sub">A dated timeline entry attached to one batch.</p>
+    <div class="field">
+      <label for="co-batch">Batch</label>
+      <select id="co-batch"></select>
+    </div>
+    <div class="field">
+      <label>Entry type</label>
+      <div class="seg-type" role="group" aria-label="Entry type">
+        <button aria-pressed="true" data-etype="input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c2 1 3.5 3 3.5 5.5 0 1-.3 2-.8 2.8l7.3 7.3v1.4H14l-2-2h-2.5"/><path d="M4 5.5c1.8 1.6 3 3.8 3 6.2v1.8H4.5a2.5 2.5 0 0 1 0-5H5"/><path d="M5 19.5l-1-1.5"/></svg>Profile input</button>
+        <button aria-pressed="false" data-etype="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h11l3 6v8H4z"/><path d="M8 11v5"/><path d="M12 11v5"/><path d="M15 11v5"/><path d="M4 9h14"/></svg>Profile check</button>
+        <button aria-pressed="false" data-etype="measure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h4"/><path d="M12 3v6"/><path d="M6.5 9h11a.5.5 0 0 1 .5.5v1a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3v-1a.5.5 0 0 1 .5-.5z"/><path d="M7.5 13.5c0 2.5.9 4.2 2.5 5.2v1.8h4v-1.8c1.6-1 2.5-2.7 2.5-5.2"/></svg>Measurement</button>
+        <button aria-pressed="false" data-etype="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a1 1 0 0 1 1-1h11l4 4v11.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M16 4v5h5"/><path d="M8 12h8"/><path d="M8 15.5h8"/></svg>Note</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="co-notes">Notes</label>
+      <textarea id="co-notes" placeholder="e.g. pH 3.1, tasted clean and dry — left on the counter, scobys intact."></textarea>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="co-cancel">Cancel</button>
+      <button class="btn primary" id="co-save">Save entry</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<!-- profile detail -->
+<div class="overlay" id="profile-overlay">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="profile-sheet-title">
+    <div id="profile-sheet"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const ICONS = {
+  attention:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12"/><path d="M12 15.8v.2"/></svg>',
+  active:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',
+  ready:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg>',
+  fridge:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M8 9h.5M8 15.5h.5"/></svg>',
+  archived:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1.5 13h9L18 7"/><path d="M9 11v5M15 11v5"/><path d="M9 3h6l1 4H8z"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h11l3 6v8H4z"/><path d="M8 11v5M12 11v5M15 11v5M4 9h14"/></svg>',
+  input:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c2 1 3.5 3 3.5 5.5 0 1-.3 2-.8 2.8l7.3 7.3v1.4H14l-2-2h-2.5"/><path d="M4 5.5c1.8 1.6 3 3.8 3 6.2v1.8H4.5a2.5 2.5 0 0 1 0-5H5"/><path d="M5 19.5l-1-1.5"/></svg>',
+  note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a1 1 0 0 1 1-1h11l4 4v11.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M16 4v5h5"/><path d="M8 12h8M8 15.5h8"/></svg>',
+  calc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M8.5 7.5h7M8.5 12h1M13.5 12h2M8.5 15.5h1M13.5 15.5h2M12 7.5v3"/></svg>',
+  drop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.2 6 7.6 6 10.6A6 6 0 0 1 6 13.6C6 10.6 8.5 7.2 12 3z"/></svg>',
+  temp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+};
+
+const PROFILES = {
+  kombucha: {
+    id:'Kombucha F1', tag:'Sweet tea · SCOBY · 7–12 days',
+    desc:'Continuous sweet-tea ferment. The pellicle (SCOBY) converts sugar to acetic acid; you bottle when the tea turns dry and tart.',
+    params:[['18–28°C','temperature zone'],['pH 2.5–3.5','zone'],['7–12 d','duration'],['every 2 d','check cadence'],['3–4 L','typical vessel'],['0.9–1.2','target gravity']],
+    inputs:'pH, temperature, days elapsed, taste, pellicle condition',
+    guidance:['Add 100 g sugar per L of sweet tea; cool below 30°C before pouring over the SCOBY.','Keep the vessel covered with cotton; ferment in a warm, still spot away from direct sun.','Run a <b>profile check</b> every 2 days: read pH, temperature, and taste.','Bottle when pH lands below <b>3.5</b> or the tea turns pleasantly dry — the <b>suggested value</b> is pH 3.2–3.4.'],
+    calc:'pH drop ≈ <b>(last pH − this pH)</b> ÷ days between reads. When the last two reads both sit inside the zone and drift has flattened to ≤ 0.1/day, the batch is ready.',
+    batches:'KB-004 · KB-003 · KB-002'
+  },
+  sauerkraut: {
+    id:'Sauerkraut', tag:'2% salt brine · 3–6 weeks',
+    desc:'Cabbage weighted under its own brine. Salt pulls water out and selects for lactobacillus; no vinegar, no starter.',
+    params:[['16–22°C','temperature zone'],['pH 3.4–3.8','zone'],['21–42 d','duration'],['weekly','check cadence'],['2–3%','salt weight'],['2 L','typical crock']],
+    inputs:'pH, temperature, days elapsed, brine level, aroma',
+    guidance:['Mass cabbage at 2% salt; knead until the brine pools at the base of the bowl.','Pack into the crock and weight it so brine fully covers the cabbage — exposed leaves rot.','Run a <b>profile check</b> weekly: read pH, confirm the brine line, and sniff for clean sour.','Ready when pH sits between <b>3.4 and 3.8</b> — suggested value pH 3.6 — and the aroma is bright, not funky.'],
+    calc:'Ferment speed = pH drop per 7 days. Two consecutive weekly reads inside the zone at ≤ 0.2/week drift means the batch is ready to move to the fridge.',
+    batches:'SK-012 · SK-009'
+  },
+  kimchi: {
+    id:'Kimchi', tag:'Fast ferment · 1–3 days out, then fridge',
+    desc:'Napa cabbage and radish paste, briefly fermented warm, then parked in the fridge to ripen slowly for weeks.',
+    params:[['18–22°C','temperature zone'],['pH ≤ 4.2','zone'],['1–3 d','out-of-fridge'],['daily','check cadence'],['5–8 cm','jar headspace'],['3 L','typical jar']],
+    inputs:'pH, temperature, days elapsed, gas, aroma',
+    guidance:['Salt the cabbage 90 minutes, rinse, then rub with the gochujang paste.','Pack firmly so juice rises; leave headspace for CO₂ build-up.','A <b>profile check</b> daily while out: pH falls fast — first day is the loudest.','Shift <b>to fridge</b> once pH reaches <b>4.2</b>, before it turns mushy.'],
+    calc:'Brine rise time ≈ (target pH 4.2 − current pH) ÷ daily drop. Below 4.2 it is technically ready; after that, fridge time is flavour, not safety.',
+    batches:'KK-211'
+  },
+  kefir: {
+    id:'Milk kefir', tag:'24-hour culture · room temperature',
+    desc:'A daily rhythm: culture the milk, strain the grains, start the next jar. Stops being active the moment it hits the fridge.',
+    params:[['21–24°C','temperature zone'],['pH ~4.2','zone'],['24 h','duration'],['daily','check cadence'],['1:10','grain:milk'],['1 L','typical jar']],
+    inputs:'pH, temperature, hours elapsed, grain size',
+    guidance:['Add grains at about 1:10 of milk by volume.','Strain after <b>24 hours</b> — longer turns it tart and thin.','A <b>profile check</b> reads pH only; the grains set the rhythm.','Below pH <b>4.2</b> it is ready — keep the grains to start tomorrow\u2019s batch.'],
+    calc:'The strain window is time-based: expected pH ≈ f(hours at 21–24°C). Suggested value pH 4.2 at 24 h; colder room ⇒ fewer hours.',
+    batches:'None yet — first batch pending'
+  },
+  sourdough: {
+    id:'Sourdough starter', tag:'Feed 1:1:1 · 23–28°C · 4–8 h to peak',
+    desc:'A living culture you feed on a schedule. The starter stays active as long as it is fed; sleeps in the fridge between bakes.',
+    params:[['23–28°C','temperature zone'],['peak 4–8 h','rise time'],['1:1:1','feed ratio'],['daily','check cadence'],['25 g','base flour'],['500 ml','jar']],
+    inputs:'Rise time, hours to peak, temperature, aroma',
+    guidance:['Feed 1:1:1 by weight: 25 g starter, 25 g flour, 25 g water — same time each day.','Discard most of it before feeding, or the jar overflows.','A <b>profile check</b> measures hours to peak; below <b>8 h</b> the starter is strong.','Bake when it peaks under <b>8 h</b> twice in a row — the suggested value is 4–6 h.'],
+    calc:'Peak time trend = hours-to-peak across the last 3 feeds. Halved peak time ≈ doubled culture activity; steady under 8 h means bake-ready.',
+    batches:'None yet — first batch pending'
+  }
+};
+
+const BATCHES = [
+  { id:'KB-004', profile:'kombucha', name:'Berry batch', status:'attention',
+    started:'Aug 2', day:'5 of 7–12', vessel:'3 L weck jar', temp:'24°C', ph:'3.1',
+    zone:[2.5,3.5], phNote:'within zone', phOut:false,
+    next:{kick:'Profile check · overdue since Aug 5', title:'Read pH, taste, check pellicle', body:'Expected a read around pH 3.2. Bottle day is set for Saturday.'},
+    calc:{drift:'0.15 /day', ready:'≈ Aug 10', note:'Drift 0.15/day toward pH 3.2; suggested value pH 3.2–3.4.'},
+    guidance:['Keep the vessel covered with cotton in a warm, still spot — the south window is fine.','Bottle when pH lands below <b>3.5</b> — suggested value pH 3.2–3.4.','Start F2 with 20 g ginger per L when bottling this weekend.'],
+    timeline:[
+      {t:'input', date:'Aug 7 · today', text:'pH 3.1 — tasting bright and dry, edge of sweet gone. Colouring deepens to clear amber.', chips:['pH 3.1 · within zone']},
+      {t:'check', date:'Aug 5 · Tue', text:'Profile check. Pellicle healthy and firm, tea still sweet. Noted gas build-up under the cover.', chips:['pH 3.4 · within zone','24°C']},
+      {t:'calc', date:'Aug 4 · Mon', text:'Profile calculation — drift is 0.15/day; expected ready around Aug 10 at the current pace.', chips:['suggested value pH 3.2–3.4']},
+      {t:'input', date:'Aug 3 · Sun', text:'First pH read after the starter settled.', chips:['pH 3.6']},
+      {t:'note', date:'Aug 2 · Sat', text:'Batch started — 3 L sweet tea at 100 g/L sugar, one SCOBY, pellicle carried over from KB-002. Covered with cotton.', chips:['3 L','100 g/L']}
+    ]
+  },
+  { id:'KB-003', profile:'kombucha', name:'Ginger root', status:'ready',
+    started:'Jul 26', day:'12 of 7–12', vessel:'3 L weck jar', temp:'20°C', ph:'3.2',
+    zone:[2.5,3.5], phNote:'held 3 days', phOut:false,
+    next:{kick:'Ready · due today', title:'Bottle and start F2', body:'Held pH 3.2 for three days. Move to 6 swing-top bottles with 20 g ginger each.'},
+    calc:{drift:'0.02 /day', ready:'ready now', note:'No pH movement for 3 days — the profile says it is finished fermenting.'},
+    guidance:['Bottle below the sediment line; leave 3 cm headroom.','F2 in swing-tops for 2–3 days, then to the fridge.'],
+    timeline:[
+      {t:'ready', date:'Aug 7 · today', text:'Ready. pH stable at 3.2 across three reads; flavour clean, carbonation starting in the corner jars.', chips:['pH 3.2 · stable']},
+      {t:'check', date:'Aug 5 · Tue', text:'Profile check — no change since Monday.', chips:['pH 3.2','20°C']},
+      {t:'input', date:'Jul 26 · Sun', text:'Batch started — ginger steeped 30 min in the sweet tea before the SCOBY went in.', chips:['3 L','20 g/L ginger']}
+    ]
+  },
+  { id:'SK-012', profile:'sauerkraut', name:'Caraway & juniper', status:'active',
+    started:'Jul 26', day:'12 of 21–42', vessel:'2 L crock', temp:'19°C', ph:'3.6',
+    zone:[3.4,3.8], phNote:'within zone', phOut:false,
+    next:{kick:'Profile check · due today', title:'Read pH, confirm brine line', body:'Two weeks in. Check the weight still holds the cabbage under brine.'},
+    calc:{drift:'0.08 /week', ready:'≈ Aug 19', note:'Weekly drift flattening; two more zone reads and it moves to the fridge.'},
+    guidance:['Keep the weight pressing; top up brine with 2% salt water if the line drops.','Ready when pH sits at <b>3.4–3.8</b> — suggested value pH 3.6.'],
+    timeline:[
+      {t:'check', date:'Aug 7 · today', text:'Profile check due. Last read Monday held 3.6 with brine covering the cabbage by 2 cm.', chips:['pH 3.6']},
+      {t:'input', date:'Jul 31 · Fri', text:'Week-one read — kraut smells clean, slightly lactic.', chips:['pH 3.8','19°C']},
+      {t:'note', date:'Jul 26 · Sun', text:'Batch started — 2 kg cabbage at 2% salt, 8 g caraway, 10 juniper berries.', chips:['2 kg','2% salt']}
+    ]
+  },
+  { id:'KK-211', profile:'kimchi', name:'Gochujang', status:'fridge',
+    started:'Jul 30', day:'fridge · day 8', vessel:'3 L jar', temp:'4°C', ph:'4.1',
+    zone:[0,4.2], phNote:'below threshold', phOut:false,
+    next:{kick:'To fridge · in storage', title:'Check in two weeks', body:'pH 4.1 under the 4.2 line. Ripening slowly; taste monthly.'},
+    calc:{drift:'—', ready:'slow in fridge', note:'Cold slows it to a near stop — flavour, not safety, now.'},
+    guidance:['Keep submerged; a skin of juice on top is fine.','If it bubbles hard, it is still fermenting — move lower in the fridge.'],
+    timeline:[
+      {t:'input', date:'Aug 7 · today', text:'Monthly taste — deep, mellow, still crunchy.', chips:['pH 4.1']},
+      {t:'ready', date:'Jul 30 · Wed', text:'Reached pH 4.2 out of the fridge and moved to the fridge the same night.', chips:['pH 4.2']},
+      {t:'note', date:'Jul 27 · Mon', text:'Batch started — cabbage, radish, 4 tbsp gochujang paste.', chips:['3 L jar']}
+    ]
+  },
+  { id:'SK-009', profile:'sauerkraut', name:'Classic green', status:'ready',
+    started:'Jun 20', day:'complete', vessel:'2 L crock', temp:'18°C', ph:'3.5',
+    zone:[3.4,3.8], phNote:'bottled', phOut:false,
+    next:{kick:'Ready · bottled Aug 1', title:'In the fridge', body:'Bottled with the brine. Enjoyable for weeks.'},
+    calc:{drift:'—', ready:'complete', note:'Log closed on Aug 1.'},
+    guidance:[],
+    timeline:[
+      {t:'ready', date:'Aug 1 · Sat', text:'Ready — bottled 2 L of classic kraut with brine.', chips:['pH 3.5']},
+      {t:'check', date:'Jul 25 · Sat', text:'Profile check — aroma clean, brine held.', chips:['pH 3.7']},
+      {t:'note', date:'Jun 20 · Sat', text:'Batch started — green cabbage, 2% salt, no spices.', chips:['2 kg']}
+    ]
+  },
+  { id:'KB-002', profile:'kombucha', name:'Hibiscus', status:'archived',
+    started:'Jun 12', day:'complete', vessel:'3 L weck jar', temp:'22°C', ph:'3.1',
+    zone:[2.5,3.5], phNote:'closed out', phOut:false,
+    next:{kick:'Archived', title:'Batch closed · Jun 29', body:'Pellicle donated to KB-004.'},
+    calc:{drift:'—', ready:'complete', note:'Log closed.'},
+    guidance:[],
+    timeline:[
+      {t:'note', date:'Jun 29 · Mon', text:'Batch closed. Pellicle handed to KB-004 for the next ferment.', chips:['archived']},
+      {t:'ready', date:'Jun 26 · Fri', text:'Ready — hibiscus kombucha bottled.', chips:['pH 3.1']},
+      {t:'note', date:'Jun 12 · Fri', text:'Batch started — 3 L sweet tea with 30 g dried hibiscus.', chips:['3 L']}
+    ]
+  }
+];
+
+const CAL = {
+  year:2026, month:7,
+  events:{
+    1:[{b:'KB-003',t:'check',label:'KB-003 · check'}],
+    3:[{b:'KB-004',t:'check',label:'KB-004 · start'}],
+    5:[{b:'KB-004',t:'check',label:'KB-004 · check'}],
+    7:[{b:'SK-012',t:'check',label:'SK-012 · check'},{b:'KB-003',t:'ready',label:'KB-003 · ready'}],
+    8:[{b:'KB-003',t:'ready',label:'KB-003 · F2'}],
+    10:[{b:'KB-004',t:'check',label:'KB-004 · check'}],
+    15:[{b:'KK-211',t:'fridge',label:'KK-211 · check'}],
+    18:[{b:'SK-012',t:'check',label:'SK-012 · check'}],
+    22:[{b:'KB-004',t:'ready',label:'KB-004 · ready'}]
+  }
+};
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const statusHTML = b => {
+  const m = {
+    attention:['st-attention',ICONS.attention,'Active · attention'],
+    active:['st-active',ICONS.active,'Active'],
+    ready:['st-ready',ICONS.ready,'Ready'],
+    fridge:['st-fridge',ICONS.fridge,'To fridge'],
+    archived:['st-archived',ICONS.archived,'Archived']
+  }[b.status] || ['st-active',ICONS.active,'Active'];
+  return `<span class="status ${m[0]}"><span class="dot" aria-hidden="true"></span>${m[1]}<span>${m[2]}</span></span>`;
+};
+const batchCardHTML = b => {
+  const chips = [b.day, b.vessel];
+  if (b.status !== 'archived'){ chips.push(`${b.temp}`); if(b.ph) chips.push(`pH ${b.ph}`); }
+  const next = b.status === 'archived' ? '' :
+    `<div class="bc-next">${b.status==='ready'?ICONS.ready:(b.status==='fridge'?ICONS.fridge:ICONS.attention)}<span><b>${b.next.title}</b>${b.status==='fridge'?'':' · '+b.next.kick}</span></div>`;
+  return `<button class="batch-card" data-open-batch="${b.id}">
+    <div class="bc-top"><span class="bc-id">${b.id}</span>${statusHTML(b)}</div>
+    <div style="text-align:left"><h3>${esc(b.name)}</h3><div class="bc-name">${PROFILES[b.profile].id}</div></div>
+    <div class="bc-metrics">${chips.map(c=>`<span>${c}</span>`).join('')}</div>
+    ${next}
+  </button>`;
+};
+
+/* ---------- router ---------- */
+let current = 'today';
+function go(screen){
+  current = screen;
+  $$('.screen').forEach(s=>s.classList.toggle('active', s.id==='screen-'+screen));
+  $$('#desktop-nav button, #mobile-nav button').forEach(b=>{
+    b.setAttribute('aria-current', b.dataset.screen===screen ? 'true' : 'false');
+  });
+  $('#tb-title').textContent = screen==='batch' ? $('#bc-batch').textContent : $('#screen-'+screen).dataset.title;
+  $('#tb-sub').textContent = screen==='batch' ? 'Batch workspace' : $('#screen-'+screen).dataset.sub;
+  $('#fab').style.display = screen==='batch' ? 'none' : '';
+  try{ localStorage.setItem('fs.screen', screen); }catch(e){}
+  window.scrollTo(0,0);
+  closeMenu(); closeComposer();
+}
+$$('#desktop-nav button, #mobile-nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.screen)));
+$$('[data-goto]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();go(a.dataset.goto);}));
+
+/* ---------- batch cards ---------- */
+function renderBatches(filter){
+  const list = filter==='all' ? BATCHES : BATCHES.filter(b=>b.status===filter);
+  $('#all-batches').innerHTML = list.map(batchCardHTML).join('');
+  const todayActive = BATCHES.filter(b=>b.status!=='archived');
+  $('#today-batches').innerHTML = todayActive.map(batchCardHTML).join('');
+}
+$$('#batch-filters button').forEach(btn=>btn.addEventListener('click',()=>{
+  $$('#batch-filters button').forEach(b=>b.setAttribute('aria-pressed',b===btn?'true':'false'));
+  renderBatches(btn.dataset.filter);
+}));
+
+/* ---------- mini upcoming ---------- */
+const MINI = [
+  {dow:'Fri', date:7, label:'SK-012 check', cls:''},
+  {dow:'Sat', date:8, label:'KB-003 · F2', cls:'ready'},
+  {dow:'Sun', date:9, label:'—', cls:''},
+  {dow:'Mon', date:10, label:'KB-004 check', cls:''},
+  {dow:'Tue', date:11, label:'—', cls:''},
+  {dow:'Wed', date:12, label:'—', cls:''},
+  {dow:'Thu', date:13, label:'—', cls:''}
+];
+$('#mini-upcoming').innerHTML = MINI.map(d=>`
+  <div class="mini-day ${d.date===7?'today':''}">
+    <div class="md-dow">${d.dow}</div>
+    <div class="md-date">${d.date}</div>
+    <div class="md-items">${d.label!=='—'?`<span class="mini-item ${d.cls}">${d.label}</span>`:'<span class="mini-item" style="visibility:hidden">·</span>'}</div>
+  </div>`).join('');
+
+/* ---------- calendar ---------- */
+function buildCalendar(){
+  const {year,month,events} = CAL;
+  const title = ['January','February','March','April','May','June','July','August','September','October','November','December'][month];
+  $('#cal-title').textContent = title+' '+year;
+  const first = new Date(year,month,1);
+  const lead = (first.getDay()+6)%7;
+  const days = new Date(year,month+1,0).getDate();
+  const today = 7;
+  const cells=[];
+  for(let i=0;i<lead;i++) cells.push('<div class="cal-day other"></div>');
+  for(let d=1;d<=days;d++){
+    const evs = events[d]||[];
+    const evHTML = evs.map(ev=>`<div class="cal-event ev-${ev.t}" title="${esc(ev.label)}">${ev.label}</div>`).join('');
+    cells.push(`<div class="cal-day ${d===today?'today':''}"><span class="d-num">${d}</span>${evHTML}</div>`);
+  }
+  $('#cal-grid').innerHTML = cells.join('');
+}
+$('#cal-prev').addEventListener('click',()=>toast('September 2026 is not part of this concept month'));
+$('#cal-next').addEventListener('click',()=>toast('September 2026 is not part of this concept month'));
+buildCalendar();
+
+/* ---------- upcoming list ---------- */
+const UPCOMING = [
+  {date:'7', dow:'Fri', body:'SK-012 profile check', sub:'Day 12 · due today'},
+  {date:'8', dow:'Sat', body:'KB-003 bottle for F2', sub:'20 g ginger per bottle'},
+  {date:'10', dow:'Mon', body:'KB-004 profile check', sub:'Day 8 · due'},
+  {date:'15', dow:'Sat', body:'KK-211 fridge check', sub:'Taste + pH read'},
+  {date:'18', dow:'Tue', body:'SK-012 profile check', sub:'Day 23 · due'}
+];
+$('#upcoming-list').innerHTML = UPCOMING.map(u=>`
+  <div class="upcoming-item">
+    <div class="up-date"><b>${u.date}</b><span>${u.dow}</span></div>
+    <div class="up-body"><b>${u.body}</b><p>${u.sub}</p></div>
+    <span class="status st-attention"><span class="dot"></span>check</span>
+  </div>`).join('');
+
+/* ---------- profiles ---------- */
+$('#profile-grid').innerHTML = Object.keys(PROFILES).map(key=>{
+  const p = PROFILES[key];
+  return `<button class="profile-card" data-profile="${key}">
+    <div class="pc-id">Fermentation profile</div>
+    <h3>${esc(p.id)}</h3>
+    <div class="pc-desc">${p.desc}</div>
+    <div class="pc-params">${p.params.map(x=>`<div class="pc-param"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
+    <div class="pc-rows">
+      <p><b>Profile inputs</b> ${p.inputs}</p>
+      <p><b>Profile calculation</b> ${p.calc.replace(/<[^>]+>/g,'').slice(0,86)}…</p>
+    </div>
+    <div class="pc-foot"><span class="mono" style="font-size:11px">${p.batches}</span><span class="eyebrow">View guidance →</span></div>
+  </button>`;
+}).join('');
+
+/* ---------- profile detail sheet ---------- */
+function openProfile(key){
+  const p = PROFILES[key];
+  $('#profile-sheet').innerHTML = `
+    <h2 id="profile-sheet-title">${esc(p.id)}</h2>
+    <p class="sheet-sub">${esc(p.tag)}</p>
+    <div class="pc-params" style="margin-bottom:14px">${p.params.map(x=>`<div class="pc-param"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
+    <div class="wb-panel" style="margin-bottom:14px">
+      <h3>Profile guidance</h3>
+      ${p.guidance.map((g,i)=>`<div class="guide-step"><span class="g-n">${i+1}</span><p>${g}</p></div>`).join('')}
+    </div>
+    <div class="wb-panel">
+      <h3>Profile calculation</h3>
+      <div class="calc-line">${p.calc}</div>
+    </div>
+    <div class="hint" style="margin-top:12px">Batches on this profile: ${esc(p.batches)}</div>
+    <div class="sheet-actions"><button class="btn primary" id="profile-done">Done</button></div>`;
+  $('#profile-overlay').classList.add('open');
+}
+$('#profile-overlay').addEventListener('click',e=>{ if(e.target.id==='profile-overlay'||e.target.id==='profile-done') $('#profile-overlay').classList.remove('open'); });
+
+/* ---------- workspace ---------- */
+function renderWorkspace(batch){
+  const b = batch;
+  const zonePct = lo => { const [a,z] = b.zone; return Math.max(0,Math.min(100,((lo-a)/(z-a))*100)); };
+  const phPos = b.zone[0]===0 ? 88 : zonePct(parseFloat(b.ph));
+  const phHTML = `<div class="meas">
+      <div class="m-label"><span>pH</span><span class="mono">zone ${b.zone.join('–')}</span></div>
+      <div class="m-value">${b.ph}<small> · ${esc(b.phNote)}</small></div>
+      <div class="zone" aria-hidden="true"><span class="z-band"></span><span class="z-marker ${b.phOut?'out':''}" style="left:${phPos}%"></span></div>
+      <div class="m-note">${ICONS.drop} Optional pH read${b.phOut?' · outside zone':''}</div>
+    </div>`;
+  const tempHTML = `<div class="meas">
+      <div class="m-label"><span>Temperature</span></div>
+      <div class="m-value">${b.temp}</div>
+      <div class="m-note">${ICONS.temp} Zone ${PROFILES[b.profile].params[0][0]}</div>
+    </div>`;
+  const daysHTML = `<div class="meas">
+      <div class="m-label"><span>Days elapsed</span></div>
+      <div class="m-value">${b.day}</div>
+      <div class="m-note">${ICONS.clock} Check cadence: ${PROFILES[b.profile].params[3][0]}</div>
+    </div>`;
+  const driftHTML = `<div class="meas">
+      <div class="m-label"><span>Profile calculation</span></div>
+      <div class="m-value" style="font-size:19px">${esc(b.calc.drift)}</div>
+      <div class="m-note">Expected ready ${esc(b.calc.ready)}</div>
+    </div>`;
+
+  const guideHTML = `<div class="wb-panel">
+    <h3>Profile guidance · ${esc(PROFILES[b.profile].id)}</h3>
+    ${b.guidance.length?b.guidance.map((g,i)=>`<div class="guide-step"><span class="g-n">${i+1}</span><p>${g}</p></div>`).join(''):'<p style="color:var(--muted);font-size:13.5px">No active guidance — this batch is closed.</p>'}
+    <div style="margin-top:10px" class="calc-line">${PROFILES[b.profile].calc}</div>
+  </div>`;
+
+  const tlHTML = b.timeline.map(e=>`
+    <div class="tl-entry ${e.t}">
+      <span class="tl-dot" aria-hidden="true">${ICONS[e.t==='input'?'input':(e.t==='check'?'check':(e.t==='ready'?'ready':'note'))]}</span>
+      <div class="tl-card">
+        <div class="tl-head"><span class="tl-type">${e.t==='input'?'Profile input':e.t==='check'?'Profile check':e.t==='ready'?'Ready':e.t==='calc'?'Profile calculation':'Timeline entry'}</span><span class="tl-date">${e.date}</span></div>
+        <div class="tl-text">${esc(e.text)}</div>
+        ${e.chips?`<div class="tl-chips">${e.chips.map(c=>`<span>${c}</span>`).join('')}</div>`:''}
+      </div>
+    </div>`).join('');
+
+  $('#bc-batch').textContent = b.id;
+  $('#wb-root').innerHTML = `
+    <div class="screen-head" style="margin-bottom:16px">
+      <div>
+        <div class="eyebrow">${b.id} · ${PROFILES[b.profile].id} · started ${b.started}</div>
+        <h1 style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">${esc(b.name)} ${statusHTML(b)}</h1>
+        <p>${esc(b.next.body)}</p>
+      </div>
+      <div class="head-actions"><button class="btn primary" data-open-composer>Record observation</button></div>
+    </div>
+    <div class="workbench">
+      <div class="wb-rail">
+        <div class="next-action">
+          <div class="na-ic" aria-hidden="true">${b.status==='ready'?ICONS.ready:b.status==='fridge'?ICONS.fridge:ICONS.attention}</div>
+            <div class="na-body">
+            <div class="na-kick">${esc(b.next.kick)}</div>
+            <b>${esc(b.next.title)}</b>
+            <p>${esc(b.next.body)}</p>
+          </div>
+        </div>
+        <div class="wb-panel">
+          <h3>Key measurements <span class="count">optional pH shown with zone</span></h3>
+          <div class="meas-grid">${phHTML}${tempHTML}${daysHTML}${driftHTML}</div>
+          <div class="hint" style="margin-top:12px">Suggested value · ${PROFILES[b.profile].params[2][0]} window, ${esc(b.calc.note)}</div>
+        </div>
+        ${guideHTML}
+      </div>
+      <div class="wb-main">
+        <div class="wb-panel">
+          <h3>Timeline <span class="count">${b.timeline.length} entries</span></h3>
+          <div class="timeline" id="wb-timeline">${tlHTML}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ---------- open batch ---------- */
+let activeBatch = 'KB-004';
+function openBatch(id){
+  const b = BATCHES.find(x=>x.id===id); if(!b) return;
+  activeBatch = id;
+  renderWorkspace(b);
+  go('batch');
+  try{ localStorage.setItem('fs.batch', id); }catch(e){}
+}
+document.addEventListener('click',e=>{
+  const t = e.target.closest('[data-open-batch]');
+  if(t) openBatch(t.dataset.openBatch);
+  const p = e.target.closest('[data-profile]');
+  if(p) openProfile(p.dataset.profile);
+});
+try{ activeBatch = localStorage.getItem('fs.batch')||'KB-004'; }catch(e){}
+renderWorkspace(BATCHES.find(b=>b.id===activeBatch)||BATCHES[0]);
+
+/* ---------- composer ---------- */
+function populateComposer(){
+  $('#co-batch').innerHTML = BATCHES.filter(b=>b.status!=='archived').map(b=>`<option value="${b.id}" ${b.id===activeBatch?'selected':''}>${b.id} · ${esc(b.name)}</option>`).join('');
+}
+let entryType='input';
+$$('.seg-type button').forEach(btn=>btn.addEventListener('click',()=>{
+  $$('.seg-type button').forEach(b=>b.setAttribute('aria-pressed',b===btn?'true':'false'));
+  entryType = btn.dataset.etype;
+}));
+function openComposer(){ populateComposer(); $('#composer').classList.add('open'); }
+function closeComposer(){ $('#composer').classList.remove('open'); }
+$$('[data-open-composer]').forEach(b=>b.addEventListener('click',openComposer));
+$('#co-cancel').addEventListener('click',closeComposer);
+$('#composer').addEventListener('click',e=>{ if(e.target.id==='composer') closeComposer(); });
+$('#co-save').addEventListener('click',()=>{
+  const bid = $('#co-batch').value;
+  const notes = $('#co-notes').value.trim();
+  const b = BATCHES.find(x=>x.id===bid);
+  if(b){
+    const types = {input:'Profile input',check:'Profile check',measure:'Measurement',note:'Timeline entry'};
+    b.timeline.unshift({t: entryType==='note'?'note':(entryType==='measure'?'input':entryType), date:'Aug 7 · just now', text: notes || (types[entryType]+' added from the quick-entry sheet.'), chips: entryType==='measure'?['measurement logged']:[]});
+    if(activeBatch===bid){ renderWorkspace(b); $('#wb-timeline').scrollTop = 0; }
+    renderBatches('all');
+  }
+  $('#co-notes').value='';
+  closeComposer();
+  toast('Observation saved to '+bid+' timeline');
+});
+
+/* ---------- menu ---------- */
+function openMenu(){
+  $('#menu').classList.toggle('open');
+  $('#btn-menu-mobile').setAttribute('aria-expanded', $('#menu').classList.contains('open'));
+  $('#btn-menu-desktop').setAttribute('aria-expanded', $('#menu').classList.contains('open'));
+}
+function closeMenu(){ $('#menu').classList.remove('open'); $('#btn-menu-mobile').setAttribute('aria-expanded','false'); $('#btn-menu-desktop').setAttribute('aria-expanded','false'); }
+$('#btn-menu-mobile').addEventListener('click',e=>{e.stopPropagation();openMenu();});
+$('#btn-menu-desktop').addEventListener('click',e=>{e.stopPropagation();openMenu();});
+$$('#menu button[data-menu-go]').forEach(b=>b.addEventListener('click',()=>{ go('settings'); }));
+document.addEventListener('click',e=>{ if(!e.target.closest('#menu') && !e.target.closest('#btn-menu-mobile') && !e.target.closest('#btn-menu-desktop')) closeMenu(); });
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ---------- boot ---------- */
+renderBatches('all');
+try{ const s=localStorage.getItem('fs.screen'); if(s) go(s); }catch(e){}
+</script>
+</body>
+</html>

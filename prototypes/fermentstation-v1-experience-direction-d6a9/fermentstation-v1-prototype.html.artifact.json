@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "fermentstation-v1-prototype.html",
+  "entry": "fermentstation-v1-prototype.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-08-07T18:08:28.841Z",
+  "updatedAt": "2026-08-07T18:08:28.841Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
