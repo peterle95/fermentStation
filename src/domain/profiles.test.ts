@@ -128,6 +128,15 @@ describe("fermentation profiles", () => {
     expect(validateProfile(profile)).toContain("pH zones cannot overlap.");
   });
 
+  it("validates optional temperature ranges", () => {
+    const base = createProfileState().profiles[0];
+
+    expect(validateProfile({ ...base, temperatureMinC: 18, temperatureMaxC: 28 })).toEqual([]);
+    expect(validateProfile({ ...base, temperatureMinC: 28 }).some((error) => error.startsWith("Temperature range"))).toBe(true);
+    expect(validateProfile({ ...base, temperatureMinC: 28, temperatureMaxC: 18 }).some((error) => error.startsWith("Temperature range"))).toBe(true);
+    expect(validateProfile({ ...base, temperatureMinC: -1, temperatureMaxC: 18 }).some((error) => error.startsWith("Temperature range"))).toBe(true);
+  });
+
   it("allows empty checks and normalizes check names for uniqueness", () => {
     const base = createProfileState().profiles[0];
     expect(validateProfile({ ...base, checks: [] })).toEqual([]);

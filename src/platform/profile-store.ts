@@ -46,7 +46,9 @@ function isProfile(value: unknown): boolean {
       return ["danger", "safe", "optimal"].includes(String(candidate.label)) &&
         typeof candidate.min === "number" && typeof candidate.max === "number";
     }) &&
-    (profile.expectedDurationDays === undefined || typeof profile.expectedDurationDays === "number");
+    (profile.expectedDurationDays === undefined || typeof profile.expectedDurationDays === "number") &&
+    (profile.temperatureMinC === undefined || typeof profile.temperatureMinC === "number") &&
+    (profile.temperatureMaxC === undefined || typeof profile.temperatureMaxC === "number");
 }
 
 function normalizeProfile(profile: FermentationProfile): FermentationProfile {

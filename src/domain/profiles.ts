@@ -7,6 +7,8 @@ export interface FermentationProfile {
   calculations: ProfileCalculation[];
   checks: ProfileCheck[];
   phZones: PhZone[];
+  temperatureMinC?: number;
+  temperatureMaxC?: number;
   expectedDurationDays?: number;
 }
 
@@ -186,6 +188,14 @@ export function validateProfile(profile: FermentationProfile): string[] {
   if (profile.expectedDurationDays !== undefined &&
       (!Number.isInteger(profile.expectedDurationDays) || profile.expectedDurationDays < 1)) {
     errors.push("Expected duration must be a positive whole number.");
+  }
+  const { temperatureMinC: temperatureMin, temperatureMaxC: temperatureMax } = profile;
+  if ((temperatureMin === undefined) !== (temperatureMax === undefined) ||
+      (temperatureMin !== undefined &&
+       (!Number.isFinite(temperatureMin) || !Number.isFinite(temperatureMax) ||
+        temperatureMin < 0 || temperatureMin > 100 || temperatureMax! < 0 || temperatureMax! > 100 ||
+        temperatureMin > temperatureMax!))) {
+    errors.push("Temperature range must include both values between 0 and 100°C, with the minimum no greater than the maximum.");
   }
   const calculationNames = new Set<string>();
   for (const calculation of profile.calculations) {

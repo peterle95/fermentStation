@@ -53,6 +53,22 @@ describe("batch workflow", () => {
     expect(screen.getByText(/No recurring checks yet/)).toBeTruthy();
   });
 
+  it("connects editable temperature and guidance to the profile card", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+
+    fireEvent.change(screen.getByLabelText("Guidance"), { target: { value: "Keep it warm and shaded." } });
+    fireEvent.change(screen.getByLabelText("Temperature minimum"), { target: { value: "18" } });
+    fireEvent.change(screen.getByLabelText("Temperature maximum"), { target: { value: "22" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+
+    const card = screen.getByRole("button", { name: "View Kombucha F1 guidance" }).closest("article");
+    expect(card?.textContent).toContain("Keep it warm and shaded.");
+    expect(card?.textContent).toContain("18–22°C");
+    expect(card?.textContent).not.toContain("Sweet tea · SCOBY");
+  });
+
   it("starts, snapshots, monitors, and filters a batch", () => {
     render(<App />);
 
