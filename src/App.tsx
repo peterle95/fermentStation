@@ -1313,7 +1313,6 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
   const [checkRows, setCheckRows] = useState<ProfileCheckRow[]>([]);
   const [guidanceRows, setGuidanceRows] = useState<string[]>([]);
   const [message, setMessage] = useState("");
-  const inputsRef = useRef<HTMLTextAreaElement>(null);
   const checkInputsRef = useRef<Record<string, HTMLInputElement | null>>({});
   const [focusCheckId, setFocusCheckId] = useState<string | null>(null);
 
@@ -1324,7 +1323,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
   }, [checkRows, focusCheckId]);
 
   function currentInputs() {
-    return inputsRef.current ? parseInputs(inputsRef.current.value) : editing?.inputs ?? [];
+    return editing?.inputs ?? [];
   }
 
   function edit(profile: FermentationProfile) {
@@ -1414,7 +1413,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const inputs = parseInputs(String(data.get("inputs") ?? ""));
+    const inputs = editing?.inputs.map((input) => ({ ...input })) ?? [];
     const structuredRows = calculations.filter((row): row is StructuredFormulaRow => row.kind === "structured");
     const resultNames = new Set(calculations.map((row) => row.kind === "structured" ? row.result : row.calculation.name));
     for (const source of new Set(structuredRows.map((row) => row.source))) {
@@ -1436,6 +1435,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
       temperatureMaxC: String(data.get("temperatureMaxC") ?? "").trim() === ""
         ? undefined
         : Number(data.get("temperatureMaxC")),
+      phZones: parsePhRange(data.get("phMin"), data.get("phMax")),
       expectedDurationDays: data.get("expectedDurationDays")
         ? Number(data.get("expectedDurationDays"))
         : undefined,
@@ -1446,7 +1446,6 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
         formula: `${row.source} ${row.operator} ${row.operand}${row.operandType === "percentage" ? "%" : ""}`,
       }),
       checks: checkRows,
-      phZones: parsePhZones(String(data.get("phZones") ?? "")),
     };
 
     const nextErrors = validateProfile(profile);
@@ -1473,6 +1472,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
       {editing && (() => {
         const presentation = presentationFor(editing);
         const duration = editing.expectedDurationDays ? `${editing.expectedDurationDays} days` : "—";
+        const phRange = phRangeFor(editing);
         return (
           <div className="profile-editor-page">
             <header className="profile-mobile-bar">
@@ -1498,13 +1498,11 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
                       </div>
                     </div>
                      <label className="profile-editor-field"><span>Temperature minimum</span><span className="profile-editor-suffix"><input aria-label="Temperature minimum" defaultValue={editing.temperatureMinC ?? ""} min="0" max="100" name="temperatureMinC" step="any" type="number" /><i>°C</i></span></label>
-                     <label className="profile-editor-field"><span>Temperature maximum</span><span className="profile-editor-suffix"><input aria-label="Temperature maximum" defaultValue={editing.temperatureMaxC ?? ""} min="0" max="100" name="temperatureMaxC" step="any" type="number" /><i>°C</i></span></label>
-                     <label className="profile-editor-field"><span>Expected duration</span><span className="profile-editor-suffix"><input defaultValue={editing.expectedDurationDays ?? ""} min="1" name="expectedDurationDays" type="number" /><i>days</i></span></label>
-                  </div>
-                  <div className="profile-editor-compatibility">
-                    <label>Inputs<textarea defaultValue={editing.inputs.map((input) => `${input.name}, ${input.unit}, ${input.defaultValue ?? ""}`).join("\n")} name="inputs" ref={inputsRef} /></label>
-                    <label>pH zones<textarea defaultValue={editing.phZones.map((zone) => `${zone.label}, ${zone.min}, ${zone.max}`).join("\n")} name="phZones" /></label>
-                  </div>
+                      <label className="profile-editor-field"><span>Temperature maximum</span><span className="profile-editor-suffix"><input aria-label="Temperature maximum" defaultValue={editing.temperatureMaxC ?? ""} min="0" max="100" name="temperatureMaxC" step="any" type="number" /><i>°C</i></span></label>
+                      <label className="profile-editor-field"><span>pH minimum</span><span className="profile-editor-suffix"><input aria-label="pH minimum" defaultValue={phRange.min} min="0" max="14" name="phMin" step="any" type="number" /><i>pH</i></span></label>
+                      <label className="profile-editor-field"><span>pH maximum</span><span className="profile-editor-suffix"><input aria-label="pH maximum" defaultValue={phRange.max} min="0" max="14" name="phMax" step="any" type="number" /><i>pH</i></span></label>
+                      <label className="profile-editor-field"><span>Expected duration</span><span className="profile-editor-suffix"><input defaultValue={editing.expectedDurationDays ?? ""} min="1" name="expectedDurationDays" type="number" /><i>days</i></span></label>
+                   </div>
                 </section>
 
                 <section className="profile-editor-section">
@@ -1642,26 +1640,23 @@ function formulaTermLabel(term: string) {
   return words ? words[0].toUpperCase() + words.slice(1) : term;
 }
 
-function parseInputs(value: string): FermentationProfile["inputs"] {
-  return value.split("\n").filter((line) => line.trim()).map((line) => {
-    const [name = "", unit = "", defaultValue = ""] = line.split(",").map((part) => part.trim());
-    return {
-      name,
-      unit: unit as FermentationProfile["inputs"][number]["unit"],
-      defaultValue: defaultValue === "" ? undefined : Number(defaultValue),
-    };
-  });
+function phRangeFor(profile: FermentationProfile): { min: number | ""; max: number | "" } {
+  const zones = profile.phZones.filter(({ label }) => label === "optimal");
+  const selected = zones.length > 0 ? zones : profile.phZones;
+  return selected.length > 0
+    ? { min: Math.min(...selected.map(({ min }) => min)), max: Math.max(...selected.map(({ max }) => max)) }
+    : { min: "", max: "" };
 }
 
-function parsePhZones(value: string): FermentationProfile["phZones"] {
-  return value.split("\n").filter((line) => line.trim()).map((line) => {
-    const [label = "", min = "", max = ""] = line.split(",").map((part) => part.trim());
-    return {
-      label: label as FermentationProfile["phZones"][number]["label"],
-      min: Number(min),
-      max: Number(max),
-    };
-  });
+function parsePhRange(minValue: FormDataEntryValue | null, maxValue: FormDataEntryValue | null): FermentationProfile["phZones"] {
+  const minText = String(minValue ?? "").trim();
+  const maxText = String(maxValue ?? "").trim();
+  if (!minText || !maxText) return [];
+  const min = Number(minText);
+  const max = Number(maxText);
+  return Number.isFinite(min) && Number.isFinite(max)
+    ? [{ label: "optimal", min, max }]
+    : [];
 }
 
 function timelineEntryText(entry: TimelineEntry): string {
