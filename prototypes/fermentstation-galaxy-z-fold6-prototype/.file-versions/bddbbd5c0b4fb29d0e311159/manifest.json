@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 2,
+  "fileName": "fermentstation-fold6-concept.html",
+  "currentVersionId": "f8aca395-42bc-4dee-a6e8-d3c552dec82c",
+  "entries": [
+    {
+      "id": "a22b1f19-2426-4e2b-9474-b998b69052fd",
+      "fileName": "fermentstation-fold6-concept.html",
+      "version": 1,
+      "label": "Version 1",
+      "createdAt": 1786128981918,
+      "source": "ai",
+      "prompt": "Create a high-fidelity, browser-viewable, clickable UI prototype for resolving GitHub issue \"Prototype the Galaxy Z Fold6 Android experience\". This is throwaway design work only, not production app code.\n\nBuild an interactive FermentStation household fermentation tracker concept for a Galaxy Z Fold6. Preserve the established visual direction: warm editorial household-craft styling; tactile paper/clay character; calm, practical information hierarchy; shared batch-status colors; Android-native interactions and accessibility. Use the existing recovered prototype only as visual reference if available; do not overwrite or alter it.\n\nThe single artifact must let a reviewer compare three structurally different adaptive layout variants, switchable in a clearly labeled prototype-only fixed bottom switcher and with left/right keyboard navigation. The variation must be in hierarchy and layout, not merely color:\nA. Cover display: compact Today-first list; inner display: navigation rail plus detail pane.\nB. Cover display: task-oriented home; inner display: dashboard canvas with persistent batch queue.\nC. Cover display: timeline-focused navigation; inner display: multi-column workbench.\n\nFor every variant, make the cover screen approximately 23:9 narrow portrait and the inner display approximately 6:5 wide. Provide an obvious posture toggle that keeps the same active primary destination and retains any visible unsaved draft text when switching cover/inner. Demonstrate this by allowing the user to start a timeline entry or batch note, type text, navigate between primary destinations, and fold/unfold without losing it.\n\nCover all primary navigation: Today, Batches, Calendar, Profiles, and Settings. Include believable sample content for active, ready, and to-fridge batches. Cover Android interaction states: selected nav state, FAB or primary action, bottom sheet/dialog editing, focus/typing state, empty or no-results state, and an accessible status presentation not dependent only on color. Use touch-friendly targets and label controls.\n\nPlace a short in-prototype note identifying this as a review-only Fold6 concept and how to switch variants/posture. Make it self-contained HTML/CSS/JS, runnable directly in the preview. Aim to create a concrete concept the user can critique, not an implementation plan.",
+      "size": 20655,
+      "mime": "text/html; charset=utf-8",
+      "kind": "html",
+      "contentPath": "0001-a22b1f19-2426-4e2b-9474-b998b69052fd.html",
+      "promptSource": "message",
+      "contentDigest": "21989fd7ceb31b753c494a37a1f745e80e56db8222c694345ba10407920fdae6"
+    },
+    {
+      "id": "f8aca395-42bc-4dee-a6e8-d3c552dec82c",
+      "fileName": "fermentstation-fold6-concept.html",
+      "version": 2,
+      "label": "Version 2",
+      "createdAt": 1786129302671,
+      "source": "ai",
+      "prompt": "here should be a symbol of a carrot",
+      "size": 20656,
+      "mime": "text/html; charset=utf-8",
+      "kind": "html",
+      "contentPath": "0002-f8aca395-42bc-4dee-a6e8-d3c552dec82c.html",
+      "contentDigest": "cd188d5e905f189cdd7a830ec5089e4f16ba9f1344b7be6775f8ceab42dbebc0",
+      "promptSource": "message"
+    }
+  ]
+}

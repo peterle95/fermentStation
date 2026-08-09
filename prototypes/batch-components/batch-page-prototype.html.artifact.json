@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "batch-page-prototype.html",
+  "entry": "batch-page-prototype.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-08-09T13:18:48.865Z",
+  "updatedAt": "2026-08-09T13:18:48.865Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
