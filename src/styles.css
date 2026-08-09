@@ -2964,34 +2964,23 @@ button:disabled {
   .batch-workspace .timeline-entry > button { grid-row: 3; }
 }
 
-/* Profile editor mirrors prototypes/profile-page/ferment-profile-editor.html. */
+/* Profile editor uses the shared application shell and palette. */
 .profile-editor-shell {
-  --editor-bg: #f5f4ed;
-  --editor-surface: #faf9f5;
-  --editor-warm: #e8e6dc;
-  --editor-fg: #141413;
-  --editor-fg-2: #3d3d3a;
-  --editor-muted: #5e5d59;
-  --editor-meta: #87867f;
-  --editor-border: #f0eee6;
-  --editor-border-soft: #e8e6dc;
-  --editor-accent: #c96442;
-  --editor-success: #17a34a;
+  --editor-bg: var(--bg);
+  --editor-surface: var(--surface);
+  --editor-warm: var(--panel);
+  --editor-fg: var(--ink);
+  --editor-fg-2: var(--ink);
+  --editor-muted: var(--muted);
+  --editor-meta: oklch(60% 0.013 60);
+  --editor-border: var(--border);
+  --editor-border-soft: var(--border);
+  --editor-accent: var(--accent);
+  --editor-success: var(--green);
   background: var(--editor-bg);
   color: var(--editor-fg);
 }
 
-.profile-editor-shell .sidebar { background: var(--editor-bg); border-right-color: var(--editor-border-soft); flex-basis: 15.75rem; padding: 1.25rem 0.75rem; }
-.profile-editor-shell .brand { padding: 0 0.5rem; }
-.profile-editor-shell .brand-mark { background: var(--editor-fg); color: var(--editor-surface); }
-.profile-editor-shell .brand strong { color: var(--editor-fg); font-family: Georgia, serif; font-size: 1.375rem; font-weight: 500; }
-.profile-editor-shell .brand span:not(.brand-mark), .profile-editor-shell .sidebar-foot { color: var(--editor-meta); }
-.profile-editor-shell .navigation { gap: 0.25rem; margin-top: 3rem; }
-.profile-editor-shell .navigation button { border-radius: 0.5rem; color: var(--editor-muted); font-size: 0.9375rem; font-weight: 500; min-height: 2.75rem; padding: 0 0.75rem; }
-.profile-editor-shell .navigation button:hover, .profile-editor-shell .navigation button:focus-visible { background: var(--editor-warm); color: var(--editor-fg); outline: 0; }
-.profile-editor-shell .navigation button.selected { background: var(--editor-surface); box-shadow: 0 0 0 1px var(--editor-border); color: var(--editor-fg); }
-.profile-editor-shell .navigation button:last-child { display: none; }
-.profile-editor-shell .sidebar-foot { border-top: 1px solid var(--editor-border-soft); font-size: 0.875rem; line-height: 1.45; margin: auto 0 0; padding: 0.75rem 0.5rem 0; }
 .profile-editor-shell .main-content { padding: 2.5rem 3.5rem 4.5rem; }
 .profile-editor-shell .profile-tools, .profiles:has(.profile-editor-page) .profile-tools { display: none; }
 .profile-editor-page { margin: 0 auto; max-width: 67.5rem; }

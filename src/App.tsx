@@ -169,7 +169,6 @@ export function App() {
             </button>
           ))}
         </nav>
-        <p className="sidebar-foot">A quiet record of what is changing, and what to do next.</p>
       </aside>
 
       <div className="content-shell">
