@@ -24,6 +24,12 @@ A value the user supplies for a batch, such as water volume, cabbage weight, or 
 **Profile guidance**:
 A fixed condition or recommendation supplied by a fermentation profile, such as temperature or salt percentage.
 
+**Profile temperature range**:
+The optional lower and upper Celsius bounds for the conditions a fermentation profile recommends. Both bounds are supplied together, must be between 0 and 100°C, and the lower bound cannot exceed the upper bound.
+
+**Profile card**:
+The summary of a fermentation profile on the profiles main page. It contains only profile-owned values that can be authored in the profile editor; batch-derived facts and hardcoded examples do not belong on it.
+
 **Profile check**:
 An optional named recurring check supplied by a fermentation profile, such as tasting or burping a jar. A profile may have no checks. When a batch is created, its profile checks are copied into that batch; later profile edits do not change existing batches. Profile checks use positive whole-day intervals and unique normalized names.
 

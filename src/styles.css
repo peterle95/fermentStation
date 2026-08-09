@@ -3023,7 +3023,8 @@ button:disabled {
 .profile-editor-suffix { position: relative; }
 .profile-editor-suffix input { padding-right: 3.5rem; }
 .profile-editor-suffix i { color: var(--editor-meta); font-family: Consolas, monospace; font-size: 0.75rem; font-style: normal; pointer-events: none; position: absolute; right: 0.8125rem; top: 50%; transform: translateY(-50%); }
-.profile-editor-compatibility { height: 1px; margin: -1px; opacity: 0; overflow: hidden; position: absolute; width: 1px; }
+.profile-editor-compatibility { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1rem; }
+.profile-editor-compatibility label { color: var(--editor-fg-2); display: grid; gap: 0.4375rem; }
 .profile-editor-checks { display: grid; gap: 0.75rem; }
 .profile-editor-check-row { align-items: end; background: var(--editor-surface); border: 1px solid var(--editor-border); border-radius: 0.75rem; display: grid; gap: 0.5rem; grid-template-columns: 1.15fr 0.8fr 0.7fr 2.625rem; padding: 0.75rem; }
 .profile-editor-check-row input { padding: 0.5625rem 0.625rem; }
@@ -3077,6 +3078,7 @@ button:disabled {
   .profile-editor-head { align-items: flex-start; display: block; margin: 1.5rem 0 2rem; }
   .profile-editor-status { margin-top: 1rem; }
   .profile-editor-fields { grid-template-columns: 1fr; }
+  .profile-editor-compatibility { grid-template-columns: 1fr; }
   .profile-editor-check-row { grid-template-columns: 1fr 1fr 2.625rem; }
   .profile-editor-check-row label:first-child { grid-column: 1 / -1; }
   .profile-editor-check-row label:nth-child(3) { display: none; }
