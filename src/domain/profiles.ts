@@ -11,6 +11,7 @@ export interface FermentationProfile {
 }
 
 export interface ProfileCheck {
+  id?: string;
   name: string;
   intervalDays: number;
 }
@@ -35,16 +36,9 @@ export interface ProfileCalculation {
 
 export type MetricUnit = "g" | "kg" | "ml" | "l";
 
-export interface TrashedProfile extends FermentationProfile {
-  deletedAt: number;
-}
-
 export interface ProfileState {
   profiles: FermentationProfile[];
-  trash: TrashedProfile[];
 }
-
-const recoveryPeriodMs = 7 * 24 * 60 * 60 * 1000;
 
 const emptyProfileFields = { inputs: [], calculations: [], checks: [], phZones: [] };
 
@@ -87,7 +81,7 @@ const starterProfiles: FermentationProfile[] = [
 ];
 
 export function createProfileState(): ProfileState {
-  return { profiles: starterProfiles.map(cloneProfile), trash: [] };
+  return { profiles: starterProfiles.map(cloneProfile) };
 }
 
 export function cloneProfile(profile: FermentationProfile): FermentationProfile {
@@ -95,9 +89,21 @@ export function cloneProfile(profile: FermentationProfile): FermentationProfile 
     ...profile,
     inputs: profile.inputs.map((input) => ({ ...input })),
     calculations: profile.calculations.map((calculation) => ({ ...calculation })),
-    checks: profile.checks.map((check) => ({ ...check })),
+    checks: normalizeProfileChecks(profile.checks, `profile-check-${profile.id}`),
     phZones: profile.phZones.map((zone) => ({ ...zone })),
   };
+}
+
+export function normalizeProfileChecks(checks: ProfileCheck[], prefix = "profile-check"): ProfileCheck[] {
+  const ids = new Set<string>();
+  return checks.map((check, index) => {
+    const fallback = `${prefix}-${index}`;
+    let id = check.id?.trim() || fallback;
+    let suffix = 1;
+    while (ids.has(id)) id = `${fallback}-${suffix++}`;
+    ids.add(id);
+    return { ...check, id, name: check.name.trim() };
+  });
 }
 
 interface Quantity {
@@ -203,10 +209,11 @@ export function validateProfile(profile: FermentationProfile): string[] {
   }
   const checkNames = new Set<string>();
   for (const check of profile.checks) {
-    if (!check.name.trim() || checkNames.has(check.name)) {
+    const normalizedName = check.name.trim().toLowerCase();
+    if (!normalizedName || checkNames.has(normalizedName)) {
       errors.push("Check names must be present and unique.");
     }
-    checkNames.add(check.name);
+    checkNames.add(normalizedName);
     if (!Number.isInteger(check.intervalDays) || check.intervalDays < 1) {
       errors.push(`${check.name || "Check"} interval must be a positive whole number.`);
     }
@@ -297,7 +304,10 @@ export function addProfile(
   profile: FermentationProfile,
 ): ProfileState {
   assertValidProfile(profile);
-  return { ...state, profiles: [...state.profiles, profile] };
+  return {
+    ...state,
+    profiles: [...state.profiles, { ...profile, checks: normalizeProfileChecks(profile.checks, `profile-check-${profile.id}`) }],
+  };
 }
 
 export function updateProfile(
@@ -312,52 +322,13 @@ export function updateProfile(
   }
 
   const profiles = [...state.profiles];
-  profiles[index] = profile;
+  profiles[index] = { ...profile, checks: normalizeProfileChecks(profile.checks, `profile-check-${profile.id}`) };
   return { ...state, profiles };
 }
 
 export function deleteProfile(
   state: ProfileState,
   id: string,
-  deletedAt: number,
 ): ProfileState {
-  const current = discardExpiredProfiles(state, deletedAt);
-  const profile = current.profiles.find((candidate) => candidate.id === id);
-
-  if (!profile) {
-    return current;
-  }
-
-  return {
-    profiles: current.profiles.filter((candidate) => candidate.id !== id),
-    trash: [...current.trash, { ...profile, deletedAt }],
-  };
-}
-
-export function restoreProfile(
-  state: ProfileState,
-  id: string,
-  now: number,
-): ProfileState {
-  const profile = state.trash.find((candidate) => candidate.id === id);
-
-  if (!profile || now - profile.deletedAt >= recoveryPeriodMs) {
-    return discardExpiredProfiles(state, now);
-  }
-
-  const { deletedAt: _deletedAt, ...restored } = profile;
-  return {
-    profiles: state.profiles.some((candidate) => candidate.id === id)
-      ? state.profiles
-      : [...state.profiles, restored],
-    trash: state.trash.filter((candidate) => candidate.id !== id),
-  };
-}
-
-export function discardExpiredProfiles(state: ProfileState, now: number): ProfileState {
-  const trash = state.trash.filter(
-    (profile) => now - profile.deletedAt < recoveryPeriodMs,
-  );
-
-  return trash.length === state.trash.length ? state : { ...state, trash };
+  return { ...state, profiles: state.profiles.filter((candidate) => candidate.id !== id) };
 }

@@ -94,8 +94,8 @@ export function createBatch(
     inputValues: values,
     calculationValues: {},
     finishDate,
-    checks: profile.checks.map((check) => ({
-      id: check.name,
+    checks: profileSnapshot.checks.map((check) => ({
+      id: createStableId("batch-check"),
       name: check.name,
       intervalDays: check.intervalDays,
       nextDueDate: addCalendarDays(startDate, check.intervalDays),
@@ -194,18 +194,70 @@ function validatePhValue(value: number): void {
   }
 }
 
-export function adjustBatchCheck(batch: Batch, id: string, intervalDays: number): Batch {
-  if (!Number.isInteger(intervalDays) || intervalDays < 1) {
-    throw new Error("Check interval must be a positive whole number");
-  }
+export function addBatchCheck(
+  batch: Batch,
+  name: string,
+  intervalDays: number,
+  addedDate: string,
+): Batch {
+  if (batch.status !== "active") throw new Error("Checks are paused while the batch is not active");
+  assertCheckInterval(intervalDays);
+  const trimmedName = name.trim();
+  assertUniqueCheckName(batch.checks, trimmedName);
+  return {
+    ...batch,
+    checks: [...batch.checks, {
+      id: createStableId("batch-check"),
+      name: trimmedName,
+      intervalDays,
+      nextDueDate: addCalendarDays(addedDate, intervalDays),
+    }],
+  };
+}
+
+export function renameBatchCheck(batch: Batch, id: string, name: string): Batch {
+  if (!batch.checks.some((check) => check.id === id)) throw new Error(`Unknown check ${id}`);
+  const trimmedName = name.trim();
+  assertUniqueCheckName(batch.checks, trimmedName, id);
+  return {
+    ...batch,
+    checks: batch.checks.map((check) => check.id === id ? { ...check, name: trimmedName } : check),
+  };
+}
+
+export function removeBatchCheck(batch: Batch, id: string): Batch {
+  return { ...batch, checks: batch.checks.filter((check) => check.id !== id) };
+}
+
+export function adjustBatchCheck(
+  batch: Batch,
+  id: string,
+  intervalDays: number,
+  today: string,
+): Batch {
+  if (batch.status !== "active") throw new Error("Checks are paused while the batch is not active");
+  assertCheckInterval(intervalDays);
+  if (!batch.checks.some((check) => check.id === id)) throw new Error(`Unknown check ${id}`);
   return {
     ...batch,
     checks: batch.checks.map((check) => check.id === id ? {
       ...check,
       intervalDays,
-      nextDueDate: addCalendarDays(check.lastCompletedDate ?? batch.startDate, intervalDays),
+      nextDueDate: addCalendarDays(check.lastCompletedDate ?? today, intervalDays),
     } : check),
   };
+}
+
+function assertCheckInterval(intervalDays: number): void {
+  if (!Number.isInteger(intervalDays) || intervalDays < 1) {
+    throw new Error("Check interval must be a positive whole number");
+  }
+}
+
+function assertUniqueCheckName(checks: BatchCheck[], name: string, currentId?: string): void {
+  if (!name || checks.some((check) => check.id !== currentId && check.name.trim().toLowerCase() === name.toLowerCase())) {
+    throw new Error("Check names must be present and unique");
+  }
 }
 
 export function completeBatchCheck(
@@ -237,6 +289,7 @@ export function dueBatchChecks(batch: Batch, today: string): Array<BatchCheck & 
     ? batch.checks
       .filter((check) => check.nextDueDate <= today)
       .map((check) => ({ ...check, overdue: check.nextDueDate < today }))
+      .sort(compareDueChecks)
     : [];
 }
 
@@ -264,7 +317,8 @@ export function calendarEvents(batches: Batch[]): CalendarEvent[] {
       kind: "check" as const,
       label: check.name,
     })) : []),
-  ]).sort((left, right) => left.date.localeCompare(right.date));
+  ]).sort((left, right) => left.date.localeCompare(right.date) ||
+    left.batchName.localeCompare(right.batchName) || left.label.localeCompare(right.label));
 }
 
 function recalculateBatch(batch: Batch): Batch {
@@ -292,6 +346,13 @@ function addCalendarDays(date: string, days: number): string {
   const value = new Date(`${date}T00:00:00Z`);
   value.setUTCDate(value.getUTCDate() + days);
   return value.toISOString().slice(0, 10);
+}
+
+function createStableId(prefix: string): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 function calendarDaysBetween(start: string, end: string): number {
@@ -440,9 +501,15 @@ export function prioritizeToday(batches: Batch[], today?: string): Batch[] {
       const rightDue = dueBatchChecks(right, today)[0];
       if (leftDue?.overdue !== rightDue?.overdue) return leftDue?.overdue ? -1 : 1;
       if (!!leftDue !== !!rightDue) return leftDue ? -1 : 1;
+      if (leftDue && rightDue) return compareDueChecks(leftDue, rightDue);
     }
-    return priority[left.status] - priority[right.status];
+    return priority[left.status] - priority[right.status] || left.name.localeCompare(right.name);
   });
+}
+
+function compareDueChecks(left: BatchCheck, right: BatchCheck): number {
+  return left.nextDueDate.localeCompare(right.nextDueDate) ||
+    left.name.localeCompare(right.name) || left.id.localeCompare(right.id);
 }
 
 export function statusLabel(status: BatchStatus): string {

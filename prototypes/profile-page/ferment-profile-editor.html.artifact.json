@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "prototypes/ferment-profile-editor.html",
+  "entry": "prototypes/ferment-profile-editor.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-08-08T17:14:30.470Z",
+  "updatedAt": "2026-08-09T07:28:56.871Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

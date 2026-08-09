@@ -36,6 +36,9 @@ export async function createArchive(
 ): Promise<Uint8Array> {
   validateStableIds(profileState, batchState);
   const records = structuredClone({ profileState, batchState }) as ArchiveRecords;
+  if (records.profileState.profiles.some((profile) => validateProfile(profile).length > 0)) {
+    throw new Error("Archive contains an invalid profile");
+  }
   const photos: Record<string, Uint8Array> = {};
   for (const batch of [...records.batchState.batches, ...records.batchState.trash]) {
     for (const entry of [...batch.timeline, ...batch.timelineTrash]) {
@@ -124,7 +127,6 @@ export async function importArchive(
   return {
     profileState: {
       profiles: [...localProfiles.profiles, ...profileState.profiles],
-      trash: [...localProfiles.trash, ...profileState.trash],
     },
     batchState: {
       batches: [...localBatches.batches, ...batchState.batches],
@@ -149,10 +151,6 @@ export function resolveArchiveCollisions(
       profiles: [
         ...imported.profileState.profiles.filter(({ id }) => keep || !profileIds.has(id)),
         ...imported.pendingProfileState.profiles.filter(({ id }) => !keep || !profileIds.has(id)),
-      ],
-      trash: [
-        ...imported.profileState.trash.filter(({ id }) => keep || !profileIds.has(id)),
-        ...imported.pendingProfileState.trash.filter(({ id }) => !keep || !profileIds.has(id)),
       ],
     },
     batchState: {
@@ -209,20 +207,17 @@ function hydratePhotos(
 }
 
 function validateStableIds(profiles: ProfileState, batches: BatchState): void {
-  uniqueIds([...profiles.profiles, ...profiles.trash], "profile");
+  uniqueIds(profiles.profiles, "profile");
   uniqueIds([...batches.batches, ...batches.trash], "batch");
   for (const batch of [...batches.batches, ...batches.trash]) {
+    uniqueIds(batch.checks, `checks in ${batch.id}`);
     uniqueIds([...batch.timeline, ...batch.timelineTrash], `timeline entries in ${batch.id}`);
   }
 }
 
 function validateImportedRecords(profiles: ProfileState, batches: BatchState): void {
-  for (const profile of [...profiles.profiles, ...profiles.trash]) {
+  for (const profile of profiles.profiles) {
     if (validateProfile(profile).length > 0) throw new Error("Archive contains an invalid profile");
-    if ("deletedAt" in profile &&
-        (typeof profile.deletedAt !== "number" || !validTimestamp(profile.deletedAt))) {
-      throw new Error("Archive contains an invalid profile trash timestamp");
-    }
   }
   for (const batch of [...batches.batches, ...batches.trash]) {
     if (!validDate(batch.startDate) || batch.finishDate !== undefined && !validDate(batch.finishDate) ||
@@ -241,8 +236,14 @@ function validateImportedRecords(profiles: ProfileState, batches: BatchState): v
       value.override !== undefined && !nonnegative(value.override))) {
       throw new Error("Archive contains an invalid batch calculation");
     }
-    if (batch.checks.some((check) => !Number.isInteger(check.intervalDays) || check.intervalDays < 1 ||
-        !validDate(check.nextDueDate) || check.lastCompletedDate !== undefined && !validDate(check.lastCompletedDate))) {
+    const checkNames = new Set<string>();
+    if (batch.checks.some((check) => {
+      const name = check.name.trim().toLowerCase();
+      const duplicate = !name || checkNames.has(name);
+      checkNames.add(name);
+      return duplicate || !Number.isInteger(check.intervalDays) || check.intervalDays < 1 ||
+        !validDate(check.nextDueDate) || check.lastCompletedDate !== undefined && !validDate(check.lastCompletedDate);
+    })) {
       throw new Error("Archive contains an invalid batch check");
     }
     for (const entry of [...batch.timeline, ...batch.timelineTrash]) {
@@ -291,7 +292,7 @@ function findCollisions(
   importedBatches: BatchState,
 ): ArchiveCollision[] {
   const collisions: ArchiveCollision[] = [];
-  collectCollisions("profile", [...localProfiles.profiles, ...localProfiles.trash], [...importedProfiles.profiles, ...importedProfiles.trash], collisions);
+  collectCollisions("profile", localProfiles.profiles, importedProfiles.profiles, collisions);
   collectCollisions("batch", [...localBatches.batches, ...localBatches.trash], [...importedBatches.batches, ...importedBatches.trash], collisions);
   return collisions;
 }

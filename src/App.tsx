@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   addTimelineEntry,
   addPhReading,
+  addBatchCheck,
   adjustBatchCheck,
   batchStatuses,
   createBatch,
@@ -14,6 +15,8 @@ import {
   dueBatchChecks,
   filterBatches,
   latestPhReading,
+  removeBatchCheck,
+  renameBatchCheck,
   prioritizeToday,
   phWarning,
   phZoneLabel,
@@ -30,7 +33,6 @@ import {
   type BatchState,
   type BatchStatus,
   type TimelineEntry,
-  type TrashedBatch,
   updateBatchForDate,
   updatePhReading,
 } from "./domain/batches";
@@ -38,9 +40,7 @@ import {
   addProfile,
   createProfileState,
   deleteProfile,
-  discardExpiredProfiles,
   parseSimpleFormula,
-  restoreProfile,
   updateProfile,
   validateProfile,
   type FermentationProfile,
@@ -84,6 +84,13 @@ function localDate() {
     .slice(0, 10);
 }
 
+function createClientId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `record-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 function NavIcon({ destination }: { destination: Destination }) {
   if (destination === "today") return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="4" /><path d="M12 9V5M10 5h4M12 2l1.5 3h-3zM2 13h3M19 13h3M5 5l2 2M19 5l-2 2" /></svg>;
   if (destination === "batches") return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3h8M9 3v3l-3 9a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3l-3-9V3M7 14h10" /></svg>;
@@ -92,10 +99,9 @@ function NavIcon({ destination }: { destination: Destination }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19 12a7 7 0 0 0-.1-1l2.1-1.6-2-3.4-2.5 1a7 7 0 0 0-1.7-1L14.4 3h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.5-1-2 3.4L6 11a7 7 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.5 1 2-3.4-2.1-1.6a7 7 0 0 0 .1-1z" /></svg>;
 }
 
-function StatusIcon({ status }: { status: BatchStatus | "attention" | "archived" }) {
+function StatusIcon({ status }: { status: BatchStatus | "attention" }) {
   if (status === "ready") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 12.5l5 5 10-11" /></svg>;
   if (status === "to-fridge") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM8 9h.5M8 15.5h.5" /></svg>;
-  if (status === "archived") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M6 7l1.5 13h9L18 7M9 11v5M15 11v5M9 3h6l1 4H8z" /></svg>;
   if (status === "attention") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7.5V12M12 15.8v.2" /></svg>;
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3.2" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></svg>;
 }
@@ -105,7 +111,7 @@ export function App() {
     () => browserShellStore.load() ?? createShellState(),
   );
   const [profileState, setProfileState] = useState(() =>
-    discardExpiredProfiles(browserProfileStore.load() ?? createProfileState(), Date.now()),
+    browserProfileStore.load() ?? createProfileState(),
   );
   const [batchState, setBatchState] = useState(() =>
     updateBatchDates(
@@ -113,11 +119,11 @@ export function App() {
     ),
   );
   const [openBatchId, setOpenBatchId] = useState<string | null>(null);
+  const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
 
   function saveProfiles(next: typeof profileState) {
-    const current = discardExpiredProfiles(next, Date.now());
-    browserProfileStore.save(current);
-    setProfileState(current);
+    browserProfileStore.save(next);
+    setProfileState(next);
   }
 
   function navigate(destination: Destination) {
@@ -125,6 +131,7 @@ export function App() {
     browserShellStore.save(next);
     setShell(next);
     setOpenBatchId(null);
+    setEditingProfileId(null);
   }
 
   function saveBatches(next: BatchState) {
@@ -139,11 +146,11 @@ export function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${editingProfileId && shell.destination === "profiles" ? " profile-editor-shell" : ""}`}>
       <aside className="sidebar">
         <div className="brand">
           <span className="brand-mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 3h4M12 3v6M6.5 9h11a.5.5 0 0 1 .5.5v1a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3v-1a.5.5 0 0 1 .5-.5zM7.5 13.5c0 2.5.9 4.2 2.5 5.2v1.8h4v-1.8c1.6-1 2.5-2.7 2.5-5.2M10 20.5h4" /></svg></span>
-          <div><strong>FermentStation</strong><span>Household · v1 concept</span></div>
+          <div><strong>FermentStation</strong><span>Household journal</span></div>
         </div>
         <nav aria-label="Primary navigation" className="navigation">
           {destinations.map((destination) => (
@@ -162,6 +169,7 @@ export function App() {
             </button>
           ))}
         </nav>
+        <p className="sidebar-foot">A quiet record of what is changing, and what to do next.</p>
       </aside>
 
       <div className="content-shell">
@@ -194,9 +202,7 @@ export function App() {
                   ...batchState, batches: [...batchState.batches, batch],
                 })}
                 onDelete={(id) => saveBatches(deleteBatch(batchState, id, Date.now()))}
-                onRestore={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
                 profiles={profileState.profiles}
-                trash={batchState.trash}
               />
             </section>
           ) : shell.destination === "batches" ? (
@@ -222,10 +228,8 @@ export function App() {
                 ...batchState, batches: [...batchState.batches, batch],
               })}
               onDelete={(id) => saveBatches(deleteBatch(batchState, id, Date.now()))}
-              onRestore={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
-              profiles={profileState.profiles}
-              trash={batchState.trash}
-            />
+               profiles={profileState.profiles}
+             />
             </section>
           ) : shell.destination === "calendar" ? (
             <section className="calendar-screen" aria-label="Fermentation calendar">
@@ -240,20 +244,21 @@ export function App() {
             </section>
           ) : shell.destination === "profiles" ? (
             <section className="profiles-screen" aria-label="Fermentation profiles">
-              <div className="screen-head">
-                <div>
-                  <p className="eyebrow">Recipes that remember</p>
-                  <h1>Profiles</h1>
-                  <p className="screen-intro">A fermentation profile carries the inputs, guidance, and calculations a batch follows until it's ready.</p>
+              {!editingProfileId && (
+                <div className="screen-head">
+                  <div>
+                    <p className="eyebrow">Recipes that remember</p>
+                    <h1>Profiles</h1>
+                    <p className="screen-intro">A fermentation profile carries the inputs, guidance, and calculations a batch follows until it's ready.</p>
+                  </div>
                 </div>
-              </div>
+              )}
               <Profiles
                 formulaTerms={shell.formulaTerms}
                 profiles={profileState.profiles}
-                trash={profileState.trash}
-                onDelete={(id) => saveProfiles(deleteProfile(profileState, id, Date.now()))}
-                onRestore={(id) => saveProfiles(restoreProfile(profileState, id, Date.now()))}
+                onDelete={(id) => saveProfiles(deleteProfile(profileState, id))}
                 onSave={handleProfile}
+                onEditingChange={setEditingProfileId}
               />
             </section>
           ) : shell.destination === "settings" ? (
@@ -280,11 +285,12 @@ export function App() {
                 browserShellStore.save(next);
                 setShell(next);
               }}
-              onImport={(profiles, importedBatches) => {
-                saveProfiles(profiles);
-                saveBatches(importedBatches);
-              }}
-            />
+               onImport={(profiles, importedBatches) => {
+                 saveProfiles(profiles);
+                 saveBatches(importedBatches);
+               }}
+               onRestoreBatch={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
+             />
             </section>
           ) : (
             <>
@@ -324,11 +330,13 @@ interface SettingsViewProps {
   onFormulaTermsChange(formulaTerms: string[]): void;
   onPreferencesChange(preferences: ShellPreferences): void;
   onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
+  onRestoreBatch(id: string): void;
 }
 
-function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport }: SettingsViewProps) {
+function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport, onRestoreBatch }: SettingsViewProps) {
   const [message, setMessage] = useState("");
   const [pendingImport, setPendingImport] = useState<ArchiveImport | null>(null);
+  const [showDeletedBatches, setShowDeletedBatches] = useState(false);
   const [terms, setTerms] = useState(formulaTerms);
   const [newTerm, setNewTerm] = useState("");
   const [termError, setTermError] = useState("");
@@ -445,6 +453,28 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
           <button className="setting-export" onClick={downloadJournal} type="button">Export journal</button>
         </div>
         <div className="setting-row">
+          <div className="setting-body"><b>Recently deleted batches</b><p>Batches remain recoverable for seven days.</p></div>
+          <button
+            aria-expanded={showDeletedBatches}
+            aria-label={showDeletedBatches ? "Close recently deleted batches" : "Open recently deleted batches"}
+            className="setting-trash-button"
+            onClick={() => setShowDeletedBatches(!showDeletedBatches)}
+            type="button"
+          >
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" /></svg>
+          </button>
+        </div>
+        {showDeletedBatches && (
+          <div className="deleted-batches-panel" aria-label="Recently deleted batches">
+            {batchState.trash.length === 0 ? <p>No recently deleted batches.</p> : batchState.trash.map((batch) => (
+              <div className="trash-item" key={batch.id}>
+                <span>{batch.name}</span>
+                <button aria-label={`Restore ${batch.name}`} onClick={() => onRestoreBatch(batch.id)} type="button">Restore</button>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="setting-row">
           <div className="setting-body"><b>About</b><p>FermentStation v1 concept · not production software.</p></div>
           <span className="settings-version">v1.0-concept</span>
         </div>
@@ -523,6 +553,7 @@ function CalendarView({ batches }: { batches: Batch[] }) {
     }),
   ];
   const upcoming = events.filter(({ date }) => date >= today).slice(0, 5);
+  const overdue = events.filter(({ date, kind }) => kind === "check" && date < today).slice(0, 5);
 
   function shiftMonth(offset: number) {
     setViewDate(new Date(year, month + offset, 1));
@@ -564,10 +595,11 @@ function CalendarView({ batches }: { batches: Batch[] }) {
           <span className="legend-fridge"><i />To fridge</span>
         </div>
       </div>
-      <div>
-        <div className="calendar-section-label"><h2>Upcoming checks</h2></div>
-        <div className="upcoming-list">
-          {upcoming.length === 0 ? <p className="calendar-empty">No finish dates or checks scheduled.</p> : upcoming.map((event) => {
+      <div className="calendar-lists">
+        <div>
+          <div className="calendar-section-label"><h2>Upcoming checks</h2></div>
+          <div className="upcoming-list">
+            {upcoming.length === 0 ? <p className="calendar-empty">No finish dates or checks scheduled.</p> : upcoming.map((event) => {
             const date = new Date(`${event.date}T12:00:00`);
             const isFinish = event.kind === "finish";
             return (
@@ -577,7 +609,23 @@ function CalendarView({ batches }: { batches: Batch[] }) {
                 <span className={`calendar-status ${isFinish ? "ready" : "attention"}`}><span className="status-dot" />{isFinish ? "ready" : "check"}</span>
               </article>
             );
-          })}
+            })}
+          </div>
+        </div>
+        <div>
+          <div className="calendar-section-label"><h2>Overdue</h2></div>
+          <div className="upcoming-list">
+            {overdue.length === 0 ? <p className="calendar-empty">No overdue checks.</p> : overdue.map((event) => {
+              const date = new Date(`${event.date}T12:00:00`);
+              return (
+                <article className="upcoming-item overdue-item" key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`}>
+                  <div className="upcoming-date"><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span></div>
+                  <div className="upcoming-body"><time className="calendar-event-date" dateTime={event.date}>{event.date}</time><b>{event.batchName} {event.label}</b><p>Profile check · overdue</p></div>
+                  <span className="calendar-status attention"><span className="status-dot" />overdue</span>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -588,19 +636,17 @@ interface BatchViewProps {
   batches: Batch[];
   mode: "today" | "batches";
   profiles: FermentationProfile[];
-  trash: TrashedBatch[];
   onChange(batch: Batch): void;
   onCreate(batch: Batch): void;
   onDelete(id: string): void;
   onNavigate(destination: Destination): void;
   onOpen(id: string | null): void;
-  onRestore(id: string): void;
   openBatchId: string | null;
 }
 
-type BatchListFilter = BatchFilter | "attention" | "archived";
+type BatchListFilter = BatchFilter | "attention";
 
-function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelete, onNavigate, onOpen, onRestore, openBatchId }: BatchViewProps) {
+function BatchView({ batches, mode, profiles, onChange, onCreate, onDelete, onNavigate, onOpen, openBatchId }: BatchViewProps) {
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<BatchListFilter>("all");
   const [profileId, setProfileId] = useState(profiles[0]?.id ?? "");
@@ -608,9 +654,11 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
   const selectedProfile = profiles.find(({ id }) => id === profileId) ?? profiles[0];
   const visible = mode === "today" ? prioritizeToday(batches, localDate()) : filter === "attention"
     ? batches.filter((batch) => batch.status === "active" && dueBatchChecks(batch, localDate()).length > 0)
-    : filter === "archived" ? trash : filterBatches(batches, filter);
+    : filterBatches(batches, filter);
   const openBatch = visible.find(({ id }) => id === openBatchId);
-  const dueChecks = visible.flatMap((batch) => dueBatchChecks(batch, localDate()).map((check) => ({ batch, check })));
+  const dueChecks = visible.flatMap((batch) => dueBatchChecks(batch, localDate()).map((check) => ({ batch, check })))
+    .sort((left, right) => left.check.nextDueDate.localeCompare(right.check.nextDueDate) ||
+      left.batch.name.localeCompare(right.batch.name) || left.check.name.localeCompare(right.check.name));
   const readyBatches = visible.filter(({ status }) => status === "ready");
   const today = localDate();
   const upcoming = calendarEvents(batches).filter(({ date }) => date >= today);
@@ -631,7 +679,7 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
     }
 
     const batch = createBatch(profile, {
-      id: crypto.randomUUID(),
+      id: createClientId(),
       name: String(data.get("name") ?? ""),
       startDate,
       today: localDate(),
@@ -654,7 +702,11 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
     <section className="batches" aria-label={mode === "today" ? "Today batch queue" : "Batch list"}>
       {openBatch ? (
         <>
-          <button autoFocus className="back-link" onClick={closeBatch} type="button">← Back to {mode}</button>
+          <div className="batch-breadcrumb">
+            <button autoFocus className="back-link" onClick={closeBatch} type="button">← Back to {mode}</button>
+            <span aria-hidden="true">/</span>
+            <span>{openBatch.id}</span>
+          </div>
           <BatchCard batch={openBatch} onChange={onChange} onDelete={onDelete} />
         </>
       ) : (
@@ -740,9 +792,9 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
 
       {mode === "batches" && (
         <div className="filter-row" role="group" aria-label="Filter batches by status">
-          {(["all", "attention", ...batchStatuses, "archived"] as BatchListFilter[]).map((status) => (
+          {(["all", "attention", ...batchStatuses] as BatchListFilter[]).map((status) => (
             <button aria-pressed={filter === status} key={status} onClick={() => setFilter(status)} type="button">
-              {status === "all" ? "All" : status === "attention" ? "Active · attention" : status === "archived" ? "Archived" : statusLabel(status)}
+              {status === "all" ? "All" : status === "attention" ? "Active · attention" : statusLabel(status)}
             </button>
           ))}
         </div>
@@ -762,7 +814,7 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
             </div>
           ) : null}
           <div className="batch-overview">
-            {visible.map((batch) => <CompactBatchCard archived={filter === "archived"} batch={batch} key={batch.id} mode={mode} onOpen={onOpen} />)}
+            {visible.map((batch) => <CompactBatchCard batch={batch} key={batch.id} mode={mode} onOpen={onOpen} />)}
           </div>
         </section>
       )}
@@ -788,36 +840,24 @@ function BatchView({ batches, mode, profiles, trash, onChange, onCreate, onDelet
       )}
       </>
       )}
-      {trash.length > 0 && (
-        <section className="trash" aria-label="Deleted batches">
-          <h3>Recently deleted batches</h3>
-          <p>Batches remain recoverable for seven days.</p>
-          {trash.map((batch) => (
-            <div className="trash-item" key={batch.id}>
-              <span>{batch.name}</span>
-              <button aria-label={`Restore ${batch.name}`} onClick={() => onRestore(batch.id)} type="button">Restore</button>
-            </div>
-          ))}
-        </section>
-      )}
     </section>
   );
 }
 
-function CompactBatchCard({ archived, batch, mode, onOpen }: { archived?: boolean; batch: Batch; mode: "today" | "batches"; onOpen(id: string): void }) {
+function CompactBatchCard({ batch, mode, onOpen }: { batch: Batch; mode: "today" | "batches"; onOpen(id: string): void }) {
   const nextCheck = batch.status === "active" ? [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0] : undefined;
   const latestPh = latestPhReading(batch);
   const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
-  const next = archived ? "" : nextCheck ? `${nextCheck.name} · ${nextCheck.nextDueDate}` : batch.finishDate ? `Finish · ${batch.finishDate}` : "Review timeline";
+  const next = nextCheck ? `${nextCheck.name} · ${nextCheck.nextDueDate}` : batch.finishDate ? `Finish · ${batch.finishDate}` : "Review timeline";
   const isAttention = batch.status === "active" && dueBatchChecks(batch, localDate()).length > 0;
-  const statusText = archived ? "Archived" : isAttention ? "Active · attention" : statusLabel(batch.status);
+  const statusText = isAttention ? "Active · attention" : statusLabel(batch.status);
   return (
     <button aria-label={`Open ${batch.name}`} className={mode === "batches" ? "batch-card" : "batch-summary"} onClick={() => onOpen(batch.id)} type="button">
-      <div className={mode === "batches" ? "bc-top" : "summary-heading"}><small className={mode === "batches" ? "bc-id" : undefined}>{batch.id.slice(0, 8)}</small><span className={`status status-${archived ? "archived" : isAttention ? "attention" : batch.status}`}><StatusIcon status={archived ? "archived" : isAttention ? "attention" : batch.status} />{statusText}</span></div>
+      <div className={mode === "batches" ? "bc-top" : "summary-heading"}><small className={mode === "batches" ? "bc-id" : undefined}>{batch.id.slice(0, 8)}</small><span className={`status status-${isAttention ? "attention" : batch.status}`}><StatusIcon status={isAttention ? "attention" : batch.status} />{statusText}</span></div>
       <h3>{batch.name}</h3>
       <p className={mode === "batches" ? "bc-name" : undefined}>{batch.profileSnapshot.name}</p>
       <div className={mode === "batches" ? "bc-metrics" : "summary-metrics"}><span>Day {day}</span>{latestPh && <span>pH {latestPh.value}</span>}</div>
-      {!archived && <p className={mode === "batches" ? "bc-next" : "summary-next"}><strong>Next:</strong> {next}</p>}
+      <p className={mode === "batches" ? "bc-next" : "summary-next"}><strong>Next:</strong> {next}</p>
     </button>
   );
 }
@@ -832,13 +872,18 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
   const [editing, setEditing] = useState<TimelineEntry | null>(null);
   const [editingPh, setEditingPh] = useState<Extract<TimelineEntry, { kind: "ph" }> | null>(null);
   const [editingPhoto, setEditingPhoto] = useState<Extract<TimelineEntry, { kind: "photo" }> | null>(null);
+  const [checkDrafts, setCheckDrafts] = useState<Record<string, string>>({});
+  const [checkError, setCheckError] = useState("");
+  const [addingCheck, setAddingCheck] = useState(false);
+  const [newCheckName, setNewCheckName] = useState("");
+  const [newCheckInterval, setNewCheckInterval] = useState("7");
 
   function saveEntry(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const kind = String(data.get("kind")) as "note" | "measurement" | "status";
     const common = {
-      id: editing?.id ?? crypto.randomUUID(),
+      id: editing?.id ?? createClientId(),
       date: String(data.get("date") ?? ""),
     };
     const entry: TimelineEntry = kind === "status"
@@ -852,7 +897,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
 
   function recordStatus(status: BatchStatus) {
     onChange(addTimelineEntry(batch, {
-      id: crypto.randomUUID(), date: localDate(), kind: "status", status,
+      id: createClientId(), date: localDate(), kind: "status", status,
     }));
   }
 
@@ -871,7 +916,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const entry = {
-      id: editingPh?.id ?? crypto.randomUUID(),
+      id: editingPh?.id ?? createClientId(),
       date: String(data.get("date") ?? ""),
       kind: "ph" as const,
       value: Number(data.get("value")),
@@ -897,7 +942,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
       dataUrl: await fileToDataUrl(file),
     } : editingPhoto!;
     const entry = {
-      id: editingPhoto?.id ?? crypto.randomUUID(),
+      id: editingPhoto?.id ?? createClientId(),
       date: String(data.get("date") ?? ""),
       kind: "photo" as const,
       name: replacement.name,
@@ -910,156 +955,244 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
     form.reset();
   }
 
+  function saveNewCheck(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    try {
+      onChange(addBatchCheck(batch, newCheckName, Number(newCheckInterval), localDate()));
+      setNewCheckName("");
+      setNewCheckInterval("7");
+      setAddingCheck(false);
+      setCheckError("");
+    } catch (error) {
+      setCheckError((error as Error).message);
+    }
+  }
+
+  function saveCheckName(checkId: string, currentName: string) {
+    try {
+      onChange(renameBatchCheck(batch, checkId, checkDrafts[checkId] ?? currentName));
+      setCheckDrafts(({ [checkId]: _removed, ...rest }) => rest);
+      setCheckError("");
+    } catch (error) {
+      setCheckError((error as Error).message);
+    }
+  }
+
   const latestPh = latestPhReading(batch);
   const phReadings = batch.timeline.filter((entry) => entry.kind === "ph");
+  const dueCheck = dueBatchChecks(batch, localDate())[0];
+  const nextCheck = [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0];
+  const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
+  const temperatureInput = batch.profileSnapshot.inputs.find((input) => /temp/i.test(input.name));
+  const temperature = temperatureInput ? batch.inputValues[temperatureInput.name] : undefined;
+  const phZone = latestPh ? batch.profileSnapshot.phZones.find((zone) => latestPh.value >= zone.min && latestPh.value <= zone.max) : undefined;
+  const phRange = batch.profileSnapshot.phZones.length > 0
+    ? `${Math.min(...batch.profileSnapshot.phZones.map(({ min }) => min))}–${Math.max(...batch.profileSnapshot.phZones.map(({ max }) => max))}`
+    : "No zone defined";
+  const phPosition = latestPh && phZone
+    ? Math.max(0, Math.min(100, ((latestPh.value - phZone.min) / Math.max(0.01, phZone.max - phZone.min)) * 100))
+    : 50;
+  const firstCalculation = batch.profileSnapshot.calculations[0];
+  const firstCalculationValue = firstCalculation ? batch.calculationValues[firstCalculation.name] : undefined;
+  const nextAction = dueCheck
+    ? {
+        kick: dueCheck.overdue ? `Profile check · overdue since ${dueCheck.nextDueDate}` : "Profile check · due today",
+        title: dueCheck.name,
+        body: "Record the current readings and note what you see in the vessel.",
+      }
+    : batch.status === "ready"
+      ? { kick: "Ready · review next step", title: "Bottle or choose the next status", body: "The finish window has been reached. Review the timeline before moving it on." }
+      : batch.status === "to-fridge"
+        ? { kick: "To fridge · in storage", title: "Taste and check in", body: "Keep the batch cold and add the next observation when you taste it." }
+        : { kick: "Batch in progress", title: nextCheck ? `Next ${nextCheck.name}` : "Keep the timeline current", body: nextCheck ? `Next check due ${nextCheck.nextDueDate}.` : "Record readings, notes, and status changes as the ferment develops." };
 
   return (
-    <article className="batch-card">
-      <div className="batch-heading">
+    <article className="batch-workspace">
+      <div className="batch-workspace-head">
         <div>
-          <span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span>
-          <h3>{batch.name}</h3>
-        </div>
-        <time dateTime={batch.startDate}>Started {batch.startDate}</time>
-      </div>
-      <p><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
-      {batch.profileSnapshot.guidance && <p>{batch.profileSnapshot.guidance}</p>}
-      {batch.finishDate && (
-        <label className="finish-date">
-          Finish date
-          <input onChange={(event) => onChange(setFinishDate(batch, event.target.value, localDate()))} type="date" value={batch.finishDate} />
-        </label>
-      )}
-      {batch.profileSnapshot.inputs.length > 0 && (
-        <form className="batch-values" onSubmit={saveInputs}>
-          {batch.profileSnapshot.inputs.map((input) => (
-            <label key={input.name}>
-              {input.name} ({input.unit})
-              <input defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" />
-            </label>
-          ))}
-          <button type="submit">Update inputs</button>
-        </form>
-      )}
-      {batch.profileSnapshot.calculations.map((calculation) => {
-        const value = batch.calculationValues[calculation.name];
-        return (
-          <form className="calculation" key={calculation.name} onSubmit={(event) => {
-            event.preventDefault();
-            const raw = String(new FormData(event.currentTarget).get("override") ?? "");
-            if (raw !== "") onChange(overrideBatchCalculation(batch, calculation.name, Number(raw)));
-          }}>
-            <span><strong>{calculation.name}:</strong> {value?.override ?? value?.suggested ?? "Incomplete"} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
-            <input aria-label={`Override ${calculation.name}`} min="0" name="override" step="any" type="number" />
-            <button type="submit">Override</button>
-          </form>
-        );
-      })}
-      {batch.checks.length > 0 && (
-        <section className="checks" aria-label={`${batch.name} checks`}>
-          <h4>Checks</h4>
-          {batch.checks.map((check) => {
-            const due = dueBatchChecks(batch, localDate()).find(({ id }) => id === check.id);
-            return (
-              <div className="check" key={check.id}>
-                <span><strong>{check.name}</strong> <span>{batch.status === "active" ? `${due?.overdue ? "Overdue" : due ? "Due" : "Next"} ${check.nextDueDate}` : "Paused"}</span></span>
-                <label>Every <input aria-label={`${check.name} interval days`} min="1" onChange={(event) => onChange(adjustBatchCheck(batch, check.id, Number(event.target.value)))} type="number" value={check.intervalDays} /> days</label>
-                <button disabled={batch.status !== "active"} onClick={() => onChange(completeBatchCheck(batch, check.id, localDate(), crypto.randomUUID()))} type="button">Complete {check.name}</button>
-              </div>
-            );
-          })}
-        </section>
-      )}
-      <section className="ph-log" aria-label={`${batch.name} pH log`}>
-        <h4>pH log</h4>
-        <p><strong>Latest:</strong> {latestPh ? `${latestPh.value} on ${latestPh.date}` : "No readings yet."}</p>
-        {phReadings.map((entry) => (
-          <div className="ph-reading" key={entry.id}>
-            <time dateTime={entry.date}>{entry.date}</time>
-            <span>pH {entry.value}</span>
-            {phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}
-            {phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}
-            <button aria-label={`Edit pH from ${entry.date}`} onClick={() => setEditingPh(entry)} type="button">Edit</button>
-            <button aria-label={`Delete pH from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
+          <p className="eyebrow">{batch.id} · {batch.profileSnapshot.name} · started {batch.startDate}</p>
+          <div className="batch-title-row">
+            <h3>{batch.name}</h3>
+            <span className={`status status-${batch.status}`}><StatusIcon status={batch.status} />{statusLabel(batch.status)}</span>
           </div>
-        ))}
-        <form className="ph-form" key={editingPh?.id ?? "new-ph"} onSubmit={savePh}>
-          <label>pH date <input defaultValue={editingPh?.date ?? localDate()} name="date" required type="date" /></label>
-          <label>pH value <input defaultValue={editingPh?.value} name="value" required step="0.01" type="number" /></label>
-          <button type="submit">{editingPh ? "Save pH" : "Add pH"}</button>
-          {editingPh && <button onClick={() => setEditingPh(null)} type="button">Cancel</button>}
-        </form>
-      </section>
-      <div className="form-actions" aria-label={`Change ${batch.name} status`}>
-        {batchStatuses.filter((status) => status !== batch.status).map((status) => (
-          <button key={status} onClick={() => recordStatus(status)} type="button">
-            {status === "active" ? "Return to active" : `Mark ${statusLabel(status).toLowerCase()}`}
-          </button>
-        ))}
-        <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
+          <p className="batch-lead">{nextAction.body}</p>
+        </div>
+        <button className="primary-action" onClick={() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" })} type="button">Record observation</button>
       </div>
 
-      <section className="timeline" aria-label={`${batch.name} timeline`}>
-        <h4>Timeline</h4>
-        {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
-        {batch.timeline.filter((entry) => entry.kind !== "ph").map((entry) => (
-          <div className="timeline-entry" key={entry.id}>
-            <time dateTime={entry.date}>{entry.date}</time>
-            <span className="timeline-content">
-              {timelineEntryText(entry)}
-              {entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}
-            </span>
-            {(entry.kind === "note" || entry.kind === "measurement" || entry.kind === "status") && <button aria-label={`Edit ${entry.kind} from ${entry.date}`} onClick={() => setEditing(entry)} type="button">Edit</button>}
-            {entry.kind === "photo" && <button aria-label={`Edit photo from ${entry.date}`} onClick={() => setEditingPhoto(entry)} type="button">Edit</button>}
-            <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
+      <div className="workbench">
+        <div className="wb-rail">
+          <section className="next-action" aria-labelledby="next-action-heading">
+            <div className="next-action-icon"><StatusIcon status={batch.status} /></div>
+            <div>
+              <p className="next-action-kick">{nextAction.kick}</p>
+              <h4 id="next-action-heading">{nextAction.title}</h4>
+              <p>{nextAction.body}</p>
+            </div>
+          </section>
+
+          <section className="wb-panel" aria-labelledby="measurements-heading">
+            <h4 id="measurements-heading">Key measurements <span>live batch data</span></h4>
+            <div className="meas-grid">
+              <div className="meas">
+                <div className="meas-label"><span>pH</span><span>zone {phRange}</span></div>
+                <strong className="meas-value">{latestPh?.value ?? "—"}<small>{latestPh ? ` · ${phZoneLabel(batch, latestPh.value) ?? "outside zone"}` : " · optional read"}</small></strong>
+                <div className="measurement-zone" aria-hidden="true"><span /><i className={!phZone ? "out" : undefined} style={{ left: `${phPosition}%` }} /></div>
+                <p className="meas-note">{latestPh ? `Latest read ${latestPh.date}` : "Add a pH reading in the log below."}</p>
+              </div>
+              <div className="meas">
+                <div className="meas-label"><span>Temperature</span></div>
+                <strong className="meas-value">{temperature ?? "—"}<small>{temperatureInput ? ` ${temperatureInput.unit}` : " not recorded"}</small></strong>
+                <p className="meas-note">{temperatureInput ? `Input · ${temperatureInput.name}` : "Add temperature to the profile inputs."}</p>
+              </div>
+              <div className="meas">
+                <div className="meas-label"><span>Days elapsed</span></div>
+                <strong className="meas-value">{day}</strong>
+                <p className="meas-note">{nextCheck ? `Check cadence · every ${nextCheck.intervalDays} days` : "No recurring check set"}</p>
+              </div>
+              <div className="meas">
+                <div className="meas-label"><span>Profile calculation</span></div>
+                <strong className="meas-value meas-value-small">{firstCalculationValue?.override ?? firstCalculationValue?.suggested ?? "—"}<small>{firstCalculation?.unit ?? "incomplete"}</small></strong>
+                <p className="meas-note">{firstCalculation ? firstCalculation.name : "No calculation defined"}</p>
+              </div>
+            </div>
+            <p className="hint">Suggested values recalculate from the profile snapshot. Overrides and input editing remain available below.</p>
+          </section>
+
+          <section className="wb-panel batch-guidance" aria-labelledby="guidance-heading">
+            <h4 id="guidance-heading">Profile guidance <span>{batch.profileSnapshot.name}</span></h4>
+            <p className="snapshot-line"><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
+            {batch.profileSnapshot.guidance && <div className="guide-step"><span>01</span><p><RichProfileText value={batch.profileSnapshot.guidance} /></p></div>}
+            {batch.profileSnapshot.instructions && <div className="guide-step"><span>02</span><p><RichProfileText value={batch.profileSnapshot.instructions} /></p></div>}
+            {batch.profileSnapshot.guidance === "" && batch.profileSnapshot.instructions === "" && <p className="muted-copy">No active guidance in this profile snapshot.</p>}
+          </section>
+
+          {batch.finishDate && (
+            <section className="wb-panel batch-details" aria-labelledby="finish-heading">
+              <h4 id="finish-heading">Batch details</h4>
+              <label className="finish-date">Finish date<input onChange={(event) => onChange(setFinishDate(batch, event.target.value, localDate()))} type="date" value={batch.finishDate} /></label>
+            </section>
+          )}
+
+          {batch.profileSnapshot.inputs.length > 0 && (
+            <section className="wb-panel" aria-labelledby="inputs-heading">
+              <h4 id="inputs-heading">Profile inputs <span>{batch.profileSnapshot.inputs.length}</span></h4>
+              <form className="batch-values" onSubmit={saveInputs}>
+                {batch.profileSnapshot.inputs.map((input) => (
+                  <label key={input.name}>{input.name} ({input.unit})<input defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" /></label>
+                ))}
+                <button className="secondary-action" type="submit">Update inputs</button>
+              </form>
+            </section>
+          )}
+
+          {batch.profileSnapshot.calculations.length > 0 && (
+            <section className="wb-panel" aria-labelledby="calculations-heading">
+              <h4 id="calculations-heading">Profile calculations <span>{batch.profileSnapshot.calculations.length}</span></h4>
+              {batch.profileSnapshot.calculations.map((calculation) => {
+                const value = batch.calculationValues[calculation.name];
+                return (
+                  <form className="calculation" key={calculation.name} onSubmit={(event) => {
+                    event.preventDefault();
+                    const raw = String(new FormData(event.currentTarget).get("override") ?? "");
+                    if (raw !== "") onChange(overrideBatchCalculation(batch, calculation.name, Number(raw)));
+                  }}>
+                    <span><strong>{calculation.name}:</strong> {value?.override ?? value?.suggested ?? "Incomplete"} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
+                    <input aria-label={`Override ${calculation.name}`} min="0" name="override" step="any" type="number" />
+                    <button className="secondary-action" type="submit">Override</button>
+                  </form>
+                );
+              })}
+            </section>
+          )}
+
+          <section className="wb-panel checks" aria-label={`${batch.name} checks`}>
+            <div className="checks-heading"><h4>Recurring checks</h4><button className="secondary-action" disabled={batch.status !== "active"} onClick={() => { setAddingCheck(true); setCheckError(""); }} type="button">Add check</button></div>
+            {checkError && <p className="notice" role="alert">{checkError}</p>}
+            {batch.checks.length === 0 && !addingCheck && <p className="muted-copy">No recurring checks yet.</p>}
+            {batch.checks.map((check) => {
+              const due = dueBatchChecks(batch, localDate()).find(({ id }) => id === check.id);
+              return (
+                <div className="check" key={check.id}>
+                  <label><span>Check name</span><input aria-label={`Check name ${check.id}`} onChange={(event) => setCheckDrafts({ ...checkDrafts, [check.id]: event.target.value })} value={checkDrafts[check.id] ?? check.name} /></label>
+                  <span className="check-schedule">{batch.status === "active" ? `${due?.overdue ? "Overdue" : due ? "Due" : "Next"} ${check.nextDueDate}` : "Paused"}</span>
+                  <label>Every <input aria-label={`${check.name} interval days`} disabled={batch.status !== "active"} min="1" onChange={(event) => onChange(adjustBatchCheck(batch, check.id, Number(event.target.value), localDate()))} type="number" value={check.intervalDays} /> days</label>
+                  <button onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button>
+                  <button disabled={batch.status !== "active"} onClick={() => onChange(completeBatchCheck(batch, check.id, localDate(), createClientId()))} type="button">Complete {check.name}</button>
+                  <button aria-label={`Remove ${check.name}`} onClick={() => onChange(removeBatchCheck(batch, check.id))} type="button">Remove</button>
+                </div>
+              );
+            })}
+            {addingCheck && <form className="check-form" onSubmit={saveNewCheck}>
+              <label>Check name<input autoFocus onChange={(event) => setNewCheckName(event.target.value)} placeholder="e.g. Taste and smell" required value={newCheckName} /></label>
+              <label>Every <input min="1" onChange={(event) => setNewCheckInterval(event.target.value)} required type="number" value={newCheckInterval} /> days</label>
+              <button className="secondary-action" type="submit">Add recurring check</button>
+              <button onClick={() => setAddingCheck(false)} type="button">Cancel</button>
+            </form>}
+          </section>
+        </div>
+
+        <div className="wb-main">
+          <section className="wb-panel" aria-label={`${batch.name} pH log`}>
+            <h4>pH log <span>{phReadings.length} readings</span></h4>
+            <div className="ph-log">
+              <p><strong>Latest:</strong> {latestPh ? `${latestPh.value} on ${latestPh.date}` : "No readings yet."}</p>
+              {phReadings.map((entry) => (
+                <div className="ph-reading" key={entry.id}>
+                  <time dateTime={entry.date}>{entry.date}</time><span>pH {entry.value}</span>
+                  {phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}
+                  {phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}
+                  <button aria-label={`Edit pH from ${entry.date}`} onClick={() => setEditingPh(entry)} type="button">Edit</button>
+                  <button aria-label={`Delete pH from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
+                </div>
+              ))}
+              <form className="ph-form" key={editingPh?.id ?? "new-ph"} onSubmit={savePh}>
+                <label>pH date <input defaultValue={editingPh?.date ?? localDate()} name="date" required type="date" /></label>
+                <label>pH value <input defaultValue={editingPh?.value} name="value" required step="0.01" type="number" /></label>
+                <button className="secondary-action" type="submit">{editingPh ? "Save pH" : "Add pH"}</button>
+                {editingPh && <button onClick={() => setEditingPh(null)} type="button">Cancel</button>}
+              </form>
+            </div>
+          </section>
+
+          <section className="wb-panel" aria-label={`${batch.name} timeline`}>
+            <div className="timeline-panel-heading"><h4>Timeline <span>{batch.timeline.length} entries</span></h4><p>Every observation stays attached to this batch.</p></div>
+            <section className="timeline">
+              {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
+              {batch.timeline.filter((entry) => entry.kind !== "ph").map((entry) => (
+                <div className={`timeline-entry timeline-${entry.kind}`} key={entry.id}>
+                  <span className="timeline-dot" aria-hidden="true" />
+                  <time dateTime={entry.date}>{entry.date}</time>
+                  <span className="timeline-content">{timelineEntryText(entry)}{entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}</span>
+                  {(entry.kind === "note" || entry.kind === "measurement" || entry.kind === "status") && <button aria-label={`Edit ${entry.kind} from ${entry.date}`} onClick={() => setEditing(entry)} type="button">Edit</button>}
+                  {entry.kind === "photo" && <button aria-label={`Edit photo from ${entry.date}`} onClick={() => setEditingPhoto(entry)} type="button">Edit</button>}
+                  <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
+                </div>
+              ))}
+              <form className="timeline-form" id="batch-activity-form" key={editing?.id ?? "new"} onSubmit={saveEntry}>
+                <label>Activity type<select defaultValue={editing?.kind ?? "note"} name="kind"><option value="note">Note</option><option value="measurement">Measurement</option><option value="status">Status change</option></select></label>
+                <label>Activity date<input defaultValue={editing?.date ?? localDate()} name="date" required type="date" /></label>
+                <label>Note or measurement<input defaultValue={editing && (editing.kind === "note" || editing.kind === "measurement") ? editing.text : ""} name="text" /></label>
+                <label>Activity status<select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>
+                <div className="form-actions"><button className="primary-action" type="submit">{editing ? "Save activity" : "Add activity"}</button>{editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}</div>
+              </form>
+              <form className="photo-form" key={editingPhoto?.id ?? "new-photo"} onSubmit={savePhoto}>
+                <label>Photo date <input defaultValue={editingPhoto?.date ?? localDate()} name="date" required type="date" /></label>
+                <label>Photo <input accept="image/*" capture="environment" name="photo" required={!editingPhoto} type="file" /></label>
+                <label>Caption <input defaultValue={editingPhoto?.caption} name="caption" /></label>
+                <button className="secondary-action" type="submit">{editingPhoto ? "Save photo" : "Attach photo"}</button>
+                {editingPhoto && <button onClick={() => setEditingPhoto(null)} type="button">Cancel</button>}
+              </form>
+              {batch.timelineTrash.length > 0 && <div className="timeline-trash"><strong>Recently deleted activity</strong>{batch.timelineTrash.map((entry) => <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">Restore {entry.kind} from {entry.date}</button>)}</div>}
+            </section>
+          </section>
+
+          <div className="form-actions batch-status-actions" aria-label={`Change ${batch.name} status`}>
+            {batchStatuses.filter((status) => status !== batch.status).map((status) => <button key={status} onClick={() => recordStatus(status)} type="button">{status === "active" ? "Return to active" : `Mark ${statusLabel(status).toLowerCase()}`}</button>)}
+            <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
           </div>
-        ))}
-        <form className="timeline-form" key={editing?.id ?? "new"} onSubmit={saveEntry}>
-          <label>
-            Activity type
-            <select defaultValue={editing?.kind ?? "note"} name="kind">
-              <option value="note">Note</option>
-              <option value="measurement">Measurement</option>
-              <option value="status">Status change</option>
-            </select>
-          </label>
-          <label>
-            Activity date
-            <input defaultValue={editing?.date ?? localDate()} name="date" required type="date" />
-          </label>
-          <label>
-            Note or measurement
-            <input defaultValue={editing && (editing.kind === "note" || editing.kind === "measurement") ? editing.text : ""} name="text" />
-          </label>
-          <label>
-            Activity status
-            <select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">
-              {batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}
-            </select>
-          </label>
-          <div className="form-actions">
-            <button className="primary-action" type="submit">{editing ? "Save activity" : "Add activity"}</button>
-            {editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}
-          </div>
-        </form>
-        <form className="photo-form" key={editingPhoto?.id ?? "new-photo"} onSubmit={savePhoto}>
-          <label>Photo date <input defaultValue={editingPhoto?.date ?? localDate()} name="date" required type="date" /></label>
-          <label>Photo <input accept="image/*" capture="environment" name="photo" required={!editingPhoto} type="file" /></label>
-          <label>Caption <input defaultValue={editingPhoto?.caption} name="caption" /></label>
-          <button type="submit">{editingPhoto ? "Save photo" : "Attach photo"}</button>
-          {editingPhoto && <button onClick={() => setEditingPhoto(null)} type="button">Cancel</button>}
-        </form>
-        {batch.timelineTrash.length > 0 && (
-          <div className="timeline-trash">
-            <strong>Recently deleted activity</strong>
-            {batch.timelineTrash.map((entry) => (
-              <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">
-                Restore {entry.kind} from {entry.date}
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
+        </div>
+      </div>
     </article>
   );
 }
@@ -1067,10 +1200,9 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
 interface ProfilesProps {
   formulaTerms: string[];
   profiles: FermentationProfile[];
-  trash: { id: string; name: string; deletedAt: number }[];
   onDelete(id: string): void;
-  onRestore(id: string): void;
   onSave(profile: FermentationProfile): void;
+  onEditingChange(id: string | null): void;
 }
 
 interface ProfilePresentation {
@@ -1081,6 +1213,12 @@ interface ProfilePresentation {
   guidance: string[];
   calculation: string;
   batches: string;
+}
+
+interface ProfileCheckRow {
+  id: string;
+  name: string;
+  intervalDays: number;
 }
 
 const profilePresentations: Record<string, ProfilePresentation> = {
@@ -1198,10 +1336,10 @@ const metricUnits: MetricUnit[] = ["g", "kg", "ml", "l"];
 function formulaRows(profile: FermentationProfile): FormulaRow[] {
   return profile.calculations.map((calculation) => {
     const parsed = parseSimpleFormula(calculation.formula);
-    if (!parsed) return { id: crypto.randomUUID(), kind: "legacy", calculation };
+    if (!parsed) return { id: createClientId(), kind: "legacy", calculation };
     const input = profile.inputs.find(({ name }) => name === parsed.source);
     return {
-      id: crypto.randomUUID(),
+      id: createClientId(),
       kind: "structured",
       source: parsed.source,
       sourceUnit: input?.unit ?? "g",
@@ -1215,12 +1353,22 @@ function formulaRows(profile: FermentationProfile): FormulaRow[] {
   });
 }
 
-function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }: ProfilesProps) {
+function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }: ProfilesProps) {
   const [editing, setEditing] = useState<FermentationProfile | null>(null);
   const [viewing, setViewing] = useState<FermentationProfile | null>(null);
   const [calculations, setCalculations] = useState<FormulaRow[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+  const [checkRows, setCheckRows] = useState<ProfileCheckRow[]>([]);
+  const [message, setMessage] = useState("");
   const inputsRef = useRef<HTMLTextAreaElement>(null);
+  const checkInputsRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const [focusCheckId, setFocusCheckId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!focusCheckId) return;
+    checkInputsRef.current[focusCheckId]?.focus();
+    setFocusCheckId(null);
+  }, [checkRows, focusCheckId]);
 
   function currentInputs() {
     return inputsRef.current ? parseInputs(inputsRef.current.value) : editing?.inputs ?? [];
@@ -1228,9 +1376,36 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
 
   function edit(profile: FermentationProfile) {
     setErrors([]);
+    setMessage("");
     setViewing(null);
     setEditing(profile);
     setCalculations(formulaRows(profile));
+    setCheckRows(profile.checks.map((check) => ({
+      id: check.id ?? createClientId(), name: check.name, intervalDays: check.intervalDays,
+    })));
+    onEditingChange(profile.id);
+  }
+
+  function closeEditor() {
+    setEditing(null);
+    setErrors([]);
+    setCheckRows([]);
+    setFocusCheckId(null);
+    onEditingChange(null);
+  }
+
+  function updateCheck(id: string, update: Partial<ProfileCheckRow>) {
+    setCheckRows(checkRows.map((check) => check.id === id ? { ...check, ...update } : check));
+  }
+
+  function addCheck() {
+    const id = createClientId();
+    setCheckRows([...checkRows, { id, name: "", intervalDays: 7 }]);
+    setFocusCheckId(id);
+  }
+
+  function removeCheck(index: number) {
+    setCheckRows(checkRows.filter((_, checkIndex) => checkIndex !== index));
   }
 
   function addFormula() {
@@ -1246,7 +1421,7 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
       ...terms,
     ])];
     setCalculations([...calculations, {
-      id: crypto.randomUUID(),
+      id: createClientId(),
       kind: "structured",
       source,
       sourceUnit,
@@ -1285,7 +1460,7 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
       }
     }
     const profile = {
-      id: editing?.id ?? crypto.randomUUID(),
+       id: editing?.id ?? createClientId(),
       name: String(data.get("name") ?? "").trim(),
       guidance: String(data.get("guidance") ?? "").trim(),
       instructions: String(data.get("instructions") ?? "").trim(),
@@ -1298,7 +1473,7 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
         unit: row.resultUnit,
         formula: `${row.source} ${row.operator} ${row.operand}${row.operandType === "percentage" ? "%" : ""}`,
       }),
-      checks: parseChecks(String(data.get("checks") ?? "")),
+       checks: checkRows,
       phZones: parsePhZones(String(data.get("phZones") ?? "")),
     };
 
@@ -1309,69 +1484,103 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
     }
 
     onSave(profile);
-    setEditing(null);
+    setMessage(`${profile.name} profile saved.`);
+    closeEditor();
   }
 
   return (
     <section className="profiles" aria-label="Fermentation profiles">
       <div className="profile-tools">
         <button className="profile-add" onClick={() => {
-          edit({ id: crypto.randomUUID(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [], phZones: [] });
+          edit({ id: createClientId(), name: "", guidance: "", instructions: "", inputs: [], calculations: [], checks: [], phZones: [] });
         }} type="button">
           Add profile
         </button>
       </div>
 
-      {editing && (
-        <form className="profile-form" key={editing.id} onSubmit={save}>
-          <label>Name <input autoFocus defaultValue={editing.name} name="name" required /></label>
-          <label>Guidance <textarea defaultValue={editing.guidance} name="guidance" /></label>
-          <label>Instructions <textarea defaultValue={editing.instructions} name="instructions" /></label>
-          <label>Expected duration (days) <input defaultValue={editing.expectedDurationDays} min="1" name="expectedDurationDays" type="number" /></label>
-          <label>Inputs <span className="optional">One per line: name, unit, default</span><textarea defaultValue={editing.inputs.map((input) => `${input.name}, ${input.unit}, ${input.defaultValue ?? ""}`).join("\n")} name="inputs" ref={inputsRef} /></label>
-          <fieldset className="formula-builder">
-            <legend>Calculations</legend>
-            {calculations.map((row, index) => row.kind === "legacy" ? (
-              <div className="legacy-formula" key={row.id}>
-                <p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p>
-                <p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p>
-                <button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button>
-              </div>
-            ) : (
-              <div className="formula-row" key={row.id}>
-                <label>Source term row {index + 1}<select onChange={(event) => {
-                  const source = event.target.value;
-                  const matchingSource = calculations.find((candidate): candidate is StructuredFormulaRow => candidate.kind === "structured" && candidate.source === source);
-                  updateFormula(row.id, {
-                    source,
-                    sourceUnit: matchingSource?.sourceUnit ?? currentInputs().find(({ name }) => name === source)?.unit ?? row.sourceUnit,
-                    sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false,
-                  });
-                }} value={row.source}>{availableSourceTerms(formulaTerms, calculations, currentInputs()).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select></label>
-                <label>Source unit row {index + 1}<select onChange={(event) => updateSourceUnit(row.source, event.target.value as MetricUnit)} value={row.sourceUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
-                <label>Operator row {index + 1}<select onChange={(event) => updateFormula(row.id, { operator: event.target.value as StructuredFormulaRow["operator"] })} value={row.operator}>
-                  <option value="+">+</option><option value="-">-</option><option value="*">×</option><option value="/">/</option>
-                </select></label>
-                <label>Operand row {index + 1}<input min="0" onChange={(event) => updateFormula(row.id, { operand: event.target.value })} required step="any" type="number" value={row.operand} /></label>
-                <label>Operand type row {index + 1}<select onChange={(event) => updateFormula(row.id, { operandType: event.target.value as StructuredFormulaRow["operandType"] })} value={row.operandType}><option value="number">Number</option><option value="percentage">Percentage</option></select></label>
-                <label>Result term row {index + 1}<select onChange={(event) => updateFormula(row.id, { result: event.target.value })} value={row.result}>{availableResultTerms(formulaTerms, editing, calculations).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select></label>
-                <label>Result unit row {index + 1}<select onChange={(event) => updateFormula(row.id, { resultUnit: event.target.value as MetricUnit })} value={row.resultUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
-                <button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button>
-              </div>
-            ))}
-            <button onClick={addFormula} type="button">Add formula</button>
-          </fieldset>
-          <label>Recurring checks <span className="optional">One per line: name, interval days</span><textarea defaultValue={editing.checks.map((check) => `${check.name}, ${check.intervalDays}`).join("\n")} name="checks" /></label>
-          <label>pH zones <span className="optional">One per line: danger|safe|optimal, min, max</span><textarea defaultValue={editing.phZones.map((zone) => `${zone.label}, ${zone.min}, ${zone.max}`).join("\n")} name="phZones" /></label>
-          {errors.length > 0 && <div className="notice" role="alert">{errors.join(" ")}</div>}
-          <div className="form-actions">
-            <button className="primary-action" type="submit">Save profile</button>
-            <button onClick={() => setEditing(null)} type="button">Cancel</button>
-          </div>
-        </form>
-      )}
+      {editing && (() => {
+        const presentation = presentationFor(editing);
+        const batches = presentation.batches.startsWith("None") ? "None" : presentation.batches;
+        const duration = editing.expectedDurationDays ? `${editing.expectedDurationDays} days` : "7-10 days";
+        return (
+          <div className="profile-editor-page">
+            <header className="profile-mobile-bar">
+              <span className="brand-mark" aria-hidden="true">F</span>
+              <strong>FermentStation</strong>
+              <button aria-label="Open menu" className="icon-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
+            </header>
+            <nav className="profile-editor-crumbs" aria-label="Breadcrumb"><button onClick={closeEditor} type="button">Profiles</button></nav>
+            <header className="profile-editor-head">
+              <div><p className="profile-editor-eyebrow">Fermentation profile</p><h1>{editing.name || "Profile name"}</h1></div>
+              <span className="profile-editor-status"><i />{batches === "None" ? "Used by 0 batches" : "Used by 2 batches"}</span>
+            </header>
 
-      <div className="profile-list">
+            <div className="profile-editor-grid">
+              <form className="profile-editor-form" key={editing.id} onSubmit={save}>
+                <section className="profile-editor-section">
+                  <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">01 / The profile</p><h2>Give it a clear name</h2><p className="profile-editor-intro">A profile is a reusable practice, not a recipe card. Keep its description grounded in what you will actually observe.</p></div></div>
+                  <div className="profile-editor-fields">
+                    <label className="profile-editor-field wide"><span>Name</span><input autoFocus defaultValue={editing.name} name="name" required /></label>
+                    <label className="profile-editor-field wide"><span>Guidance</span><textarea defaultValue={editing.guidance} name="guidance" /></label>
+                    <label className="profile-editor-field wide"><span>Instructions</span><textarea defaultValue={editing.instructions} name="instructions" /></label>
+                    <label className="profile-editor-field"><span>Expected duration</span><span className="profile-editor-suffix"><input defaultValue={editing.expectedDurationDays ?? ""} min="1" name="expectedDurationDays" type="number" /><i>days</i></span></label>
+                  </div>
+                  <div className="profile-editor-compatibility">
+                    <label>Inputs<textarea defaultValue={editing.inputs.map((input) => `${input.name}, ${input.unit}, ${input.defaultValue ?? ""}`).join("\n")} name="inputs" ref={inputsRef} /></label>
+                    <label>pH zones<textarea defaultValue={editing.phZones.map((zone) => `${zone.label}, ${zone.min}, ${zone.max}`).join("\n")} name="phZones" /></label>
+                  </div>
+                </section>
+
+                <section className="profile-editor-section">
+                  <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">02 / Recurring checks</p><h2>What should be noticed?</h2><p className="profile-editor-intro">A small number of checks is easier to sustain. These appear in the daily queue when due.</p></div><button className="profile-editor-text-button" onClick={addCheck} type="button">Add check</button></div>
+                  <div className="profile-editor-checks">
+                    {checkRows.length === 0 && <p className="profile-editor-check-empty">No recurring checks yet. Add one when this profile needs a repeating rhythm.</p>}
+                    {checkRows.map((check, index) => (
+                      <div className="profile-editor-check-row" key={check.id}>
+                        <label><span>Check</span><input aria-label={`Check name ${index + 1}`} onChange={(event) => updateCheck(check.id, { name: event.target.value })} placeholder="e.g. Taste and smell" ref={(input) => { checkInputsRef.current[check.id] = input; }} value={check.name} /></label>
+                        <label><span>Every</span><input aria-label={`Check interval ${index + 1}`} min="1" onChange={(event) => updateCheck(check.id, { intervalDays: Number(event.target.value) })} type="number" value={check.intervalDays || ""} /></label>
+                        <span className="profile-editor-check-unit">days</span>
+                        <button aria-label={`Remove ${check.name || "check"}`} className="profile-editor-icon-button" onClick={() => removeCheck(index)} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" /></svg></button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="profile-editor-section">
+                  <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">03 / Calculations</p><h2>Formulas</h2></div></div>
+                  <fieldset className="profile-editor-formula"><legend className="sr-only">Formulas</legend>
+                    {calculations.map((row, index) => row.kind === "legacy" ? (
+                      <div className="legacy-formula" key={row.id}><p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p><p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p><button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button></div>
+                    ) : (
+                      <div className="profile-editor-formula-row" key={row.id}>
+                        <label>Source term row {index + 1}<select onChange={(event) => { const source = event.target.value; const matchingSource = calculations.find((candidate): candidate is StructuredFormulaRow => candidate.kind === "structured" && candidate.source === source); updateFormula(row.id, { source, sourceUnit: matchingSource?.sourceUnit ?? currentInputs().find(({ name }) => name === source)?.unit ?? row.sourceUnit, sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false }); }} value={row.source}>{availableSourceTerms(formulaTerms, calculations, currentInputs()).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select></label>
+                        <label>Source unit row {index + 1}<select onChange={(event) => updateSourceUnit(row.source, event.target.value as MetricUnit)} value={row.sourceUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
+                        <label>Operator row {index + 1}<select onChange={(event) => updateFormula(row.id, { operator: event.target.value as StructuredFormulaRow["operator"] })} value={row.operator}><option value="+">+</option><option value="-">-</option><option value="*">×</option><option value="/">/</option></select></label>
+                        <label>Operand row {index + 1}<input min="0" onChange={(event) => updateFormula(row.id, { operand: event.target.value })} required step="any" type="number" value={row.operand} /></label>
+                        <label>Operand type row {index + 1}<select onChange={(event) => updateFormula(row.id, { operandType: event.target.value as StructuredFormulaRow["operandType"] })} value={row.operandType}><option value="number">Number</option><option value="percentage">Percentage</option></select></label>
+                        <label>Result term row {index + 1}<select onChange={(event) => updateFormula(row.id, { result: event.target.value })} value={row.result}>{availableResultTerms(formulaTerms, editing, calculations).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select></label>
+                        <label>Result unit row {index + 1}<select onChange={(event) => updateFormula(row.id, { resultUnit: event.target.value as MetricUnit })} value={row.resultUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
+                        <button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button>
+                      </div>
+                    ))}
+                    <button className="profile-editor-add-formula" onClick={addFormula} type="button">Add formula</button>
+                  </fieldset>
+                </section>
+
+                {errors.length > 0 && <div className="notice" role="alert">{errors.join(" ")}</div>}
+                <div className="profile-editor-actions"><button aria-label="Cancel" className="profile-editor-text-button" onClick={closeEditor} type="button">Cancel changes</button><div><button className="profile-editor-button" onClick={() => setMessage("Preview reflects the current profile settings.")} type="button">Preview</button><button className="profile-editor-button primary" type="submit">Save profile <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 12h14M13 6l6 6-6 6" /></svg></button></div></div>
+              </form>
+
+              <aside className="profile-editor-aside" aria-label="Profile context">
+                <article className="profile-editor-card"><p className="profile-editor-eyebrow">At a glance</p><h3>{editing.name || "Profile name"}</h3><p>{presentation.description}</p><div className="profile-editor-meta"><div><span>Active batches</span><strong>{batches}</strong></div><div><span>Expected duration</span><strong>{duration}</strong></div><div><span>Next check</span><strong>{checkRows[0]?.name ? "Today" : "Not scheduled"}</strong></div></div></article>
+                <article className="profile-editor-card profile-editor-note"><h3>Practical note</h3><p>Brine is the first thing to check. If leaves rise above the surface, record it and top up with 2% salt water.</p></article>
+              </aside>
+            </div>
+          </div>
+        );
+      })()}
+
+      {!editing && <div className="profile-list">
         {profiles.map((profile) => {
           const presentation = presentationFor(profile);
           const calculation = presentation.calculation.replace(/<[^>]+>/g, "");
@@ -1401,7 +1610,9 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
             </article>
           );
         })}
-      </div>
+      </div>}
+
+      {message && <div className="profile-editor-toast" role="status">{message}</div>}
 
       {viewing && (() => {
         const presentation = presentationFor(viewing);
@@ -1428,18 +1639,6 @@ function Profiles({ formulaTerms, profiles, trash, onDelete, onRestore, onSave }
         );
       })()}
 
-      {trash.length > 0 && (
-        <section className="trash" aria-label="Deleted profiles">
-          <h3>Recently deleted</h3>
-          <p>Profiles remain recoverable for seven days.</p>
-          {trash.map((profile) => (
-            <div className="trash-item" key={profile.id}>
-              <span>{profile.name}</span>
-              <button aria-label={`Restore ${profile.name}`} onClick={() => onRestore(profile.id)} type="button">Restore</button>
-            </div>
-          ))}
-        </section>
-      )}
     </section>
   );
 }
@@ -1477,13 +1676,6 @@ function parseInputs(value: string): FermentationProfile["inputs"] {
       unit: unit as FermentationProfile["inputs"][number]["unit"],
       defaultValue: defaultValue === "" ? undefined : Number(defaultValue),
     };
-  });
-}
-
-function parseChecks(value: string): FermentationProfile["checks"] {
-  return value.split("\n").filter((line) => line.trim()).map((line) => {
-    const [name = "", intervalDays = ""] = line.split(",").map((part) => part.trim());
-    return { name, intervalDays: Number(intervalDays) };
   });
 }
 

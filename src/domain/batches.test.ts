@@ -3,6 +3,7 @@ import { createProfileState, validateProfile } from "./profiles";
 import {
   addTimelineEntry,
   addPhReading,
+  addBatchCheck,
   adjustBatchCheck,
   calendarEvents,
   changeBatchStatus,
@@ -15,6 +16,8 @@ import {
   dueBatchChecks,
   filterBatches,
   latestPhReading,
+  removeBatchCheck,
+  renameBatchCheck,
   prioritizeToday,
   phWarning,
   phZoneLabel,
@@ -202,8 +205,9 @@ describe("batches", () => {
       { ...profile(), checks: [{ name: "Taste", intervalDays: 2 }] },
       { id: "batch-1", startDate: "2026-08-01" },
     );
-    const adjusted = adjustBatchCheck(batch, "Taste", 3);
-    const completed = completeBatchCheck(adjusted, "Taste", "2026-08-06", "entry-1");
+    const checkId = batch.checks[0].id;
+    const adjusted = adjustBatchCheck(batch, checkId, 3, "2026-08-01");
+    const completed = completeBatchCheck(adjusted, checkId, "2026-08-06", "entry-1");
 
     expect(batch.checks[0].nextDueDate).toBe("2026-08-03");
     expect(adjusted.checks[0].nextDueDate).toBe("2026-08-04");
@@ -214,6 +218,31 @@ describe("batches", () => {
     expect(completed.timeline[0]).toMatchObject({ kind: "check", checkName: "Taste" });
   });
 
+  it("keeps check identity separate from names and supports batch-local checks", () => {
+    const batch = createBatch(
+      { ...profile(), checks: [{ name: "Taste", intervalDays: 2 }] },
+      { id: "batch-1", startDate: "2026-08-01" },
+    );
+    const copied = batch.checks[0];
+    const withLocal = addBatchCheck(batch, "  Burp  ", 3, "2026-08-10");
+    const local = withLocal.checks[1];
+
+    expect(copied.id).not.toBe(copied.name);
+    expect(local).toMatchObject({ name: "Burp", nextDueDate: "2026-08-13" });
+    expect(() => addBatchCheck(withLocal, "burp", 2, "2026-08-10"))
+      .toThrow("present and unique");
+
+    const renamed = renameBatchCheck(withLocal, local.id, "Gas release");
+    expect(renamed.checks[1].name).toBe("Gas release");
+    const completed = completeBatchCheck(renamed, local.id, "2026-08-11", "entry-1");
+    const adjusted = adjustBatchCheck(completed, local.id, 5, "2026-08-20");
+    expect(adjusted.checks[1].nextDueDate).toBe("2026-08-16");
+
+    const removed = removeBatchCheck(adjusted, local.id);
+    expect(removed.checks).toHaveLength(1);
+    expect(removed.timeline[0]).toMatchObject({ kind: "check", checkName: "Gas release" });
+  });
+
   it("pauses checks outside active and emits sorted calendar work", () => {
     const batch = createBatch(
       { ...profile(), expectedDurationDays: 7, checks: [{ name: "Burp", intervalDays: 2 }] },
@@ -222,6 +251,7 @@ describe("batches", () => {
     const ready = changeBatchStatus(batch, "ready");
 
     expect(dueBatchChecks(ready, "2026-08-10")).toEqual([]);
+    expect(() => addBatchCheck(ready, "Burp", 2, "2026-08-10")).toThrow("Checks are paused");
     expect(() => completeBatchCheck(ready, "Burp", "2026-08-10", "entry-1"))
       .toThrow("Checks are paused");
     expect(calendarEvents([batch])).toEqual([
