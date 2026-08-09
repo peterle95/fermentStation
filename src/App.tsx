@@ -1030,7 +1030,10 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
           </div>
           <p className="batch-lead">{nextAction.body}</p>
         </div>
-        <button className="primary-action" onClick={() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" })} type="button">Record observation</button>
+        <div className="batch-head-actions">
+          <button className="primary-action" onClick={() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" })} type="button">Record observation</button>
+          <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
+        </div>
       </div>
 
       <div className="workbench">
@@ -1079,6 +1082,60 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
             {batch.profileSnapshot.guidance.length === 0 && <p className="muted-copy">No active guidance in this profile snapshot.</p>}
           </section>
 
+        </div>
+
+        <div className="wb-main">
+          <section className="wb-panel" aria-label={`${batch.name} pH log`}>
+            <h4>pH log <span>{phReadings.length} readings</span></h4>
+           <div className="ph-log">
+              <p><strong>Latest:</strong> {latestPh ? `${latestPh.value} on ${latestPh.date}` : "No readings yet."}{latestPh && phWarning(latestPh.value) && <span className="warning"> · {phWarning(latestPh.value)}</span>}</p>
+              <p className="muted-copy">Readings and profile zones appear in the timeline below.</p>
+            </div>
+          </section>
+
+          <section className="wb-panel activity-logger" aria-labelledby="activity-logger-heading">
+            <div className="timeline-panel-heading"><h4 id="activity-logger-heading">Log activity <span>{editing ? "Editing entry" : "New entry"}</span></h4><p>Record one dated observation on this batch.</p></div>
+            <form className="timeline-form" id="batch-activity-form" key={editing?.id ?? "new"} onSubmit={saveEntry}>
+              <label>Activity type<select disabled={!!editing} name="kind" onChange={(event) => { const nextKind = event.target.value as LoggerKind; setLoggerKind(nextKind); setSelectedCheckId(nextKind === "check" ? preferredCheckId : ""); }} value={loggerKind}>
+                <option value="note">Note</option>
+                <option value="measurement">Measurement</option>
+                <option value="ph">pH reading</option>
+                <option value="temperature">Temperature</option>
+                <option value="status">Status change</option>
+                <option disabled={batch.status !== "active"} value="check">Check completion</option>
+                <option value="photo">Photo</option>
+              </select></label>
+              <label>Activity date<input defaultValue={editing?.date ?? localDate()} name="date" required type="date" /></label>
+              {(loggerKind === "note" || loggerKind === "measurement") && <label>Note or measurement<input defaultValue={editing && (editing.kind === "note" || editing.kind === "measurement") ? editing.text : ""} name="text" /></label>}
+              {loggerKind === "ph" && <label>pH value<input defaultValue={editing?.kind === "ph" ? editing.value : undefined} name="value" required step="0.01" type="number" /></label>}
+              {loggerKind === "temperature" && <label>Temperature ({units === "imperial" ? "°F" : "°C"})<input defaultValue={editing?.kind === "temperature" ? displayTemperature(editing.value, units) : undefined} name="value" required step="any" type="number" /></label>}
+              {loggerKind === "status" && <label>Activity status<select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>}
+              {loggerKind === "check" && <label>Batch check<select disabled={batch.status !== "active" || batch.checks.length === 0} name="checkId" onChange={(event) => setSelectedCheckId(event.target.value)} value={selectedCheckId || preferredCheckId}>{batch.checks.map((check) => <option key={check.id} value={check.id}>{check.name}</option>)}</select></label>}
+              {loggerKind === "photo" && <><label>Photo<input accept="image/*" capture="environment" name="photo" required={!editing} type="file" /></label><label>Caption<input defaultValue={editing?.kind === "photo" ? editing.caption : ""} name="caption" /></label></>}
+              <div className="form-actions"><button className="primary-action" type="submit">{editing ? "Save activity" : "Log activity"}</button>{editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}</div>
+            </form>
+          </section>
+
+          <section className="wb-panel" aria-label={`${batch.name} timeline`}>
+            <div className="timeline-panel-heading"><h4>Timeline <span>{batch.timeline.length} entries</span></h4><p>Every observation stays attached to this batch.</p></div>
+            <section className="timeline">
+              {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
+              {batch.timeline.map((entry) => (
+                <div className={`timeline-entry timeline-${entry.kind}`} key={entry.id}>
+                  <span className="timeline-dot" aria-hidden="true" />
+                  <time dateTime={entry.date}>{entry.date}</time>
+                  <span className="timeline-content">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}</span>
+                  {entry.kind !== "check" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} onClick={() => editEntry(entry)} type="button">Edit</button>}
+                  <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
+                </div>
+              ))}
+              {batch.timelineTrash.length > 0 && <div className="timeline-trash"><strong>Recently deleted activity</strong>{batch.timelineTrash.map((entry) => <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">Restore {entry.kind} from {entry.date}</button>)}</div>}
+            </section>
+          </section>
+
+        </div>
+
+        <div className="wb-support">
           {batch.finishDate && (
             <section className="wb-panel batch-details" aria-labelledby="finish-heading">
               <h4 id="finish-heading">Batch details</h4>
@@ -1141,60 +1198,6 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
               <button onClick={() => setAddingCheck(false)} type="button">Cancel</button>
             </form>}
           </section>
-        </div>
-
-        <div className="wb-main">
-          <section className="wb-panel" aria-label={`${batch.name} pH log`}>
-            <h4>pH log <span>{phReadings.length} readings</span></h4>
-           <div className="ph-log">
-              <p><strong>Latest:</strong> {latestPh ? `${latestPh.value} on ${latestPh.date}` : "No readings yet."}{latestPh && phWarning(latestPh.value) && <span className="warning"> · {phWarning(latestPh.value)}</span>}</p>
-              <p className="muted-copy">Readings and profile zones appear in the timeline below.</p>
-            </div>
-          </section>
-
-          <section className="wb-panel activity-logger" aria-labelledby="activity-logger-heading">
-            <div className="timeline-panel-heading"><h4 id="activity-logger-heading">Log activity <span>{editing ? "Editing entry" : "New entry"}</span></h4><p>Record one dated observation on this batch.</p></div>
-            <form className="timeline-form" id="batch-activity-form" key={editing?.id ?? "new"} onSubmit={saveEntry}>
-              <label>Activity type<select disabled={!!editing} name="kind" onChange={(event) => { const nextKind = event.target.value as LoggerKind; setLoggerKind(nextKind); setSelectedCheckId(nextKind === "check" ? preferredCheckId : ""); }} value={loggerKind}>
-                <option value="note">Note</option>
-                <option value="measurement">Measurement</option>
-                <option value="ph">pH reading</option>
-                <option value="temperature">Temperature</option>
-                <option value="status">Status change</option>
-                <option disabled={batch.status !== "active"} value="check">Check completion</option>
-                <option value="photo">Photo</option>
-              </select></label>
-              <label>Activity date<input defaultValue={editing?.date ?? localDate()} name="date" required type="date" /></label>
-              {(loggerKind === "note" || loggerKind === "measurement") && <label>Note or measurement<input defaultValue={editing && (editing.kind === "note" || editing.kind === "measurement") ? editing.text : ""} name="text" /></label>}
-              {loggerKind === "ph" && <label>pH value<input defaultValue={editing?.kind === "ph" ? editing.value : undefined} name="value" required step="0.01" type="number" /></label>}
-              {loggerKind === "temperature" && <label>Temperature ({units === "imperial" ? "°F" : "°C"})<input defaultValue={editing?.kind === "temperature" ? displayTemperature(editing.value, units) : undefined} name="value" required step="any" type="number" /></label>}
-              {loggerKind === "status" && <label>Activity status<select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>}
-              {loggerKind === "check" && <label>Batch check<select disabled={batch.status !== "active" || batch.checks.length === 0} name="checkId" onChange={(event) => setSelectedCheckId(event.target.value)} value={selectedCheckId || preferredCheckId}>{batch.checks.map((check) => <option key={check.id} value={check.id}>{check.name}</option>)}</select></label>}
-              {loggerKind === "photo" && <><label>Photo<input accept="image/*" capture="environment" name="photo" required={!editing} type="file" /></label><label>Caption<input defaultValue={editing?.kind === "photo" ? editing.caption : ""} name="caption" /></label></>}
-              <div className="form-actions"><button className="primary-action" type="submit">{editing ? "Save activity" : "Log activity"}</button>{editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}</div>
-            </form>
-          </section>
-
-          <section className="wb-panel" aria-label={`${batch.name} timeline`}>
-            <div className="timeline-panel-heading"><h4>Timeline <span>{batch.timeline.length} entries</span></h4><p>Every observation stays attached to this batch.</p></div>
-            <section className="timeline">
-              {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
-              {batch.timeline.map((entry) => (
-                <div className={`timeline-entry timeline-${entry.kind}`} key={entry.id}>
-                  <span className="timeline-dot" aria-hidden="true" />
-                  <time dateTime={entry.date}>{entry.date}</time>
-                  <span className="timeline-content">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}</span>
-                  {entry.kind !== "check" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} onClick={() => editEntry(entry)} type="button">Edit</button>}
-                  <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
-                </div>
-              ))}
-              {batch.timelineTrash.length > 0 && <div className="timeline-trash"><strong>Recently deleted activity</strong>{batch.timelineTrash.map((entry) => <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">Restore {entry.kind} from {entry.date}</button>)}</div>}
-            </section>
-          </section>
-
-          <div className="form-actions batch-status-actions" aria-label={`Change ${batch.name} status`}>
-            <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
-          </div>
         </div>
       </div>
     </article>

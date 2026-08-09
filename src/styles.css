@@ -2512,6 +2512,23 @@ button:disabled {
   justify-content: space-between;
 }
 
+.batch-head-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.batch-head-actions > button:not(.primary-action) {
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 0.6rem;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+}
+
 .batch-workspace-head .eyebrow {
   margin-bottom: 0.35rem;
 }
@@ -2563,6 +2580,14 @@ button:disabled {
   display: grid;
   gap: 1.125rem;
   grid-template-columns: minmax(18rem, 20rem) minmax(0, 1fr);
+}
+
+.wb-support {
+  display: grid;
+  gap: 1rem;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-width: 0;
 }
 
 .wb-rail,
@@ -2938,18 +2963,16 @@ button:disabled {
 
 .batch-workspace .timeline-trash { margin-top: 0.75rem; }
 
-.batch-status-actions {
-  border-top: 1px solid var(--border);
-  padding-top: 0.75rem;
-}
-
 @media (max-width: 899px) {
   .workbench { grid-template-columns: 1fr; }
   .batch-workspace-head { align-items: flex-start; }
-  .batch-workspace-head > .primary-action { width: 100%; }
+  .batch-head-actions { width: 100%; }
+  .batch-head-actions .primary-action { flex: 1; }
+  .wb-support { grid-column: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 600px) {
+  .wb-support { grid-template-columns: 1fr; }
   .batch-workspace .timeline-entry { grid-template-columns: 0.75rem 1fr auto auto; }
   .batch-workspace .timeline-entry time { grid-column: 2 / -1; grid-row: 1; }
   .batch-workspace .timeline-entry .timeline-dot { grid-row: 1 / span 3; }
