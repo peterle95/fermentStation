@@ -18,8 +18,8 @@ import {
   removeBatchCheck,
   renameBatchCheck,
   prioritizeToday,
-  phWarning,
   phZoneLabel,
+  phWarning,
   restoreBatch,
   restoreTimelineEntry,
   overrideBatchCalculation,
@@ -180,12 +180,14 @@ export function App() {
         <main className="main-content">
           {shell.destination === "today" ? (
             <section className="today-screen">
-              <div className="screen-head">
-                <div>
-                  <p className="eyebrow">{formatToday()}</p>
-                  <h1>Today</h1>
+              {!openBatchId && (
+                <div className="screen-head">
+                  <div>
+                    <p className="eyebrow">{formatToday()}</p>
+                    <h1>Today</h1>
+                  </div>
                 </div>
-              </div>
+              )}
               <BatchView
                 batches={batchState.batches}
                 mode="today"
@@ -201,6 +203,7 @@ export function App() {
                 })}
                 onDelete={(id) => saveBatches(deleteBatch(batchState, id, Date.now()))}
                 profiles={profileState.profiles}
+                units={shell.units}
               />
             </section>
           ) : shell.destination === "batches" ? (
@@ -225,9 +228,10 @@ export function App() {
               onCreate={(batch) => saveBatches({
                 ...batchState, batches: [...batchState.batches, batch],
               })}
-              onDelete={(id) => saveBatches(deleteBatch(batchState, id, Date.now()))}
-               profiles={profileState.profiles}
-             />
+               onDelete={(id) => saveBatches(deleteBatch(batchState, id, Date.now()))}
+                profiles={profileState.profiles}
+                units={shell.units}
+              />
             </section>
           ) : shell.destination === "calendar" ? (
             <section className="calendar-screen" aria-label="Fermentation calendar">
@@ -634,6 +638,7 @@ interface BatchViewProps {
   batches: Batch[];
   mode: "today" | "batches";
   profiles: FermentationProfile[];
+  units: ShellPreferences["units"];
   onChange(batch: Batch): void;
   onCreate(batch: Batch): void;
   onDelete(id: string): void;
@@ -644,7 +649,7 @@ interface BatchViewProps {
 
 type BatchListFilter = BatchFilter | "attention";
 
-function BatchView({ batches, mode, profiles, onChange, onCreate, onDelete, onNavigate, onOpen, openBatchId }: BatchViewProps) {
+function BatchView({ batches, mode, profiles, units, onChange, onCreate, onDelete, onNavigate, onOpen, openBatchId }: BatchViewProps) {
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<BatchListFilter>("all");
   const [profileId, setProfileId] = useState(profiles[0]?.id ?? "");
@@ -703,7 +708,7 @@ function BatchView({ batches, mode, profiles, onChange, onCreate, onDelete, onNa
           <div className="batch-breadcrumb">
             <button autoFocus className="back-link" onClick={closeBatch} type="button">← Back to {mode}</button>
           </div>
-          <BatchCard batch={openBatch} onChange={onChange} onDelete={onDelete} />
+          <BatchCard batch={openBatch} onChange={onChange} onDelete={onDelete} units={units} />
         </>
       ) : (
       <>
@@ -862,39 +867,87 @@ interface BatchCardProps {
   batch: Batch;
   onChange(batch: Batch): void;
   onDelete(id: string): void;
+  units: ShellPreferences["units"];
 }
 
-function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
+type LoggerKind = "note" | "measurement" | "ph" | "temperature" | "status" | "photo" | "check";
+
+function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   const [editing, setEditing] = useState<TimelineEntry | null>(null);
-  const [editingPh, setEditingPh] = useState<Extract<TimelineEntry, { kind: "ph" }> | null>(null);
-  const [editingPhoto, setEditingPhoto] = useState<Extract<TimelineEntry, { kind: "photo" }> | null>(null);
+  const [loggerKind, setLoggerKind] = useState<LoggerKind>("note");
+  const [selectedCheckId, setSelectedCheckId] = useState("");
   const [checkDrafts, setCheckDrafts] = useState<Record<string, string>>({});
   const [checkError, setCheckError] = useState("");
   const [addingCheck, setAddingCheck] = useState(false);
   const [newCheckName, setNewCheckName] = useState("");
   const [newCheckInterval, setNewCheckInterval] = useState("7");
 
-  function saveEntry(event: React.FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (!editing) return;
+    requestAnimationFrame(() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" }));
+  }, [editing]);
+
+  async function saveEntry(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const kind = String(data.get("kind")) as "note" | "measurement" | "status";
+    const kind = editing?.kind ?? String(data.get("kind")) as LoggerKind;
     const common = {
       id: editing?.id ?? createClientId(),
       date: String(data.get("date") ?? ""),
     };
-    const entry: TimelineEntry = kind === "status"
-      ? { ...common, kind, status: String(data.get("status")) as BatchStatus }
-      : { ...common, kind, text: String(data.get("text") ?? "").trim() };
-    if (!entry.date || ("text" in entry && !entry.text)) return;
-    onChange(editing ? updateTimelineEntry(batch, entry, localDate()) : addTimelineEntry(batch, entry));
+    let entry: TimelineEntry;
+    if (kind === "status") {
+      entry = { ...common, kind, status: String(data.get("status")) as BatchStatus };
+    } else if (kind === "ph") {
+      entry = { ...common, kind, value: Number(data.get("value")) };
+    } else if (kind === "temperature") {
+      const value = Number(data.get("value"));
+      entry = { ...common, kind, value: units === "imperial" ? (value - 32) * 5 / 9 : value };
+    } else if (kind === "photo") {
+      const form = event.currentTarget;
+      const file = (form.elements.namedItem("photo") as HTMLInputElement).files?.[0];
+      const current = editing?.kind === "photo" ? editing : undefined;
+      if ((!file || file.size === 0) && !current) return;
+      if (file && file.size > 0 && !file.type.startsWith("image/")) return;
+      const photo: TimelineEntry = {
+        ...common,
+        kind,
+        name: file && file.size > 0 ? file.name : current!.name,
+        mimeType: file && file.size > 0 ? file.type : current!.mimeType,
+        dataUrl: file && file.size > 0 ? await fileToDataUrl(file) : current!.dataUrl,
+        caption: String(data.get("caption") ?? "").trim(),
+      };
+      onChange(editing ? updateTimelineEntry(batch, photo) : addTimelineEntry(batch, photo));
+      setEditing(null);
+      setLoggerKind("note");
+      form.reset();
+      return;
+    } else if (kind === "check") {
+      if (batch.status !== "active") return;
+      const checkId = String(data.get("checkId") ?? "");
+      if (!checkId) return;
+      onChange(completeBatchCheck(batch, checkId, common.date, common.id));
+      setEditing(null);
+      setLoggerKind("note");
+      event.currentTarget.reset();
+      return;
+    } else {
+      entry = { ...common, kind, text: String(data.get("text") ?? "").trim() };
+    }
+    if (!entry.date || ("value" in entry && !Number.isFinite(entry.value)) || ("text" in entry && !entry.text)) return;
+    if (kind === "ph") {
+      const phEntry = entry as Extract<TimelineEntry, { kind: "ph" }>;
+      onChange(editing ? updatePhReading(batch, phEntry) : addPhReading(batch, phEntry));
+      setEditing(null);
+      setLoggerKind("note");
+      event.currentTarget.reset();
+      return;
+    }
+    const next = editing ? updateTimelineEntry(batch, entry, localDate()) : addTimelineEntry(batch, entry);
+    onChange(next);
     setEditing(null);
+    setLoggerKind("note");
     event.currentTarget.reset();
-  }
-
-  function recordStatus(status: BatchStatus) {
-    onChange(addTimelineEntry(batch, {
-      id: createClientId(), date: localDate(), kind: "status", status,
-    }));
   }
 
   function saveInputs(event: React.FormEvent<HTMLFormElement>) {
@@ -908,47 +961,10 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
     onChange(next);
   }
 
-  function savePh(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const entry = {
-      id: editingPh?.id ?? createClientId(),
-      date: String(data.get("date") ?? ""),
-      kind: "ph" as const,
-      value: Number(data.get("value")),
-    };
-    onChange(editingPh ? updatePhReading(batch, entry) : addPhReading(batch, entry));
-    setEditingPh(null);
-    event.currentTarget.reset();
-  }
-
-  async function savePhoto(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const file = (form.elements.namedItem("photo") as HTMLInputElement).files?.[0];
-    if (!file || file.size === 0) {
-      if (!editingPhoto) return;
-    } else if (!file.type.startsWith("image/")) {
-      return;
-    }
-    const replacement = file && file.size > 0 ? {
-      name: file.name,
-      mimeType: file.type,
-      dataUrl: await fileToDataUrl(file),
-    } : editingPhoto!;
-    const entry = {
-      id: editingPhoto?.id ?? createClientId(),
-      date: String(data.get("date") ?? ""),
-      kind: "photo" as const,
-      name: replacement.name,
-      mimeType: replacement.mimeType,
-      dataUrl: replacement.dataUrl,
-      caption: String(data.get("caption") ?? "").trim(),
-    };
-    onChange(editingPhoto ? updateTimelineEntry(batch, entry) : addTimelineEntry(batch, entry));
-    setEditingPhoto(null);
-    form.reset();
+  function editEntry(entry: TimelineEntry) {
+    if (entry.kind === "check") return;
+    setLoggerKind(entry.kind);
+    setEditing(entry);
   }
 
   function saveNewCheck(event: React.FormEvent<HTMLFormElement>) {
@@ -977,6 +993,7 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
   const latestPh = latestPhReading(batch);
   const phReadings = batch.timeline.filter((entry) => entry.kind === "ph");
   const dueCheck = dueBatchChecks(batch, localDate())[0];
+  const preferredCheckId = dueCheck?.id ?? batch.checks[0]?.id ?? "";
   const nextCheck = [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0];
   const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
   const temperatureInput = batch.profileSnapshot.inputs.find((input) => /temp/i.test(input.name));
@@ -1111,10 +1128,9 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
                 <div className="check" key={check.id}>
                   <label><span>Check name</span><input aria-label={`Check name ${check.id}`} onChange={(event) => setCheckDrafts({ ...checkDrafts, [check.id]: event.target.value })} value={checkDrafts[check.id] ?? check.name} /></label>
                   <span className="check-schedule">{batch.status === "active" ? `${due?.overdue ? "Overdue" : due ? "Due" : "Next"} ${check.nextDueDate}` : "Paused"}</span>
-                  <label>Every <input aria-label={`${check.name} interval days`} disabled={batch.status !== "active"} min="1" onChange={(event) => onChange(adjustBatchCheck(batch, check.id, Number(event.target.value), localDate()))} type="number" value={check.intervalDays} /> days</label>
-                  <button onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button>
-                  <button disabled={batch.status !== "active"} onClick={() => onChange(completeBatchCheck(batch, check.id, localDate(), createClientId()))} type="button">Complete {check.name}</button>
-                  <button aria-label={`Remove ${check.name}`} onClick={() => onChange(removeBatchCheck(batch, check.id))} type="button">Remove</button>
+                   <label>Every <input aria-label={`${check.name} interval days`} disabled={batch.status !== "active"} min="1" onChange={(event) => onChange(adjustBatchCheck(batch, check.id, Number(event.target.value), localDate()))} type="number" value={check.intervalDays} /> days</label>
+                   <button onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button>
+                   <button aria-label={`Remove ${check.name}`} onClick={() => onChange(removeBatchCheck(batch, check.id))} type="button">Remove</button>
                 </div>
               );
             })}
@@ -1130,60 +1146,53 @@ function BatchCard({ batch, onChange, onDelete }: BatchCardProps) {
         <div className="wb-main">
           <section className="wb-panel" aria-label={`${batch.name} pH log`}>
             <h4>pH log <span>{phReadings.length} readings</span></h4>
-            <div className="ph-log">
-              <p><strong>Latest:</strong> {latestPh ? `${latestPh.value} on ${latestPh.date}` : "No readings yet."}</p>
-              {phReadings.map((entry) => (
-                <div className="ph-reading" key={entry.id}>
-                  <time dateTime={entry.date}>{entry.date}</time><span>pH {entry.value}</span>
-                  {phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}
-                  {phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}
-                  <button aria-label={`Edit pH from ${entry.date}`} onClick={() => setEditingPh(entry)} type="button">Edit</button>
-                  <button aria-label={`Delete pH from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
-                </div>
-              ))}
-              <form className="ph-form" key={editingPh?.id ?? "new-ph"} onSubmit={savePh}>
-                <label>pH date <input defaultValue={editingPh?.date ?? localDate()} name="date" required type="date" /></label>
-                <label>pH value <input defaultValue={editingPh?.value} name="value" required step="0.01" type="number" /></label>
-                <button className="secondary-action" type="submit">{editingPh ? "Save pH" : "Add pH"}</button>
-                {editingPh && <button onClick={() => setEditingPh(null)} type="button">Cancel</button>}
-              </form>
+           <div className="ph-log">
+              <p><strong>Latest:</strong> {latestPh ? `${latestPh.value} on ${latestPh.date}` : "No readings yet."}{latestPh && phWarning(latestPh.value) && <span className="warning"> · {phWarning(latestPh.value)}</span>}</p>
+              <p className="muted-copy">Readings and profile zones appear in the timeline below.</p>
             </div>
+          </section>
+
+          <section className="wb-panel activity-logger" aria-labelledby="activity-logger-heading">
+            <div className="timeline-panel-heading"><h4 id="activity-logger-heading">Log activity <span>{editing ? "Editing entry" : "New entry"}</span></h4><p>Record one dated observation on this batch.</p></div>
+            <form className="timeline-form" id="batch-activity-form" key={editing?.id ?? "new"} onSubmit={saveEntry}>
+              <label>Activity type<select disabled={!!editing} name="kind" onChange={(event) => { const nextKind = event.target.value as LoggerKind; setLoggerKind(nextKind); setSelectedCheckId(nextKind === "check" ? preferredCheckId : ""); }} value={loggerKind}>
+                <option value="note">Note</option>
+                <option value="measurement">Measurement</option>
+                <option value="ph">pH reading</option>
+                <option value="temperature">Temperature</option>
+                <option value="status">Status change</option>
+                <option disabled={batch.status !== "active"} value="check">Check completion</option>
+                <option value="photo">Photo</option>
+              </select></label>
+              <label>Activity date<input defaultValue={editing?.date ?? localDate()} name="date" required type="date" /></label>
+              {(loggerKind === "note" || loggerKind === "measurement") && <label>Note or measurement<input defaultValue={editing && (editing.kind === "note" || editing.kind === "measurement") ? editing.text : ""} name="text" /></label>}
+              {loggerKind === "ph" && <label>pH value<input defaultValue={editing?.kind === "ph" ? editing.value : undefined} name="value" required step="0.01" type="number" /></label>}
+              {loggerKind === "temperature" && <label>Temperature ({units === "imperial" ? "°F" : "°C"})<input defaultValue={editing?.kind === "temperature" ? displayTemperature(editing.value, units) : undefined} name="value" required step="any" type="number" /></label>}
+              {loggerKind === "status" && <label>Activity status<select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>}
+              {loggerKind === "check" && <label>Batch check<select disabled={batch.status !== "active" || batch.checks.length === 0} name="checkId" onChange={(event) => setSelectedCheckId(event.target.value)} value={selectedCheckId || preferredCheckId}>{batch.checks.map((check) => <option key={check.id} value={check.id}>{check.name}</option>)}</select></label>}
+              {loggerKind === "photo" && <><label>Photo<input accept="image/*" capture="environment" name="photo" required={!editing} type="file" /></label><label>Caption<input defaultValue={editing?.kind === "photo" ? editing.caption : ""} name="caption" /></label></>}
+              <div className="form-actions"><button className="primary-action" type="submit">{editing ? "Save activity" : "Log activity"}</button>{editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}</div>
+            </form>
           </section>
 
           <section className="wb-panel" aria-label={`${batch.name} timeline`}>
             <div className="timeline-panel-heading"><h4>Timeline <span>{batch.timeline.length} entries</span></h4><p>Every observation stays attached to this batch.</p></div>
             <section className="timeline">
               {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
-              {batch.timeline.filter((entry) => entry.kind !== "ph").map((entry) => (
+              {batch.timeline.map((entry) => (
                 <div className={`timeline-entry timeline-${entry.kind}`} key={entry.id}>
                   <span className="timeline-dot" aria-hidden="true" />
                   <time dateTime={entry.date}>{entry.date}</time>
-                  <span className="timeline-content">{timelineEntryText(entry)}{entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}</span>
-                  {(entry.kind === "note" || entry.kind === "measurement" || entry.kind === "status") && <button aria-label={`Edit ${entry.kind} from ${entry.date}`} onClick={() => setEditing(entry)} type="button">Edit</button>}
-                  {entry.kind === "photo" && <button aria-label={`Edit photo from ${entry.date}`} onClick={() => setEditingPhoto(entry)} type="button">Edit</button>}
+                  <span className="timeline-content">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}</span>
+                  {entry.kind !== "check" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} onClick={() => editEntry(entry)} type="button">Edit</button>}
                   <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
                 </div>
               ))}
-              <form className="timeline-form" id="batch-activity-form" key={editing?.id ?? "new"} onSubmit={saveEntry}>
-                <label>Activity type<select defaultValue={editing?.kind ?? "note"} name="kind"><option value="note">Note</option><option value="measurement">Measurement</option><option value="status">Status change</option></select></label>
-                <label>Activity date<input defaultValue={editing?.date ?? localDate()} name="date" required type="date" /></label>
-                <label>Note or measurement<input defaultValue={editing && (editing.kind === "note" || editing.kind === "measurement") ? editing.text : ""} name="text" /></label>
-                <label>Activity status<select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>
-                <div className="form-actions"><button className="primary-action" type="submit">{editing ? "Save activity" : "Add activity"}</button>{editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}</div>
-              </form>
-              <form className="photo-form" key={editingPhoto?.id ?? "new-photo"} onSubmit={savePhoto}>
-                <label>Photo date <input defaultValue={editingPhoto?.date ?? localDate()} name="date" required type="date" /></label>
-                <label>Photo <input accept="image/*" capture="environment" name="photo" required={!editingPhoto} type="file" /></label>
-                <label>Caption <input defaultValue={editingPhoto?.caption} name="caption" /></label>
-                <button className="secondary-action" type="submit">{editingPhoto ? "Save photo" : "Attach photo"}</button>
-                {editingPhoto && <button onClick={() => setEditingPhoto(null)} type="button">Cancel</button>}
-              </form>
               {batch.timelineTrash.length > 0 && <div className="timeline-trash"><strong>Recently deleted activity</strong>{batch.timelineTrash.map((entry) => <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">Restore {entry.kind} from {entry.date}</button>)}</div>}
             </section>
           </section>
 
           <div className="form-actions batch-status-actions" aria-label={`Change ${batch.name} status`}>
-            {batchStatuses.filter((status) => status !== batch.status).map((status) => <button key={status} onClick={() => recordStatus(status)} type="button">{status === "active" ? "Return to active" : `Mark ${statusLabel(status).toLowerCase()}`}</button>)}
             <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
           </div>
         </div>
@@ -1246,6 +1255,11 @@ function presentationFor(profile: FermentationProfile): ProfilePresentation {
 
 function formatNumber(value: number) {
   return Number.isInteger(value) ? String(value) : String(value).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function displayTemperature(celsius: number, units: ShellPreferences["units"]): string {
+  const value = units === "imperial" ? celsius * 9 / 5 + 32 : celsius;
+  return formatNumber(Number(value.toFixed(2)));
 }
 
 function formatCheckInterval(intervalDays: number) {
@@ -1655,10 +1669,11 @@ function parsePhRange(minValue: FormDataEntryValue | null, maxValue: FormDataEnt
     : [];
 }
 
-function timelineEntryText(entry: TimelineEntry): string {
+function timelineEntryText(entry: TimelineEntry, units: ShellPreferences["units"] = "metric"): string {
   if (entry.kind === "status") return `Status: ${statusLabel(entry.status)}`;
   if (entry.kind === "check") return `Completed check: ${entry.checkName}`;
   if (entry.kind === "ph") return `pH ${entry.value}`;
+  if (entry.kind === "temperature") return `Temperature ${displayTemperature(entry.value, units)}°${units === "imperial" ? "F" : "C"}`;
   if (entry.kind === "photo") return entry.caption || entry.name;
   return entry.text;
 }

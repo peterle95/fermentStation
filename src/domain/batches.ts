@@ -14,6 +14,7 @@ export type TimelineEntry =
   | { id: string; date: string; kind: "status"; status: BatchStatus }
   | { id: string; date: string; kind: "check"; checkName: string }
   | { id: string; date: string; kind: "ph"; value: number }
+  | { id: string; date: string; kind: "temperature"; value: number }
   | {
       id: string;
       date: string;
