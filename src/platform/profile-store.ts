@@ -1,4 +1,10 @@
-import { normalizeProfileChecks, type FermentationProfile, type ProfileState } from "../domain/profiles";
+import {
+  normalizeProfile,
+  normalizeProfileChecks,
+  type FermentationProfile,
+  type ProfileRecord,
+  type ProfileState,
+} from "../domain/profiles";
 
 export interface ProfileStore {
   load(): ProfileState | null;
@@ -12,7 +18,7 @@ interface KeyValueStore {
 
 const storageKey = "fermentstation.profiles";
 
-function isProfile(value: unknown): boolean {
+function isProfile(value: unknown): value is ProfileRecord {
   if (!value || typeof value !== "object") {
     return false;
   }
@@ -22,9 +28,11 @@ function isProfile(value: unknown): boolean {
   const calculations = profile.calculations ?? [];
   const checks = profile.checks ?? [];
   const phZones = profile.phZones ?? [];
-  return ["id", "name", "guidance", "instructions"].every(
-    (key) => typeof profile[key] === "string",
-  ) && Array.isArray(inputs) && inputs.every((input) => {
+  const guidance = profile.guidance;
+  const hasGuidance = Array.isArray(guidance)
+    ? guidance.every((step) => typeof step === "string")
+    : typeof guidance === "string" && typeof profile.instructions === "string";
+  return ["id", "name"].every((key) => typeof profile[key] === "string") && hasGuidance && Array.isArray(inputs) && inputs.every((input) => {
     if (!input || typeof input !== "object") return false;
     const candidate = input as Record<string, unknown>;
     return typeof candidate.name === "string" && ["g", "kg", "ml", "l"].includes(String(candidate.unit)) &&
@@ -51,9 +59,9 @@ function isProfile(value: unknown): boolean {
     (profile.temperatureMaxC === undefined || typeof profile.temperatureMaxC === "number");
 }
 
-function normalizeProfile(profile: FermentationProfile): FermentationProfile {
+function normalizeStoredProfile(profile: ProfileRecord): FermentationProfile {
   return {
-    ...profile,
+    ...normalizeProfile(profile),
     inputs: profile.inputs ?? [],
     calculations: profile.calculations ?? [],
     checks: normalizeProfileChecks(profile.checks ?? [], `profile-check-${profile.id}`),
@@ -61,7 +69,7 @@ function normalizeProfile(profile: FermentationProfile): FermentationProfile {
   };
 }
 
-function isProfileState(value: unknown): value is ProfileState {
+function isProfileState(value: unknown): value is { profiles: ProfileRecord[] } {
   if (!value || typeof value !== "object") {
     return false;
   }
@@ -96,7 +104,7 @@ export function createProfileStore(storage: KeyValueStore): ProfileStore {
 
 export function parseProfileState(state: unknown): ProfileState | null {
   return isProfileState(state) ? {
-    profiles: state.profiles.map(normalizeProfile),
+    profiles: state.profiles.map(normalizeStoredProfile),
   } : null;
 }
 

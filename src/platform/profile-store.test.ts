@@ -47,4 +47,15 @@ describe("profile store", () => {
     expect(loaded.profiles[0].checks[0].id).toEqual(expect.any(String));
     expect(store.load()?.profiles[0].checks[0].id).toBe(loaded.profiles[0].checks[0].id);
   });
+
+  it("migrates legacy guidance and instructions into guidance steps", () => {
+    const profile = createProfileState().profiles[0];
+    const legacyProfile = { ...profile, guidance: profile.guidance[0], instructions: profile.guidance[1] };
+    const store = createProfileStore({
+      getItem: () => JSON.stringify({ profiles: [legacyProfile] }),
+      setItem: () => undefined,
+    });
+
+    expect(store.load()?.profiles[0].guidance).toEqual(profile.guidance);
+  });
 });

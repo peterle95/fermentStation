@@ -3000,7 +3000,7 @@ button:disabled {
 .profile-editor-crumbs button, .profile-editor-text-button { background: transparent; border: 0; color: var(--editor-fg-2); cursor: pointer; font-size: 0.875rem; padding: 0; text-decoration: underline; text-underline-offset: 0.2rem; }
 .profile-editor-crumbs button:hover, .profile-editor-text-button:hover { color: var(--editor-fg); }
 .profile-editor-head { align-items: flex-end; display: flex; gap: 1.5rem; justify-content: space-between; margin: 2.125rem 0 2rem; }
-.profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-field > span, .profile-editor-check-row label > span, .profile-editor-formula-row label, .profile-editor-compatibility label { font-family: Consolas, monospace; font-size: 0.625rem; letter-spacing: 0.09em; text-transform: uppercase; }
+.profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-field > span, .profile-editor-guidance-head > span, .profile-editor-guidance-row > span, .profile-editor-check-row label > span, .profile-editor-formula-row label, .profile-editor-compatibility label { font-family: Consolas, monospace; font-size: 0.625rem; letter-spacing: 0.09em; text-transform: uppercase; }
 .profile-editor-eyebrow, .profile-editor-kicker { color: var(--editor-meta); margin: 0 0 0.5rem; }
 .profile-editor-page h1, .profile-editor-page h2, .profile-editor-page h3, .profile-editor-page p { margin: 0; }
 .profile-editor-page h1, .profile-editor-page h2, .profile-editor-page h3 { font-family: Georgia, serif; font-weight: 500; letter-spacing: -0.015em; line-height: 1.1; }
@@ -3022,6 +3022,12 @@ button:disabled {
 .profile-editor-page input, .profile-editor-page textarea, .profile-editor-page select { background: var(--editor-surface); border: 1px solid var(--editor-border-soft); border-radius: 0.5rem; color: var(--editor-fg); font: inherit; min-width: 0; padding: 0.6875rem 0.75rem; width: 100%; }
 .profile-editor-page input:hover, .profile-editor-page textarea:hover, .profile-editor-page select:hover { border-color: var(--editor-meta); }
 .profile-editor-page textarea { line-height: 1.6; min-height: 6.375rem; resize: vertical; }
+.profile-editor-guidance { display: grid; gap: 0.75rem; grid-column: 1 / -1; }
+.profile-editor-guidance-head { align-items: baseline; display: flex; justify-content: space-between; }
+.profile-editor-guidance-head > span, .profile-editor-guidance-row > span { color: var(--editor-fg-2); }
+.profile-editor-guidance-rows { display: grid; gap: 0.75rem; }
+.profile-editor-guidance-row { background: var(--editor-surface); border: 1px solid var(--editor-border); border-radius: 0.75rem; display: grid; gap: 0.5rem; padding: 0.75rem; }
+.profile-editor-guidance-row .profile-editor-text-button { justify-self: start; }
 .profile-editor-suffix { position: relative; }
 .profile-editor-suffix input { padding-right: 3.5rem; }
 .profile-editor-suffix i { color: var(--editor-meta); font-family: Consolas, monospace; font-size: 0.75rem; font-style: normal; pointer-events: none; position: absolute; right: 0.8125rem; top: 50%; transform: translateY(-50%); }

@@ -5,7 +5,7 @@ import {
   type BatchState,
   type TimelineEntry,
 } from "../domain/batches";
-import { normalizeProfileChecks } from "../domain/profiles";
+import { normalizeProfile, normalizeProfileChecks, type ProfileRecord } from "../domain/profiles";
 
 export interface BatchStore {
   load(): BatchState | null;
@@ -26,6 +26,8 @@ function isBatch(value: unknown): value is Batch {
 
   const batch = value as Record<string, unknown>;
   const profile = batch.profileSnapshot;
+  const profileRecord = profile && typeof profile === "object" ? profile as Record<string, unknown> : {};
+  const guidance = profileRecord.guidance;
   const timeline = batch.timeline ?? [];
   const timelineTrash = batch.timelineTrash ?? [];
   return (
@@ -34,9 +36,10 @@ function isBatch(value: unknown): value is Batch {
     batchStatuses.includes(batch.status as Batch["status"]) &&
     !!profile &&
     typeof profile === "object" &&
-    ["id", "name", "guidance", "instructions"].every(
-      (key) => typeof (profile as Record<string, unknown>)[key] === "string",
-    ) &&
+    ["id", "name"].every((key) => typeof profileRecord[key] === "string") &&
+    (Array.isArray(guidance)
+      ? guidance.every((step) => typeof step === "string")
+      : typeof guidance === "string" && typeof profileRecord.instructions === "string") &&
     isProfileDetails(profile as Record<string, unknown>) &&
     (batch.finishDate === undefined || typeof batch.finishDate === "string") &&
     (batch.inputValues === undefined || isNumberRecord(batch.inputValues)) &&
@@ -110,7 +113,7 @@ function isTimelineEntry(value: unknown): value is TimelineEntry {
 
 function normalizeBatch(batch: Batch): Batch {
   const profileSnapshot = {
-    ...batch.profileSnapshot,
+    ...normalizeProfile(batch.profileSnapshot as ProfileRecord),
     inputs: batch.profileSnapshot.inputs ?? [],
     calculations: batch.profileSnapshot.calculations ?? [],
     checks: normalizeProfileChecks(batch.profileSnapshot.checks ?? [], `profile-check-${batch.profileSnapshot.id}`),

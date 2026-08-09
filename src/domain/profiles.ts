@@ -1,8 +1,7 @@
 export interface FermentationProfile {
   id: string;
   name: string;
-  guidance: string;
-  instructions: string;
+  guidance: string[];
   inputs: ProfileInput[];
   calculations: ProfileCalculation[];
   checks: ProfileCheck[];
@@ -48,36 +47,46 @@ const starterProfiles: FermentationProfile[] = [
   {
     id: "starter-kombucha-f1",
     name: "Kombucha F1",
-    guidance: "Keep at room temperature and cover with a breathable cloth.",
-    instructions: "Taste after 7 days, then bottle when pleasantly tart.",
+    guidance: [
+      "Keep at room temperature and cover with a breathable cloth.",
+      "Taste after 7 days, then bottle when pleasantly tart.",
+    ],
     ...emptyProfileFields,
   },
   {
     id: "starter-kimchi",
     name: "Kimchi",
-    guidance: "Pack firmly so juice rises and leave headspace for gas.",
-    instructions: "Ferment warm briefly, then move to the fridge when the pH reaches 4.2.",
+    guidance: [
+      "Pack firmly so juice rises and leave headspace for gas.",
+      "Ferment warm briefly, then move to the fridge when the pH reaches 4.2.",
+    ],
     ...emptyProfileFields,
   },
   {
     id: "starter-sauerkraut",
     name: "Sauerkraut",
-    guidance: "Use 2% salt by cabbage weight and keep cabbage below brine.",
-    instructions: "Pack tightly, weight the cabbage, and taste after 7 days.",
+    guidance: [
+      "Use 2% salt by cabbage weight and keep cabbage below brine.",
+      "Pack tightly, weight the cabbage, and taste after 7 days.",
+    ],
     ...emptyProfileFields,
   },
   {
     id: "starter-milk-kefir",
     name: "Milk kefir",
-    guidance: "Culture milk for 24 hours, then strain and restart the next jar.",
-    instructions: "Keep the grains and refrigerate the strained kefir.",
+    guidance: [
+      "Culture milk for 24 hours, then strain and restart the next jar.",
+      "Keep the grains and refrigerate the strained kefir.",
+    ],
     ...emptyProfileFields,
   },
   {
     id: "starter-sourdough",
     name: "Sourdough starter",
-    guidance: "Keep the starter loosely covered at room temperature.",
-    instructions: "Feed equal weights flour and water; use when doubled and bubbly.",
+    guidance: [
+      "Keep the starter loosely covered at room temperature.",
+      "Feed equal weights flour and water; use when doubled and bubbly.",
+    ],
     ...emptyProfileFields,
   },
 ];
@@ -86,9 +95,23 @@ export function createProfileState(): ProfileState {
   return { profiles: starterProfiles.map(cloneProfile) };
 }
 
+export type ProfileRecord = Omit<FermentationProfile, "guidance"> & {
+  guidance: string[] | string;
+  instructions?: string;
+};
+
+export function normalizeProfile(profile: ProfileRecord): FermentationProfile {
+  const { guidance: rawGuidance, instructions, ...details } = profile;
+  const guidance = Array.isArray(rawGuidance)
+    ? rawGuidance.filter((step) => step.trim())
+    : [rawGuidance, instructions ?? ""].filter((step) => step.trim());
+  return { ...details, guidance };
+}
+
 export function cloneProfile(profile: FermentationProfile): FermentationProfile {
   return {
     ...profile,
+    guidance: [...profile.guidance],
     inputs: profile.inputs.map((input) => ({ ...input })),
     calculations: profile.calculations.map((calculation) => ({ ...calculation })),
     checks: normalizeProfileChecks(profile.checks, `profile-check-${profile.id}`),
