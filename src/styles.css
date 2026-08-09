@@ -2499,13 +2499,6 @@ button:disabled {
   margin: 0 0 0.75rem;
 }
 
-.batch-breadcrumb > span:last-child {
-  color: var(--ink);
-  font-family: "IBM Plex Mono", Consolas, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-}
-
 .batch-workspace {
   display: grid;
   gap: 1rem;
