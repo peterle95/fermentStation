@@ -3072,6 +3072,162 @@ button:disabled {
 .profile-editor-toast { background: var(--editor-fg); border-radius: 0.5rem; bottom: 1.5rem; color: var(--editor-surface); font-size: 0.875rem; left: 50%; padding: 0.75rem 1rem; position: fixed; transform: translateX(-50%); z-index: 70; }
 .sr-only { height: 1px; margin: -1px; overflow: hidden; position: absolute; width: 1px; clip: rect(0 0 0 0); white-space: nowrap; }
 
+/* Batch configuration follows the batch-components prototype. */
+.batch-components-shell {
+  --component-bg: #f5f4ed;
+  --component-surface: #faf9f5;
+  --component-warm: #e8e6dc;
+  --component-fg: #141413;
+  --component-muted: #5e5d59;
+  --component-meta: #87867f;
+  --component-border: #f0eee6;
+  --component-border-soft: #e8e6dc;
+  --component-accent: #c96442;
+  background: var(--component-surface);
+  border: 1px solid var(--component-border-soft);
+  border-radius: 1rem;
+  box-shadow: rgb(0 0 0 / 5%) 0 4px 24px;
+  color: var(--component-fg);
+  font-family: Arial, system-ui, sans-serif;
+  grid-column: 1 / -1;
+  overflow: hidden;
+}
+
+.batch-components-progress {
+  background: var(--component-border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 5px;
+}
+
+.batch-components-progress span { background: var(--component-fg); }
+.batch-components-progress span:last-child { background: var(--component-accent); }
+
+.batch-components-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1.15fr 1.15fr;
+}
+
+.batch-component-card {
+  min-width: 0;
+  padding: 1.5rem;
+  border-right: 1px solid var(--component-border-soft);
+}
+
+.batch-component-card:last-child { border-right: 0; }
+
+.batch-component-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.batch-component-header h2 {
+  color: var(--component-fg);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5625rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.batch-component-step {
+  align-items: center;
+  background: var(--component-warm);
+  border-radius: 9999px;
+  color: var(--component-muted);
+  display: grid;
+  flex: 0 0 auto;
+  font-family: Consolas, monospace;
+  font-size: 0.625rem;
+  height: 1.5rem;
+  place-items: center;
+  width: 1.5rem;
+}
+
+.component-field { display: grid; gap: 0.5rem; min-width: 0; }
+.component-field > span { color: var(--component-muted); font-size: 0.875rem; letter-spacing: 0.01em; }
+
+.batch-components-shell input {
+  background: var(--component-surface);
+  border: 1px solid var(--component-border-soft);
+  border-radius: 0.5rem;
+  color: var(--component-fg);
+  font: inherit;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  width: 100%;
+}
+
+.batch-components-shell input:hover { border-color: var(--component-meta); }
+.batch-components-shell input:focus-visible { border-color: var(--component-fg); box-shadow: 0 0 0 3px rgb(56 152 236 / 30%); outline: 0; }
+
+.component-inputs,
+.component-input-fields,
+.component-calculation,
+.component-check {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.component-inputs { align-items: end; grid-template-columns: minmax(0, 1fr) auto; }
+.component-input-fields { gap: 0.5rem; }
+
+.component-button {
+  align-items: center;
+  background: var(--component-surface);
+  border: 1px solid var(--component-border-soft);
+  border-radius: 0.5rem;
+  color: var(--component-fg);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.875rem;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  white-space: nowrap;
+}
+
+.component-button:hover { border-color: var(--component-meta); }
+.component-button-primary { background: var(--component-accent); border-color: var(--component-accent); color: var(--component-surface); }
+.component-button-quiet { background: transparent; border-color: transparent; color: var(--component-muted); font-size: 0.8125rem; padding-inline: 0.25rem; }
+.component-button-quiet:hover { background: var(--component-warm); border-color: var(--component-border-soft); color: var(--component-fg); }
+
+.component-calculation + .component-calculation { border-top: 1px solid var(--component-border-soft); padding-top: 0.75rem; }
+.component-pair-label { color: var(--component-muted); font-size: 0.875rem; }
+.component-calculation-value { align-items: baseline; display: flex; gap: 0.5rem; justify-content: space-between; }
+.component-calculation-value strong { font-family: Consolas, monospace; font-size: 1rem; }
+.component-calculation-value span { color: var(--component-muted); font-size: 0.75rem; }
+
+.component-override { align-items: end; display: grid; gap: 0.5rem; grid-template-columns: minmax(0, 1fr) auto; }
+.component-empty { color: var(--component-muted); font-size: 0.875rem; margin: 0; }
+
+.component-check { background: var(--component-bg); border-radius: 0.5rem; padding: 0.75rem; }
+.component-check-meta { display: grid; gap: 0.5rem; grid-template-columns: minmax(0, 1fr) minmax(4rem, 0.7fr); }
+.component-check-status { color: var(--component-muted); font-family: Consolas, monospace; font-size: 0.6875rem; margin: 0; }
+.component-check-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.component-remove { background: transparent; border: 0; color: #b53333; cursor: pointer; font-size: 0.8125rem; min-height: 2.75rem; padding: 0 0.25rem; }
+.component-new-check { background: transparent; border: 1px solid var(--component-border-soft); }
+
+@media (max-width: 1100px) {
+  .batch-components-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .batch-component-card:nth-child(2) { border-right: 0; }
+  .batch-component-card:nth-child(-n + 2) { border-bottom: 1px solid var(--component-border-soft); }
+}
+
+@media (max-width: 600px) {
+  .batch-components-grid { grid-template-columns: 1fr; }
+  .batch-component-card { border-bottom: 1px solid var(--component-border-soft); border-right: 0; }
+  .batch-component-card:last-child { border-bottom: 0; }
+}
+
+@media (max-width: 420px) {
+  .component-inputs { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 960px) {
   .profile-editor-shell .sidebar, .profile-editor-shell .masthead, .profile-editor-shell .navigation { display: none; }
   .profile-editor-shell .main-content { padding: 0 1rem 6rem; }

@@ -208,13 +208,15 @@ export function App() {
             </section>
           ) : shell.destination === "batches" ? (
             <section className="batches-screen" aria-label="All batches">
-              <div className="screen-head">
-                <div>
-                  <p className="eyebrow">All jars &amp; crocks</p>
-                  <h1>Batches</h1>
-                  <p className="screen-intro">{screenDescription("batches")}</p>
+              {!openBatchId && (
+                <div className="screen-head">
+                  <div>
+                    <p className="eyebrow">All jars &amp; crocks</p>
+                    <h1>Batches</h1>
+                    <p className="screen-intro">{screenDescription("batches")}</p>
+                  </div>
                 </div>
-              </div>
+              )}
             <BatchView
               batches={batchState.batches}
               mode="batches"
@@ -1135,70 +1137,74 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
 
         </div>
 
-        <div className="wb-support">
-          {batch.finishDate && (
-            <section className="wb-panel batch-details" aria-labelledby="finish-heading">
-              <h4 id="finish-heading">Batch details</h4>
-              <label className="finish-date">Finish date<input onChange={(event) => onChange(setFinishDate(batch, event.target.value, localDate()))} type="date" value={batch.finishDate} /></label>
-            </section>
-          )}
+        <section className="batch-components-shell" aria-label="Batch configuration components">
+          <div className="batch-components-progress" aria-hidden="true"><span /><span /><span /><span /></div>
+          <div className="batch-components-grid">
+            <article className="batch-component-card" aria-labelledby="finish-heading">
+              <header className="batch-component-header"><h2 id="finish-heading">Batch details</h2><span className="batch-component-step">01</span></header>
+              <label className="component-field"><span>Finish date</span><input onChange={(event) => onChange(setFinishDate(batch, event.target.value, localDate()))} type="date" value={batch.finishDate ?? ""} /></label>
+            </article>
 
-          {batch.profileSnapshot.inputs.length > 0 && (
-            <section className="wb-panel" aria-labelledby="inputs-heading">
-              <h4 id="inputs-heading">Profile inputs <span>{batch.profileSnapshot.inputs.length}</span></h4>
-              <form className="batch-values" onSubmit={saveInputs}>
-                {batch.profileSnapshot.inputs.map((input) => (
-                  <label key={input.name}>{input.name} ({input.unit})<input defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" /></label>
-                ))}
-                <button className="secondary-action" type="submit">Update inputs</button>
-              </form>
-            </section>
-          )}
+            <article className="batch-component-card" aria-labelledby="inputs-heading">
+              <header className="batch-component-header"><h2 id="inputs-heading">Profile inputs</h2><span className="batch-component-step">02</span></header>
+              {batch.profileSnapshot.inputs.length > 0 ? <form className="component-inputs" onSubmit={saveInputs}>
+                <div className="component-input-fields">
+                  {batch.profileSnapshot.inputs.map((input) => (
+                    <label className="component-field" key={input.name}><span>{input.name} ({input.unit})</span><input defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" /></label>
+                  ))}
+                </div>
+                <button className="component-button component-button-primary" type="submit">Update inputs</button>
+              </form> : <p className="component-empty">No profile inputs.</p>}
+            </article>
 
-          {batch.profileSnapshot.calculations.length > 0 && (
-            <section className="wb-panel" aria-labelledby="calculations-heading">
-              <h4 id="calculations-heading">Profile calculations <span>{batch.profileSnapshot.calculations.length}</span></h4>
-              {batch.profileSnapshot.calculations.map((calculation) => {
+            <article className="batch-component-card" aria-labelledby="calculations-heading">
+              <header className="batch-component-header"><h2 id="calculations-heading">Profile calculations</h2><span className="batch-component-step">03</span></header>
+              {batch.profileSnapshot.calculations.length > 0 ? batch.profileSnapshot.calculations.map((calculation) => {
                 const value = batch.calculationValues[calculation.name];
                 return (
-                  <form className="calculation" key={calculation.name} onSubmit={(event) => {
-                    event.preventDefault();
-                    const raw = String(new FormData(event.currentTarget).get("override") ?? "");
-                    if (raw !== "") onChange(overrideBatchCalculation(batch, calculation.name, Number(raw)));
-                  }}>
-                    <span><strong>{calculation.name}:</strong> {value?.override ?? value?.suggested ?? "Incomplete"} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
-                    <input aria-label={`Override ${calculation.name}`} min="0" name="override" step="any" type="number" />
-                    <button className="secondary-action" type="submit">Override</button>
-                  </form>
+                  <div className="component-calculation" key={calculation.name}>
+                    <span className="component-pair-label">{calculation.name}:</span>
+                    <div className="component-calculation-value"><strong>{value?.override ?? value?.suggested ?? "Incomplete"} {calculation.unit}</strong><span>{value?.override !== undefined ? " (overridden)" : " suggested"}</span></div>
+                    <span className="sr-only">{value?.override ?? value?.suggested ?? "Incomplete"} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
+                    <form className="component-override" onSubmit={(event) => {
+                      event.preventDefault();
+                      const raw = String(new FormData(event.currentTarget).get("override") ?? "");
+                      if (raw !== "") onChange(overrideBatchCalculation(batch, calculation.name, Number(raw)));
+                    }}>
+                      <label className="component-field"><span>Override</span><input aria-label={`Override ${calculation.name}`} min="0" name="override" step="any" type="number" /></label>
+                      <button className="component-button" type="submit">Override</button>
+                    </form>
+                  </div>
+                );
+              }) : <p className="component-empty">No calculations.</p>}
+            </article>
+
+            <article className="batch-component-card" aria-label={`${batch.name} checks`}>
+              <header className="batch-component-header"><h2>Recurring checks</h2><button className="component-button component-button-quiet" disabled={batch.status !== "active"} onClick={() => { setAddingCheck(true); setCheckError(""); }} type="button">Add check</button></header>
+              {checkError && <p className="notice" role="alert">{checkError}</p>}
+              {batch.checks.length === 0 && !addingCheck && <p className="component-empty">No recurring checks yet.</p>}
+              {batch.checks.map((check) => {
+                const due = dueBatchChecks(batch, localDate()).find(({ id }) => id === check.id);
+                return (
+                  <div className="component-check" key={check.id}>
+                    <label className="component-field"><span>Check name</span><input aria-label={`Check name ${check.id}`} onChange={(event) => setCheckDrafts({ ...checkDrafts, [check.id]: event.target.value })} value={checkDrafts[check.id] ?? check.name} /></label>
+                    <div className="component-check-meta">
+                      <label className="component-field"><span>Next</span><input aria-label={`${check.name} next date`} readOnly type="date" value={check.nextDueDate} /></label>
+                      <label className="component-field"><span>Every</span><input aria-label={`${check.name} interval days`} disabled={batch.status !== "active"} min="1" onChange={(event) => onChange(adjustBatchCheck(batch, check.id, Number(event.target.value), localDate()))} type="number" value={check.intervalDays} /></label>
+                    </div>
+                    <p className="component-check-status">{batch.status === "active" ? `${due?.overdue ? "Overdue" : due ? "Due" : "Next"} ${check.nextDueDate}` : "Paused"}</p>
+                    <div className="component-check-actions"><button className="component-button" onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button><button className="component-remove" aria-label={`Remove ${check.name}`} onClick={() => onChange(removeBatchCheck(batch, check.id))} type="button">Remove</button></div>
+                  </div>
                 );
               })}
-            </section>
-          )}
-
-          <section className="wb-panel checks" aria-label={`${batch.name} checks`}>
-            <div className="checks-heading"><h4>Recurring checks</h4><button className="secondary-action" disabled={batch.status !== "active"} onClick={() => { setAddingCheck(true); setCheckError(""); }} type="button">Add check</button></div>
-            {checkError && <p className="notice" role="alert">{checkError}</p>}
-            {batch.checks.length === 0 && !addingCheck && <p className="muted-copy">No recurring checks yet.</p>}
-            {batch.checks.map((check) => {
-              const due = dueBatchChecks(batch, localDate()).find(({ id }) => id === check.id);
-              return (
-                <div className="check" key={check.id}>
-                  <label><span>Check name</span><input aria-label={`Check name ${check.id}`} onChange={(event) => setCheckDrafts({ ...checkDrafts, [check.id]: event.target.value })} value={checkDrafts[check.id] ?? check.name} /></label>
-                  <span className="check-schedule">{batch.status === "active" ? `${due?.overdue ? "Overdue" : due ? "Due" : "Next"} ${check.nextDueDate}` : "Paused"}</span>
-                   <label>Every <input aria-label={`${check.name} interval days`} disabled={batch.status !== "active"} min="1" onChange={(event) => onChange(adjustBatchCheck(batch, check.id, Number(event.target.value), localDate()))} type="number" value={check.intervalDays} /> days</label>
-                   <button onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button>
-                   <button aria-label={`Remove ${check.name}`} onClick={() => onChange(removeBatchCheck(batch, check.id))} type="button">Remove</button>
-                </div>
-              );
-            })}
-            {addingCheck && <form className="check-form" onSubmit={saveNewCheck}>
-              <label>Check name<input autoFocus onChange={(event) => setNewCheckName(event.target.value)} placeholder="e.g. Taste and smell" required value={newCheckName} /></label>
-              <label>Every <input min="1" onChange={(event) => setNewCheckInterval(event.target.value)} required type="number" value={newCheckInterval} /> days</label>
-              <button className="secondary-action" type="submit">Add recurring check</button>
-              <button onClick={() => setAddingCheck(false)} type="button">Cancel</button>
-            </form>}
-          </section>
-        </div>
+              {addingCheck && <form className="component-check component-new-check" onSubmit={saveNewCheck}>
+                <label className="component-field"><span>Check name</span><input autoFocus onChange={(event) => setNewCheckName(event.target.value)} placeholder="e.g. Taste and smell" required value={newCheckName} /></label>
+                <label className="component-field"><span>Every</span><input min="1" onChange={(event) => setNewCheckInterval(event.target.value)} required type="number" value={newCheckInterval} /></label>
+                <div className="component-check-actions"><button className="component-button" type="submit">Add recurring check</button><button className="component-remove" onClick={() => setAddingCheck(false)} type="button">Cancel</button></div>
+              </form>}
+            </article>
+          </div>
+        </section>
       </div>
     </article>
   );
