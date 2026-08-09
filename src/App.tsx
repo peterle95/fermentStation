@@ -1469,16 +1469,15 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
             </header>
             <nav className="profile-editor-crumbs" aria-label="Breadcrumb"><button onClick={closeEditor} type="button">Profiles</button></nav>
             <header className="profile-editor-head">
-              <div><p className="profile-editor-eyebrow">Fermentation profile</p><h1>{editing.name || "Profile name"}</h1></div>
+              <div><p className="profile-editor-eyebrow">Fermentation profile</p><h1><input aria-label="Name" autoFocus className="profile-editor-title-input" defaultValue={editing.name} form="profile-editor-form" name="name" placeholder="Profile name" required /></h1></div>
               <span className="profile-editor-status"><i />Editable profile</span>
             </header>
 
             <div className="profile-editor-grid">
-              <form className="profile-editor-form" key={editing.id} onSubmit={save}>
+              <form className="profile-editor-form" id="profile-editor-form" key={editing.id} onSubmit={save}>
                 <section className="profile-editor-section">
                   <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">01 / The profile</p><h2>Give it a clear name</h2><p className="profile-editor-intro">A profile is a reusable practice, not a recipe card. Keep its description grounded in what you will actually observe.</p></div></div>
                   <div className="profile-editor-fields">
-                    <label className="profile-editor-field wide"><span>Name</span><input autoFocus defaultValue={editing.name} name="name" required /></label>
                      <label className="profile-editor-field wide"><span>Guidance</span><textarea defaultValue={editing.guidance} name="guidance" /></label>
                      <label className="profile-editor-field wide"><span>Instructions</span><textarea defaultValue={editing.instructions} name="instructions" /></label>
                      <label className="profile-editor-field"><span>Temperature minimum</span><span className="profile-editor-suffix"><input aria-label="Temperature minimum" defaultValue={editing.temperatureMinC ?? ""} min="0" max="100" name="temperatureMinC" step="any" type="number" /><i>°C</i></span></label>

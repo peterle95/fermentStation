@@ -58,6 +58,7 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
 
+    expect(screen.getByLabelText("Name").closest("h1")).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Guidance"), { target: { value: "Keep it warm and shaded." } });
     fireEvent.change(screen.getByLabelText("Temperature minimum"), { target: { value: "18" } });
     fireEvent.change(screen.getByLabelText("Temperature maximum"), { target: { value: "22" } });
