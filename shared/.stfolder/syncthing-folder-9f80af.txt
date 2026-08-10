@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: ferment
+created: 2026-08-10T12:13:05+02:00

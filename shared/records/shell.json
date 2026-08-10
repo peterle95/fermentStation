@@ -1,0 +1,13 @@
+{
+  "destination": "today",
+  "formulaTerms": [
+    "totalWeight",
+    "water",
+    "salt",
+    "sugar",
+    "tea"
+  ],
+  "units": "metric",
+  "checkReminders": true,
+  "suggestions": true
+}
