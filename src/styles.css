@@ -1460,13 +1460,6 @@ button:disabled {
     text-align: center;
   }
 
-  .navigation button:last-child {
-    border-top: 0;
-    border-radius: 0.6rem;
-    display: none;
-    margin-top: 0;
-  }
-
   .nav-mark {
     border: 0;
     height: auto;
