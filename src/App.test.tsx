@@ -433,6 +433,8 @@ describe("batch workflow", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
 
+    expect(screen.getByRole("heading", { name: "Data storage" })).toBeTruthy();
+    expect(screen.getByText("Shared folder: Not selected")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Export ZIP archive" })).toBeTruthy();
     expect(screen.getByLabelText("Import ZIP archive")).toBeTruthy();
     expect(screen.getByText(/Live databases and app-private directories are never synchronized/))

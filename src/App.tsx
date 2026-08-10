@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { App as CapacitorApp } from "@capacitor/app";
+import type { PluginListenerHandle } from "@capacitor/core";
 import {
   addTimelineEntry,
   addPhReading,
@@ -67,6 +69,12 @@ import { loadNativeState, isNativePlatform, saveNativeState } from "./platform/n
 import { isNativeTransferAvailable, pickNativeArchive, shareNativeFile } from "./platform/native-transfer";
 import { requestReminderPermission, reconcileReminders } from "./platform/reminders";
 import { captureNativePhoto, isNativeCameraAvailable, listenForRestoredCameraPhoto, type CapturedPhoto } from "./platform/camera";
+import {
+  sharedDataStore,
+  type SharedSnapshot,
+  type SharedStorageResult,
+  type SharedStorageStatus,
+} from "./platform/shared-data-store";
 
 const labels: Record<Destination, string> = {
   today: "Today",
@@ -111,6 +119,9 @@ function StatusIcon({ status }: { status: BatchStatus | "attention" }) {
 }
 
 export function App() {
+  const browserHadData = useRef(
+    browserShellStore.load() !== null || browserProfileStore.load() !== null || browserBatchStore.load() !== null,
+  );
   const [shell, setShell] = useState(
     () => browserShellStore.load() ?? createShellState(),
   );
@@ -125,60 +136,132 @@ export function App() {
   const [openBatchId, setOpenBatchId] = useState<string | null>(null);
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [nativeReady, setNativeReady] = useState(() => !isNativePlatform());
+  const [storageStatus, setStorageStatus] = useState(() => sharedDataStore.getStatus());
+  const stateRef = useRef<SharedSnapshot>({ shell, profileState, batchState });
+  stateRef.current = { shell, profileState, batchState };
 
   useEffect(() => {
-    if (!isNativePlatform()) return;
     let active = true;
-    void loadNativeState().then((stored) => {
+    void (async () => {
+      const shared = await sharedDataStore.initialize();
       if (!active) return;
-      if (stored?.shell) setShell(stored.shell);
-      if (stored?.profileState) setProfileState(stored.profileState);
-      if (stored?.batchState) setBatchState(updateBatchDates(discardExpiredBatches(stored.batchState, Date.now())));
+      setStorageStatus(shared.status);
+      if (shared.status.location && shared.status.state !== "migration") {
+        if (shared.snapshot) applySharedSnapshot(shared.snapshot);
+        setNativeReady(true);
+        return;
+      }
+      if (isNativePlatform()) {
+        const stored = await loadNativeState();
+        if (!active) return;
+        if (stored?.shell) setShell(stored.shell);
+        if (stored?.profileState) setProfileState(stored.profileState);
+        if (stored?.batchState) setBatchState(updateBatchDates(discardExpiredBatches(stored.batchState, Date.now())));
+        if (stored) browserHadData.current = true;
+      }
       setNativeReady(true);
-    });
+    })();
     return () => { active = false; };
   }, []);
 
   useEffect(() => {
-    if (!nativeReady) return;
+    if (!nativeReady || storageStatus.location) return;
     void saveNativeState(shell, profileState, batchState);
-  }, [batchState, nativeReady, profileState, shell]);
+  }, [batchState, nativeReady, profileState, shell, storageStatus.location]);
+
+  useEffect(() => {
+    async function reloadShared() {
+      if (!sharedDataStore.getStatus().location) return;
+      applySharedResult(await sharedDataStore.reload());
+    }
+    const onFocus = () => { void reloadShared(); };
+    window.addEventListener("focus", onFocus);
+    let nativeListener: PluginListenerHandle | undefined;
+    if (isNativePlatform()) {
+      void CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+        if (isActive) void reloadShared();
+      }).then((listener) => { nativeListener = listener; });
+    }
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      void nativeListener?.remove();
+    };
+  }, []);
 
   useEffect(() => {
     void reconcileReminders(batchState, shell.checkReminders);
   }, [batchState, shell.checkReminders]);
 
   function saveProfiles(next: typeof profileState) {
+    browserHadData.current = true;
     browserProfileStore.save(next);
     setProfileState(next);
+    persistShared(sharedDataStore.saveProfiles(next));
   }
 
   function navigate(destination: Destination) {
     const next = selectDestination(shell, destination);
     browserShellStore.save(next);
     setShell(next);
+    persistShared(sharedDataStore.saveShell(next));
     setOpenBatchId(null);
     setEditingProfileId(null);
   }
 
   function updatePreferences(preferences: ShellPreferences) {
+    browserHadData.current = true;
     if (preferences.checkReminders && !shell.checkReminders && isNativePlatform()) {
       void requestReminderPermission().then((granted) => {
         const next = { ...shell, ...preferences, checkReminders: granted };
         browserShellStore.save(next);
         setShell(next);
+        persistShared(sharedDataStore.saveShell(next));
       });
       return;
     }
     const next = { ...shell, ...preferences };
     browserShellStore.save(next);
     setShell(next);
+    persistShared(sharedDataStore.saveShell(next));
   }
 
   function saveBatches(next: BatchState) {
+    browserHadData.current = true;
     const current = updateBatchDates(discardExpiredBatches(next, Date.now()));
     browserBatchStore.save(current);
     setBatchState(current);
+    persistShared(sharedDataStore.saveBatches(current));
+  }
+
+  function persistShared(operation: Promise<void>) {
+    void operation.catch(() => undefined).finally(() => setStorageStatus(sharedDataStore.getStatus()));
+  }
+
+  function applySharedSnapshot(snapshot: SharedSnapshot) {
+    const batches = updateBatchDates(discardExpiredBatches(snapshot.batchState, Date.now()));
+    browserShellStore.save(snapshot.shell);
+    browserProfileStore.save(snapshot.profileState);
+    browserBatchStore.save(batches);
+    setShell(snapshot.shell);
+    setProfileState(snapshot.profileState);
+    setBatchState(batches);
+  }
+
+  function applySharedResult(result: SharedStorageResult) {
+    setStorageStatus(result.status);
+    if (result.snapshot) applySharedSnapshot(result.snapshot);
+  }
+
+  async function chooseSharedLocation() {
+    applySharedResult(await sharedDataStore.chooseLocation(stateRef.current, browserHadData.current));
+  }
+
+  async function reloadSharedLocation() {
+    applySharedResult(await sharedDataStore.reload());
+  }
+
+  async function resolveSharedMigration(choice: "shared" | "device") {
+    applySharedResult(await sharedDataStore.resolveMigration(choice, stateRef.current));
   }
 
   function handleProfile(profile: FermentationProfile) {
@@ -320,18 +403,24 @@ export function App() {
               formulaTerms={shell.formulaTerms}
               preferences={shell}
               profileState={profileState}
-              onFormulaTermsChange={(formulaTerms) => {
+               onFormulaTermsChange={(formulaTerms) => {
+                 browserHadData.current = true;
                 const next = { ...shell, formulaTerms };
-                browserShellStore.save(next);
-                setShell(next);
-              }}
+                 browserShellStore.save(next);
+                 setShell(next);
+                 persistShared(sharedDataStore.saveShell(next));
+               }}
                onPreferencesChange={updatePreferences}
                onImport={(profiles, importedBatches) => {
                  saveProfiles(profiles);
                  saveBatches(importedBatches);
                }}
-               onRestoreBatch={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
-             />
+                onRestoreBatch={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
+                storageStatus={storageStatus}
+                onChooseStorage={chooseSharedLocation}
+                onReloadStorage={reloadSharedLocation}
+                onResolveStorage={resolveSharedMigration}
+              />
             </section>
           ) : (
             <>
@@ -372,9 +461,13 @@ interface SettingsViewProps {
   onPreferencesChange(preferences: ShellPreferences): void;
   onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
   onRestoreBatch(id: string): void;
+  storageStatus: SharedStorageStatus;
+  onChooseStorage(): void;
+  onReloadStorage(): void;
+  onResolveStorage(choice: "shared" | "device"): void;
 }
 
-function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport, onRestoreBatch }: SettingsViewProps) {
+function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport, onRestoreBatch, storageStatus, onChooseStorage, onReloadStorage, onResolveStorage }: SettingsViewProps) {
   const [message, setMessage] = useState("");
   const [pendingImport, setPendingImport] = useState<ArchiveImport | null>(null);
   const [showDeletedBatches, setShowDeletedBatches] = useState(false);
@@ -485,6 +578,29 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
 
   return (
     <section className="settings" aria-label="Local backup and transfer">
+      <section className="settings-card settings-exchange" aria-labelledby="data-storage-heading">
+        <h3 id="data-storage-heading">Data storage</h3>
+        <p>Shared folder: {storageStatus.location ?? "Not selected"}</p>
+        <p>Status: {storageStatus.message}</p>
+        {storageStatus.state !== "unavailable" && (
+          <button className="primary-action" onClick={onChooseStorage} type="button">Choose folder</button>
+        )}
+        {storageStatus.location && (
+          <button onClick={onReloadStorage} type="button">Reload from shared folder</button>
+        )}
+        {storageStatus.state === "migration" && (
+          <div className="form-actions">
+            <button onClick={() => onResolveStorage("shared")} type="button">Use shared folder data</button>
+            <button onClick={() => onResolveStorage("device")} type="button">Use this device's data</button>
+          </div>
+        )}
+        {storageStatus.conflicts.length > 0 && (
+          <div className="notice" role="alert">
+            <b>Synchronization conflict detected. Your files have been preserved.</b>
+            {storageStatus.conflicts.map((path) => <span key={path}>{path}</span>)}
+          </div>
+        )}
+      </section>
       <section className="settings-card" aria-label="Household preferences">
         <div className="setting-row">
           <div className="setting-body"><b>Units</b><p>Readouts for temperature and volume.</p></div>
@@ -540,7 +656,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
       </section>
       <section className="settings-card formula-term-settings" aria-labelledby="formula-terms-heading">
         <h3 id="formula-terms-heading">Formula dropdown terms</h3>
-        <p>These names stay on this device and are not included in archives.</p>
+        <p>These names are stored in the shared folder when configured and are not included in archives.</p>
         {terms.map((term, index) => (
           <div className="formula-term" key={index}>
             <label>Formula term {index + 1}<input onChange={(event) => setTerms(terms.map((value, termIndex) => termIndex === index ? event.target.value : value))} value={term} /></label>
