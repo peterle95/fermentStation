@@ -296,11 +296,6 @@ export function App() {
       </aside>
 
       <div className="content-shell">
-        <header className="masthead">
-          <div><strong>{labels[shell.destination]}</strong><span>{shell.destination === "batches" ? "6 batches · 3 fermenting" : "FermentStation · v1"}</span></div>
-          <button aria-label="More options" className="masthead-menu" onClick={() => navigate("settings")} type="button">•••</button>
-        </header>
-
         <main className="main-content">
           {shell.destination === "today" ? (
             <section className="today-screen">

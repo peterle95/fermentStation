@@ -441,13 +441,6 @@ describe("batch workflow", () => {
       .toBeTruthy();
   });
 
-  it("opens phone settings from the overflow menu", () => {
-    render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "More options" }));
-    expect(screen.getByRole("heading", { name: "Settings" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Export ZIP archive" })).toBeTruthy();
-  });
-
   it("returns from the profile editor with its mobile menu button", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
