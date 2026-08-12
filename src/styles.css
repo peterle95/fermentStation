@@ -14,7 +14,7 @@
   --amber-bg: oklch(93.5% 0.05 80);
   --blue: oklch(42% 0.1 244);
   --border-2: oklch(82% 0.014 75);
-  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-top: max(env(safe-area-inset-top, 0px), 24px);
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
@@ -65,6 +65,21 @@
   gap: 0;
   margin-top: 0;
   min-width: 0;
+}
+
+.today-screen,
+.today-screen .upcoming {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.today-screen .empty-state {
+  margin-top: 0;
+  padding: 1rem;
+}
+
+.today-screen .empty-state p + p {
+  margin-top: 0.375rem;
 }
 
 .today-fab {
@@ -122,7 +137,7 @@
   box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
   gap: 0.875rem;
   display: flex;
-  min-height: 13.125rem;
+  min-height: 0;
   min-width: 0;
   padding: 0.8125rem 1rem;
   width: 100%;
@@ -239,17 +254,13 @@
   padding: 1rem 1.125rem;
   text-align: left;
   width: 100%;
-  min-height: 12rem;
+  min-height: 0;
 }
 
 .today-screen .batch-summary:hover {
   border-color: oklch(82% 0.014 75);
   box-shadow: 0 1px 2px oklch(30% 0.02 60 / 8%), 0 0.75rem 1.625rem oklch(30% 0.02 60 / 10%);
   transform: translateY(-1px);
-}
-
-.today-screen .batch-summary:nth-child(-n + 3) {
-  min-height: 13.125rem;
 }
 
 .today-screen .batch-summary h3 {
@@ -294,7 +305,12 @@
 
 .today-screen .upcoming-strip {
   gap: 0.625rem;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
   padding: 0.125rem 0.125rem 0.5rem;
+  touch-action: pan-x;
+  width: 100%;
 }
 
 .today-screen .upcoming .section-label {
@@ -349,7 +365,7 @@
   text-align: center;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 480px) {
   .today-screen .batch-overview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -374,6 +390,12 @@
   }
 }
 
+@media (min-width: 840px) and (max-width: 1100px) {
+  .today-screen {
+    zoom: 0.8;
+  }
+}
+
 @media (max-width: 839px) {
   .today-fab {
     bottom: calc(5.125rem + var(--safe-bottom));
@@ -385,6 +407,35 @@
 
   .navigation {
     flex-direction: row;
+  }
+}
+
+@media (max-width: 479px) {
+  .today-screen .screen-head {
+    margin-bottom: 1.5rem;
+  }
+
+  .today-screen h1 {
+    font-size: 1.5rem;
+  }
+
+  .today-screen .queue-card {
+    gap: 0.625rem;
+    padding: 0.75rem;
+  }
+
+  .today-screen .queue-icon {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .today-screen .section-label {
+    margin-top: 1.125rem;
+  }
+
+  .today-screen .batch-summary {
+    gap: 0.5rem;
+    padding: 0.875rem 1rem;
   }
 }
 
@@ -1419,7 +1470,7 @@ button:disabled {
     margin: calc(1.125rem + var(--safe-top)) calc(1rem + var(--safe-right)) 0 calc(1rem + var(--safe-left));
     padding: 0.7rem 1rem;
     position: sticky;
-    top: 0;
+    top: var(--safe-top);
     z-index: 10;
   }
 
