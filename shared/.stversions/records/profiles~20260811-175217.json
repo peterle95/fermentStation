@@ -1,0 +1,107 @@
+{
+  "profiles": [
+    {
+      "id": "starter-kombucha-f1",
+      "name": "Kombucha F1",
+      "temperatureMinC": 16,
+      "temperatureMaxC": 24,
+      "phZones": [
+        {
+          "label": "optimal",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "expectedDurationDays": 10,
+      "inputs": [
+        {
+          "name": "water",
+          "unit": "ml"
+        }
+      ],
+      "calculations": [
+        {
+          "name": "tea",
+          "unit": "g",
+          "formula": "water / 200"
+        },
+        {
+          "name": "sugar",
+          "unit": "g",
+          "formula": "water / 20"
+        }
+      ],
+      "checks": [],
+      "guidance": [
+        "Keep at room temperature and cover with a breathable cloth.",
+        "Taste after 7 days, then bottle when pleasantly tart."
+      ]
+    },
+    {
+      "id": "starter-kombucha-f2",
+      "name": "Kombucha F2",
+      "temperatureMinC": 16,
+      "temperatureMaxC": 24,
+      "phZones": [],
+      "expectedDurationDays": 7,
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "guidance": [
+        "Use pressure-safe bottles and leave room for carbonation.",
+        "Bottle strained kombucha with flavoring, then burp daily.",
+        "Fruit purees increase the CO2 build-up"
+      ]
+    },
+    {
+      "id": "starter-sauerkraut",
+      "name": "Sauerkraut",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Use 2% salt by cabbage weight and keep cabbage below brine.",
+        "Pack tightly, weight the cabbage, and taste after 7 days."
+      ]
+    },
+    {
+      "id": "starter-anaerobic",
+      "name": "Anaerobic fermentation",
+      "temperatureMinC": 16,
+      "temperatureMaxC": 24,
+      "phZones": [],
+      "expectedDurationDays": 7,
+      "inputs": [
+        {
+          "name": "totalWeight",
+          "unit": "g"
+        }
+      ],
+      "calculations": [
+        {
+          "name": "salt",
+          "unit": "g",
+          "formula": "totalWeight * 2%"
+        }
+      ],
+      "checks": [],
+      "guidance": [
+        "Keep ingredients submerged and the airlock filled.",
+        "Check the seal and airlock daily during active fermentation."
+      ]
+    },
+    {
+      "id": "starter-sourdough",
+      "name": "Sourdough",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Keep the starter loosely covered at room temperature.",
+        "Feed equal weights flour and water; use when doubled and bubbly."
+      ]
+    }
+  ]
+}
