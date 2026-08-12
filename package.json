@@ -16,7 +16,13 @@
     "tauri:build": "npm run tauri -- build"
   },
   "dependencies": {
+    "@capacitor/app": "^7.1.2",
+    "@capacitor/camera": "^7.0.5",
     "@capacitor/core": "^7.4.3",
+    "@capacitor/filesystem": "^7.1.8",
+    "@capacitor/local-notifications": "^7.0.7",
+    "@capacitor/share": "^7.0.4",
+    "@capawesome/capacitor-file-picker": "^7.2.0",
     "@tauri-apps/api": "^2.8.0",
     "fflate": "^0.8.3",
     "react": "^19.1.1",

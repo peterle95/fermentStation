@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { App as CapacitorApp } from "@capacitor/app";
+import type { PluginListenerHandle } from "@capacitor/core";
 import {
   addTimelineEntry,
   addPhReading,
@@ -63,6 +65,16 @@ import {
   resolveArchiveCollisions,
   type ArchiveImport,
 } from "./platform/archive";
+import { loadNativeState, isNativePlatform, saveNativeState } from "./platform/native-store";
+import { isNativeTransferAvailable, pickNativeArchive, shareNativeFile } from "./platform/native-transfer";
+import { requestReminderPermission, reconcileReminders } from "./platform/reminders";
+import { captureNativePhoto, isNativeCameraAvailable, listenForRestoredCameraPhoto, type CapturedPhoto } from "./platform/camera";
+import {
+  sharedDataStore,
+  type SharedSnapshot,
+  type SharedStorageResult,
+  type SharedStorageStatus,
+} from "./platform/shared-data-store";
 
 const labels: Record<Destination, string> = {
   today: "Today",
@@ -107,6 +119,9 @@ function StatusIcon({ status }: { status: BatchStatus | "attention" }) {
 }
 
 export function App() {
+  const browserHadData = useRef(
+    browserShellStore.load() !== null || browserProfileStore.load() !== null || browserBatchStore.load() !== null,
+  );
   const [shell, setShell] = useState(
     () => browserShellStore.load() ?? createShellState(),
   );
@@ -120,24 +135,133 @@ export function App() {
   );
   const [openBatchId, setOpenBatchId] = useState<string | null>(null);
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
+  const [nativeReady, setNativeReady] = useState(() => !isNativePlatform());
+  const [storageStatus, setStorageStatus] = useState(() => sharedDataStore.getStatus());
+  const stateRef = useRef<SharedSnapshot>({ shell, profileState, batchState });
+  stateRef.current = { shell, profileState, batchState };
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const shared = await sharedDataStore.initialize();
+      if (!active) return;
+      setStorageStatus(shared.status);
+      if (shared.status.location && shared.status.state !== "migration") {
+        if (shared.snapshot) applySharedSnapshot(shared.snapshot);
+        setNativeReady(true);
+        return;
+      }
+      if (isNativePlatform()) {
+        const stored = await loadNativeState();
+        if (!active) return;
+        if (stored?.shell) setShell(stored.shell);
+        if (stored?.profileState) setProfileState(stored.profileState);
+        if (stored?.batchState) setBatchState(updateBatchDates(discardExpiredBatches(stored.batchState, Date.now())));
+        if (stored) browserHadData.current = true;
+      }
+      setNativeReady(true);
+    })();
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!nativeReady || storageStatus.location) return;
+    void saveNativeState(shell, profileState, batchState);
+  }, [batchState, nativeReady, profileState, shell, storageStatus.location]);
+
+  useEffect(() => {
+    async function reloadShared() {
+      if (!sharedDataStore.getStatus().location) return;
+      applySharedResult(await sharedDataStore.reload());
+    }
+    const onFocus = () => { void reloadShared(); };
+    window.addEventListener("focus", onFocus);
+    let nativeListener: PluginListenerHandle | undefined;
+    if (isNativePlatform()) {
+      void CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+        if (isActive) void reloadShared();
+      }).then((listener) => { nativeListener = listener; });
+    }
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      void nativeListener?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    void reconcileReminders(batchState, shell.checkReminders);
+  }, [batchState, shell.checkReminders]);
 
   function saveProfiles(next: typeof profileState) {
+    browserHadData.current = true;
     browserProfileStore.save(next);
     setProfileState(next);
+    persistShared(sharedDataStore.saveProfiles(next));
   }
 
   function navigate(destination: Destination) {
     const next = selectDestination(shell, destination);
     browserShellStore.save(next);
     setShell(next);
+    persistShared(sharedDataStore.saveShell(next));
     setOpenBatchId(null);
     setEditingProfileId(null);
   }
 
+  function updatePreferences(preferences: ShellPreferences) {
+    browserHadData.current = true;
+    if (preferences.checkReminders && !shell.checkReminders && isNativePlatform()) {
+      void requestReminderPermission().then((granted) => {
+        const next = { ...shell, ...preferences, checkReminders: granted };
+        browserShellStore.save(next);
+        setShell(next);
+        persistShared(sharedDataStore.saveShell(next));
+      });
+      return;
+    }
+    const next = { ...shell, ...preferences };
+    browserShellStore.save(next);
+    setShell(next);
+    persistShared(sharedDataStore.saveShell(next));
+  }
+
   function saveBatches(next: BatchState) {
+    browserHadData.current = true;
     const current = updateBatchDates(discardExpiredBatches(next, Date.now()));
     browserBatchStore.save(current);
     setBatchState(current);
+    persistShared(sharedDataStore.saveBatches(current));
+  }
+
+  function persistShared(operation: Promise<void>) {
+    void operation.catch(() => undefined).finally(() => setStorageStatus(sharedDataStore.getStatus()));
+  }
+
+  function applySharedSnapshot(snapshot: SharedSnapshot) {
+    const batches = updateBatchDates(discardExpiredBatches(snapshot.batchState, Date.now()));
+    browserShellStore.save(snapshot.shell);
+    browserProfileStore.save(snapshot.profileState);
+    browserBatchStore.save(batches);
+    setShell(snapshot.shell);
+    setProfileState(snapshot.profileState);
+    setBatchState(batches);
+  }
+
+  function applySharedResult(result: SharedStorageResult) {
+    setStorageStatus(result.status);
+    if (result.snapshot) applySharedSnapshot(result.snapshot);
+  }
+
+  async function chooseSharedLocation() {
+    applySharedResult(await sharedDataStore.chooseLocation(stateRef.current, browserHadData.current));
+  }
+
+  async function reloadSharedLocation() {
+    applySharedResult(await sharedDataStore.reload());
+  }
+
+  async function resolveSharedMigration(choice: "shared" | "device") {
+    applySharedResult(await sharedDataStore.resolveMigration(choice, stateRef.current));
   }
 
   function handleProfile(profile: FermentationProfile) {
@@ -172,11 +296,6 @@ export function App() {
       </aside>
 
       <div className="content-shell">
-        <header className="masthead">
-          <div><strong>{labels[shell.destination]}</strong><span>{shell.destination === "batches" ? "6 batches · 3 fermenting" : "FermentStation · v1"}</span></div>
-          <button aria-label="More options" className="masthead-menu" type="button">•••</button>
-        </header>
-
         <main className="main-content">
           {shell.destination === "today" ? (
             <section className="today-screen">
@@ -279,22 +398,24 @@ export function App() {
               formulaTerms={shell.formulaTerms}
               preferences={shell}
               profileState={profileState}
-              onFormulaTermsChange={(formulaTerms) => {
+               onFormulaTermsChange={(formulaTerms) => {
+                 browserHadData.current = true;
                 const next = { ...shell, formulaTerms };
-                browserShellStore.save(next);
-                setShell(next);
-              }}
-              onPreferencesChange={(preferences) => {
-                const next = { ...shell, ...preferences };
-                browserShellStore.save(next);
-                setShell(next);
-              }}
+                 browserShellStore.save(next);
+                 setShell(next);
+                 persistShared(sharedDataStore.saveShell(next));
+               }}
+               onPreferencesChange={updatePreferences}
                onImport={(profiles, importedBatches) => {
                  saveProfiles(profiles);
                  saveBatches(importedBatches);
                }}
-               onRestoreBatch={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
-             />
+                onRestoreBatch={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
+                storageStatus={storageStatus}
+                onChooseStorage={chooseSharedLocation}
+                onReloadStorage={reloadSharedLocation}
+                onResolveStorage={resolveSharedMigration}
+              />
             </section>
           ) : (
             <>
@@ -335,9 +456,13 @@ interface SettingsViewProps {
   onPreferencesChange(preferences: ShellPreferences): void;
   onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
   onRestoreBatch(id: string): void;
+  storageStatus: SharedStorageStatus;
+  onChooseStorage(): void;
+  onReloadStorage(): void;
+  onResolveStorage(choice: "shared" | "device"): void;
 }
 
-function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport, onRestoreBatch }: SettingsViewProps) {
+function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport, onRestoreBatch, storageStatus, onChooseStorage, onReloadStorage, onResolveStorage }: SettingsViewProps) {
   const [message, setMessage] = useState("");
   const [pendingImport, setPendingImport] = useState<ArchiveImport | null>(null);
   const [showDeletedBatches, setShowDeletedBatches] = useState(false);
@@ -373,6 +498,11 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
 
   async function downloadArchive() {
     const bytes = await createArchive(profileState, batchState);
+    if (isNativeTransferAvailable()) {
+      await shareNativeFile(bytes, `fermentstation-${localDate()}.zip`, "Export FermentStation archive");
+      setMessage("Archive ready to share or save.");
+      return;
+    }
     const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: "application/zip" }));
     const link = document.createElement("a");
     link.href = url;
@@ -382,7 +512,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
     setMessage("Archive exported locally.");
   }
 
-  function downloadJournal() {
+  async function downloadJournal() {
     const journal = [
       "FermentStation journal",
       `Exported ${localDate()}`,
@@ -395,6 +525,11 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         ...batch.timeline.map((entry) => `${entry.date}: ${timelineEntryText(entry)}`),
       ]),
     ].join("\n");
+    if (isNativeTransferAvailable()) {
+      await shareNativeFile(new TextEncoder().encode(journal), `fermentstation-journal-${localDate()}.txt`, "Export FermentStation journal");
+      setMessage("Journal ready to share or save.");
+      return;
+    }
     const url = URL.createObjectURL(new Blob([journal], { type: "text/plain" }));
     const link = document.createElement("a");
     link.href = url;
@@ -404,15 +539,9 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
     setMessage("Journal exported locally.");
   }
 
-  async function uploadArchive(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  async function importBytes(bytes: Uint8Array) {
     try {
-      const imported = await importArchive(
-        new Uint8Array(await file.arrayBuffer()),
-        profileState,
-        batchState,
-      );
+      const imported = await importArchive(bytes, profileState, batchState);
       setPendingImport(imported.collisions.length > 0 ? imported : null);
       if (imported.collisions.length > 0) {
         setMessage("Import paused. Resolve the listed identifier collisions before changing local data.");
@@ -423,13 +552,50 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
     } catch (error) {
       setPendingImport(null);
       setMessage(`Import rejected: ${(error as Error).message}`);
-    } finally {
-      event.target.value = "";
+    }
+  }
+
+  async function uploadArchive(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await importBytes(new Uint8Array(await file.arrayBuffer()));
+    event.target.value = "";
+  }
+
+  async function pickArchive() {
+    try {
+      const bytes = await pickNativeArchive();
+      if (bytes) await importBytes(bytes);
+    } catch (error) {
+      setMessage(`Import rejected: ${(error as Error).message}`);
     }
   }
 
   return (
     <section className="settings" aria-label="Local backup and transfer">
+      <section className="settings-card settings-exchange" aria-labelledby="data-storage-heading">
+        <h3 id="data-storage-heading">Data storage</h3>
+        <p>Shared folder: {storageStatus.location ?? "Not selected"}</p>
+        <p>Status: {storageStatus.message}</p>
+        {storageStatus.state !== "unavailable" && (
+          <button className="primary-action" onClick={onChooseStorage} type="button">Choose folder</button>
+        )}
+        {storageStatus.location && (
+          <button onClick={onReloadStorage} type="button">Reload from shared folder</button>
+        )}
+        {storageStatus.state === "migration" && (
+          <div className="form-actions">
+            <button onClick={() => onResolveStorage("shared")} type="button">Use shared folder data</button>
+            <button onClick={() => onResolveStorage("device")} type="button">Use this device's data</button>
+          </div>
+        )}
+        {storageStatus.conflicts.length > 0 && (
+          <div className="notice" role="alert">
+            <b>Synchronization conflict detected. Your files have been preserved.</b>
+            {storageStatus.conflicts.map((path) => <span key={path}>{path}</span>)}
+          </div>
+        )}
+      </section>
       <section className="settings-card" aria-label="Household preferences">
         <div className="setting-row">
           <div className="setting-body"><b>Units</b><p>Readouts for temperature and volume.</p></div>
@@ -485,7 +651,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
       </section>
       <section className="settings-card formula-term-settings" aria-labelledby="formula-terms-heading">
         <h3 id="formula-terms-heading">Formula dropdown terms</h3>
-        <p>These names stay on this device and are not included in archives.</p>
+        <p>These names are stored in the shared folder when configured and are not included in archives.</p>
         {terms.map((term, index) => (
           <div className="formula-term" key={index}>
             <label>Formula term {index + 1}<input onChange={(event) => setTerms(terms.map((value, termIndex) => termIndex === index ? event.target.value : value))} value={term} /></label>
@@ -503,6 +669,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         <h3>Data exchange</h3>
         <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
         <button className="primary-action" onClick={downloadArchive} type="button">Export ZIP archive</button>
+        {isNativeTransferAvailable() && <button onClick={pickArchive} type="button">Choose ZIP from device</button>}
         <label>Import ZIP archive <input accept=".zip,application/zip" onChange={uploadArchive} type="file" /></label>
       </section>
       {message && <p className="notice" role="status">{message}</p>}
@@ -729,7 +896,7 @@ function BatchView({ batches, mode, profiles, units, onChange, onCreate, onDelet
       {mode === "today" && (
         <button
           aria-label="Start batch"
-          className="today-fab primary-action"
+          className="batch-fab primary-action"
           disabled={profiles.length === 0}
           onClick={() => setCreating(true)}
           type="button"
@@ -880,6 +1047,7 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   const [selectedCheckId, setSelectedCheckId] = useState("");
   const [checkDrafts, setCheckDrafts] = useState<Record<string, string>>({});
   const [checkError, setCheckError] = useState("");
+  const [capturedPhoto, setCapturedPhoto] = useState<CapturedPhoto | null>(null);
   const [addingCheck, setAddingCheck] = useState(false);
   const [newCheckName, setNewCheckName] = useState("");
   const [newCheckInterval, setNewCheckInterval] = useState("7");
@@ -888,6 +1056,12 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
     if (!editing) return;
     requestAnimationFrame(() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" }));
   }, [editing]);
+
+  useEffect(() => {
+    let dispose: (() => void) | undefined;
+    void listenForRestoredCameraPhoto(setCapturedPhoto).then((remove) => { dispose = remove; });
+    return () => dispose?.();
+  }, []);
 
   async function saveEntry(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -909,19 +1083,23 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
       const form = event.currentTarget;
       const file = (form.elements.namedItem("photo") as HTMLInputElement).files?.[0];
       const current = editing?.kind === "photo" ? editing : undefined;
-      if ((!file || file.size === 0) && !current) return;
+      if ((!file || file.size === 0) && !capturedPhoto && !current) return;
       if (file && file.size > 0 && !file.type.startsWith("image/")) return;
+      const selected = file && file.size > 0
+        ? { name: file.name, mimeType: file.type, dataUrl: await fileToDataUrl(file) }
+        : capturedPhoto;
       const photo: TimelineEntry = {
         ...common,
         kind,
-        name: file && file.size > 0 ? file.name : current!.name,
-        mimeType: file && file.size > 0 ? file.type : current!.mimeType,
-        dataUrl: file && file.size > 0 ? await fileToDataUrl(file) : current!.dataUrl,
+        name: selected?.name ?? current!.name,
+        mimeType: selected?.mimeType ?? current!.mimeType,
+        dataUrl: selected?.dataUrl ?? current!.dataUrl,
         caption: String(data.get("caption") ?? "").trim(),
       };
       onChange(editing ? updateTimelineEntry(batch, photo) : addTimelineEntry(batch, photo));
       setEditing(null);
       setLoggerKind("note");
+      setCapturedPhoto(null);
       form.reset();
       return;
     } else if (kind === "check") {
@@ -1113,7 +1291,15 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
               {loggerKind === "temperature" && <label>Temperature ({units === "imperial" ? "°F" : "°C"})<input defaultValue={editing?.kind === "temperature" ? displayTemperature(editing.value, units) : undefined} name="value" required step="any" type="number" /></label>}
               {loggerKind === "status" && <label>Activity status<select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>}
               {loggerKind === "check" && <label>Batch check<select disabled={batch.status !== "active" || batch.checks.length === 0} name="checkId" onChange={(event) => setSelectedCheckId(event.target.value)} value={selectedCheckId || preferredCheckId}>{batch.checks.map((check) => <option key={check.id} value={check.id}>{check.name}</option>)}</select></label>}
-              {loggerKind === "photo" && <><label>Photo<input accept="image/*" capture="environment" name="photo" required={!editing} type="file" /></label><label>Caption<input defaultValue={editing?.kind === "photo" ? editing.caption : ""} name="caption" /></label></>}
+               {loggerKind === "photo" && <>
+                 <label>Photo<input accept="image/*" capture="environment" name="photo" required={!editing && !capturedPhoto} type="file" /></label>
+                 {isNativeCameraAvailable() && <button onClick={async () => {
+                   try { setCapturedPhoto(await captureNativePhoto()); }
+                   catch (error) { setCheckError(`Camera unavailable: ${(error as Error).message}`); }
+                 }} type="button">Take photo</button>}
+                 {capturedPhoto && <p className="notice" role="status">Photo captured. Add a caption or save the activity.</p>}
+                 <label>Caption<input defaultValue={editing?.kind === "photo" ? editing.caption : ""} name="caption" /></label>
+               </>}
               <div className="form-actions"><button className="primary-action" type="submit">{editing ? "Save activity" : "Log activity"}</button>{editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}</div>
             </form>
           </section>
@@ -1497,7 +1683,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
             <header className="profile-mobile-bar">
               <span className="brand-mark" aria-hidden="true">F</span>
               <strong>FermentStation</strong>
-              <button aria-label="Open menu" className="icon-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
+              <button aria-label="Close profile editor menu" className="icon-button" onClick={closeEditor} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
             </header>
             <nav className="profile-editor-crumbs" aria-label="Breadcrumb"><button onClick={closeEditor} type="button">Profiles</button></nav>
             <header className="profile-editor-head">

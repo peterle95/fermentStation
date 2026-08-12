@@ -12,7 +12,7 @@ interface KeyValueStore {
 
 const storageKey = "fermentstation.shell";
 
-function normalizeShellState(value: unknown): ShellState | null {
+export function parseShellState(value: unknown): ShellState | null {
   if (!value || typeof value !== "object") {
     return null;
   }
@@ -60,7 +60,7 @@ export function createShellStore(storage: KeyValueStore): ShellStore {
         }
 
         const state: unknown = JSON.parse(value);
-        return normalizeShellState(state);
+        return parseShellState(state);
       } catch {
         return null;
       }

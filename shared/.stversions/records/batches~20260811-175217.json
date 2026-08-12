@@ -1,0 +1,366 @@
+{
+  "batches": [
+    {
+      "id": "ecdd4e5c-accf-4647-9767-9ab96c197b27",
+      "name": "Kombucha F1",
+      "startDate": "2026-08-08",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "temperatureMinC": 16,
+        "temperatureMaxC": 24,
+        "phZones": [
+          {
+            "label": "optimal",
+            "min": 2,
+            "max": 3
+          }
+        ],
+        "expectedDurationDays": 10,
+        "inputs": [
+          {
+            "name": "water",
+            "unit": "ml"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "tea",
+            "unit": "g",
+            "formula": "water / 200"
+          },
+          {
+            "name": "sugar",
+            "unit": "g",
+            "formula": "water / 20"
+          }
+        ],
+        "checks": [],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {
+        "water": 1137
+      },
+      "calculationValues": {
+        "tea": {
+          "suggested": 5.685
+        },
+        "sugar": {
+          "suggested": 56.85
+        }
+      },
+      "finishDate": "2026-08-18",
+      "checks": []
+    },
+    {
+      "id": "6b75580c-8dc6-44a5-87d1-65bea8e4cacc",
+      "name": "Glas Bottle",
+      "startDate": "2026-08-06",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f2",
+        "name": "Kombucha F2",
+        "temperatureMinC": 16,
+        "temperatureMaxC": 24,
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [],
+        "calculations": [],
+        "checks": [],
+        "guidance": [
+          "Use pressure-safe bottles and leave room for carbonation.",
+          "Bottle strained kombucha with flavoring, then burp daily.",
+          "Fruit purees increase the CO2 build-up"
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-13",
+      "checks": []
+    },
+    {
+      "id": "b544835d-3f1b-40b4-ac72-ca31eaeca657",
+      "name": "Plastic Bottle",
+      "startDate": "2026-08-08",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f2",
+        "name": "Kombucha F2",
+        "temperatureMinC": 16,
+        "temperatureMaxC": 24,
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [],
+        "calculations": [],
+        "checks": [],
+        "guidance": [
+          "Use pressure-safe bottles and leave room for carbonation.",
+          "Bottle strained kombucha with flavoring, then burp daily.",
+          "Fruit purees increase the CO2 build-up"
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-15",
+      "checks": []
+    },
+    {
+      "id": "095f522a-6d5b-4726-83b9-7987f3819f42",
+      "name": "Big Glass Jar",
+      "startDate": "2026-08-04",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-anaerobic",
+        "name": "Anaerobic fermentation",
+        "temperatureMinC": 16,
+        "temperatureMaxC": 24,
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [
+          {
+            "name": "totalWeight",
+            "unit": "g"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "salt",
+            "unit": "g",
+            "formula": "totalWeight * 2%"
+          }
+        ],
+        "checks": [],
+        "guidance": [
+          "Keep ingredients submerged and the airlock filled.",
+          "Check the seal and airlock daily during active fermentation."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {
+        "salt": {
+          "suggested": null
+        }
+      },
+      "finishDate": "2026-08-11",
+      "checks": []
+    },
+    {
+      "id": "7cd8903f-ce7b-496b-a731-b704e217a890",
+      "name": "Small Glass Jar",
+      "startDate": "2026-08-06",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-anaerobic",
+        "name": "Anaerobic fermentation",
+        "temperatureMinC": 16,
+        "temperatureMaxC": 24,
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [
+          {
+            "name": "totalWeight",
+            "unit": "g"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "salt",
+            "unit": "g",
+            "formula": "totalWeight * 2%"
+          }
+        ],
+        "checks": [],
+        "guidance": [
+          "Keep ingredients submerged and the airlock filled.",
+          "Check the seal and airlock daily during active fermentation."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {
+        "salt": {
+          "suggested": null
+        }
+      },
+      "finishDate": "2026-08-13",
+      "checks": []
+    }
+  ],
+  "trash": [
+    {
+      "id": "10346fcc-6b32-45ec-963e-02fe4e1aedcf",
+      "name": "Kombucha F1",
+      "startDate": "2026-08-08",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "inputs": [],
+        "calculations": [],
+        "checks": [],
+        "phZones": [],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "checks": [],
+      "deletedAt": 1786190106555
+    },
+    {
+      "id": "4d6e711f-5903-484b-ac10-2e77b4ca5d04",
+      "name": "Kombucha F1",
+      "startDate": "2026-07-27",
+      "status": "ready",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "expectedDurationDays": 10,
+        "inputs": [],
+        "calculations": [],
+        "checks": [],
+        "phZones": [],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-06",
+      "checks": [],
+      "checksPausedAt": "2026-08-06",
+      "deletedAt": 1786284520189
+    },
+    {
+      "id": "648a23d7-6530-492c-890f-4d6369f28ec1",
+      "name": "Kombucha F1",
+      "startDate": "2026-08-08",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "expectedDurationDays": 10,
+        "inputs": [],
+        "calculations": [],
+        "checks": [],
+        "phZones": [],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-18",
+      "checks": [],
+      "deletedAt": 1786284521802
+    },
+    {
+      "id": "25e4cc58-25f8-44c5-ad81-c9ac308b7f95",
+      "name": "Kombucha F1",
+      "startDate": "2026-08-04",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "expectedDurationDays": 10,
+        "inputs": [],
+        "calculations": [],
+        "checks": [],
+        "phZones": [],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-14",
+      "checks": [],
+      "deletedAt": 1786284523092
+    },
+    {
+      "id": "59193cbe-d379-4698-b849-8375fad281aa",
+      "name": "Kombucha F1",
+      "startDate": "2026-08-09",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "temperatureMinC": 16,
+        "temperatureMaxC": 24,
+        "phZones": [
+          {
+            "label": "optimal",
+            "min": 2,
+            "max": 3
+          }
+        ],
+        "expectedDurationDays": 10,
+        "inputs": [
+          {
+            "name": "water",
+            "unit": "ml"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "tea",
+            "unit": "g",
+            "formula": "water / 200"
+          },
+          {
+            "name": "sugar",
+            "unit": "g",
+            "formula": "water / 20"
+          }
+        ],
+        "checks": [],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {
+        "water": 1137
+      },
+      "calculationValues": {
+        "tea": {
+          "suggested": 5.685
+        },
+        "sugar": {
+          "suggested": 56.85
+        }
+      },
+      "finishDate": "2026-08-19",
+      "checks": [],
+      "deletedAt": 1786285156348
+    }
+  ]
+}
