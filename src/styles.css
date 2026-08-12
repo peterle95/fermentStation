@@ -14,6 +14,10 @@
   --amber-bg: oklch(93.5% 0.05 80);
   --blue: oklch(42% 0.1 244);
   --border-2: oklch(82% 0.014 75);
+  --safe-top: max(env(safe-area-inset-top, 0px), 24px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
   color: var(--ink);
   background: var(--bg);
   font-family: "Karla", "Segoe UI", system-ui, sans-serif;
@@ -63,38 +67,19 @@
   min-width: 0;
 }
 
-.today-fab {
-  align-items: center;
-  border-radius: 1rem;
-  bottom: 1.625rem;
-  box-shadow: 0 0.25rem 0.875rem oklch(40% 0.08 45 / 35%);
-  display: grid;
-  font-size: 0;
-  height: 3.5rem;
-  padding: 0;
-  place-items: center;
-  position: fixed;
-  right: 1.125rem;
-  width: 3.5rem;
-  z-index: 30;
+.today-screen,
+.today-screen .upcoming {
+  max-width: 100%;
+  min-width: 0;
 }
 
-.today-fab span:first-child {
-  font-size: 1.875rem;
-  font-weight: 400;
-  line-height: 1;
+.today-screen .empty-state {
+  margin-top: 0;
+  padding: 1rem;
 }
 
-.today-fab span:last-child {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+.today-screen .empty-state p + p {
+  margin-top: 0.375rem;
 }
 
 .action-queue {
@@ -118,7 +103,7 @@
   box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
   gap: 0.875rem;
   display: flex;
-  min-height: 13.125rem;
+  min-height: 0;
   min-width: 0;
   padding: 0.8125rem 1rem;
   width: 100%;
@@ -235,17 +220,13 @@
   padding: 1rem 1.125rem;
   text-align: left;
   width: 100%;
-  min-height: 12rem;
+  min-height: 0;
 }
 
 .today-screen .batch-summary:hover {
   border-color: oklch(82% 0.014 75);
   box-shadow: 0 1px 2px oklch(30% 0.02 60 / 8%), 0 0.75rem 1.625rem oklch(30% 0.02 60 / 10%);
   transform: translateY(-1px);
-}
-
-.today-screen .batch-summary:nth-child(-n + 3) {
-  min-height: 13.125rem;
 }
 
 .today-screen .batch-summary h3 {
@@ -290,7 +271,12 @@
 
 .today-screen .upcoming-strip {
   gap: 0.625rem;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
   padding: 0.125rem 0.125rem 0.5rem;
+  touch-action: pan-x;
+  width: 100%;
 }
 
 .today-screen .upcoming .section-label {
@@ -345,13 +331,13 @@
   text-align: center;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 480px) {
   .today-screen .batch-overview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 900px) {
+@media (min-width: 840px) {
   .today-screen .batch-overview {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -370,11 +356,13 @@
   }
 }
 
-@media (max-width: 899px) {
-  .today-fab {
-    bottom: 5.125rem;
+@media (min-width: 840px) and (max-width: 1100px) {
+  .today-screen {
+    zoom: 0.8;
   }
+}
 
+@media (max-width: 839px) {
   .today-screen .queue-card .primary-action {
     align-self: flex-start;
   }
@@ -384,13 +372,41 @@
   }
 }
 
+@media (max-width: 479px) {
+  .today-screen .screen-head {
+    margin-bottom: 1.5rem;
+  }
+
+  .today-screen h1 {
+    font-size: 1.5rem;
+  }
+
+  .today-screen .queue-card {
+    gap: 0.625rem;
+    padding: 0.75rem;
+  }
+
+  .today-screen .queue-icon {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .today-screen .section-label {
+    margin-top: 1.125rem;
+  }
+
+  .today-screen .batch-summary {
+    gap: 0.5rem;
+    padding: 0.875rem 1rem;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  min-width: 320px;
   background: var(--bg);
 }
 
@@ -401,7 +417,7 @@ button {
 
 .app-shell {
   display: flex;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .sidebar {
@@ -410,11 +426,11 @@ button {
   display: flex;
   flex: 0 0 15.75rem;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: 1.25rem 0.9rem;
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
 }
 
 .brand {
@@ -438,19 +454,16 @@ button {
   width: 2.2rem;
 }
 
-.brand div,
-.masthead div {
+.brand div {
   display: grid;
 }
 
-.brand strong,
-.masthead strong {
+.brand strong {
   font-family: Georgia, serif;
   font-size: 1.18rem;
 }
 
-.brand span:not(.brand-mark),
-.masthead span {
+.brand span:not(.brand-mark) {
   color: var(--muted);
   font-family: Consolas, monospace;
   font-size: 0.62rem;
@@ -461,10 +474,6 @@ button {
 .content-shell {
   flex: 1;
   min-width: 0;
-}
-
-.masthead {
-  display: none;
 }
 
 .eyebrow {
@@ -569,7 +578,9 @@ h2 {
   border-radius: 0.9rem;
   margin-top: 1.5rem;
   max-width: 40rem;
+  min-width: 0;
   padding: 1.5rem;
+  width: 100%;
 }
 
 .empty-state p {
@@ -654,6 +665,7 @@ h2 {
   border: 1px solid var(--border);
   border-radius: 0.875rem;
   box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
+  min-width: 0;
   padding: 1rem 1.125rem;
 }
 
@@ -664,6 +676,11 @@ h2 {
   gap: 1rem;
   justify-content: space-between;
   padding: 0.875rem 0.25rem;
+}
+
+.setting-row > *,
+.setting-body {
+  min-width: 0;
 }
 
 .setting-row:last-child {
@@ -687,6 +704,7 @@ h2 {
   border-radius: 0.5625rem;
   display: inline-flex;
   flex: 0 0 auto;
+  max-width: 100%;
   padding: 0.1875rem;
 }
 
@@ -800,6 +818,10 @@ h2 {
   grid-template-columns: 1fr auto;
 }
 
+.formula-term > * {
+  min-width: 0;
+}
+
 .formula-term label,
 .formula-row label {
   display: grid;
@@ -832,7 +854,10 @@ textarea {
   border: 1px solid #bdaea0;
   border-radius: 0.4rem;
   font: inherit;
+  max-width: 100%;
+  min-width: 0;
   padding: 0.6rem;
+  width: 100%;
 }
 
 textarea {
@@ -981,7 +1006,7 @@ textarea {
 .batch-overview {
   display: grid;
   gap: 0.85rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .batch-summary {
@@ -1371,10 +1396,10 @@ button:disabled {
   opacity: 0.55;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 839px) {
   .app-shell {
     display: block;
-    padding-bottom: 5rem;
+    padding-bottom: calc(5rem + var(--safe-bottom));
   }
 
   .sidebar {
@@ -1391,46 +1416,8 @@ button:disabled {
     display: none;
   }
 
-  .masthead {
-    align-items: center;
-    background: rgb(238 233 223 / 92%);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    min-height: 4rem;
-    margin: 1.125rem 1rem 0;
-    padding: 0.7rem 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .masthead > div {
-    flex: 1;
-  }
-
-  .masthead strong {
-    font-family: "Source Serif 4", Georgia, serif;
-    font-size: 1.0625rem;
-    line-height: 1;
-  }
-
-  .masthead-menu {
-    align-items: center;
-    background: transparent;
-    border: 0;
-    color: var(--muted);
-    display: grid;
-    font-size: 1.1rem;
-    height: 2.75rem;
-    letter-spacing: 0.12em;
-    min-height: 0;
-    padding: 0;
-    place-items: center;
-    width: 2.75rem;
-  }
-
   .main-content {
-    padding: 0.25rem 1rem 2rem;
+    padding: 0.25rem calc(1rem + var(--safe-right)) 2rem calc(1rem + var(--safe-left));
   }
 
   .navigation {
@@ -1440,7 +1427,7 @@ button:disabled {
     display: flex;
     gap: 0;
     left: 0;
-    padding: 0;
+    padding: 0 var(--safe-right) var(--safe-bottom) var(--safe-left);
     position: fixed;
     right: 0;
     top: auto;
@@ -1460,13 +1447,6 @@ button:disabled {
     text-align: center;
   }
 
-  .navigation button:last-child {
-    border-top: 0;
-    border-radius: 0.6rem;
-    display: none;
-    margin-top: 0;
-  }
-
   .nav-mark {
     border: 0;
     height: auto;
@@ -1479,10 +1459,6 @@ button:disabled {
 
   .mobile-label {
     display: inline;
-  }
-
-  .batch-overview {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .queue-card {
@@ -1510,7 +1486,7 @@ button:disabled {
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 599px) {
   main > .eyebrow {
     display: none;
   }
@@ -1521,10 +1497,6 @@ button:disabled {
 
   .batch-card {
     padding: 1rem;
-  }
-
-  .batch-overview {
-    grid-template-columns: 1fr;
   }
 
   .batch-heading {
@@ -1585,6 +1557,8 @@ button:disabled {
   display: grid;
   gap: 1.125rem;
   grid-template-columns: 1fr;
+  min-width: 0;
+  width: 100%;
 }
 
 .calendar-panel {
@@ -1593,6 +1567,8 @@ button:disabled {
   border-radius: 0.875rem;
   box-shadow: 0 1px 2px oklch(30% 0.02 60 / 6%), 0 0.375rem 1.125rem oklch(30% 0.02 60 / 6%);
   padding: 1rem;
+  min-width: 0;
+  width: 100%;
 }
 
 .calendar-head {
@@ -1652,6 +1628,7 @@ button:disabled {
 }
 
 .calendar-weekdays span {
+  min-width: 0;
   padding: 0.25rem 0;
   text-align: center;
 }
@@ -1665,6 +1642,7 @@ button:disabled {
   font-size: 0.8125rem;
   gap: 0.1875rem;
   min-height: 4rem;
+  min-width: 0;
   overflow: hidden;
   padding: 0.375rem 0.4375rem;
 }
@@ -1851,7 +1829,7 @@ button:disabled {
   padding: 0.75rem;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 840px) {
   .calendar-layout {
     grid-template-columns: 1.6fr 1fr;
   }
@@ -1861,7 +1839,7 @@ button:disabled {
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 599px) {
   .calendar-panel {
     padding: 0.75rem;
   }
@@ -2086,21 +2064,21 @@ button:disabled {
   white-space: nowrap;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 600px) {
   .batches-screen .batch-overview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 900px) {
+@media (min-width: 840px) {
   .batches-screen .batch-overview {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 899px) {
+@media (max-width: 839px) {
   .batch-fab {
-    bottom: 5.125rem;
+    bottom: calc(5.125rem + var(--safe-bottom));
   }
 }
 
@@ -2304,7 +2282,68 @@ button:disabled {
   color: var(--muted);
   font-size: 0.625rem;
   margin: 0;
-  white-space: nowrap;
+}
+
+@media (max-width: 599px) {
+  .main-content > section,
+  .batches,
+  .profiles,
+  .settings,
+  .profile-list,
+  .batch-overview,
+  .calendar-layout {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .today-screen .empty-state,
+  .batch-card,
+  .batch-summary,
+  .profile-card {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .setting-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .setting-segment {
+    align-self: flex-start;
+    width: 100%;
+  }
+
+  .setting-segment button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 0.5rem;
+  }
+
+  .setting-export,
+  .setting-trash-button,
+  .settings-version {
+    align-self: flex-start;
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .formula-term {
+    grid-template-columns: 1fr;
+  }
+
+  .formula-term > button {
+    width: 100%;
+  }
+
+  .calendar-head {
+    gap: 0.5rem;
+  }
+
+  .calendar-head h2 {
+    font-size: 1.0625rem;
+    min-width: 0;
+  }
 }
 
 .profile-card-actions {
@@ -2452,7 +2491,7 @@ button:disabled {
   min-width: 5rem;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 600px) {
   .profiles-screen .pc-params {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2462,13 +2501,13 @@ button:disabled {
   }
 }
 
-@media (min-width: 900px) {
+@media (min-width: 840px) {
   .profiles-screen .profile-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 899px) {
+@media (max-width: 839px) {
   .profile-tools {
     right: 0;
     top: -0.25rem;
@@ -2963,7 +3002,7 @@ button:disabled {
 
 .batch-workspace .timeline-trash { margin-top: 0.75rem; }
 
-@media (max-width: 899px) {
+@media (max-width: 839px) {
   .workbench { grid-template-columns: 1fr; }
   .batch-workspace-head { align-items: flex-start; }
   .batch-head-actions { width: 100%; }
@@ -2971,7 +3010,7 @@ button:disabled {
   .wb-support { grid-column: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 599px) {
   .wb-support { grid-template-columns: 1fr; }
   .batch-workspace .timeline-entry { grid-template-columns: 0.75rem 1fr auto auto; }
   .batch-workspace .timeline-entry time { grid-column: 2 / -1; grid-row: 1; }
@@ -3229,7 +3268,7 @@ button:disabled {
 }
 
 @media (max-width: 960px) {
-  .profile-editor-shell .sidebar, .profile-editor-shell .masthead, .profile-editor-shell .navigation { display: none; }
+  .profile-editor-shell .sidebar, .profile-editor-shell .navigation { display: none; }
   .profile-editor-shell .main-content { padding: 0 1rem 6rem; }
   .profile-mobile-bar { align-items: center; border-bottom: 1px solid var(--editor-border-soft); display: flex; height: 3.75rem; justify-content: space-between; margin: 0 -1rem; padding: 0 1rem; }
   .profile-mobile-bar strong { flex: 1; font-family: Georgia, serif; font-size: 1.125rem; font-weight: 500; margin-left: 0.75rem; }
