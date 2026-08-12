@@ -901,7 +901,7 @@ function BatchView({ batches, mode, profiles, units, onChange, onCreate, onDelet
       {mode === "today" && (
         <button
           aria-label="Start batch"
-          className="today-fab primary-action"
+          className="batch-fab primary-action"
           disabled={profiles.length === 0}
           onClick={() => setCreating(true)}
           type="button"
