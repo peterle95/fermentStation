@@ -1,0 +1,14 @@
+---
+type: persistence architecture
+title: Storage and shared datasets
+description: Browser, native, and shared-directory persistence, including precedence, migration, conflict handling, atomic writes, and schemas.
+tags: [persistence, synchronization, storage]
+---
+
+Browser stores (`browserShellStore`, `browserProfileStore`, `browserBatchStore`) synchronously bootstrap local state. Each is a `KeyValueStore`-backed JSON record: shell preferences, `{ profiles }`, or `{ batches, trash }`; `parseShellState`, `parseProfileState`, and `parseBatchState` reject malformed values and normalize legacy records (including missing profile/check IDs, legacy guidance/instructions, batch check IDs, and older profile snapshots). Batch serialization retains photo `dataUrl` values in browser storage, so a browser round trip does not lose local photos. When `localStorage` is unavailable, the browser stores degrade to null/no-op persistence and the app continues with in-memory defaults rather than treating persistence failure as authoritative. `App.tsx` then calls `sharedDataStore.initialize()`. If a shared location is configured and valid, its snapshot overrides browser state; otherwise native platforms call `loadNativeState`. Native/local writes run only after `nativeReady` and only when no shared location is authoritative. Shared writes are queued through `SharedDataStore.enqueue`.
+
+`SharedDataStore` uses schema v1: `manifest.json`, `records/shell.json`, `records/profiles.json`, `records/batches.json`, and `photos/<batch>/<entry>.<extension>`. It reports `unavailable`, `unconfigured`, `ready`, `migration`, `problem`, or `conflict`. Initialization detects malformed or in-progress manifests, preserves conflict files, and hydrates external photos. `writeSnapshot` writes an in-progress manifest, records, externalized photos, then clears the marker. A failed queued write suppresses later writes until reload/recovery.
+
+Choosing a location sets a migration-pending flag. If both device and folder contain data, `resolveMigration("shared"|"device")` either accepts the folder or backs up/replaces shared files with the current device snapshot. `reload` runs on window focus and Capacitor app activation, but pauses during unresolved migration or after write failure. The Android SAF implementation is documented in [Android](../android-capacitor.md); interchange differences are in [data interchange](../workflows/data-interchange.md).
+
+Evidence: `src/platform/shared-data-store.ts`, `shared-directory-bridge.ts`, the three store modules, `native-store.ts`, and `src/App.tsx`. Tests: `shared-data-store.test.ts`, store suites, and relevant `App.test.tsx` workflows. Schema changes must update parsers, atomic/recovery tests, Java/Tauri bridges, and archive/shared documentation.
