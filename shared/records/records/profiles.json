@@ -1,0 +1,64 @@
+{
+  "profiles": [
+    {
+      "id": "starter-kombucha-f1",
+      "name": "Kombucha F1",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Keep at room temperature and cover with a breathable cloth.",
+        "Taste after 7 days, then bottle when pleasantly tart."
+      ]
+    },
+    {
+      "id": "starter-kimchi",
+      "name": "Kimchi",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Pack firmly so juice rises and leave headspace for gas.",
+        "Ferment warm briefly, then move to the fridge when the pH reaches 4.2."
+      ]
+    },
+    {
+      "id": "starter-sauerkraut",
+      "name": "Sauerkraut",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Use 2% salt by cabbage weight and keep cabbage below brine.",
+        "Pack tightly, weight the cabbage, and taste after 7 days."
+      ]
+    },
+    {
+      "id": "starter-milk-kefir",
+      "name": "Milk kefir",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Culture milk for 24 hours, then strain and restart the next jar.",
+        "Keep the grains and refrigerate the strained kefir."
+      ]
+    },
+    {
+      "id": "starter-sourdough",
+      "name": "Sourdough starter",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Keep the starter loosely covered at room temperature.",
+        "Feed equal weights flour and water; use when doubled and bubbly."
+      ]
+    }
+  ]
+}
