@@ -6,8 +6,8 @@ okf_version: "0.1"
 
 - [Capacitor Android runtime](android-capacitor.md) - Android packaging and the SharedDirectory SAF plugin that implements shared-folder persistence.
 - [Tauri desktop runtime](desktop-tauri.md) - Desktop packaging and Rust-side filesystem bridge/security boundary for the local-first application.
-- [FermentStation code wiki](quickstart.md) - Entry point for understanding the local-first fermentation tracker, its domain model, persistence protocols, platform runtimes, and safe change paths.
-- [Tests and validation](testing.md) - Behavioral test inventory mapped to domain invariants, persistence boundaries, UI workflows, and native security limits.
+- [FermentStation wiki quickstart](quickstart.md) - Navigation guide for the local-first fermentation tracker, its domain rules, persistence boundaries, native integrations, workflows, tests, and build operations.
+- [Tests and validation](testing.md) - Behavioral test inventory mapped to domain invariants, persistence boundaries, UI workflows, native security limits, and the gaps requiring device or desktop validation.
 
 # Directories
 

@@ -1,19 +1,30 @@
 ---
 type: test guide
 title: Tests and validation
-description: Behavioral test inventory mapped to domain invariants, persistence boundaries, UI workflows, and native security limits.
+description: Behavioral test inventory mapped to domain invariants, persistence boundaries, UI workflows, native security limits, and the gaps requiring device or desktop validation.
 tags: [testing, validation, quality]
 ---
 
-Run `npm test` for Vitest, `npm run typecheck` for the TypeScript project build, and `npm run build` for typecheck plus Vite production output.
+# Tests and validation
 
-- `src/domain/batches.test.ts`: creation/defaults, status pause shifting, checks, calculations, pH precision/zones, timeline trash expiry, filtering, and calendar projections.
-- `src/domain/profiles.test.ts`: normalization, units/formulas, invalid expressions, validation, and CRUD.
-- `src/domain/shell.test.ts`: destination/default invariants.
-- `src/platform/*-store.test.ts`: parser rejection/normalization and persistence contracts.
-- `src/platform/archive.test.ts`: ZIP limits, hashes, photo references, schema failures, stable IDs, merges, and collision strategies.
-- `src/platform/shared-data-store.test.ts`: migration choices, malformed/in-progress manifests, conflict files, external photos, queued writes, and atomic failure behavior.
-- `src/App.test.tsx`: navigation and end-to-end user flows across batches, profiles, archive, reminders, and shared storage.
-- `src-tauri/src/main.rs` tests: desktop path/security constraints.
+Run `npm test` for Vitest, `npm run typecheck` for the TypeScript project build, and `npm run build` for typecheck plus Vite production output. Vitest runs domain, platform, and React/jsdom tests with native boundaries mocked or unavailable; it does not prove Android Storage Access Framework, notification, camera process-death, or packaged Tauri behavior.
 
-Android Java/Capacitor integrations are not fully covered by the Vitest suites; validate with `npm run cap:sync` and the Android build when changing them. Three concrete boundary checks are: (1) App batch/profile actions call domain mutations and persistence, exercised by named flows in `src/App.test.tsx` plus `batches.test.ts`; (2) Settings archive upload passes bytes through `importArchive` and collision UI, covered by `archive.test.ts` and App archive flows; (3) shared-folder initialization/reload applies validated records to App state, covered by `shared-data-store.test.ts` and App shared-storage flows. Browser persistence degradation is directly covered by `shell-store.test.ts` and parser/store tests. Android plugin behavior and Tauri atomic-write recovery remain source-level or manual integration coverage (the Tauri path-security test is direct); do not infer native recovery guarantees from Vitest alone. A domain change should update its focused suite first; a schema/bridge change needs parser, integration, and failure-recovery tests.
+## Suite ownership and evidence
+
+- `src/domain/batches.test.ts` owns batch creation, profile snapshots, status pause/resume, checks, calculations, pH precision/zones, timeline and batch trash expiry, filtering, prioritization, and calendar projections.
+- `src/domain/profiles.test.ts` owns normalization, unit conversion/formula parsing, invalid expressions, validation, and CRUD.
+- `src/domain/shell.test.ts` owns destination/default preference invariants.
+- `src/platform/*-store.test.ts` owns parser rejection/normalization and browser persistence contracts.
+- `src/platform/archive.test.ts` owns ZIP limits, hashes, photo references, schema failures, stable IDs, merges, and collision strategies.
+- `src/platform/shared-data-store.test.ts` owns migration choices, malformed/in-progress manifests, conflict files, photo externalization/hydration, queued writes, unchanged writes, and failure status behavior.
+- `src/App.test.tsx` is the jsdom end-to-end surface for navigation, profile editing, batch creation/filtering, timeline/pH/check flows, settings, archive import/export, reminders, shared-storage results, and browser/native fallback UI.
+- `android/app/src/test/java/com/peterle/fermentstation/SharedDirectoryPluginTest.java` protects Android relative-path rejection; it does not replace device SAF tests.
+- Tests embedded in `src-tauri/src/main.rs` protect Rust traversal/absolute-path rejection and the implementation also contains atomic-write, recovery, nesting, and 64 MB safeguards requiring `cargo test --manifest-path src-tauri/Cargo.toml`.
+
+## Change routing and gaps
+
+A representative end-to-end route is distributed across `src/App.test.tsx` flows: edit/save a profile, create a batch from it, record checks/measurements/photos, persist the resulting batch, then exercise Settings archive export/import and collision resolution. The UI suite proves composition; `batches.test.ts`, `shared-data-store.test.ts`, and `archive.test.ts` prove immutable transitions and serialized round trips rather than native filesystem behavior.
+
+Change routing is explicit: a new persisted field requires the owning domain type and focused domain test, `src/platform/*-store.ts` parser tests, `shared-data-store.test.ts`, `archive.test.ts`, and the relevant App flow; a new formula term requires `profiles.ts`, profile editor/UI tests, and formula tests; a new status requires `batches.ts`, lifecycle/calendar tests, App status-flow tests, and archive/shared parsers; a new archive member requires `archive.ts`, archive integrity/tamper tests, and Settings import/export coverage; a new native method requires `shared-directory-bridge.ts`, Android plugin registration/implementation, Tauri `invoke_handler`, native contract tests, and platform-lifecycle coverage. Schema/bridge changes need parser, integration, and failure-recovery assertions across TypeScript and native contracts. Archive changes require both archive unit tests and the App collision/import flow. Shared-storage changes require migration/conflict/queued-write tests and, when native implementation changes, Android/Tauri validation.
+
+Manual or platform validation remains necessary for Android permissions and URI persistence, SAF provider rename behavior, camera restoration after process death, local notifications, generated Capacitor assets, and signed Tauri packaging. Do not infer those guarantees from Vitest. The narrow validation ladder is `npm run typecheck` → `npm test` → `npm run build` → platform sync/build; Rust changes additionally use Cargo tests.

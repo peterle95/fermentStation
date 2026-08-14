@@ -1,22 +1,42 @@
 ---
-type: architecture overview
-title: Application architecture and UI composition
-description: React composition root, domain commands, platform adapters, state precedence, and user-facing workflows.
-tags: [architecture, react, workflows]
+type: architecture
+title: System architecture
+description: FermentStation is a local-first React application whose domain state is persisted through browser, Capacitor, shared-folder, or Tauri adapters.
+tags: [architecture, composition, local-first]
 ---
 
-`src/main.tsx` mounts `App` under React StrictMode. `src/App.tsx` is the composition root and owns Today, Batches, Calendar, Profiles, and Settings destinations, plus batch detail/edit forms, profile editor dialogs, timeline/photo/pH/check actions, archive import/export dialogs, shared-folder migration/conflict UI, reminder settings, and native lifecycle effects. It imports pure commands from [batches](../domains/batches.md), [profiles](../domains/profiles.md), and shell navigation rather than embedding domain rules.
+# System architecture
 
-React state owns `shell`, `profileState`, `batchState`, open batch/profile IDs, native readiness, and shared-storage status. Startup bootstraps browser stores, initializes shared storage, applies a shared snapshot when configured, otherwise loads native state, then projects dates and discards expired trash. Effects persist native state only when ready and no shared location is authoritative; shared reload runs on focus/app activation. Camera restoration and reminder reconciliation are effect-driven boundaries.
+`src/main.tsx` mounts `App` into `#root` and loads `src/styles.css`. Vite compiles the TypeScript/React frontend; the same web bundle is hosted directly in a browser, embedded by Capacitor Android, or served by Tauri desktop. `App` is the composition root: it owns shell/profile/batch state, selects platform capabilities, initializes persistence, reconciles reminders, and routes the five destinations (`today`, `batches`, `calendar`, `profiles`, `settings`).
+
+## Boundaries and data flow
+
+The domain layer (`src/domain`) is pure state and rules. `profiles.ts` defines profile schemas and formula calculation; `batches.ts` snapshots profiles into batches and owns timeline/status/check/trash behavior; `shell.ts` defines navigation and preferences. The platform layer (`src/platform`) adapts those states to browser `localStorage`, Capacitor Preferences/Filesystem, a shared directory, native camera/file/share APIs, and notifications. UI handlers call domain transformations, then save the resulting aggregate through the selected store.
 
 ```mermaid
 flowchart LR
-  Main[src/main.tsx] --> App[src/App.tsx]
-  App --> Domain[domain commands]
-  App --> Local[local stores]
-  App --> Shared[SharedDataStore]
-  App --> Native[Capacitor/Tauri adapters]
-  Shared --> Records[versioned records and photos]
+  UI[App.tsx views] --> Shell[shell domain]
+  UI --> Profiles[profiles domain]
+  UI --> Batches[batches domain]
+  Shell --> Stores[platform stores]
+  Profiles --> Stores
+  Batches --> Stores
+  Stores --> Browser[Browser localStorage]
+  Stores --> Native[Capacitor native state]
+  Stores --> Shared[Android/Tauri shared directory]
+  UI --> Integrations[Camera archive share reminders]
 ```
 
-Tests in `src/App.test.tsx` cover user-facing navigation and workflows; domain/platform suites prove the invariants behind handlers. `navigate` delegates destination changes to `selectDestination`; `updatePreferences` updates shell preferences and calls the shell store. Profile and batch handlers call domain CRUD/mutation functions, then `saveProfiles`/`saveBatches` (or the shared equivalents). App tests explicitly cover settings persistence, profile editing, navigation, and Fold6 posture preservation: the latter keeps the selected destination and unsaved draft while layout changes. Changes to a screen should trace from its App handler to the owning domain/platform symbol and focused test, not duplicate business logic in JSX. See [storage](../platform/storage.md) and [interchange](../workflows/data-interchange.md) for authority and protocol details.
+A batch owns a cloned `profileSnapshot`, so later profile edits do not silently change existing fermentation records. Shared persistence serializes `manifest.json` plus `records/{shell,profiles,batches}.json`; photo payloads move to `photos/` and are hydrated before `parseBatchState` (see [shared storage](../platform/storage.md) and [data interchange](../workflows/data-interchange.md)).
+
+## Native composition
+
+`createPlatformSharedDirectoryBridge` chooses the Android Capacitor `SharedDirectory` plugin, Tauri commands, or an unavailable browser bridge. The cross-runtime contract is canonicalized in [native contracts](native-contracts.md). Android and desktop retain the selected folder in device-local configuration; the shared dataset does not contain that path.
+
+## UI ownership
+
+Detailed view responsibilities and event paths belong in [UI architecture](ui.md). The domain pages are the change targets for behavior changes, while platform pages own serialization and capability boundaries. No server or remote API exists; synchronization is file-based and conflict-preserving rather than merge-based.
+
+## Focused validation
+
+Use `npm run typecheck` for frontend contracts, `npm test` for domain/platform/UI behavior, `npm run build` for the Vite bundle, and platform-specific commands in [operations](../operations/build.md). Rust command/path invariants are tested with `cargo test --manifest-path src-tauri/Cargo.toml` when the Rust toolchain is available.
