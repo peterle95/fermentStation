@@ -38,9 +38,13 @@ jobs:
         run: openwiki code --update --print
         env:
           OPENWIKI_PROVIDER: openai-chatgpt
-          # OpenAI (ChatGPT login) authenticates through a browser login, which has no
-          # unattended equivalent. Supply CI credentials for it yourself.
           OPENWIKI_MODEL_ID: "gpt-5.6-luna"
+          # Create these secrets through an interactive `openwiki code --init` session.
+          # Treat the refresh token like a password.
+          OPENAI_CHATGPT_ACCESS_TOKEN: ${{ secrets.OPENAI_CHATGPT_ACCESS_TOKEN }}
+          OPENAI_CHATGPT_REFRESH_TOKEN: ${{ secrets.OPENAI_CHATGPT_REFRESH_TOKEN }}
+          OPENAI_CHATGPT_EXPIRES_AT: ${{ secrets.OPENAI_CHATGPT_EXPIRES_AT }}
+          OPENAI_CHATGPT_ACCOUNT_ID: ${{ secrets.OPENAI_CHATGPT_ACCOUNT_ID }}
           # Required for the LangSmith connector's code-mode pull to authenticate.
           # For extra workspaces, add OPENWIKI_LANGSMITH_API_KEY_2, _3, ... as repo
           # secrets and env entries here.
