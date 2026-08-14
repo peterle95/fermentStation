@@ -1,0 +1,12 @@
+---
+type: platform integration
+title: Device integrations
+description: Camera, notifications, native archive transfer, and app lifecycle adapters with explicit failure boundaries.
+tags: [platform, camera, notifications, capacitor]
+---
+
+`isNativePlatform` and feature-specific checks prevent browser calls. `camera.ts` uses Capacitor Camera, converts captured files to data URLs with configured orientation/quality, and listens for `appRestoredResult` so an Android process death can return a pending photo. `App.tsx` owns listener cleanup and inserts the resulting photo as a timeline entry; camera failure never replaces domain state.
+
+`native-transfer.ts` adapts archive bytes to native file picking and sharing. `createArchive`/`importArchive` remain the authoritative validation and merge layer; native APIs only supply or deliver bytes. `reminders.ts` requests permission, cancels tagged notifications, derives stable IDs from checks, schedules overdue checks immediately and future checks at due dates. Notification failure is non-authoritative: batches and `ShellState.remindersEnabled` remain the source of truth.
+
+App focus and Capacitor `appStateChange` trigger shared reload; camera restored-result listeners are removed on unmount. Native paths are thin adapters and have limited browser-test coverage; focused behavior is asserted through `src/App.test.tsx`, while `archive.test.ts` covers the portable bytes independent of native transport. Changes to plugin calls require the adapter, App lifecycle effect, and platform-specific build configuration to be reviewed together.
