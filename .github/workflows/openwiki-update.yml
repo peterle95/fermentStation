@@ -27,8 +27,12 @@ jobs:
           node-version: "22"
 
       - name: Install OpenWiki
-        # mermaid + jsdom are optional; they add high-fidelity validation of Mermaid diagrams. Remove if your wiki has none.
-        run: npm install --global openwiki@0.3.3 mermaid@11.16.0 jsdom@29.1.1
+        # Keep OpenWiki's dependency resolution separate from optional Mermaid tooling.
+        # --legacy-peer-deps avoids a stale deepagents/langsmith peer constraint.
+        run: npm install --global --legacy-peer-deps --no-audit --no-fund openwiki@0.3.3
+
+      - name: Install Mermaid validation tooling
+        run: npm install --global --no-audit --no-fund mermaid@11.16.0 jsdom@30.0.1
 
       - name: Run OpenWiki
         run: openwiki code --update --print
