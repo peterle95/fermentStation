@@ -11,6 +11,18 @@ Run `npm test` for Vitest, `npm run typecheck` for the TypeScript project build,
 
 ## Suite ownership and evidence
 
+| Surface | Canonical tests | What is and is not proved |
+|---|---|---|
+| Batch and profile domains | `src/domain/batches.test.ts`, `src/domain/profiles.test.ts`, `src/domain/shell.test.ts` | Pure lifecycle, formula, validation, and shell invariants; no filesystem/native provider behavior |
+| Browser/native parsers | `src/platform/*-store.test.ts` | JSON rejection/normalization and local persistence contracts; not Capacitor process recovery |
+| Shared dataset | `src/platform/shared-data-store.test.ts` | schema markers, migration, conflicts, queued writes, photo hydration; bridge provider behavior remains native |
+| Archive and transfer UI | `src/platform/archive.test.ts`, `src/App.test.tsx` | ZIP integrity/merge plus Settings workflows; native picker/share is not fully modeled by jsdom |
+| Android bridge | `android/app/src/test/java/com/peterle/fermentstation/SharedDirectoryPluginTest.java` | Relative-path rejection; SAF permissions, provider rename/backup, and file limits need device/instrumentation checks |
+| Tauri bridge | tests embedded in `src-tauri/src/main.rs` | Rust path/security behavior; run Cargo tests for atomic recovery and limits, then validate packaged commands |
+| Camera and reminders | `src/App.test.tsx` plus adapter source | UI fallback and orchestration; process-death restoration, notification provider behavior, and permission prompts require device validation |
+
+The focused suites establish these ownership boundaries:
+
 - `src/domain/batches.test.ts` owns batch creation, profile snapshots, status pause/resume, checks, calculations, pH precision/zones, timeline and batch trash expiry, filtering, prioritization, and calendar projections.
 - `src/domain/profiles.test.ts` owns normalization, unit conversion/formula parsing, invalid expressions, validation, and CRUD.
 - `src/domain/shell.test.ts` owns destination/default preference invariants.
