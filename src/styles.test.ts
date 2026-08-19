@@ -18,4 +18,10 @@ describe("mobile safe-area layout", () => {
       /@media \(max-width: 620px\) \{[\s\S]*?\.profile-editor-shell \.main-content \{ padding: var\(--safe-top\) 0\.75rem 7rem; \}/,
     );
   });
+
+  it("keeps a batch status on the right after its ID is omitted", () => {
+    expect(styles).toMatch(
+      /\.summary-heading \.status,\s*\.batches-screen \.bc-top \.status \{\s*margin-left: auto;\s*\}/,
+    );
+  });
 });
