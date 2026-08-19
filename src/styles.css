@@ -2849,6 +2849,11 @@ button:disabled {
   border-color: oklch(62% 0.15 25);
 }
 
+.meas.meas-cool {
+  background: oklch(93.5% 0.04 245);
+  border-color: var(--blue);
+}
+
 .meas-label {
   align-items: center;
   color: var(--muted);
