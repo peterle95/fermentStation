@@ -1,10 +1,318 @@
 {
   "batches": [
     {
+      "id": "ab8a67cb-cd5b-4f5a-a24f-6bdcd02eb791",
+      "name": "Small Glass Jar",
+      "startDate": "2026-08-04",
+      "status": "to-fridge",
+      "profileSnapshot": {
+        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
+        "name": "Anaerobic fermentation",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [
+          {
+            "name": "totalWeight",
+            "unit": "g"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "salt",
+            "unit": "g",
+            "formula": "totalWeight * 2%"
+          }
+        ],
+        "checks": [],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "02e33b02-ef47-42b0-8156-8c25befd0f7b",
+          "date": "2026-08-12",
+          "kind": "status",
+          "status": "to-fridge"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {
+        "salt": {
+          "suggested": null
+        }
+      },
+      "finishDate": "2026-08-11",
+      "checks": [],
+      "checksPausedAt": "2026-08-11"
+    },
+    {
+      "id": "b79c0c3a-f01b-495a-8181-bf923d24b4b6",
+      "name": "Apple Orange",
+      "startDate": "2026-08-18",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 3
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-25",
+      "checks": [
+        {
+          "id": "73b05e5b-66f8-4a92-9b45-4f55a14c46d3",
+          "name": "Bubbles",
+          "intervalDays": 3,
+          "nextDueDate": "2026-08-21"
+        }
+      ]
+    },
+    {
+      "id": "9847effa-75b5-4268-b9ae-08831f9f7dee",
+      "name": "Apple Beeren",
+      "startDate": "2026-08-18",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 3
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-25",
+      "checks": [
+        {
+          "id": "9c52e07d-6610-4044-b204-135f9875e3fb",
+          "name": "Bubbles",
+          "intervalDays": 3,
+          "nextDueDate": "2026-08-21"
+        }
+      ]
+    },
+    {
+      "id": "3478ce89-14d8-4889-ae94-44f60b0783dc",
+      "name": "Kombucha F1",
+      "startDate": "2026-08-18",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [
+          {
+            "name": "water",
+            "unit": "ml"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "tea",
+            "unit": "g",
+            "formula": "water / 200"
+          },
+          {
+            "name": "sugar",
+            "unit": "g",
+            "formula": "water / 20"
+          }
+        ],
+        "checks": [
+          {
+            "id": "1e25a145-89b2-4c37-afa3-b4157a1684a8",
+            "name": "Mold",
+            "intervalDays": 2
+          }
+        ],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {
+        "water": 1200
+      },
+      "calculationValues": {
+        "tea": {
+          "suggested": 6
+        },
+        "sugar": {
+          "suggested": 60
+        }
+      },
+      "finishDate": "2026-08-25",
+      "checks": [
+        {
+          "id": "fec890cc-5584-4e30-91e4-aa0826422008",
+          "name": "Mold",
+          "intervalDays": 2,
+          "nextDueDate": "2026-08-20"
+        }
+      ]
+    }
+  ],
+  "trash": [
+    {
+      "id": "d75a2a49-777f-4e30-b222-639c6d3c4710",
+      "name": "Glas Bottle",
+      "startDate": "2026-08-06",
+      "status": "ready",
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 3
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "76eadb49-8566-4718-a9fe-e0e9b3249468",
+          "date": "2026-08-12",
+          "kind": "check",
+          "checkName": "Bubbles"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-13",
+      "checks": [
+        {
+          "id": "967f6600-72e9-4d85-8515-8a942a7d30bf",
+          "name": "Bubbles",
+          "intervalDays": 3,
+          "nextDueDate": "2026-08-15",
+          "lastCompletedDate": "2026-08-12"
+        }
+      ],
+      "checksPausedAt": "2026-08-13",
+      "deletedAt": 1786608072115
+    },
+    {
+      "id": "eca3bb75-d518-469c-9f4b-e5b649aaf70f",
+      "name": "Big Glass Jar",
+      "startDate": "2026-08-06",
+      "status": "to-fridge",
+      "profileSnapshot": {
+        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
+        "name": "Anaerobic fermentation",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [
+          {
+            "name": "totalWeight",
+            "unit": "g"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "salt",
+            "unit": "g",
+            "formula": "totalWeight * 2%"
+          }
+        ],
+        "checks": [],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "0520ca0d-a4aa-4957-a755-cf9839682f84",
+          "date": "2026-08-13",
+          "kind": "status",
+          "status": "to-fridge"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {
+        "salt": {
+          "suggested": null
+        }
+      },
+      "finishDate": "2026-08-13",
+      "checks": [],
+      "checksPausedAt": "2026-08-13",
+      "deletedAt": 1787045363035
+    },
+    {
+      "id": "b157ab55-3910-4c75-a3cc-aa19193e2a97",
+      "name": "Plastic Bottle",
+      "startDate": "2026-08-08",
+      "status": "ready",
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 3
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "57dc22d7-26c3-4aea-8f16-bd4733835c4e",
+          "date": "2026-08-12",
+          "kind": "check",
+          "checkName": "Bubbles"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-15",
+      "checks": [],
+      "checksPausedAt": "2026-08-15",
+      "deletedAt": 1787045365782
+    },
+    {
       "id": "02724742-f6e5-4444-8efd-2c2cf4d8d62d",
       "name": "Kombucha F1",
       "startDate": "2026-08-08",
-      "status": "active",
+      "status": "ready",
       "profileSnapshot": {
         "id": "starter-kombucha-f1",
         "name": "Kombucha F1",
@@ -69,187 +377,9 @@
           "nextDueDate": "2026-08-14",
           "lastCompletedDate": "2026-08-12"
         }
-      ]
-    },
-    {
-      "id": "b157ab55-3910-4c75-a3cc-aa19193e2a97",
-      "name": "Plastic Bottle",
-      "startDate": "2026-08-08",
-      "status": "active",
-      "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [],
-        "calculations": [],
-        "checks": [
-          {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
-            "intervalDays": 3
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "57dc22d7-26c3-4aea-8f16-bd4733835c4e",
-          "date": "2026-08-12",
-          "kind": "check",
-          "checkName": "Bubbles"
-        }
       ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {},
-      "finishDate": "2026-08-15",
-      "checks": [
-        {
-          "id": "66f91a9d-1b7c-4cc2-a4d1-55fdd6ce2dec",
-          "name": "Bubbles",
-          "intervalDays": 3,
-          "nextDueDate": "2026-08-15",
-          "lastCompletedDate": "2026-08-12"
-        }
-      ]
-    },
-    {
-      "id": "ab8a67cb-cd5b-4f5a-a24f-6bdcd02eb791",
-      "name": "Small Glass Jar",
-      "startDate": "2026-08-04",
-      "status": "to-fridge",
-      "profileSnapshot": {
-        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
-        "name": "Anaerobic fermentation",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [
-          {
-            "name": "totalWeight",
-            "unit": "g"
-          }
-        ],
-        "calculations": [
-          {
-            "name": "salt",
-            "unit": "g",
-            "formula": "totalWeight * 2%"
-          }
-        ],
-        "checks": [],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "02e33b02-ef47-42b0-8156-8c25befd0f7b",
-          "date": "2026-08-12",
-          "kind": "status",
-          "status": "to-fridge"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {
-        "salt": {
-          "suggested": null
-        }
-      },
-      "finishDate": "2026-08-11",
-      "checks": [],
-      "checksPausedAt": "2026-08-11"
-    },
-    {
-      "id": "eca3bb75-d518-469c-9f4b-e5b649aaf70f",
-      "name": "Big Glass Jar",
-      "startDate": "2026-08-06",
-      "status": "to-fridge",
-      "profileSnapshot": {
-        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
-        "name": "Anaerobic fermentation",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [
-          {
-            "name": "totalWeight",
-            "unit": "g"
-          }
-        ],
-        "calculations": [
-          {
-            "name": "salt",
-            "unit": "g",
-            "formula": "totalWeight * 2%"
-          }
-        ],
-        "checks": [],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "0520ca0d-a4aa-4957-a755-cf9839682f84",
-          "date": "2026-08-13",
-          "kind": "status",
-          "status": "to-fridge"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {
-        "salt": {
-          "suggested": null
-        }
-      },
-      "finishDate": "2026-08-13",
-      "checks": [],
-      "checksPausedAt": "2026-08-13"
-    }
-  ],
-  "trash": [
-    {
-      "id": "d75a2a49-777f-4e30-b222-639c6d3c4710",
-      "name": "Glas Bottle",
-      "startDate": "2026-08-06",
-      "status": "ready",
-      "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [],
-        "calculations": [],
-        "checks": [
-          {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
-            "intervalDays": 3
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "76eadb49-8566-4718-a9fe-e0e9b3249468",
-          "date": "2026-08-12",
-          "kind": "check",
-          "checkName": "Bubbles"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {},
-      "finishDate": "2026-08-13",
-      "checks": [
-        {
-          "id": "967f6600-72e9-4d85-8515-8a942a7d30bf",
-          "name": "Bubbles",
-          "intervalDays": 3,
-          "nextDueDate": "2026-08-15",
-          "lastCompletedDate": "2026-08-12"
-        }
-      ],
-      "checksPausedAt": "2026-08-13",
-      "deletedAt": 1786608072115
+      "checksPausedAt": "2026-08-15",
+      "deletedAt": 1787047326909
     }
   ]
 }
