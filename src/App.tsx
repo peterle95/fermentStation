@@ -1259,8 +1259,18 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   const preferredCheckId = dueCheck?.id ?? batch.checks[0]?.id ?? "";
   const nextCheck = [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0];
   const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
-  const temperatureInput = batch.profileSnapshot.inputs.find((input) => /temp/i.test(input.name));
-  const temperature = temperatureInput ? batch.inputValues[temperatureInput.name] : undefined;
+  const temperatureReadings = batch.timeline.filter((entry) => entry.kind === "temperature");
+  const latestTemperature = temperatureReadings[temperatureReadings.length - 1];
+  const temperatureRange = batch.profileSnapshot.temperatureMinC !== undefined && batch.profileSnapshot.temperatureMaxC !== undefined
+    ? { min: batch.profileSnapshot.temperatureMinC, max: batch.profileSnapshot.temperatureMaxC }
+    : undefined;
+  const temperatureUnit = units === "imperial" ? "°F" : "°C";
+  const temperatureRangeLabel = temperatureRange
+    ? `${displayTemperature(temperatureRange.min, units)}–${displayTemperature(temperatureRange.max, units)}${temperatureUnit}`
+    : "range not set";
+  const temperatureAlert = latestTemperature && temperatureRange
+    ? latestTemperature.value < temperatureRange.min ? " meas-cool" : latestTemperature.value > temperatureRange.max ? " meas-alert" : ""
+    : "";
   const phZone = latestPh ? batch.profileSnapshot.phZones.find((zone) => latestPh.value >= zone.min && latestPh.value <= zone.max) : undefined;
   const phBounds = batch.profileSnapshot.phZones.length > 0
     ? {
@@ -1326,10 +1336,10 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
                 <div className="measurement-zone" aria-hidden="true"><span /><i className={phOutsideZone ? "out" : undefined} style={{ left: `${phPosition}%` }} /></div>
                 <p className="meas-note">{latestPh ? `Latest read ${latestPh.date}` : "Add a pH reading in the log below."}</p>
               </div>
-              <div className="meas">
-                <div className="meas-label"><span>Temperature</span></div>
-                <strong className="meas-value">{temperature ?? "—"}<small>{temperatureInput ? ` ${temperatureInput.unit}` : " not recorded"}</small></strong>
-                <p className="meas-note">{temperatureInput ? `Input · ${temperatureInput.name}` : "Add temperature to the profile inputs."}</p>
+              <div className={`meas${temperatureAlert}`}>
+                <div className="meas-label"><span>Temperature</span><span>range {temperatureRangeLabel}</span></div>
+                <strong className="meas-value">{latestTemperature ? displayTemperature(latestTemperature.value, units) : "—"}<small>{latestTemperature ? ` ${temperatureUnit}` : " not recorded"}</small></strong>
+                <p className="meas-note">{latestTemperature ? `Latest read ${latestTemperature.date}` : "Record temperature in the log below."}</p>
               </div>
               <div className="meas">
                 <div className="meas-label"><span>Days elapsed</span></div>
