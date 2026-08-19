@@ -363,7 +363,7 @@ export function App() {
                   <p className="screen-intro">Amber marks a profile check, green a ready day, blue a shift to the fridge.</p>
                 </div>
               </div>
-              <CalendarView batches={batchState.batches} />
+              <CalendarView batches={batchState.batches} onOpen={(id) => { navigate("batches"); setOpenBatchId(id); }} />
             </section>
           ) : shell.destination === "profiles" ? (
             <section className="profiles-screen" aria-label="Fermentation profiles">
@@ -706,8 +706,51 @@ function updateBatchDates(state: BatchState): BatchState {
   };
 }
 
-function CalendarView({ batches }: { batches: Batch[] }) {
+interface BatchPickerProps {
+  date: string;
+  events: CalendarEvent[];
+  onClose(): void;
+  onOpen(id: string): void;
+}
+
+function BatchPicker({ date, events, onClose, onOpen }: BatchPickerProps) {
+  const batchIds = [...new Set(events.map(({ batchId }) => batchId))];
+
+  useEffect(() => {
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", dismiss);
+    return () => window.removeEventListener("keydown", dismiss);
+  }, [onClose]);
+
+  if (batchIds.length < 2) return null;
+
+  return (
+    <div className="upcoming-batch-picker-overlay" onClick={onClose}>
+      <div aria-label={`Choose a batch for ${date}`} aria-modal="true" className="upcoming-batch-picker" id={`upcoming-batch-picker-${date}`} onClick={(event) => event.stopPropagation()} role="dialog">
+        <div className="upcoming-batch-picker-heading">
+          <strong>Choose a batch</strong>
+          <button onClick={onClose} type="button">Close</button>
+        </div>
+        {batchIds.map((batchId) => {
+          const batchEvents = events.filter((event) => event.batchId === batchId);
+          const batchName = batchEvents[0].batchName;
+          return (
+            <button aria-label={`Open ${batchName}`} className="upcoming-batch-choice" key={batchId} onClick={() => { onClose(); onOpen(batchId); }} type="button">
+              <strong>{batchName}</strong>
+              <span>{batchEvents.map((event) => event.label).join(" · ")}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string): void }) {
   const [viewDate, setViewDate] = useState(() => new Date(`${localDate()}T12:00:00`));
+  const [openDate, setOpenDate] = useState<string | null>(null);
   const events = calendarEvents(batches);
   const today = localDate();
   const year = viewDate.getFullYear();
@@ -744,21 +787,42 @@ function CalendarView({ batches }: { batches: Batch[] }) {
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => <span key={day}>{day}</span>)}
         </div>
         <div className="calendar-grid" role="grid" aria-label={monthLabel}>
-          {cells.map((cell, index) => cell.date ? (
-            <div
-              aria-label={`${cell.date}${cell.events.length ? `, ${cell.events.map(({ label }) => label).join(", ")}` : ""}`}
-              className={`calendar-day${cell.date === today ? " today" : ""}`}
-              key={cell.date}
-              role="gridcell"
-            >
+          {cells.map((cell, index) => {
+            if (!cell.date) return <div aria-hidden="true" className="calendar-day other" key={`leading-${index}`} />;
+            const dateValue = cell.date;
+            const batchIds = [...new Set(cell.events.map(({ batchId }) => batchId))];
+            const canChooseBatch = batchIds.length > 1;
+            const contents = <>
               <span className="calendar-day-number">{Number(cell.date.slice(-2))}</span>
               {cell.events.map((event) => (
                 <span className={`calendar-event event-${event.kind}`} key={`${event.batchId}-${event.kind}-${event.label}`} title={`${event.batchName}: ${event.label}`}>
                   {event.label}
                 </span>
               ))}
-            </div>
-          ) : <div aria-hidden="true" className="calendar-day other" key={`leading-${index}`} />)}
+            </>;
+            return (
+              <div
+                aria-label={cell.events.length ? undefined : cell.date}
+                className={`calendar-day${dateValue === today ? " today" : ""}${cell.events.length ? " has-events" : ""}`}
+                key={dateValue}
+                role="gridcell"
+              >
+                {cell.events.length ? (
+                  <button
+                    aria-controls={canChooseBatch ? `upcoming-batch-picker-${dateValue}` : undefined}
+                    aria-expanded={canChooseBatch ? openDate === dateValue : undefined}
+                    aria-haspopup={canChooseBatch ? "dialog" : undefined}
+                    aria-label={canChooseBatch ? `Choose a batch for ${dateValue}` : `Open ${cell.events[0].batchName} for ${dateValue}`}
+                    className="calendar-day-button"
+                    onClick={() => canChooseBatch ? setOpenDate((current) => current === dateValue ? null : dateValue) : onOpen(batchIds[0])}
+                    type="button"
+                  >
+                    {contents}
+                  </button>
+                ) : contents}
+              </div>
+            );
+          })}
         </div>
         <div className="calendar-legend">
           <span className="legend-check"><i />Profile check</span>
@@ -774,11 +838,11 @@ function CalendarView({ batches }: { batches: Batch[] }) {
             const date = new Date(`${event.date}T12:00:00`);
             const isFinish = event.kind === "finish";
             return (
-              <article className="upcoming-item" key={`${event.batchId}-${event.kind}-${event.date}`}>
+              <button aria-label={`Open ${event.batchName}: ${event.label}`} className="upcoming-item" key={`${event.batchId}-${event.kind}-${event.date}`} onClick={() => onOpen(event.batchId)} type="button">
                 <div className="upcoming-date"><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span></div>
                 <div className="upcoming-body"><time className="calendar-event-date" dateTime={event.date}>{event.date}</time><b>{event.batchName} {isFinish ? "finish date" : event.label}</b><p>{isFinish ? "Ready to bottle or move on." : "Profile check · due"}</p></div>
                 <span className={`calendar-status ${isFinish ? "ready" : "attention"}`}><span className="status-dot" />{isFinish ? "ready" : "check"}</span>
-              </article>
+              </button>
             );
             })}
           </div>
@@ -789,16 +853,17 @@ function CalendarView({ batches }: { batches: Batch[] }) {
             {overdue.length === 0 ? <p className="calendar-empty">No overdue checks.</p> : overdue.map((event) => {
               const date = new Date(`${event.date}T12:00:00`);
               return (
-                <article className="upcoming-item overdue-item" key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`}>
+                <button aria-label={`Open ${event.batchName}: ${event.label}`} className="upcoming-item overdue-item" key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
                   <div className="upcoming-date"><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span></div>
                   <div className="upcoming-body"><time className="calendar-event-date" dateTime={event.date}>{event.date}</time><b>{event.batchName} {event.label}</b><p>Profile check · overdue</p></div>
                   <span className="calendar-status attention"><span className="status-dot" />overdue</span>
-                </article>
+                </button>
               );
             })}
           </div>
         </div>
       </div>
+      {openDate && <BatchPicker date={openDate} events={events.filter((event) => event.date === openDate)} onClose={() => setOpenDate(null)} onOpen={onOpen} />}
     </div>
   );
 }
@@ -822,6 +887,7 @@ function BatchView({ batches, mode, profiles, units, onChange, onCreate, onDelet
   const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState<BatchListFilter>("all");
   const [profileId, setProfileId] = useState(profiles[0]?.id ?? "");
+  const [openUpcomingDate, setOpenUpcomingDate] = useState<string | null>(null);
   const overviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const selectedProfile = profiles.find(({ id }) => id === profileId) ?? profiles[0];
   const visible = mode === "today" ? prioritizeToday(batches, localDate()) : filter === "attention"
@@ -840,6 +906,7 @@ function BatchView({ batches, mode, profiles, units, onChange, onCreate, onDelet
     const dateValue = date.toISOString().slice(0, 10);
     return { date: dateValue, events: upcoming.filter((event) => event.date === dateValue) };
   });
+  const selectedUpcomingEvents = upcomingDays.find(({ date }) => date === openUpcomingDate)?.events ?? [];
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -998,14 +1065,30 @@ function BatchView({ batches, mode, profiles, units, onChange, onCreate, onDelet
           <div className="upcoming-strip">
             {upcomingDays.map(({ date: dateValue, events }) => {
               const date = new Date(`${dateValue}T12:00:00`);
+              const batchIds = [...new Set(events.map(({ batchId }) => batchId))];
+              const canChooseBatch = batchIds.length > 1;
               return (
-                <button className={dateValue === today ? "today" : undefined} key={dateValue} onClick={() => events[0] && onOpen(events[0].batchId)} type="button">
+                <button
+                  aria-controls={canChooseBatch ? `upcoming-batch-picker-${dateValue}` : undefined}
+                  aria-expanded={canChooseBatch ? openUpcomingDate === dateValue : undefined}
+                  aria-haspopup={canChooseBatch ? "dialog" : undefined}
+                  aria-label={canChooseBatch ? `Choose a batch for ${dateValue}` : undefined}
+                  className={dateValue === today ? "today" : undefined}
+                  key={dateValue}
+                  onClick={() => {
+                    if (canChooseBatch) return setOpenUpcomingDate((openDate) => openDate === dateValue ? null : dateValue);
+                    setOpenUpcomingDate(null);
+                    if (batchIds.length === 1) onOpen(batchIds[0]);
+                  }}
+                  type="button"
+                >
                   <time dateTime={dateValue}><strong>{date.getDate()}</strong>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</time>
                   <div>{events.map((event) => <span className={`event-${event.kind}`} key={`${event.batchId}-${event.kind}-${event.label}`}>{event.label}</span>)}</div>
                 </button>
               );
             })}
           </div>
+          {openUpcomingDate && <BatchPicker date={openUpcomingDate} events={selectedUpcomingEvents} onClose={() => setOpenUpcomingDate(null)} onOpen={onOpen} />}
         </section>
       )}
       </>
@@ -1023,7 +1106,7 @@ function CompactBatchCard({ batch, mode, onOpen }: { batch: Batch; mode: "today"
   const statusText = isAttention ? "Active · attention" : statusLabel(batch.status);
   return (
     <button aria-label={`Open ${batch.name}`} className={mode === "batches" ? "batch-card" : "batch-summary"} onClick={() => onOpen(batch.id)} type="button">
-      <div className={mode === "batches" ? "bc-top" : "summary-heading"}><small className={mode === "batches" ? "bc-id" : undefined}>{batch.id.slice(0, 8)}</small><span className={`status status-${isAttention ? "attention" : batch.status}`}><StatusIcon status={isAttention ? "attention" : batch.status} />{statusText}</span></div>
+      <div className={mode === "batches" ? "bc-top" : "summary-heading"}><span className={`status status-${isAttention ? "attention" : batch.status}`}><StatusIcon status={isAttention ? "attention" : batch.status} />{statusText}</span></div>
       <h3>{batch.name}</h3>
       <p className={mode === "batches" ? "bc-name" : undefined}>{batch.profileSnapshot.name}</p>
       <div className={mode === "batches" ? "bc-metrics" : "summary-metrics"}><span>Day {day}</span>{latestPh && <span>pH {latestPh.value}</span>}</div>
@@ -1179,11 +1262,18 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   const temperatureInput = batch.profileSnapshot.inputs.find((input) => /temp/i.test(input.name));
   const temperature = temperatureInput ? batch.inputValues[temperatureInput.name] : undefined;
   const phZone = latestPh ? batch.profileSnapshot.phZones.find((zone) => latestPh.value >= zone.min && latestPh.value <= zone.max) : undefined;
-  const phRange = batch.profileSnapshot.phZones.length > 0
-    ? `${Math.min(...batch.profileSnapshot.phZones.map(({ min }) => min))}–${Math.max(...batch.profileSnapshot.phZones.map(({ max }) => max))}`
+  const phBounds = batch.profileSnapshot.phZones.length > 0
+    ? {
+        min: Math.min(...batch.profileSnapshot.phZones.map(({ min }) => min)),
+        max: Math.max(...batch.profileSnapshot.phZones.map(({ max }) => max)),
+      }
+    : undefined;
+  const phRange = phBounds
+    ? `${phBounds.min}–${phBounds.max}`
     : "No zone defined";
-  const phPosition = latestPh && phZone
-    ? Math.max(0, Math.min(100, ((latestPh.value - phZone.min) / Math.max(0.01, phZone.max - phZone.min)) * 100))
+  const phOutsideZone = Boolean(latestPh && phBounds && !phZone);
+  const phPosition = latestPh && phBounds
+    ? Math.max(0, Math.min(100, ((latestPh.value - phBounds.min) / Math.max(0.01, phBounds.max - phBounds.min)) * 100))
     : 50;
   const firstCalculation = batch.profileSnapshot.calculations[0];
   const firstCalculationValue = firstCalculation ? batch.calculationValues[firstCalculation.name] : undefined;
@@ -1230,10 +1320,10 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
           <section className="wb-panel" aria-labelledby="measurements-heading">
             <h4 id="measurements-heading">Key measurements <span>live batch data</span></h4>
             <div className="meas-grid">
-              <div className="meas">
+              <div className={`meas${phOutsideZone ? " meas-alert" : ""}`}>
                 <div className="meas-label"><span>pH</span><span>zone {phRange}</span></div>
                 <strong className="meas-value">{latestPh?.value ?? "—"}<small>{latestPh ? ` · ${phZoneLabel(batch, latestPh.value) ?? "outside zone"}` : " · optional read"}</small></strong>
-                <div className="measurement-zone" aria-hidden="true"><span /><i className={!phZone ? "out" : undefined} style={{ left: `${phPosition}%` }} /></div>
+                <div className="measurement-zone" aria-hidden="true"><span /><i className={phOutsideZone ? "out" : undefined} style={{ left: `${phPosition}%` }} /></div>
                 <p className="meas-note">{latestPh ? `Latest read ${latestPh.date}` : "Add a pH reading in the log below."}</p>
               </div>
               <div className="meas">
