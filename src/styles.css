@@ -1132,6 +1132,11 @@ textarea {
   justify-content: space-between;
 }
 
+.summary-heading .status,
+.batches-screen .bc-top .status {
+  margin-left: auto;
+}
+
 .summary-metrics {
   display: flex;
   flex-wrap: wrap;
