@@ -427,6 +427,11 @@ describe("batch workflow", () => {
 
   it("logs temperature in the selected unit and stores Celsius", () => {
     render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    fireEvent.change(screen.getByLabelText("Temperature minimum"), { target: { value: "18" } });
+    fireEvent.change(screen.getByLabelText("Temperature maximum"), { target: { value: "22" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     fireEvent.click(screen.getByRole("button", { name: "°F / qt" }));
     fireEvent.click(screen.getByRole("button", { name: "Today" }));
@@ -439,8 +444,25 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
 
     expect(screen.getByText("Temperature 68°F")).toBeTruthy();
+    const keyMeasurements = screen.getByRole("heading", { name: /key measurements/i }).closest(".wb-panel") as HTMLElement;
+    const temperatureMeasurement = within(keyMeasurements).getByText("Temperature").closest(".meas")!;
+    expect(temperatureMeasurement.textContent).toContain("68 °F");
+    expect(temperatureMeasurement.textContent).toContain(`Latest read ${localDateForTest()}`);
+    expect(temperatureMeasurement.textContent).toContain("range 64.4–71.6°F");
+    expect(temperatureMeasurement.className).not.toContain("meas-cool");
+    expect(temperatureMeasurement.className).not.toContain("meas-alert");
+
+    fireEvent.click(screen.getByRole("button", { name: /Edit temperature/ }));
+    fireEvent.change(screen.getByLabelText("Temperature (°F)"), { target: { value: "60" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save activity" }));
+    expect(temperatureMeasurement.className).toContain("meas-cool");
+
+    fireEvent.click(screen.getByRole("button", { name: /Edit temperature/ }));
+    fireEvent.change(screen.getByLabelText("Temperature (°F)"), { target: { value: "80" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save activity" }));
+    expect(temperatureMeasurement.className).toContain("meas-alert");
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline)
-      .toContainEqual(expect.objectContaining({ kind: "temperature", value: 20 }));
+      .toContainEqual(expect.objectContaining({ kind: "temperature", value: expect.closeTo((80 - 32) * 5 / 9) }));
   });
 
   it("attaches, displays, edits, deletes, and restores a local photo", async () => {
