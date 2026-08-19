@@ -404,7 +404,7 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("pH value"), { target: { value: "15" } });
     fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
     expect(screen.getByText("Outside the usual pH range of 0-14")).toBeTruthy();
-    const keyMeasurements = screen.getByRole("heading", { name: /key measurements/i }).closest(".wb-panel")!;
+    const keyMeasurements = screen.getByRole("heading", { name: /key measurements/i }).closest(".wb-panel") as HTMLElement;
     const phMeasurement = within(keyMeasurements).getByText("pH").closest(".meas")!;
     expect(phMeasurement.className).toContain("meas-alert");
     expect(phMeasurement.querySelector<HTMLElement>(".measurement-zone i")!.style.left).toBe("100%");
@@ -422,7 +422,7 @@ describe("batch workflow", () => {
     expect(screen.getByText("optimal")).toBeTruthy();
     expect(screen.getByText("Latest:").parentElement?.textContent).toContain("3.45 on 2026-08-02");
     expect(phMeasurement.className).not.toContain("meas-alert");
-    expect(phMeasurement.querySelector<HTMLElement>(".measurement-zone i")!.style.left).toBe("62.5%");
+    expect(Number(phMeasurement.querySelector<HTMLElement>(".measurement-zone i")!.style.left.replace("%", ""))).toBeCloseTo(62.5);
   });
 
   it("logs temperature in the selected unit and stores Celsius", () => {
