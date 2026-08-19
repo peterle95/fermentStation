@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "./App";
 import { createProfileState } from "./domain/profiles";
@@ -324,6 +324,53 @@ describe("batch workflow", () => {
     expect(screen.getByText("Finish date")).toBeTruthy();
     expect(screen.getByText("Taste")).toBeTruthy();
     expect(screen.getByText(expectedNextDate)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: `Open Kombucha F1 for ${expectedNextDate}` }));
+    expect(screen.getByRole("heading", { name: "Kombucha F1" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Kombucha F1: Taste" }));
+    expect(screen.getByRole("heading", { name: "Kombucha F1" })).toBeTruthy();
+  });
+
+  it("chooses a batch when an upcoming day has multiple batches", () => {
+    const finishDate = addDaysForTest(localDateForTest(), 2);
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.change(screen.getByLabelText(/batch name/i), { target: { value: "First jar" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+    fireEvent.change(screen.getByLabelText("Finish date"), { target: { value: finishDate } });
+    fireEvent.click(screen.getByRole("button", { name: /Back to today/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
+    fireEvent.change(screen.getByLabelText(/batch name/i), { target: { value: "Second jar" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+    fireEvent.change(screen.getByLabelText("Finish date"), { target: { value: finishDate } });
+    fireEvent.click(screen.getByRole("button", { name: /Back to today/i }));
+
+    fireEvent.click(screen.getByRole("button", { name: `Choose a batch for ${finishDate}` }));
+    const chooser = screen.getByRole("dialog", { name: `Choose a batch for ${finishDate}` });
+    expect(chooser.textContent).toContain("First jar");
+    expect(chooser.textContent).toContain("Second jar");
+    expect(screen.getByRole("button", { name: "Close" })).toBeTruthy();
+
+    fireEvent.click(chooser.parentElement!);
+    expect(screen.queryByRole("dialog")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: `Choose a batch for ${finishDate}` }));
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: `Choose a batch for ${finishDate}` }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Open Second jar" }));
+    expect(screen.getByRole("heading", { name: "Second jar" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    fireEvent.click(screen.getByRole("button", { name: `Choose a batch for ${finishDate}` }));
+    const calendarChooser = screen.getByRole("dialog", { name: `Choose a batch for ${finishDate}` });
+    expect(calendarChooser.textContent).toContain("First jar");
+    fireEvent.click(within(calendarChooser).getByRole("button", { name: "Open First jar" }));
+    expect(screen.getByRole("heading", { name: "First jar" })).toBeTruthy();
   });
 
   it("adds, renames, and removes a batch-local check", () => {
@@ -357,6 +404,16 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("pH value"), { target: { value: "15" } });
     fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
     expect(screen.getByText("Outside the usual pH range of 0-14")).toBeTruthy();
+    const keyMeasurements = screen.getByRole("heading", { name: /key measurements/i }).closest(".wb-panel")!;
+    const phMeasurement = within(keyMeasurements).getByText("pH").closest(".meas")!;
+    expect(phMeasurement.className).toContain("meas-alert");
+    expect(phMeasurement.querySelector<HTMLElement>(".measurement-zone i")!.style.left).toBe("100%");
+
+    fireEvent.click(screen.getByRole("button", { name: /Edit pH/ }));
+    fireEvent.change(screen.getByLabelText("pH value"), { target: { value: "2.5" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save activity" }));
+    expect(phMeasurement.className).toContain("meas-alert");
+    expect(phMeasurement.querySelector<HTMLElement>(".measurement-zone i")!.style.left).toBe("0%");
 
     fireEvent.click(screen.getByRole("button", { name: /Edit pH/ }));
     fireEvent.change(screen.getByLabelText("Activity date"), { target: { value: "2026-08-02" } });
@@ -364,6 +421,8 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save activity" }));
     expect(screen.getByText("optimal")).toBeTruthy();
     expect(screen.getByText("Latest:").parentElement?.textContent).toContain("3.45 on 2026-08-02");
+    expect(phMeasurement.className).not.toContain("meas-alert");
+    expect(phMeasurement.querySelector<HTMLElement>(".measurement-zone i")!.style.left).toBe("62.5%");
   });
 
   it("logs temperature in the selected unit and stores Celsius", () => {
