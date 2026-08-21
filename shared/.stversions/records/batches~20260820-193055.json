@@ -1,6 +1,51 @@
 {
   "batches": [
     {
+      "id": "ab8a67cb-cd5b-4f5a-a24f-6bdcd02eb791",
+      "name": "Small Glass Jar",
+      "startDate": "2026-08-04",
+      "status": "to-fridge",
+      "profileSnapshot": {
+        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
+        "name": "Anaerobic fermentation",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [
+          {
+            "name": "totalWeight",
+            "unit": "g"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "salt",
+            "unit": "g",
+            "formula": "totalWeight * 2%"
+          }
+        ],
+        "checks": [],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "02e33b02-ef47-42b0-8156-8c25befd0f7b",
+          "date": "2026-08-12",
+          "kind": "status",
+          "status": "to-fridge"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {
+        "salt": {
+          "suggested": null
+        }
+      },
+      "finishDate": "2026-08-11",
+      "checks": [],
+      "checksPausedAt": "2026-08-11"
+    },
+    {
       "id": "b79c0c3a-f01b-495a-8181-bf923d24b4b6",
       "name": "Apple Orange",
       "startDate": "2026-08-18",
@@ -56,20 +101,7 @@
         ],
         "guidance": []
       },
-      "timeline": [
-        {
-          "id": "dd993311-6a56-4609-8a26-0af6d3b00326",
-          "date": "2026-08-19",
-          "kind": "ph",
-          "value": 3
-        },
-        {
-          "id": "e9fd5712-b6c4-4aea-96c9-97b7fe7cf005",
-          "date": "2026-08-19",
-          "kind": "temperature",
-          "value": 22
-        }
-      ],
+      "timeline": [],
       "timelineTrash": [],
       "inputValues": {},
       "calculationValues": {},
@@ -348,52 +380,6 @@
       ],
       "checksPausedAt": "2026-08-15",
       "deletedAt": 1787047326909
-    },
-    {
-      "id": "ab8a67cb-cd5b-4f5a-a24f-6bdcd02eb791",
-      "name": "Small Glass Jar",
-      "startDate": "2026-08-04",
-      "status": "to-fridge",
-      "profileSnapshot": {
-        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
-        "name": "Anaerobic fermentation",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [
-          {
-            "name": "totalWeight",
-            "unit": "g"
-          }
-        ],
-        "calculations": [
-          {
-            "name": "salt",
-            "unit": "g",
-            "formula": "totalWeight * 2%"
-          }
-        ],
-        "checks": [],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "02e33b02-ef47-42b0-8156-8c25befd0f7b",
-          "date": "2026-08-12",
-          "kind": "status",
-          "status": "to-fridge"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {
-        "salt": {
-          "suggested": null
-        }
-      },
-      "finishDate": "2026-08-11",
-      "checks": [],
-      "checksPausedAt": "2026-08-11",
-      "deletedAt": 1787130422608
     }
   ]
 }
