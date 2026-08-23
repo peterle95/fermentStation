@@ -21,7 +21,9 @@ The shell renders the same selected destination in responsive layouts; React sta
 - **Profiles** edits guidance, inputs, calculations, pH zones, temperatures, durations, and checks; save uses `validateProfile` before publishing.
 - **Settings** edits units, reminders, suggestions, formula terms, shared-folder selection, archive import/export, journal export, and trash restoration.
 
-`BatchView` and `BatchCard` are the primary batch workflow boundary: forms add notes, measurements, pH, temperature, photos, status changes, checks, inputs, and calculation overrides through domain functions. `Profiles` edits structured rows rather than evaluating arbitrary JavaScript. `SettingsView` owns archive file selection/download and shared-storage migration dialogs.
+`BatchView` and `BatchCard` are the primary batch workflow boundary: forms add notes, measurements, pH, temperature, photos, status changes, checks, inputs, and calculation overrides through domain functions. `BatchCard` renders the latest pH and temperature timeline readings against the profile snapshot's pH zones and temperature bounds, marking out-of-range pH as an alert and below-range temperature as cool. `CalendarView` and the Today upcoming strip open a single owning batch directly; when several batches share a date, `BatchPicker` provides a dismissible accessible chooser. `Profiles` edits structured rows rather than evaluating arbitrary JavaScript. `SettingsView` owns archive file selection/download and shared-storage migration dialogs.
+
+Calendar selection behavior is detailed in [calendar and upcoming navigation](../workflows/calendar.md).
 
 ```mermaid
 sequenceDiagram
