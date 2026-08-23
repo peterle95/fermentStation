@@ -29,7 +29,7 @@ The focused suites establish these ownership boundaries:
 - `src/platform/*-store.test.ts` owns parser rejection/normalization and browser persistence contracts.
 - `src/platform/archive.test.ts` owns ZIP limits, hashes, photo references, schema failures, stable IDs, merges, and collision strategies.
 - `src/platform/shared-data-store.test.ts` owns migration choices, malformed/in-progress manifests, conflict files, photo externalization/hydration, queued writes, unchanged writes, and failure status behavior.
-- `src/App.test.tsx` is the jsdom end-to-end surface for navigation, profile editing, batch creation/filtering, timeline/pH/check flows, settings, archive import/export, reminders, shared-storage results, and browser/native fallback UI.
+- `src/App.test.tsx` is the jsdom end-to-end surface for navigation, profile editing, batch creation/filtering, timeline/pH/check flows, calendar and upcoming-batch opening (including multi-batch chooser dismissal), measurement range presentation, settings, archive import/export, reminders, shared-storage results, and browser/native fallback UI.
 - `android/app/src/test/java/com/peterle/fermentstation/SharedDirectoryPluginTest.java` protects Android relative-path rejection; it does not replace device SAF tests.
 - Tests embedded in `src-tauri/src/main.rs` protect Rust traversal/absolute-path rejection and the implementation also contains atomic-write, recovery, nesting, and 64 MB safeguards requiring `cargo test --manifest-path src-tauri/Cargo.toml`.
 
