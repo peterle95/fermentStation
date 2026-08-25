@@ -12,7 +12,7 @@ FermentStation is a local-first household fermentation tracker for Android and d
 | Intent | Canonical page | Owning symbols | Focused validation |
 |---|---|---|---|
 | Add or change a fermentation rule | [Batches](domains/batches.md) or [Profiles](domains/profiles.md) | `createBatch`, `changeBatchStatus`, `validateProfile`, `calculateProfileValue` | `npm test -- src/domain/batches.test.ts src/domain/profiles.test.ts` |
-| Change a screen, navigation, or user workflow | [React UI](architecture/ui.md) | `App`, `BatchView`, `BatchCard`, `Profiles`, `SettingsView` | `npm test -- src/App.test.tsx` |
+| Change a screen, navigation, or user workflow | [React UI](architecture/ui.md) and [calendar navigation](workflows/calendar.md) | `App`, `BatchView`, `BatchCard`, `CalendarView`, `BatchPicker`, `Profiles`, `SettingsView` | `npm test -- src/App.test.tsx` |
 | Change browser/native/shared persistence | [Storage](platform/storage.md) and [platform lifecycle](workflows/platform-lifecycle.md) | `SharedDataStore`, `createPlatformSharedDirectoryBridge` | `npm test -- src/platform/*store.test.ts src/platform/shared-data-store.test.ts` |
 | Change archive import/export | [Archive](platform/archive.md) and [Archive transfer workflow](workflows/archive-transfer.md) | `createArchive`, `importArchive`, `resolveArchiveCollisions`, `shareNativeFile`, `pickNativeArchive` | `npm test -- src/platform/archive.test.ts src/App.test.tsx` |
 | Add/change camera, reminders, file picker, or sharing | [Device integrations](platform/device-integrations.md) | `captureNativePhoto`, `reconcileReminders`, native transfer functions | `npm test -- src/App.test.tsx`; device validation for native behavior |
@@ -28,7 +28,7 @@ FermentStation is a local-first household fermentation tracker for Android and d
 - [Storage](platform/storage.md) explains browser stores, native state, shared-folder snapshots, schema parsing, migration, conflicts, and photo externalization.
 - [Archive exchange](platform/archive.md) documents ZIP integrity, imports, exports, photo hashes, and collision resolution.
 - [Device integrations](platform/device-integrations.md) covers camera, reminders, native transfer, and platform capability fallbacks.
-- [Data interchange](workflows/data-interchange.md), [archive transfer](workflows/archive-transfer.md), and [platform lifecycle](workflows/platform-lifecycle.md) describe cross-system flows.
+- [Data interchange](workflows/data-interchange.md), [archive transfer](workflows/archive-transfer.md), [calendar navigation](workflows/calendar.md), and [platform lifecycle](workflows/platform-lifecycle.md) describe cross-system flows.
 
 ## Commands
 
