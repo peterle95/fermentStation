@@ -3,12 +3,8 @@
     {
       "id": "starter-kombucha-f1",
       "name": "Kombucha F1",
-      "guidance": [
-        "Keep at room temperature and cover with a breathable cloth.",
-        "Taste after 7 days, then bottle when pleasantly tart."
-      ],
       "phZones": [],
-      "expectedDurationDays": 8,
+      "expectedDurationDays": 7,
       "inputs": [
         {
           "name": "water",
@@ -33,6 +29,22 @@
           "name": "Mold",
           "intervalDays": 2
         }
+      ],
+      "guidance": [
+        "Keep at room temperature and cover with a breathable cloth.",
+        "Taste after 7 days, then bottle when pleasantly tart."
+      ]
+    },
+    {
+      "id": "starter-kimchi",
+      "name": "Kimchi",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Pack firmly so juice rises and leave headspace for gas.",
+        "Ferment warm briefly, then move to the fridge when the pH reaches 4.2."
       ]
     },
     {
@@ -44,25 +56,20 @@
       ],
       "phZones": [],
       "expectedDurationDays": 7,
-      "inputs": [
-        {
-          "name": "totalWeight",
-          "unit": "g"
-        }
-      ],
-      "calculations": [
-        {
-          "name": "salt",
-          "unit": "g",
-          "formula": "totalWeight * 2%"
-        }
-      ],
-      "checks": [
-        {
-          "id": "ee29341b-5c9c-4764-9418-62bb9414f690",
-          "name": "Mold",
-          "intervalDays": 3
-        }
+      "inputs": [],
+      "calculations": [],
+      "checks": []
+    },
+    {
+      "id": "starter-milk-kefir",
+      "name": "Milk kefir",
+      "inputs": [],
+      "calculations": [],
+      "checks": [],
+      "phZones": [],
+      "guidance": [
+        "Culture milk for 24 hours, then strain and restart the next jar.",
+        "Keep the grains and refrigerate the strained kefir."
       ]
     },
     {
@@ -80,9 +87,8 @@
     {
       "id": "a1f42d1d-a006-4d55-a448-184259650a34",
       "name": "Kombucha F2",
-      "guidance": [],
       "phZones": [],
-      "expectedDurationDays": 8,
+      "expectedDurationDays": 7,
       "inputs": [],
       "calculations": [],
       "checks": [
@@ -91,12 +97,12 @@
           "name": "Bubbles",
           "intervalDays": 3
         }
-      ]
+      ],
+      "guidance": []
     },
     {
       "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
       "name": "Anaerobic fermentation",
-      "guidance": [],
       "phZones": [],
       "expectedDurationDays": 7,
       "inputs": [
@@ -112,13 +118,8 @@
           "formula": "totalWeight * 2%"
         }
       ],
-      "checks": [
-        {
-          "id": "b2bf2b30-6823-49c4-8d8c-6912287bf3ae",
-          "name": "Mold",
-          "intervalDays": 3
-        }
-      ]
+      "checks": [],
+      "guidance": []
     }
   ]
 }

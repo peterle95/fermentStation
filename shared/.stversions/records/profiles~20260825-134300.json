@@ -44,19 +44,8 @@
       ],
       "phZones": [],
       "expectedDurationDays": 7,
-      "inputs": [
-        {
-          "name": "totalWeight",
-          "unit": "g"
-        }
-      ],
-      "calculations": [
-        {
-          "name": "salt",
-          "unit": "g",
-          "formula": "totalWeight * 2%"
-        }
-      ],
+      "inputs": [],
+      "calculations": [],
       "checks": [
         {
           "id": "ee29341b-5c9c-4764-9418-62bb9414f690",
@@ -96,7 +85,6 @@
     {
       "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
       "name": "Anaerobic fermentation",
-      "guidance": [],
       "phZones": [],
       "expectedDurationDays": 7,
       "inputs": [
@@ -112,13 +100,8 @@
           "formula": "totalWeight * 2%"
         }
       ],
-      "checks": [
-        {
-          "id": "b2bf2b30-6823-49c4-8d8c-6912287bf3ae",
-          "name": "Mold",
-          "intervalDays": 3
-        }
-      ]
+      "checks": [],
+      "guidance": []
     }
   ]
 }

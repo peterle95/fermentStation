@@ -44,19 +44,8 @@
       ],
       "phZones": [],
       "expectedDurationDays": 7,
-      "inputs": [
-        {
-          "name": "totalWeight",
-          "unit": "g"
-        }
-      ],
-      "calculations": [
-        {
-          "name": "salt",
-          "unit": "g",
-          "formula": "totalWeight * 2%"
-        }
-      ],
+      "inputs": [],
+      "calculations": [],
       "checks": [
         {
           "id": "ee29341b-5c9c-4764-9418-62bb9414f690",
