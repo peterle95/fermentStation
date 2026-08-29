@@ -8,7 +8,7 @@
         "Taste after 7 days, then bottle when pleasantly tart."
       ],
       "phZones": [],
-      "expectedDurationDays": 8,
+      "expectedDurationDays": 10,
       "inputs": [
         {
           "name": "water",
@@ -31,17 +31,13 @@
         {
           "id": "1e25a145-89b2-4c37-afa3-b4157a1684a8",
           "name": "Mold",
-          "intervalDays": 2
+          "intervalDays": 4
         }
       ]
     },
     {
       "id": "starter-sauerkraut",
       "name": "Sauerkraut",
-      "guidance": [
-        "Use 2% salt by cabbage weight and keep cabbage below brine.",
-        "Pack tightly, weight the cabbage, and taste after 7 days."
-      ],
       "phZones": [],
       "expectedDurationDays": 7,
       "inputs": [
@@ -63,6 +59,10 @@
           "name": "Mold",
           "intervalDays": 3
         }
+      ],
+      "guidance": [
+        "Use 2% salt by cabbage weight and keep cabbage below brine.",
+        "Pack tightly, weight the cabbage, and taste after 7 days."
       ]
     },
     {
@@ -82,21 +82,20 @@
       "name": "Kombucha F2",
       "guidance": [],
       "phZones": [],
-      "expectedDurationDays": 8,
+      "expectedDurationDays": 10,
       "inputs": [],
       "calculations": [],
       "checks": [
         {
           "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
           "name": "Bubbles",
-          "intervalDays": 3
+          "intervalDays": 5
         }
       ]
     },
     {
       "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
       "name": "Anaerobic fermentation",
-      "guidance": [],
       "phZones": [],
       "expectedDurationDays": 7,
       "inputs": [
@@ -118,7 +117,8 @@
           "name": "Mold",
           "intervalDays": 3
         }
-      ]
+      ],
+      "guidance": []
     }
   ]
 }

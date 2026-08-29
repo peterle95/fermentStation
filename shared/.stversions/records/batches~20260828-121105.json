@@ -336,17 +336,7 @@
         ],
         "guidance": []
       },
-      "timeline": [
-        {
-          "id": "0459651b-808f-4311-92af-89cdb71d3680",
-          "date": "2026-08-28",
-          "kind": "photo",
-          "name": "JPEG_20260828_121005_5346890130885471919.jpg",
-          "mimeType": "image/jpeg",
-          "caption": "",
-          "photoRef": "photos/af9cdd33-7adb-4f58-a122-ca7e701d1a8d/0459651b-808f-4311-92af-89cdb71d3680.jpg"
-        }
-      ],
+      "timeline": [],
       "timelineTrash": [],
       "inputValues": {},
       "calculationValues": {},

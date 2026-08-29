@@ -314,51 +314,6 @@
           "nextDueDate": "2026-08-30"
         }
       ]
-    },
-    {
-      "id": "af9cdd33-7adb-4f58-a122-ca7e701d1a8d",
-      "name": "Pear Orange Rosmarin",
-      "startDate": "2026-08-28",
-      "status": "active",
-      "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
-        "phZones": [],
-        "expectedDurationDays": 10,
-        "inputs": [],
-        "calculations": [],
-        "checks": [
-          {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
-            "intervalDays": 5
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "0459651b-808f-4311-92af-89cdb71d3680",
-          "date": "2026-08-28",
-          "kind": "photo",
-          "name": "JPEG_20260828_121005_5346890130885471919.jpg",
-          "mimeType": "image/jpeg",
-          "caption": "",
-          "photoRef": "photos/af9cdd33-7adb-4f58-a122-ca7e701d1a8d/0459651b-808f-4311-92af-89cdb71d3680.jpg"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {},
-      "finishDate": "2026-09-07",
-      "checks": [
-        {
-          "id": "e89fe4a5-fa25-41df-a4f5-5498b5330d99",
-          "name": "Bubbles",
-          "intervalDays": 5,
-          "nextDueDate": "2026-09-02"
-        }
-      ]
     }
   ],
   "trash": [
