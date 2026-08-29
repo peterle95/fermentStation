@@ -1,46 +1,57 @@
 ---
 type: guide
 title: FermentStation wiki quickstart
-description: Navigation guide for the local-first fermentation tracker, its domain rules, persistence boundaries, native integrations, workflows, tests, and build operations.
-tags: [quickstart, navigation]
+description: Entry point for understanding and safely changing the local-first FermentStation React, Android, and Tauri application.
+tags: [quickstart, navigation, repository]
 ---
 
 # FermentStation wiki quickstart
 
-FermentStation is a local-first household fermentation tracker for Android and desktop. Start with [system architecture](architecture/overview.md), then route changes by intent:
+FermentStation is a local-first household fermentation journal. `src/main.tsx` mounts the React `App`; `src/App.tsx` composes navigation, profiles, batches, persistence, native capabilities, archives, and reminders. There is no server API: state is transformed in pure domain modules and persisted through browser, Capacitor, shared-folder, or Tauri adapters.
 
-| Intent | Canonical page | Owning symbols | Focused validation |
-|---|---|---|---|
-| Add or change a fermentation rule | [Batches](domains/batches.md) or [Profiles](domains/profiles.md) | `createBatch`, `changeBatchStatus`, `validateProfile`, `calculateProfileValue` | `npm test -- src/domain/batches.test.ts src/domain/profiles.test.ts` |
-| Change a screen, navigation, or user workflow | [React UI](architecture/ui.md) and [calendar navigation](workflows/calendar.md) | `App`, `BatchView`, `BatchCard`, `CalendarView`, `BatchPicker`, `Profiles`, `SettingsView` | `npm test -- src/App.test.tsx` |
-| Change browser/native/shared persistence | [Storage](platform/storage.md) and [platform lifecycle](workflows/platform-lifecycle.md) | `SharedDataStore`, `createPlatformSharedDirectoryBridge` | `npm test -- src/platform/*store.test.ts src/platform/shared-data-store.test.ts` |
-| Change archive import/export | [Archive](platform/archive.md) and [Archive transfer workflow](workflows/archive-transfer.md) | `createArchive`, `importArchive`, `resolveArchiveCollisions`, `shareNativeFile`, `pickNativeArchive` | `npm test -- src/platform/archive.test.ts src/App.test.tsx` |
-| Add/change camera, reminders, file picker, or sharing | [Device integrations](platform/device-integrations.md) | `captureNativePhoto`, `reconcileReminders`, native transfer functions | `npm test -- src/App.test.tsx`; device validation for native behavior |
-| Change Android/Tauri bridge methods | [Native contracts](architecture/native-contracts.md) | `SharedDirectoryBridge`, `SharedDirectoryPlugin`, Tauri commands | TypeScript tests plus Android/Rust tests |
-| Change packaging or release configuration | [Deployment](operations/deployment.md) and [Build operations](operations/build.md) | Capacitor/Gradle files, `tauri.conf.json`, `main.rs` | `npm run build`, sync, platform build |
-| Understand test ownership | [Tests](testing.md) | domain/platform/App/native suites | `npm test`, `npm run typecheck` |
+## Map of the system
 
-## Main concepts
+- [System architecture](architecture/overview.md) — composition root, boundaries, data flow, and platform selection.
+- [UI architecture](architecture/ui.md) — views, React state, event handlers, navigation, drafts, and lifecycle listeners.
+- [Profile domain](domains/profiles.md) — editable profile schema, validation, formulas, units, and normalization.
+- [Batch domain](domains/batches.md) — profile snapshots, status/check lifecycle, journal timeline, pH, calendar, and trash.
+- [Shell domain](domains/shell.md) — destinations and preferences.
+- [Storage](platform/storage.md) — browser/native parsers and shared persistence boundaries.
+- [Archive](platform/archive.md) — versioned ZIP export/import and collision handling.
+- [Device integrations](platform/device-integrations.md) — camera, notifications, archive transfer, and native lifecycle.
+- [Android and Capacitor](platform/android-capacitor.md) — SAF plugin, native Filesystem, manifest, and Android capabilities.
+- [Tauri desktop](platform/desktop-tauri.md) — Rust commands and safe shared-folder filesystem behavior.
+- [Platform lifecycle](workflows/platform-lifecycle.md) — startup, source precedence, native readiness, and saves.
+- [Shared synchronization](workflows/shared-sync.md) — migration, queued writes, conflicts, and recovery.
+- [Calendar workflow](workflows/calendar.md) — Today prioritization, due checks, and calendar projections.
+- [Archive transfer](workflows/archive-transfer.md) — user-facing import/export flow.
+- [Data interchange](workflows/data-interchange.md) — shared-folder and archive schemas.
+- [Build operations](operations/build.md) — commands, prerequisites, generated outputs, and CI wiki update.
+- [Testing](testing.md) — focused suites and validation strategy.
 
-- [Profiles](domains/profiles.md) define inputs, calculations, guidance, pH zones, temperatures, durations, and recurring checks.
-- [Batches](domains/batches.md) snapshot profiles and track statuses, timeline entries, readings, photos, checks, calendar events, and seven-day recovery trash.
-- [Shell state](domains/shell.md) owns destination, units, reminder/suggestion preferences, and formula terms.
-- [Storage](platform/storage.md) explains browser stores, native state, shared-folder snapshots, schema parsing, migration, conflicts, and photo externalization.
-- [Archive exchange](platform/archive.md) documents ZIP integrity, imports, exports, photo hashes, and collision resolution.
-- [Device integrations](platform/device-integrations.md) covers camera, reminders, native transfer, and platform capability fallbacks.
-- [Data interchange](workflows/data-interchange.md), [archive transfer](workflows/archive-transfer.md), [calendar navigation](workflows/calendar.md), and [platform lifecycle](workflows/platform-lifecycle.md) describe cross-system flows.
+## Task routing
 
-## Commands
+| Intent | Canonical page | Primary source surface | Focused check | Minimal validation |
+|---|---|---|---|---|
+| Change profile fields or formulas | [Profile domain](domains/profiles.md) | `src/domain/profiles.ts`, profile editor in `src/App.tsx` | `src/domain/profiles.test.ts` | `npm test -- profiles` |
+| Change batch status, checks, timeline, pH, or trash | [Batch domain](domains/batches.md) | `src/domain/batches.ts`, batch handlers in `src/App.tsx` | `src/domain/batches.test.ts` | `npm test -- batches` |
+| Change navigation/preferences/layout | [UI architecture](architecture/ui.md), [Shell domain](domains/shell.md) | `src/App.tsx`, `src/domain/shell.ts`, `src/styles.css` | `src/App.test.tsx`, `src/styles.test.ts` | `npm test` |
+| Change JSON persistence or migrations | [Storage](platform/storage.md) | `src/platform/*-store.ts` | store tests | `npm test` |
+| Change shared-folder sync or conflicts | [Shared synchronization](workflows/shared-sync.md) | `shared-data-store.ts`, bridge, platform implementation | `shared-data-store.test.ts` | `npm test` |
+| Change archive format or collision behavior | [Archive](platform/archive.md), [Archive transfer](workflows/archive-transfer.md) | `src/platform/archive.ts`, Settings UI | `archive.test.ts`, App archive tests | `npm test` |
+| Change camera, notifications, or native transfer | [Device integrations](platform/device-integrations.md), [Android](platform/android-capacitor.md) | `src/platform/camera.ts`, `reminders.ts`, `native-transfer.ts` | App integration tests | `npm test`, then Android build/device check |
+| Change Android shared storage | [Android](platform/android-capacitor.md) | `SharedDirectoryPlugin.java`, bridge, manifest | `SharedDirectoryPluginTest` | `npm run cap:sync; npm run android:build` |
+| Change desktop shared storage/security | [Tauri desktop](platform/desktop-tauri.md) | `src-tauri/src/main.rs` | Rust unit tests | `cargo test --manifest-path src-tauri/Cargo.toml` |
+| Change packaging/tooling | [Build operations](operations/build.md) | `package.json`, Vite/Gradle/Tauri configs, scripts | build/typecheck | `npm run typecheck` or `npm run build` |
 
-```text
-npm run dev
-npm test
-npm run typecheck
-npm run build
-npm run cap:sync
-npm run android:build
-npm run tauri:dev
-npm run tauri:build
-```
+## Core invariants
 
-Build prerequisites and generated outputs are in [deployment](operations/deployment.md). Source documentation in `docs/` remains supporting material, especially `docs/shared-data-format.md` for the shared dataset and `docs/android-development-workflow.md` for Android setup. There is no remote service, server API, or migration framework beyond the documented persisted schema parsers and archive/shared-data version checks.
+A new batch owns a cloned profile snapshot; profile edits affect future batches, not existing records. Batch inputs and formula outputs reject invalid negative values and incompatible units. Recurring checks are authoritative in batch state; notifications are only a native projection. Shared datasets are accepted as complete versioned snapshots, preserve sync-conflict files, and reject interrupted or malformed generations. Archives verify structure, hashes, stable IDs, and domain validity before reaching the UI.
+
+## Validation baseline
+
+Run `npm run typecheck` for TypeScript contracts, `npm test` for domain/platform/UI behavior, and `npm run build` for the production web bundle. Use `npm run cap:sync` and `npm run android:build` for Android packaging, and `npm run tauri:build` for desktop packaging when those surfaces change. Rust-specific safety changes require the Cargo test command above.
+
+## Scope boundaries and backlog
+
+The repository has no remote backend, live database synchronization, or server-side API. File-based shared storage intentionally preserves conflicts instead of merging them. Historical gap notes in `docs/android-desktop-implementation-gaps.md` may describe capabilities that current source now implements; prefer current source and focused tests. No evidence-blocked backlog remains for the initialized wiki.
