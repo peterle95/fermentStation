@@ -1,5 +1,5 @@
 {
-  "destination": "today",
+  "destination": "calendar",
   "formulaTerms": [
     "totalWeight",
     "water",

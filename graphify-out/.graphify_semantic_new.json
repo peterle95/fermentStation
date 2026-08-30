@@ -1,0 +1,4502 @@
+{
+  "nodes": [
+    {
+      "id": "github_workflows_openwiki_update",
+      "label": "OpenWiki Update Workflow",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.github\\workflows\\openwiki-update.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "od_skills_agent_browser_skill",
+      "label": "Agent Browser Skill",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\agent-browser-6b53939dfa\\SKILL.md",
+      "source_location": null,
+      "source_url": "https://github.com/vercel-labs/agent-browser/blob/main/skills/agent-browser/SKILL.md",
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "od_skills_web_prototype_skill",
+      "label": "Web Prototype Skill",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "web_prototype_assets_template",
+      "label": "Web Prototype HTML Template",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "web_prototype_example",
+      "label": "Web Prototype Example (Tomato)",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\example.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "web_prototype_references_checklist",
+      "label": "Web Prototype Checklist",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\references\\checklist.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "web_prototype_references_layouts",
+      "label": "Web Prototype Layouts",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\references\\layouts.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "root_afk_agent_log",
+      "label": "AFK Agent Log",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\AFK_AGENT_LOG.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "root_agents",
+      "label": "AGENTS.md",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\AGENTS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "root_claude",
+      "label": "CLAUDE.md",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "root_context",
+      "label": "FermentStation Domain Context",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "root_readme",
+      "label": "FermentStation README",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_adr_0001_unified_observation_logging",
+      "label": "Unified Observation Logging ADR",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\adr\\0001-unified-observation-logging.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_agents_domain",
+      "label": "Domain Docs",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\domain.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_agents_issue_tracker",
+      "label": "Issue Tracker",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\issue-tracker.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_agents_triage_labels",
+      "label": "Triage Labels",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\triage-labels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_android_desktop_implementation_gaps",
+      "label": "Android/Desktop Implementation Gaps",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_android_development_workflow",
+      "label": "Android Development Workflow",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-development-workflow.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_ph_levels",
+      "label": "pH Levels in Fermentation",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "docs_shared_data_format",
+      "label": "Shared Data Format",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "root_index",
+      "label": "Vite Entry Point",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "openwiki_instructions",
+      "label": "OpenWiki Instructions",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\INSTRUCTIONS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "openwiki_android_capacitor",
+      "label": "Capacitor Android Runtime",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_batch",
+      "label": "Batch",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_fermentation_profile",
+      "label": "Fermentation Profile",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_batch_status",
+      "label": "Batch Status",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_timeline_entry",
+      "label": "Timeline Entry",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_temperature_reading",
+      "label": "Temperature Reading",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_observation_logger",
+      "label": "Observation Logger",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_profile_check",
+      "label": "Profile Check",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_batch_check",
+      "label": "Batch Check",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_check_schedule",
+      "label": "Check Schedule",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_check_completion",
+      "label": "Check Completion",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_profile_calculation",
+      "label": "Profile Calculation",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_profile_card",
+      "label": "Profile Card",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_profile_input",
+      "label": "Profile Input",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_profile_guidance",
+      "label": "Profile Guidance",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_starter_profile",
+      "label": "Starter Profile",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_suggested_value",
+      "label": "Suggested Value",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_finish_date",
+      "label": "Finish Date",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domain_trash",
+      "label": "Trash",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ph_safety_threshold",
+      "label": "pH Safety Threshold (4.6)",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ph_kombucha_threshold",
+      "label": "Kombucha Safety Threshold (4.2)",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ph_acidosis_risk",
+      "label": "Acidosis Risk Threshold (2.5)",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ph_inoculation_phase",
+      "label": "Inoculation Phase",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ph_acidification_phase",
+      "label": "Acidification Phase",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ph_consumption_phase",
+      "label": "Consumption Phase",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ph_three_phase_model",
+      "label": "Three-Phase Fermentation Model",
+      "file_type": "rationale",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_tauri",
+      "label": "Tauri",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_capacitor",
+      "label": "Capacitor",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "android_shared_directory_plugin",
+      "label": "SharedDirectoryPlugin",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "android_bridge_activity",
+      "label": "BridgeActivity",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "android_saf",
+      "label": "Storage Access Framework",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "storage_manifest",
+      "label": "Manifest",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "storage_records",
+      "label": "Records",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "storage_photos",
+      "label": "Photos",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "openwiki_update_workflow",
+      "label": "OpenWiki Update Workflow",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.github\\workflows\\openwiki-update.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "openwiki_doc_index",
+      "label": "OpenWiki Documentation Index",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\INSTRUCTIONS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "od_agent_browser",
+      "label": "Agent Browser",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\agent-browser-6b53939dfa\\SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "od_web_prototype",
+      "label": "Web Prototype",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "template_css_variables",
+      "label": "CSS Custom Properties (Tokens)",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "template_color_tokens",
+      "label": "Color Tokens",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "template_layout_primitives",
+      "label": "Layout Primitives",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_accent_budget",
+      "label": "Single Accent Budget",
+      "file_type": "rationale",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "wayfinder_map",
+      "label": "Wayfinder Map",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\issue-tracker.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "wayfinder_child_ticket",
+      "label": "Wayfinder Child Ticket",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\issue-tracker.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "app_entry_point",
+      "label": "App Entry Point (main.tsx)",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\index.html",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "triage_label_vocabulary",
+      "label": "Triage Label Vocabulary",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\triage-labels.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr_unified_observation_rationale",
+      "label": "Unified Observation Logging Rationale",
+      "file_type": "rationale",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\adr\\0001-unified-observation-logging.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "android_native_gaps",
+      "label": "Android Native Implementation Gaps",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "android_implementation_sequence",
+      "label": "Android Implementation Sequence",
+      "file_type": "rationale",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "android_dev_build_chain",
+      "label": "Android Dev Build Chain",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-development-workflow.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "architecture_app_tsx",
+      "label": "App.tsx",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "architecture_shared_directory_bridge",
+      "label": "SharedDirectoryBridge",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "architecture_domain_layer",
+      "label": "Domain Layer",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "architecture_platform_layer",
+      "label": "Platform Layer",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "architecture_local_first",
+      "label": "Local-First Architecture",
+      "file_type": "rationale",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null,
+      "rationale": "State is persisted through browser, Capacitor, shared-folder, or Tauri adapters with no server API."
+    },
+    {
+      "id": "domains_batches",
+      "label": "Batch Domain",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_profiles",
+      "label": "Profile Domain",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\profiles.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_shell",
+      "label": "Shell Domain",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\shell.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_batch_state",
+      "label": "BatchState",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_batch_lifecycle",
+      "label": "Batch Lifecycle",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_profile_snapshot",
+      "label": "Profile Snapshot",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_fermentation_profile",
+      "label": "FermentationProfile",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\profiles.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_validate_profile",
+      "label": "validateProfile",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\profiles.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_shell_state",
+      "label": "ShellState",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\shell.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_calendar_events",
+      "label": "calendarEvents",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "domains_batch_timeline",
+      "label": "Batch Timeline",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_batch_view",
+      "label": "BatchView",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_calendar_view",
+      "label": "CalendarView",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_profiles_view",
+      "label": "Profiles View",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_settings_view",
+      "label": "SettingsView",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_today_view",
+      "label": "Today View",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_batch_picker",
+      "label": "BatchPicker",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\calendar.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_shared_directory_plugin",
+      "label": "SharedDirectoryPlugin",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_tauri_commands",
+      "label": "Tauri Commands",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_saf",
+      "label": "Storage Access Framework",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_browser_bridge",
+      "label": "Browser Bridge",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_native_store",
+      "label": "Native Store",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\android-capacitor.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_storage",
+      "label": "Storage Architecture",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_shared_data_store",
+      "label": "SharedDataStore",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_browser_stores",
+      "label": "Browser Stores",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_capacitor",
+      "label": "Capacitor",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\android-capacitor.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_tauri",
+      "label": "Tauri",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\desktop-tauri.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_archive",
+      "label": "Archive System",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\archive.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_camera",
+      "label": "Camera Integration",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\device-integrations.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_reminders",
+      "label": "Notification Reminders",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\device-integrations.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_native_transfer",
+      "label": "Native Transfer",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\device-integrations.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_atomic_write",
+      "label": "Atomic Write",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\desktop-tauri.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "operations_build",
+      "label": "Build Operations",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\build.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "operations_deployment",
+      "label": "Deployment Configuration",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\deployment.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "operations_vite",
+      "label": "Vite",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "workflows_archive_transfer",
+      "label": "Archive Transfer Workflow",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\archive-transfer.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "workflows_calendar",
+      "label": "Calendar Workflow",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\calendar.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testing_vitest",
+      "label": "Vitest Test Suite",
+      "file_type": "concept",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testing_batch_tests",
+      "label": "Batch Domain Tests",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testing_profile_tests",
+      "label": "Profile Domain Tests",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testing_shared_store_tests",
+      "label": "Shared Data Store Tests",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testing_archive_tests",
+      "label": "Archive Tests",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testing_app_tests",
+      "label": "App Integration Tests",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "testing_rust_tests",
+      "label": "Rust Unit Tests",
+      "file_type": "code",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "quickstart",
+      "label": "FermentStation Quickstart",
+      "file_type": "document",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\quickstart.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": "2026-08-30",
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "openwiki_workflows_data_interchange",
+      "label": "Persistence and data interchange workflows",
+      "file_type": "document",
+      "description": "End-to-end comparison of local persistence, shared-folder synchronization, and portable archive exchange",
+      "confidence_score": 1.0,
+      "attributes": {
+        "tags": [
+          "workflow",
+          "persistence",
+          "archive",
+          "synchronization"
+        ],
+        "type": "workflow comparison"
+      }
+    },
+    {
+      "id": "openwiki_workflows_index",
+      "label": "Workflows index",
+      "file_type": "document",
+      "description": "Index of workflow documents for FermentStation",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "openwiki_workflows_platform_lifecycle",
+      "label": "Cross-platform lifecycle",
+      "file_type": "document",
+      "description": "Platform selection, local/native persistence, shared-folder synchronization, camera restoration, and reminders determine how FermentStation survives browser, Android, desktop, and process-restart conditions",
+      "confidence_score": 1.0,
+      "attributes": {
+        "tags": [
+          "workflow",
+          "native",
+          "synchronization"
+        ],
+        "type": "workflow"
+      }
+    },
+    {
+      "id": "openwiki_workflows_shared_sync",
+      "label": "Shared-folder synchronization and migration",
+      "file_type": "document",
+      "description": "SharedDataStore coordinates a versioned folder snapshot, explicit migration choices, queued writes, conflict preservation, and photo externalization across Android and desktop",
+      "confidence_score": 1.0,
+      "attributes": {
+        "tags": [
+          "sync",
+          "migration",
+          "shared-storage"
+        ],
+        "type": "workflow"
+      }
+    },
+    {
+      "id": "outputs_repo_implementation_advisor_report",
+      "label": "Repository audit and pragmatic engineering recommendations",
+      "file_type": "document",
+      "description": "Evidence-based audit of the whole repo focusing on code quality, data integrity, and engineering process",
+      "confidence_score": 1.0,
+      "attributes": {
+        "date": "2026-08-14",
+        "branch": "main",
+        "commit": "75cd618",
+        "test_passing": "90/90"
+      }
+    },
+    {
+      "id": "prototypes_batch_components_batch_components_prototype",
+      "label": "Batch components prototype",
+      "file_type": "image",
+      "description": "HTML prototype showing batch configuration components: batch details, profile inputs, profile calculations, recurring checks",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototypes_batch_workflow_prototype",
+      "label": "Batch workflow prototype",
+      "file_type": "image",
+      "description": "Three variant batch workflow prototype: Dashboard-first, Batch workbench, Calendar-first",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototypes_fold6_concept",
+      "label": "Galaxy Z Fold6 concept prototype",
+      "file_type": "image",
+      "description": "Review-only Fold6 concept with cover/inner display postures and three layout variants (Today/detail, Tasks/canvas, Timeline/workbench)",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototypes_v1_prototype",
+      "label": "V1 experience direction prototype",
+      "file_type": "image",
+      "description": "Full v1 concept prototype with Today, Batches, Calendar, Profiles, Settings screens and batch workspace",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototypes_profile_editor",
+      "label": "Profile editor prototype",
+      "file_type": "image",
+      "description": "Profile page prototype showing editor for fermentation profile with name, guidance, instructions, duration, recurring checks, and calculations",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "research_free_offline_sync_photo_storage",
+      "label": "Free offline-first sync and photo storage research",
+      "file_type": "document",
+      "description": "Research for issue #6 on local-first sync, ZIP export/import, Syncthing transport, and photo handling",
+      "confidence_score": 1.0,
+      "attributes": {
+        "date": "2026-08-07",
+        "issue": "#6"
+      }
+    },
+    {
+      "id": "research_free_sync",
+      "label": "Zero-cost offline-first sync research",
+      "file_type": "document",
+      "description": "Research on Syncthing transport, SQLite live-file hazards, photo handling, and alternatives for cross-device sync",
+      "confidence_score": 1.0,
+      "attributes": {
+        "date": "2026-08-07",
+        "issue": "#6"
+      }
+    },
+    {
+      "id": "research_stack_options",
+      "label": "React/TypeScript application stack research",
+      "file_type": "document",
+      "description": "Research for issue #2 comparing Capacitor+Tauri, Electron, React Native, and other stack options",
+      "confidence_score": 1.0,
+      "attributes": {
+        "date": "2026-08-07",
+        "issue": "#2"
+      }
+    },
+    {
+      "id": "shared_stfolder_syncthing_marker",
+      "label": "Syncthing folder marker",
+      "file_type": "code",
+      "description": "Syncthing folder marker for the ferment shared folder, created 2026-08-10",
+      "confidence_score": 1.0,
+      "attributes": {
+        "folder_id": "ferment",
+        "created": "2026-08-10T12:13:05+02:00"
+      }
+    },
+    {
+      "id": "concept_shelstate",
+      "label": "ShellState",
+      "file_type": "concept",
+      "description": "Application shell state persisted locally by the browser/native stores",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_profilestate",
+      "label": "ProfileState",
+      "file_type": "concept",
+      "description": "Fermentation profile state persisted locally",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_batchstate",
+      "label": "BatchState",
+      "file_type": "concept",
+      "description": "Fermentation batch state persisted locally",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_shareddatastore",
+      "label": "SharedDataStore",
+      "file_type": "concept",
+      "description": "Coordinates versioned folder snapshot, explicit migration choices, queued writes, conflict preservation, and photo externalization",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_manifest",
+      "label": "manifest.json",
+      "file_type": "concept",
+      "description": "Versioned manifest file (schema version 1) in the shared folder, tracks writeInProgress state",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_sync_conflict",
+      "label": "sync-conflict files",
+      "file_type": "concept",
+      "description": "Files matching .sync-conflict- pattern, reported but never loaded or deleted by SharedDataStore",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_archive_exchange",
+      "label": "Archive exchange format",
+      "file_type": "concept",
+      "description": "ZIP-based portable archive containing schema-versioned record JSON and hash-addressed photo originals",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_status_state_machine",
+      "label": "SharedDataStore status states",
+      "file_type": "concept",
+      "description": "State machine with unavailable, unconfigured, ready, migration, problem, and conflict states",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_photo_externalization",
+      "label": "Photo externalization",
+      "file_type": "concept",
+      "description": "Photos stored as external files at photos/<batch>/<entry>.<extension> with relative photoRef values in shared records",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_queued_writes",
+      "label": "Serialized promise queue writes",
+      "file_type": "concept",
+      "description": "Shared writes are serialized through a promise queue, marking writeInProgress in manifest during multi-record writes",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_migration_choice",
+      "label": "Migration choice",
+      "file_type": "concept",
+      "description": "When both legacy device data and shared data exist, the store holds the snapshot pending an explicit shared or device decision",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_camera_restoration",
+      "label": "Camera process death restoration",
+      "file_type": "concept",
+      "description": "Android process death can return a Capacitor appRestoredResult; listenForRestoredCameraPhoto lets App recover the pending photo flow",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_reminder_reconciliation",
+      "label": "Reminder reconciliation",
+      "file_type": "concept",
+      "description": "Requests permission, cancels previously scheduled notifications, and schedules current due checks; batch state remains authoritative on failure",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_atomic_writes",
+      "label": "Atomic writes",
+      "file_type": "concept",
+      "description": "Crash-resistant writes using temp file + fsync + rename, sibling backup, recovery of .tmp-/.bak- on next load, 64 MB file cap",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_path_traversal_protection",
+      "label": "Path traversal protection",
+      "file_type": "concept",
+      "description": "Rust bridge validates and rejects traversal and absolute paths",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_formula_engine",
+      "label": "Formula engine",
+      "file_type": "concept",
+      "description": "Recursive-descent parser avoiding eval, unit-aware",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "issue_w1_photo_hydration_data_loss",
+      "label": "W1: Photo hydration data loss hazard",
+      "file_type": "concept",
+      "description": "One unreadable/corrupt photo file voids the entire batch state on load; parseNativeBatchState returns null if any photo fails",
+      "confidence_score": 1.0,
+      "rationale": "Finding from repo audit: severity high, data loss risk"
+    },
+    {
+      "id": "issue_w2_live_dataset_in_git",
+      "label": "W2: Live dataset tracked in git",
+      "file_type": "concept",
+      "description": "The live Syncthing dataset shared/ is tracked in git including .stfolder, .stversions, and migration-backup",
+      "confidence_score": 1.0,
+      "rationale": "Finding from repo audit: severity high, repo hygiene"
+    },
+    {
+      "id": "issue_w4_stale_docs",
+      "label": "W4: Documentation contradicts code",
+      "file_type": "concept",
+      "description": "docs/android-desktop-implementation-gaps.md says features are absent when they exist since 2026-08-12",
+      "confidence_score": 1.0,
+      "rationale": "Finding from repo audit: severity medium"
+    },
+    {
+      "id": "issue_w5_no_ci",
+      "label": "W5: No CI or lint config",
+      "file_type": "concept",
+      "description": "No GitHub Actions, no lint tooling, no enforced typecheck; only local build/test",
+      "confidence_score": 1.0,
+      "rationale": "Finding from repo audit: severity medium"
+    },
+    {
+      "id": "issue_w6_app_tsx_monolith",
+      "label": "W6: App.tsx monolith",
+      "file_type": "concept",
+      "description": "UI is a 1755-line App.tsx with 2836-line styles.css; BatchView rendered twice with duplicated props; persistence calls repeat 5 places",
+      "confidence_score": 1.0,
+      "rationale": "Finding from repo audit: severity medium, fragility"
+    },
+    {
+      "id": "issue_w9_no_schema_migration",
+      "label": "W9: No schema migration framework",
+      "file_type": "concept",
+      "description": "schemaVersion !== 1 rejects the whole snapshot; every future schema change is a hard cutover",
+      "confidence_score": 1.0,
+      "rationale": "Finding from repo audit: severity low"
+    },
+    {
+      "id": "concept_recommended_fix_photo_hydration",
+      "label": "Recommended fix: photo hydration fail-soft",
+      "file_type": "concept",
+      "description": "Per-entry fallback in hydration paths: if photo file missing/corrupt, drop just that entry's photo data instead of nulling the whole state",
+      "confidence_score": 1.0,
+      "rationale": "Recommendation A from audit: smallest change at actual trust boundary"
+    },
+    {
+      "id": "concept_syncthing_transport",
+      "label": "Syncthing transport",
+      "file_type": "concept",
+      "description": "Peer-to-peer file sync using TLS, no subscription required, preserves conflict copies but does not merge, versioning is not backup",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_local_sqlite",
+      "label": "Local SQLite database",
+      "file_type": "concept",
+      "description": "Each installation owns a private SQLite database; never sync the live .db file, WAL, or journal",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_immutable_records",
+      "label": "Immutable records",
+      "file_type": "concept",
+      "description": "Timeline entries and photos are immutable in v1; corrections create a new record or explicit tombstone",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_android_scoped_storage",
+      "label": "Android scoped storage",
+      "file_type": "concept",
+      "description": "Android limits broad shared-storage access; use system file picker and SAF for user-chosen directories",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_stfolder_marker",
+      "label": ".stfolder marker",
+      "file_type": "concept",
+      "description": "Syncthing folder marker that Android cleaning software can remove, stopping sync until restored",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_capacitor",
+      "label": "Capacitor",
+      "file_type": "concept",
+      "description": "Android wrapper with official Camera, Local Notifications, and Filesystem plugins",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_tauri",
+      "label": "Tauri 2",
+      "file_type": "concept",
+      "description": "Desktop wrapper with filesystem, SQL/SQLite, dialogs, and notification plugins; no portable scheduled-notification API",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_vite_react",
+      "label": "Vite + React + TypeScript",
+      "file_type": "concept",
+      "description": "Web-first UI stack with shared domain/storage/export code; platform capabilities behind small adapters",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_nextcloud",
+      "label": "Nextcloud/WebDAV",
+      "file_type": "concept",
+      "description": "Viable only when an always-on existing server is already wanted; requires maintaining server, TLS, upgrades, backups",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototype_variants",
+      "label": "Prototype layout variants",
+      "file_type": "concept",
+      "description": "Three layout variants explored across prototypes: A (Today/detail), B (Tasks/canvas), C (Timeline/workbench)",
+      "confidence_score": 0.95
+    },
+    {
+      "id": "prototype_posture_cover_inner",
+      "label": "Cover/inner display posture",
+      "file_type": "concept",
+      "description": "Fold6 concept testing same destination and unsaved note across cover and inner display postures",
+      "confidence_score": 0.95
+    },
+    {
+      "id": "prototype_status_pills",
+      "label": "Status pills",
+      "file_type": "concept",
+      "description": "Visual status indicators: ACTIVE (amber), READY (green), TO-FRIDGE (blue), ARCHIVED (gray)",
+      "confidence_score": 0.95
+    },
+    {
+      "id": "concept_batch_workspace",
+      "label": "Batch workspace",
+      "file_type": "concept",
+      "description": "Batch workspace screen showing next action, key measurements, timeline, guidance, and calculations",
+      "confidence_score": 0.95
+    },
+    {
+      "id": "concept_profile_guidance",
+      "label": "Profile guidance",
+      "file_type": "concept",
+      "description": "Reusable fermentation practice with inputs, guidance steps, calculations, and check cadence",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_timeline_entry",
+      "label": "Timeline entry",
+      "file_type": "concept",
+      "description": "Dated entry attached to a batch; types: profile input, profile check, measurement, note",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "concept_action_queue",
+      "label": "Action queue",
+      "file_type": "concept",
+      "description": "Daily queue of due and overdue profile checks and ready-day decisions derived from batch states and dueBatchChecks",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "res_drawable_splash_screen",
+      "label": "Splash Screen (Default)",
+      "file_type": "image",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable\\splash.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "res_drawable_land_splash",
+      "label": "Splash Screen (Landscape)",
+      "file_type": "image",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-land-hdpi\\splash.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "res_drawable_port_splash",
+      "label": "Splash Screen (Portrait)",
+      "file_type": "image",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-port-hdpi\\splash.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "res_mipmap_ic_launcher",
+      "label": "Launcher Icon",
+      "file_type": "image",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "res_mipmap_ic_launcher_fg",
+      "label": "Launcher Icon Foreground",
+      "file_type": "image",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_foreground.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "res_mipmap_ic_launcher_rnd",
+      "label": "Launcher Icon (Round)",
+      "file_type": "image",
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "app_logo_root",
+      "type": "file",
+      "file_type": "image",
+      "path": "app_logo.png",
+      "name": "app_logo.png",
+      "description": "FermentStation app logo: illustrated fermentation jar with cabbage, carrots, cucumbers, dill, and bubbles in brine, on teal-to-green gradient background with rounded-square shape.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "app_logo_public",
+      "type": "file",
+      "file_type": "image",
+      "path": "public/app_logo.png",
+      "name": "app_logo.png",
+      "description": "FermentStation app logo (public/web copy): identical to root app_logo.png — fermentation jar illustration on teal-green gradient.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "ic_launcher_android",
+      "type": "file",
+      "file_type": "image",
+      "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "name": "ic_launcher.png",
+      "description": "Android adaptive icon: light blue stylized X/crossed-arrows symbol on white background. Appears to be a placeholder or framework default icon, not the FermentStation branding.",
+      "confidence_score": 0.95
+    },
+    {
+      "id": "ic_launcher_foreground_android",
+      "type": "file",
+      "file_type": "image",
+      "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+      "name": "ic_launcher_foreground.png",
+      "description": "Android adaptive icon foreground layer: same light blue X/crossed-arrows symbol as ic_launcher, square format with rounded corners.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "ic_launcher_round_android",
+      "type": "file",
+      "file_type": "image",
+      "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "name": "ic_launcher_round.png",
+      "description": "Android round launcher icon variant: same light blue X/crossed-arrows symbol in circular mask.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototype_galaxy_z_fold6",
+      "type": "file",
+      "file_type": "image",
+      "path": "prototypes/fermentstation-galaxy-z-fold6-prototype/drawing-2026-08-07T19-00-59-959Z.png",
+      "name": "drawing-2026-08-07T19-00-59-959Z.png",
+      "description": "Low-fidelity wireframe prototype of FermentStation today view on Galaxy Z Fold6. Shows date (Tuesday 20 August), tagline 'One gentle check.', next task card (Taste the pickles, Day 4), fermentation list entries (Cucumber pickles Active Day 4, Miso red Ready Day 39, Kimchi no. 7 To Fridge Day 12), and bottom navigation with Today/detail, Tasks/canvas, Timeline/workbench tabs. Marked PROTOTYPE-ONLY.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "photo_35bfd79e_bottle",
+      "type": "file",
+      "file_type": "image",
+      "path": "shared/photos/35bfd79e-ff36-4492-afa0-8b4fc9c0aefe/e564628b-4b11-4810-8e86-593e4d297e1d.jpg",
+      "name": "e564628b-4b11-4810-8e86-593e4d297e1d.jpg",
+      "description": "Photo of a swing-top glass bottle filled with cloudy amber fermented liquid (likely kombucha or water kefir), sitting on a red surface next to houseplants. Home fermentation batch documentation.",
+      "confidence_score": 0.85
+    },
+    {
+      "id": "photo_43aa155f_bottle",
+      "type": "file",
+      "file_type": "image",
+      "path": "shared/photos/43aa155f-fcd0-4aab-9da9-003226b780bf/1a37b9ba-427f-409b-a029-f4ec29520bdb.jpg",
+      "name": "1a37b9ba-427f-409b-a029-f4ec29520bdb.jpg",
+      "description": "Photo of a swing-top glass bottle with cloudy amber fermented liquid and visible SCOBY/pellicle floating at top, on dark shelf. Same fermentation batch as photo_35bfd79e, different angle/stage.",
+      "confidence_score": 0.85
+    },
+    {
+      "id": "photo_5f09dcc5_vegetable_jar",
+      "type": "file",
+      "file_type": "image",
+      "path": "shared/photos/5f09dcc5-a4bd-49a3-9c12-0dd17d95330c/8a8e2b78-11fe-4038-bd52-91c5e34101b9.jpg",
+      "name": "8a8e2b78-11fe-4038-bd52-91c5e34101b9.jpg",
+      "description": "Photo of a glass jar with white lid containing layered chopped vegetables for fermentation: tomatoes on top, onions, green peppers, and carrots visible. Vegetable ferment in progress on a kitchen counter.",
+      "confidence_score": 0.95
+    },
+    {
+      "id": "photo_af9cdd33_bottle_shelf",
+      "type": "file",
+      "file_type": "image",
+      "path": "shared/photos/af9cdd33-7adb-4f58-a122-ca7e701d1a8d/0459651b-808f-4311-92af-89cdb71d3680.jpg",
+      "name": "0459651b-808f-4311-92af-89cdb71d3680.jpg",
+      "description": "Photo of a swing-top glass bottle with cloudy amber fermented liquid (SCOBY visible at top), stored on dark shelf next to commercial beverages (vodka bottle, ale bottle). Home fermentation storage setup.",
+      "confidence_score": 0.85
+    },
+    {
+      "id": "photo_af9cf859_bottle_sideways",
+      "type": "file",
+      "file_type": "image",
+      "path": "shared/photos/af9cf859-72be-47f0-a8cd-f780f3491d27/112f87ed-e3f6-470f-8200-e11e3440b31d.jpg",
+      "name": "112f87ed-e3f6-470f-8200-e11e3440b31d.jpg",
+      "description": "Photo of a swing-top glass bottle with cloudy amber fermented liquid, lying sideways on red surface next to houseplant. Same fermentation batch, different angle/orientation.",
+      "confidence_score": 0.85
+    },
+    {
+      "id": "branding_logo",
+      "type": "concept",
+      "name": "FermentStation Logo",
+      "description": "Primary app branding: illustrated fermentation jar with vegetables (cabbage, carrots, cucumbers, dill) in brine with bubbles, on teal-green gradient. Used as app_logo.png in root and public/ directories.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "branding_color_teal_green",
+      "type": "concept",
+      "name": "Teal-Green Gradient",
+      "description": "Primary brand color: teal-to-green gradient used as background for the app logo. Evokes freshness, fermentation, and natural/organic themes.",
+      "confidence_score": 0.95
+    },
+    {
+      "id": "domain_vegetable_fermentation",
+      "type": "concept",
+      "name": "Vegetable Fermentation",
+      "description": "Lacto-fermentation of vegetables in brine, as shown in the logo (cabbage, carrots, cucumbers) and in photo_5f09dcc5 (tomatoes, onions, peppers, carrots). Core fermentation type tracked by the app.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "domain_beverage_fermentation",
+      "type": "concept",
+      "name": "Beverage Fermentation",
+      "description": "Fermentation of beverages like kombucha or water kefir, as shown in multiple shared photos (swing-top bottles with cloudy amber liquid and SCOBY/pellicle). Second major fermentation type tracked by the app.",
+      "confidence_score": 0.85
+    },
+    {
+      "id": "domain_miso",
+      "type": "concept",
+      "name": "Miso Fermentation",
+      "description": "Miso (fermented soybean paste) fermentation, referenced in prototype wireframe as 'Miso, red' with Day 39 status. Shows app supports koji/bean ferments.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "domain_kimchi",
+      "type": "concept",
+      "name": "Kimchi Fermentation",
+      "description": "Kimchi fermentation, referenced in prototype wireframe as 'Kimchi no. 7' with Day 12 status. Shows app tracks numbered batches of fermented foods.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototype_today_view",
+      "type": "concept",
+      "name": "Today View Prototype",
+      "description": "Low-fi wireframe of the app's primary Today view: shows daily check-in prompt, next task card with taste/observation logging, and fermentation batch list with status badges (Active, Ready, To Fridge). Designed for Galaxy Z Fold6.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototype_status_badges",
+      "type": "concept",
+      "name": "Fermentation Status System",
+      "description": "Status system shown in prototype: ACTIVE (green, fermentation in progress), READY (blue, fermentation complete), TO FRIDGE (gray, move to cold storage). Drives the today view task list.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "prototype_navigation_tabs",
+      "type": "concept",
+      "name": "App Navigation Structure",
+      "description": "Bottom navigation tabs shown in prototype: A - Today/detail, B - Tasks/canvas, C - Timeline/workbench. Three-panel navigation structure for the app.",
+      "confidence_score": 1.0
+    },
+    {
+      "id": "android_launcher_mismatch",
+      "type": "concept",
+      "name": "Android Icon Branding Mismatch",
+      "description": "Android launcher icons (ic_launcher, ic_launcher_foreground, ic_launcher_round) use a generic blue X/crossed-arrows symbol, NOT the fermentation jar branding from app_logo.png. May need updating for consistent branding.",
+      "confidence_score": 0.95
+    }
+  ],
+  "edges": [
+    {
+      "source": "github_workflows_openwiki_update",
+      "target": "openwiki_doc_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.github\\workflows\\openwiki-update.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "od_skills_web_prototype_skill",
+      "target": "web_prototype_assets_template",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "od_skills_web_prototype_skill",
+      "target": "web_prototype_references_layouts",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "od_skills_web_prototype_skill",
+      "target": "web_prototype_references_checklist",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_agents",
+      "target": "docs_agents_issue_tracker",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\AGENTS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_agents",
+      "target": "docs_agents_triage_labels",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\AGENTS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_agents",
+      "target": "docs_agents_domain",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\AGENTS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_agents",
+      "target": "openwiki_doc_index",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\AGENTS.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_claude",
+      "target": "root_agents",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CLAUDE.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_batch",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_fermentation_profile",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_batch_status",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_timeline_entry",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_temperature_reading",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_observation_logger",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_profile_check",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_batch_check",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_check_schedule",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_check_completion",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_profile_calculation",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_profile_card",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_profile_input",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_profile_guidance",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_starter_profile",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_suggested_value",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_finish_date",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_context",
+      "target": "domain_trash",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_fermentation_profile",
+      "target": "domain_batch",
+      "relation": "creates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_fermentation_profile",
+      "target": "domain_profile_check",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_fermentation_profile",
+      "target": "domain_profile_calculation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_fermentation_profile",
+      "target": "domain_profile_input",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_fermentation_profile",
+      "target": "domain_profile_guidance",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_fermentation_profile",
+      "target": "domain_profile_card",
+      "relation": "generates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_batch",
+      "target": "domain_batch_status",
+      "relation": "has",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_batch",
+      "target": "domain_batch_check",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_batch",
+      "target": "domain_finish_date",
+      "relation": "has",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_batch",
+      "target": "domain_timeline_entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_batch_check",
+      "target": "domain_check_schedule",
+      "relation": "has",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_check_schedule",
+      "target": "domain_check_completion",
+      "relation": "generates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_timeline_entry",
+      "target": "domain_temperature_reading",
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_batch",
+      "target": "domain_trash",
+      "relation": "deletable_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ph_three_phase_model",
+      "target": "ph_inoculation_phase",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ph_three_phase_model",
+      "target": "ph_acidification_phase",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ph_three_phase_model",
+      "target": "ph_consumption_phase",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ph_inoculation_phase",
+      "target": "ph_safety_threshold",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ph_acidification_phase",
+      "target": "ph_kombucha_threshold",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ph_consumption_phase",
+      "target": "ph_acidosis_risk",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ph_kombucha_threshold",
+      "target": "ph_safety_threshold",
+      "relation": "strict_than",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_tauri",
+      "target": "platform_capacitor",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_capacitor",
+      "target": "android_shared_directory_plugin",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_capacitor",
+      "target": "android_bridge_activity",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "android_shared_directory_plugin",
+      "target": "android_saf",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_shared_data_format",
+      "target": "storage_manifest",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_shared_data_format",
+      "target": "storage_records",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_shared_data_format",
+      "target": "storage_photos",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "storage_manifest",
+      "target": "storage_records",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "storage_records",
+      "target": "storage_photos",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "openwiki_update_workflow",
+      "target": "openwiki_doc_index",
+      "relation": "updates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.github\\workflows\\openwiki-update.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "openwiki_update_workflow",
+      "target": "root_agents",
+      "relation": "modifies",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.github\\workflows\\openwiki-update.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "openwiki_update_workflow",
+      "target": "root_claude",
+      "relation": "modifies",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.github\\workflows\\openwiki-update.yml",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "od_agent_browser",
+      "target": "od_skills_agent_browser_skill",
+      "relation": "described_by",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\agent-browser-6b53939dfa\\SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "od_web_prototype",
+      "target": "od_skills_web_prototype_skill",
+      "relation": "described_by",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "template_css_variables",
+      "target": "template_color_tokens",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "web_prototype_assets_template",
+      "target": "template_css_variables",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "web_prototype_assets_template",
+      "target": "template_layout_primitives",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "web_prototype_assets_template",
+      "target": "concept_accent_budget",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "web_prototype_references_checklist",
+      "target": "web_prototype_assets_template",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\references\\checklist.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "web_prototype_references_layouts",
+      "target": "web_prototype_assets_template",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\references\\layouts.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "web_prototype_references_layouts",
+      "target": "template_layout_primitives",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\references\\layouts.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_index",
+      "target": "app_entry_point",
+      "relation": "loads",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\index.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_agents_issue_tracker",
+      "target": "wayfinder_map",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\issue-tracker.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_agents_issue_tracker",
+      "target": "wayfinder_child_ticket",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\issue-tracker.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "wayfinder_map",
+      "target": "wayfinder_child_ticket",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\issue-tracker.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_agents_triage_labels",
+      "target": "triage_label_vocabulary",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\triage-labels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr_unified_observation_rationale",
+      "target": "domain_observation_logger",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\adr\\0001-unified-observation-logging.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr_unified_observation_rationale",
+      "target": "domain_temperature_reading",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\adr\\0001-unified-observation-logging.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_android_desktop_implementation_gaps",
+      "target": "android_native_gaps",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_android_desktop_implementation_gaps",
+      "target": "android_implementation_sequence",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_android_desktop_implementation_gaps",
+      "target": "platform_tauri",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_android_desktop_implementation_gaps",
+      "target": "platform_capacitor",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_android_development_workflow",
+      "target": "android_dev_build_chain",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-development-workflow.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_android_development_workflow",
+      "target": "platform_capacitor",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-development-workflow.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "android_dev_build_chain",
+      "target": "platform_capacitor",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-development-workflow.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_batch_check",
+      "target": "domain_profile_check",
+      "relation": "copied_from",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_starter_profile",
+      "target": "domain_fermentation_profile",
+      "relation": "specialization_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_profile_calculation",
+      "target": "domain_profile_input",
+      "relation": "derives_from",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_suggested_value",
+      "target": "domain_profile_calculation",
+      "relation": "produced_by",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "web_prototype_example",
+      "target": "web_prototype_assets_template",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\example.html",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "web_prototype_references_checklist",
+      "target": "web_prototype_references_layouts",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\references\\checklist.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_ph_levels",
+      "target": "domain_observation_logger",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_ph_levels",
+      "target": "domain_timeline_entry",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "openwiki_android_capacitor",
+      "target": "android_shared_directory_plugin",
+      "relation": "describes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "openwiki_android_capacitor",
+      "target": "android_saf",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_afk_agent_log",
+      "target": "docs_agents_issue_tracker",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\AFK_AGENT_LOG.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_agents_domain",
+      "target": "root_context",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\domain.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "docs_agents_domain",
+      "target": "docs_adr_0001_unified_observation_logging",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\domain.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "root_readme",
+      "target": "root_context",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\README.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domain_profile_temperature_range",
+      "target": "domain_fermentation_profile",
+      "relation": "part_of",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.2,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "domains_shell",
+      "relation": "orchestrates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "domains_profiles",
+      "relation": "orchestrates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "domains_batches",
+      "relation": "orchestrates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_domain_layer",
+      "target": "domains_batches",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_domain_layer",
+      "target": "domains_profiles",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_domain_layer",
+      "target": "domains_shell",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_platform_layer",
+      "target": "platform_browser_stores",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_platform_layer",
+      "target": "platform_native_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_platform_layer",
+      "target": "platform_shared_data_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_shared_directory_bridge",
+      "target": "platform_shared_directory_plugin",
+      "relation": "delegates to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_shared_directory_bridge",
+      "target": "platform_tauri_commands",
+      "relation": "delegates to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_shared_directory_bridge",
+      "target": "platform_browser_bridge",
+      "relation": "delegates to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_shared_directory_plugin",
+      "target": "platform_saf",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_tauri_commands",
+      "target": "platform_atomic_write",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\desktop-tauri.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_tauri_commands",
+      "target": "platform_tauri",
+      "relation": "runs on",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\desktop-tauri.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_shared_directory_plugin",
+      "target": "platform_capacitor",
+      "relation": "runs on",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\android-capacitor.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domains_batches",
+      "target": "domains_batch_timeline",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domains_batches",
+      "target": "domains_calendar_events",
+      "relation": "computes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domains_batches",
+      "target": "domains_batch_lifecycle",
+      "relation": "manages",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domains_batches",
+      "target": "domains_profile_snapshot",
+      "relation": "creates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domains_profiles",
+      "target": "domains_fermentation_profile",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\profiles.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domains_profiles",
+      "target": "domains_validate_profile",
+      "relation": "validates with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\profiles.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "domains_shell",
+      "target": "domains_shell_state",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\shell.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "ui_batch_view",
+      "relation": "renders",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "ui_calendar_view",
+      "relation": "renders",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "ui_profiles_view",
+      "relation": "renders",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "ui_settings_view",
+      "relation": "renders",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "ui_today_view",
+      "relation": "renders",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ui_calendar_view",
+      "target": "ui_batch_picker",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\calendar.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ui_today_view",
+      "target": "ui_batch_picker",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\calendar.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ui_batch_view",
+      "target": "domains_batches",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ui_profiles_view",
+      "target": "domains_profiles",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ui_settings_view",
+      "target": "workflows_archive_transfer",
+      "relation": "owns",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\archive-transfer.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "workflows_archive_transfer",
+      "target": "platform_archive",
+      "relation": "validates with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\archive-transfer.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "workflows_archive_transfer",
+      "target": "platform_native_transfer",
+      "relation": "transports via",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\archive-transfer.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_archive",
+      "target": "platform_shared_data_store",
+      "relation": "validates for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\archive.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_shared_data_store",
+      "target": "platform_browser_stores",
+      "relation": "fallback to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_shared_data_store",
+      "target": "platform_native_store",
+      "relation": "fallback to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_storage",
+      "target": "platform_browser_stores",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_storage",
+      "target": "platform_native_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_storage",
+      "target": "platform_shared_data_store",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "operations_build",
+      "target": "operations_vite",
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\build.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "operations_build",
+      "target": "platform_capacitor",
+      "relation": "syncs with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\build.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "operations_build",
+      "target": "platform_tauri",
+      "relation": "builds for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\build.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "operations_deployment",
+      "target": "platform_capacitor",
+      "relation": "packages for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\deployment.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "operations_deployment",
+      "target": "platform_tauri",
+      "relation": "packages for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\deployment.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "testing_batch_tests",
+      "target": "domains_batches",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "testing_profile_tests",
+      "target": "domains_profiles",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "testing_shared_store_tests",
+      "target": "platform_shared_data_store",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "testing_archive_tests",
+      "target": "platform_archive",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "testing_app_tests",
+      "target": "architecture_app_tsx",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "testing_rust_tests",
+      "target": "platform_tauri_commands",
+      "relation": "tests",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_camera",
+      "target": "platform_capacitor",
+      "relation": "runs on",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\device-integrations.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "platform_reminders",
+      "target": "platform_capacitor",
+      "relation": "runs on",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\device-integrations.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "platform_camera",
+      "relation": "integrates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\device-integrations.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "architecture_app_tsx",
+      "target": "platform_reminders",
+      "relation": "integrates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\device-integrations.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "openwiki_workflows_data_interchange",
+      "target": "openwiki_workflows_index",
+      "relation": "listed_in",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_platform_lifecycle",
+      "target": "openwiki_workflows_index",
+      "relation": "listed_in",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_shared_sync",
+      "target": "openwiki_workflows_index",
+      "relation": "listed_in",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_data_interchange",
+      "target": "concept_shelstate",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_data_interchange",
+      "target": "concept_profilestate",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_data_interchange",
+      "target": "concept_batchstate",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_data_interchange",
+      "target": "concept_shareddatastore",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_data_interchange",
+      "target": "concept_archive_exchange",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_data_interchange",
+      "target": "concept_photo_externalization",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_data_interchange",
+      "target": "concept_sync_conflict",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_platform_lifecycle",
+      "target": "concept_shareddatastore",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_platform_lifecycle",
+      "target": "concept_status_state_machine",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_platform_lifecycle",
+      "target": "concept_camera_restoration",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_platform_lifecycle",
+      "target": "concept_reminder_reconciliation",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_platform_lifecycle",
+      "target": "concept_migration_choice",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_platform_lifecycle",
+      "target": "concept_queued_writes",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_platform_lifecycle",
+      "target": "concept_sync_conflict",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_shared_sync",
+      "target": "concept_shareddatastore",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_shared_sync",
+      "target": "concept_manifest",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_shared_sync",
+      "target": "concept_status_state_machine",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_shared_sync",
+      "target": "concept_migration_choice",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_shared_sync",
+      "target": "concept_sync_conflict",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_shared_sync",
+      "target": "concept_photo_externalization",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "openwiki_workflows_shared_sync",
+      "target": "concept_queued_writes",
+      "relation": "describes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "issue_w1_photo_hydration_data_loss",
+      "relation": "identifies",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "issue_w2_live_dataset_in_git",
+      "relation": "identifies",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "issue_w4_stale_docs",
+      "relation": "identifies",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "issue_w5_no_ci",
+      "relation": "identifies",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "issue_w6_app_tsx_monolith",
+      "relation": "identifies",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "issue_w9_no_schema_migration",
+      "relation": "identifies",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "concept_recommended_fix_photo_hydration",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "concept_atomic_writes",
+      "relation": "validates",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "concept_path_traversal_protection",
+      "relation": "validates",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "outputs_repo_implementation_advisor_report",
+      "target": "concept_formula_engine",
+      "relation": "validates",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_offline_sync_photo_storage",
+      "target": "concept_local_sqlite",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_offline_sync_photo_storage",
+      "target": "concept_archive_exchange",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_offline_sync_photo_storage",
+      "target": "concept_syncthing_transport",
+      "relation": "evaluates",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_offline_sync_photo_storage",
+      "target": "concept_nextcloud",
+      "relation": "evaluates",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_offline_sync_photo_storage",
+      "target": "concept_immutable_records",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_offline_sync_photo_storage",
+      "target": "concept_photo_externalization",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_offline_sync_photo_storage",
+      "target": "concept_android_scoped_storage",
+      "relation": "references",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_sync",
+      "target": "concept_syncthing_transport",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_sync",
+      "target": "concept_local_sqlite",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_sync",
+      "target": "concept_immutable_records",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_free_sync",
+      "target": "concept_stfolder_marker",
+      "relation": "references",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_stack_options",
+      "target": "concept_capacitor",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_stack_options",
+      "target": "concept_tauri",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_stack_options",
+      "target": "concept_vite_react",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_stack_options",
+      "target": "concept_local_sqlite",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "research_stack_options",
+      "target": "concept_archive_exchange",
+      "relation": "recommends",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_shareddatastore",
+      "target": "concept_manifest",
+      "relation": "uses",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_shareddatastore",
+      "target": "concept_status_state_machine",
+      "relation": "implements",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_shareddatastore",
+      "target": "concept_sync_conflict",
+      "relation": "detects",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_shareddatastore",
+      "target": "concept_queued_writes",
+      "relation": "implements",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_shareddatastore",
+      "target": "concept_photo_externalization",
+      "relation": "uses",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_shareddatastore",
+      "target": "concept_migration_choice",
+      "relation": "implements",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "issue_w1_photo_hydration_data_loss",
+      "target": "concept_photo_externalization",
+      "relation": "breaks",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_recommended_fix_photo_hydration",
+      "target": "issue_w1_photo_hydration_data_loss",
+      "relation": "fixes",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_archive_exchange",
+      "target": "concept_local_sqlite",
+      "relation": "imports_into",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_syncthing_transport",
+      "target": "concept_sync_conflict",
+      "relation": "produces",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_syncthing_transport",
+      "target": "concept_stfolder_marker",
+      "relation": "requires",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "concept_immutable_records",
+      "target": "concept_archive_exchange",
+      "relation": "pattern_for",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "shared_stfolder_syncthing_marker",
+      "target": "concept_stfolder_marker",
+      "relation": "instance_of",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "prototypes_batch_workflow_prototype",
+      "target": "prototype_variants",
+      "relation": "implements",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "prototypes_fold6_concept",
+      "target": "prototype_variants",
+      "relation": "implements",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "prototypes_fold6_concept",
+      "target": "prototype_posture_cover_inner",
+      "relation": "implements",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "source": "prototypes_v1_prototype",
+      "target": "concept_batch_workspace",
+      "relation": "implements",
+      "confidence_score": 0.95,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototypes_v1_prototype",
+      "target": "concept_profile_guidance",
+      "relation": "implements",
+      "confidence_score": 0.95,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototypes_v1_prototype",
+      "target": "concept_action_queue",
+      "relation": "implements",
+      "confidence_score": 0.95,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototypes_profile_editor",
+      "target": "concept_profile_guidance",
+      "relation": "implements",
+      "confidence_score": 0.95,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototype_status_pills",
+      "target": "prototype_variants",
+      "relation": "design_pattern",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototype_status_pills",
+      "target": "concept_batch_workspace",
+      "relation": "visualizes",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "concept_batch_workspace",
+      "target": "concept_action_queue",
+      "relation": "derives_from",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "concept_profile_guidance",
+      "target": "concept_formula_engine",
+      "relation": "uses",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "concept_action_queue",
+      "target": "concept_reminder_reconciliation",
+      "relation": "drives",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "concept_profile_guidance",
+      "target": "concept_timeline_entry",
+      "relation": "generates",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototypes_batch_components_batch_components_prototype",
+      "target": "prototype_status_pills",
+      "relation": "uses",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototypes_batch_workflow_prototype",
+      "target": "prototype_status_pills",
+      "relation": "uses",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototypes_fold6_concept",
+      "target": "prototype_status_pills",
+      "relation": "uses",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "prototypes_v1_prototype",
+      "target": "prototype_status_pills",
+      "relation": "uses",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "concept_capacitor",
+      "target": "concept_tauri",
+      "relation": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "concept_nextcloud",
+      "target": "concept_syncthing_transport",
+      "relation": "semantically_similar_to",
+      "confidence_score": 0.65,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "source": "res_drawable_splash_screen",
+      "target": "res_drawable_land_splash",
+      "relation": "orientation_variant",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable\\splash.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "res_drawable_splash_screen",
+      "target": "res_drawable_port_splash",
+      "relation": "density_variant",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable\\splash.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "res_mipmap_ic_launcher",
+      "target": "res_mipmap_ic_launcher_fg",
+      "relation": "component_layer",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "res_mipmap_ic_launcher",
+      "target": "res_mipmap_ic_launcher_rnd",
+      "relation": "shape_variant",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "res_drawable_splash_screen",
+      "target": "res_mipmap_ic_launcher",
+      "relation": "brand_identity",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable\\splash.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "app_logo_root",
+      "target": "branding_logo",
+      "relationship": "instantiates",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "app_logo_public",
+      "target": "branding_logo",
+      "relationship": "instantiates",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "app_logo_root",
+      "target": "app_logo_public",
+      "relationship": "duplicate_of",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "app_logo_root",
+      "target": "branding_color_teal_green",
+      "relationship": "uses_color",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "branding_logo",
+      "target": "domain_vegetable_fermentation",
+      "relationship": "depicts",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "ic_launcher_android",
+      "target": "ic_launcher_foreground_android",
+      "relationship": "derives_from",
+      "type": "INFERRED",
+      "confidence_score": 0.95
+    },
+    {
+      "source": "ic_launcher_android",
+      "target": "ic_launcher_round_android",
+      "relationship": "derives_from",
+      "type": "INFERRED",
+      "confidence_score": 0.95
+    },
+    {
+      "source": "ic_launcher_foreground_android",
+      "target": "ic_launcher_round_android",
+      "relationship": "same_symbol",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "android_launcher_mismatch",
+      "target": "ic_launcher_android",
+      "relationship": "identifies_issue",
+      "type": "INFERRED",
+      "confidence_score": 0.95
+    },
+    {
+      "source": "android_launcher_mismatch",
+      "target": "branding_logo",
+      "relationship": "conflicts_with",
+      "type": "INFERRED",
+      "confidence_score": 0.85
+    },
+    {
+      "source": "prototype_galaxy_z_fold6",
+      "target": "prototype_today_view",
+      "relationship": "implements",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "prototype_today_view",
+      "target": "prototype_status_badges",
+      "relationship": "contains",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "prototype_today_view",
+      "target": "prototype_navigation_tabs",
+      "relationship": "contains",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "prototype_today_view",
+      "target": "domain_vegetable_fermentation",
+      "relationship": "references",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "prototype_today_view",
+      "target": "domain_miso",
+      "relationship": "references",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "prototype_today_view",
+      "target": "domain_kimchi",
+      "relationship": "references",
+      "type": "EXTRACTED",
+      "confidence_score": 1.0
+    },
+    {
+      "source": "prototype_status_badges",
+      "target": "domain_vegetable_fermentation",
+      "relationship": "applies_to",
+      "type": "INFERRED",
+      "confidence_score": 0.95
+    },
+    {
+      "source": "prototype_status_badges",
+      "target": "domain_miso",
+      "relationship": "applies_to",
+      "type": "INFERRED",
+      "confidence_score": 0.95
+    },
+    {
+      "source": "prototype_status_badges",
+      "target": "domain_kimchi",
+      "relationship": "applies_to",
+      "type": "INFERRED",
+      "confidence_score": 0.95
+    },
+    {
+      "source": "photo_35bfd79e_bottle",
+      "target": "domain_beverage_fermentation",
+      "relationship": "depicts",
+      "type": "INFERRED",
+      "confidence_score": 0.85
+    },
+    {
+      "source": "photo_43aa155f_bottle",
+      "target": "domain_beverage_fermentation",
+      "relationship": "depicts",
+      "type": "INFERRED",
+      "confidence_score": 0.85
+    },
+    {
+      "source": "photo_af9cdd33_bottle_shelf",
+      "target": "domain_beverage_fermentation",
+      "relationship": "depicts",
+      "type": "INFERRED",
+      "confidence_score": 0.85
+    },
+    {
+      "source": "photo_af9cf859_bottle_sideways",
+      "target": "domain_beverage_fermentation",
+      "relationship": "depicts",
+      "type": "INFERRED",
+      "confidence_score": 0.85
+    },
+    {
+      "source": "photo_5f09dcc5_vegetable_jar",
+      "target": "domain_vegetable_fermentation",
+      "relationship": "depicts",
+      "type": "INFERRED",
+      "confidence_score": 0.95
+    },
+    {
+      "source": "photo_35bfd79e_bottle",
+      "target": "photo_43aa155f_bottle",
+      "relationship": "same_batch_different_angle",
+      "type": "INFERRED",
+      "confidence_score": 0.75
+    },
+    {
+      "source": "photo_35bfd79e_bottle",
+      "target": "photo_af9cf859_bottle_sideways",
+      "relationship": "same_batch_different_angle",
+      "type": "INFERRED",
+      "confidence_score": 0.65
+    },
+    {
+      "source": "photo_43aa155f_bottle",
+      "target": "photo_af9cdd33_bottle_shelf",
+      "relationship": "same_batch_different_location",
+      "type": "INFERRED",
+      "confidence_score": 0.65
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "web_prototype_composition_system",
+      "label": "Web Prototype Composition System",
+      "nodes": [
+        "od_skills_web_prototype_skill",
+        "web_prototype_assets_template",
+        "web_prototype_references_layouts",
+        "web_prototype_references_checklist",
+        "web_prototype_example"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md"
+    },
+    {
+      "id": "ph_fermentation_science_model",
+      "label": "pH Fermentation Science Model",
+      "nodes": [
+        "ph_three_phase_model",
+        "ph_safety_threshold",
+        "ph_kombucha_threshold",
+        "ph_acidosis_risk",
+        "ph_inoculation_phase",
+        "ph_acidification_phase",
+        "ph_consumption_phase"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md"
+    },
+    {
+      "id": "issue_tracking_wayfinding_system",
+      "label": "Issue Tracking and Wayfinding System",
+      "nodes": [
+        "docs_agents_issue_tracker",
+        "triage_label_vocabulary",
+        "wayfinder_map",
+        "wayfinder_child_ticket",
+        "root_afk_agent_log"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\issue-tracker.md"
+    },
+    {
+      "id": "hyper_shared_directory_bridge",
+      "label": "Shared Directory Bridge Contract",
+      "nodes": [
+        "architecture_shared_directory_bridge",
+        "platform_shared_directory_plugin",
+        "platform_tauri_commands",
+        "platform_browser_bridge"
+      ],
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md"
+    },
+    {
+      "id": "hyper_batch_domain",
+      "label": "Batch Domain Core",
+      "nodes": [
+        "domains_batches",
+        "domains_batch_timeline",
+        "domains_calendar_events",
+        "domains_batch_lifecycle"
+      ],
+      "relation": "composes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md"
+    },
+    {
+      "id": "hyper_app_composition",
+      "label": "App Composition Root",
+      "nodes": [
+        "architecture_app_tsx",
+        "domains_shell",
+        "domains_profiles",
+        "domains_batches"
+      ],
+      "relation": "orchestrates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md"
+    },
+    {
+      "id": "hyperedge_sync_data_flow",
+      "label": "Data synchronization and interchange flow",
+      "member_nodes": [
+        "concept_local_sqlite",
+        "concept_archive_exchange",
+        "concept_syncthing_transport",
+        "concept_immutable_records",
+        "concept_photo_externalization",
+        "concept_sync_conflict",
+        "concept_stfolder_marker"
+      ],
+      "description": "The complete data path from local SQLite storage through immutable record exchange files to Syncthing transport or ZIP export, with conflict preservation and photo externalization",
+      "confidence_score": 1.0,
+      "evidence_type": "EXTRACTED"
+    },
+    {
+      "id": "hyperedge_platform_capabilities",
+      "label": "Platform capability adapters",
+      "member_nodes": [
+        "concept_capacitor",
+        "concept_tauri",
+        "concept_camera_restoration",
+        "concept_reminder_reconciliation",
+        "concept_atomic_writes",
+        "concept_path_traversal_protection"
+      ],
+      "description": "Platform-specific capabilities (camera, notifications, file writes, path safety) that are gated behind adapters with browser-safe fallbacks",
+      "confidence_score": 0.95,
+      "evidence_type": "INFERRED"
+    },
+    {
+      "id": "hyperedge_prototype_ui_patterns",
+      "label": "UI prototype design patterns",
+      "member_nodes": [
+        "prototype_variants",
+        "prototype_posture_cover_inner",
+        "prototype_status_pills",
+        "concept_batch_workspace",
+        "concept_profile_guidance",
+        "concept_action_queue",
+        "concept_timeline_entry"
+      ],
+      "description": "Consistent UI patterns across prototypes: status pills (Active/Ready/Fridge/Archived), Today action queue, batch workspace with timeline, and profile guidance with recurring checks",
+      "confidence_score": 0.85,
+      "evidence_type": "INFERRED"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
