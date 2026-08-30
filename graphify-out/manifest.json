@@ -1,0 +1,1124 @@
+{
+  "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\open-design.json": {
+    "mtime": 1786522740.3506925,
+    "seen": 1788076616.6754358,
+    "ast_hash": "dcc7df5da62c143627523508cae5138d",
+    "semantic_hash": "dcc7df5da62c143627523508cae5138d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\build.gradle": {
+    "mtime": 1786525063.715013,
+    "seen": 1788076616.6754358,
+    "ast_hash": "8125eee8f6d6c922234c1e096bf3f164",
+    "semantic_hash": "8125eee8f6d6c922234c1e096bf3f164"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\capacitor.build.gradle": {
+    "mtime": 1786549000.7777052,
+    "seen": 1788076616.6754358,
+    "ast_hash": "6f88b95e5fc767dd79b7bd61e930b75f",
+    "semantic_hash": "6f88b95e5fc767dd79b7bd61e930b75f"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\androidTest\\java\\com\\getcapacitor\\myapp\\ExampleInstrumentedTest.java": {
+    "mtime": 1786525063.7170205,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ad9f48554e68abd100c02334f7063ab6",
+    "semantic_hash": "ad9f48554e68abd100c02334f7063ab6"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\java\\com\\peterle\\fermentstation\\MainActivity.java": {
+    "mtime": 1786525063.7180264,
+    "seen": 1788076616.6754358,
+    "ast_hash": "b4d8d73ae567c3002249323621329d53",
+    "semantic_hash": "b4d8d73ae567c3002249323621329d53"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\java\\com\\peterle\\fermentstation\\SharedDirectoryPlugin.java": {
+    "mtime": 1786525063.7190642,
+    "seen": 1788076616.6754358,
+    "ast_hash": "22cdaa7e562534e122a4539512a1b3e9",
+    "semantic_hash": "22cdaa7e562534e122a4539512a1b3e9"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\test\\java\\com\\getcapacitor\\myapp\\ExampleUnitTest.java": {
+    "mtime": 1786525063.725532,
+    "seen": 1788076616.6754358,
+    "ast_hash": "3f8a2768101e4de10f606ea4516fd339",
+    "semantic_hash": "3f8a2768101e4de10f606ea4516fd339"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\test\\java\\com\\peterle\\fermentstation\\SharedDirectoryPluginTest.java": {
+    "mtime": 1786525063.7265387,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c4200c948be2cc0f1375711f1e3b2782",
+    "semantic_hash": "c4200c948be2cc0f1375711f1e3b2782"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\build.gradle": {
+    "mtime": 1786525063.7275455,
+    "seen": 1788076616.6754358,
+    "ast_hash": "337cd58839b8df34fe5e7204f9cc81b1",
+    "semantic_hash": "337cd58839b8df34fe5e7204f9cc81b1"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\capacitor.settings.gradle": {
+    "mtime": 1786549000.7757025,
+    "seen": 1788076616.6754358,
+    "ast_hash": "614b4d5339907e48d9aeb31c7c4a318e",
+    "semantic_hash": "614b4d5339907e48d9aeb31c7c4a318e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\gradlew": {
+    "mtime": 1786525063.7295456,
+    "seen": 1788076616.6754358,
+    "ast_hash": "acf9007174811a6ebb9c43febccbcf37",
+    "semantic_hash": "acf9007174811a6ebb9c43febccbcf37"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\settings.gradle": {
+    "mtime": 1786525063.730545,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c609df618dbeec637255380c9f707ccf",
+    "semantic_hash": "c609df618dbeec637255380c9f707ccf"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\variables.gradle": {
+    "mtime": 1786525063.730545,
+    "seen": 1788076616.6754358,
+    "ast_hash": "afd9ab33acb5fc6a59a977b76b274297",
+    "semantic_hash": "afd9ab33acb5fc6a59a977b76b274297"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\capacitor.config.ts": {
+    "mtime": 1786525063.731545,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a19842df8e07aba6ba1f803968d56272",
+    "semantic_hash": "a19842df8e07aba6ba1f803968d56272"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\.last-update.json": {
+    "mtime": 1787999741.5916295,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ed1f8b41e84234e8f81df14286156a48",
+    "semantic_hash": "ed1f8b41e84234e8f81df14286156a48"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\package.json": {
+    "mtime": 1786525063.7420597,
+    "seen": 1788076616.6754358,
+    "ast_hash": "fec45e5766eaf099771c187cc177f538",
+    "semantic_hash": "fec45e5766eaf099771c187cc177f538"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\batch-components\\batch-components-prototype.html.artifact.json": {
+    "mtime": 1786525063.7430606,
+    "seen": 1788076616.6754358,
+    "ast_hash": "8a338f657005fed7a3db92e0800f0bab",
+    "semantic_hash": "8a338f657005fed7a3db92e0800f0bab"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\batch-components\\batch-page-prototype.html.artifact.json": {
+    "mtime": 1786525063.7430606,
+    "seen": 1788076616.6754358,
+    "ast_hash": "676f8fc30ca78bbf1512cbea91c4c6c6",
+    "semantic_hash": "676f8fc30ca78bbf1512cbea91c4c6c6"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-galaxy-z-fold6-prototype\\.file-versions\\bddbbd5c0b4fb29d0e311159\\manifest.json": {
+    "mtime": 1786525063.7471032,
+    "seen": 1788076616.6754358,
+    "ast_hash": "068b06e5945a9d5f8437f3ce21c7d5ca",
+    "semantic_hash": "068b06e5945a9d5f8437f3ce21c7d5ca"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-galaxy-z-fold6-prototype\\fermentstation-fold6-concept.html.artifact.json": {
+    "mtime": 1786525063.7480912,
+    "seen": 1788076616.6754358,
+    "ast_hash": "bcf68a4fd0025fdd2d063428de18ad1d",
+    "semantic_hash": "bcf68a4fd0025fdd2d063428de18ad1d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-v1-experience-direction-d6a9\\.file-versions\\0371badc8013c838aecf5840\\manifest.json": {
+    "mtime": 1786525063.7500913,
+    "seen": 1788076616.6754358,
+    "ast_hash": "1efb63aac90a82a22f3457af7033ffcd",
+    "semantic_hash": "1efb63aac90a82a22f3457af7033ffcd"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-v1-experience-direction-d6a9\\fermentstation-v1-prototype.html.artifact.json": {
+    "mtime": 1786525063.7520943,
+    "seen": 1788076616.6754358,
+    "ast_hash": "2408729dc0565e3e69166116db435c25",
+    "semantic_hash": "2408729dc0565e3e69166116db435c25"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\profile-page\\ferment-profile-editor.html.artifact.json": {
+    "mtime": 1786525063.7540941,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ddb66f94db2f694eb08d33297621a6d2",
+    "semantic_hash": "ddb66f94db2f694eb08d33297621a6d2"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\scripts\\android-build.ps1": {
+    "mtime": 1786525063.756606,
+    "seen": 1788076616.6754358,
+    "ast_hash": "16b8bc97012da42e16a6c73b0113eec2",
+    "semantic_hash": "16b8bc97012da42e16a6c73b0113eec2"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\scripts\\tauri.ps1": {
+    "mtime": 1786525063.7576034,
+    "seen": 1788076616.6754358,
+    "ast_hash": "695a749c1282f192ad5f81b9ad40b5fd",
+    "semantic_hash": "695a749c1282f192ad5f81b9ad40b5fd"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\batches~20260828-115950.json": {
+    "mtime": 1787910650.9283848,
+    "seen": 1788076616.6754358,
+    "ast_hash": "41e910c90f23818a0b9b86483e2aae83",
+    "semantic_hash": "41e910c90f23818a0b9b86483e2aae83"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\batches~20260828-121000.json": {
+    "mtime": 1787911179.81371,
+    "seen": 1788076616.6754358,
+    "ast_hash": "cfb4f3567659b71653da217f08d7afff",
+    "semantic_hash": "cfb4f3567659b71653da217f08d7afff"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\batches~20260828-121011.json": {
+    "mtime": 1787911785.2403953,
+    "seen": 1788076616.6754358,
+    "ast_hash": "514b7133caae79a670a34d2ab8ccac66",
+    "semantic_hash": "514b7133caae79a670a34d2ab8ccac66"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\batches~20260828-121105.json": {
+    "mtime": 1787911800.9003952,
+    "seen": 1788076616.6754358,
+    "ast_hash": "48e369ed92ad01b60fd5961ffe5bc4d1",
+    "semantic_hash": "48e369ed92ad01b60fd5961ffe5bc4d1"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\batches~20260829-132319.json": {
+    "mtime": 1787911816.8003953,
+    "seen": 1788076616.6754358,
+    "ast_hash": "d493063caf980b4e9ea3b01df4858f2b",
+    "semantic_hash": "d493063caf980b4e9ea3b01df4858f2b"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\profiles~20260825-134240.json": {
+    "mtime": 1787658114.6467478,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ccbd63c95019c519025954e196052c65",
+    "semantic_hash": "ccbd63c95019c519025954e196052c65"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\profiles~20260825-134300.json": {
+    "mtime": 1787658149.5187478,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a6324c21850133298305d7da04160fb9",
+    "semantic_hash": "a6324c21850133298305d7da04160fb9"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\profiles~20260825-134320.json": {
+    "mtime": 1787658168.750748,
+    "seen": 1788076616.6754358,
+    "ast_hash": "27f364bf6527d6292a1b0bd0d2552521",
+    "semantic_hash": "27f364bf6527d6292a1b0bd0d2552521"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\profiles~20260828-120311.json": {
+    "mtime": 1787861233.352165,
+    "seen": 1788076616.6754358,
+    "ast_hash": "cdaeb84723ebe1919aadcf64e1a16358",
+    "semantic_hash": "cdaeb84723ebe1919aadcf64e1a16358"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\profiles~20260828-120324.json": {
+    "mtime": 1787911380.8673537,
+    "seen": 1788076616.6754358,
+    "ast_hash": "82a13a50acda6be7e48438cf51e8c66a",
+    "semantic_hash": "82a13a50acda6be7e48438cf51e8c66a"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\shell~20260828-120200.json": {
+    "mtime": 1787910513.3923848,
+    "seen": 1788076616.6754358,
+    "ast_hash": "22428e69a71307d9fa2073fc5e826480",
+    "semantic_hash": "22428e69a71307d9fa2073fc5e826480"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\shell~20260828-120220.json": {
+    "mtime": 1787911312.0873537,
+    "seen": 1788076616.6754358,
+    "ast_hash": "9642e7c927fe7dabf58607df9ac8f939",
+    "semantic_hash": "9642e7c927fe7dabf58607df9ac8f939"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\shell~20260828-120940.json": {
+    "mtime": 1787911331.0153537,
+    "seen": 1788076616.6754358,
+    "ast_hash": "db90d7f4c2bc56e0491211747413f009",
+    "semantic_hash": "db90d7f4c2bc56e0491211747413f009"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\shell~20260828-121000.json": {
+    "mtime": 1787911769.9803953,
+    "seen": 1788076616.6754358,
+    "ast_hash": "9642e7c927fe7dabf58607df9ac8f939",
+    "semantic_hash": "9642e7c927fe7dabf58607df9ac8f939"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stversions\\records\\shell~20260829-132319.json": {
+    "mtime": 1787911785.6283953,
+    "seen": 1788076616.6754358,
+    "ast_hash": "22428e69a71307d9fa2073fc5e826480",
+    "semantic_hash": "22428e69a71307d9fa2073fc5e826480"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\manifest.json": {
+    "mtime": 1786525063.7636025,
+    "seen": 1788076616.6754358,
+    "ast_hash": "8cd8499ef2156cdd4ffebd2f83710afd",
+    "semantic_hash": "8cd8499ef2156cdd4ffebd2f83710afd"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\migration-backup\\2026-08-11T15-52-06-584Z\\manifest.json": {
+    "mtime": 1786525063.76511,
+    "seen": 1788076616.6754358,
+    "ast_hash": "8cd8499ef2156cdd4ffebd2f83710afd",
+    "semantic_hash": "8cd8499ef2156cdd4ffebd2f83710afd"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\migration-backup\\2026-08-11T15-52-06-584Z\\records\\batches.json": {
+    "mtime": 1786525063.7661157,
+    "seen": 1788076616.6754358,
+    "ast_hash": "e98685724785b9d171b6fb94ea3ae9d2",
+    "semantic_hash": "e98685724785b9d171b6fb94ea3ae9d2"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\migration-backup\\2026-08-11T15-52-06-584Z\\records\\profiles.json": {
+    "mtime": 1786525063.7661157,
+    "seen": 1788076616.6754358,
+    "ast_hash": "7417d71a97f117be82b10044cc96112f",
+    "semantic_hash": "7417d71a97f117be82b10044cc96112f"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\migration-backup\\2026-08-11T15-52-06-584Z\\records\\shell.json": {
+    "mtime": 1786525063.7671287,
+    "seen": 1788076616.6754358,
+    "ast_hash": "73750fe7b260da27c63414b38cc3837a",
+    "semantic_hash": "73750fe7b260da27c63414b38cc3837a"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\migration-backup\\2026-08-11T15-53-21-692Z\\manifest.json": {
+    "mtime": 1786525063.7671287,
+    "seen": 1788076616.6754358,
+    "ast_hash": "8cd8499ef2156cdd4ffebd2f83710afd",
+    "semantic_hash": "8cd8499ef2156cdd4ffebd2f83710afd"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\migration-backup\\2026-08-11T15-53-21-692Z\\records\\batches.json": {
+    "mtime": 1786525063.7681148,
+    "seen": 1788076616.6754358,
+    "ast_hash": "b72caf4785e2ff8ab459fc1338ce0c4e",
+    "semantic_hash": "b72caf4785e2ff8ab459fc1338ce0c4e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\migration-backup\\2026-08-11T15-53-21-692Z\\records\\profiles.json": {
+    "mtime": 1786525063.7691174,
+    "seen": 1788076616.6754358,
+    "ast_hash": "dab42e5dace465e30a7d4750b861cfcf",
+    "semantic_hash": "dab42e5dace465e30a7d4750b861cfcf"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\migration-backup\\2026-08-11T15-53-21-692Z\\records\\shell.json": {
+    "mtime": 1786525063.7701185,
+    "seen": 1788076616.6754358,
+    "ast_hash": "60299ccc6a55151a969b3e648b9a3609",
+    "semantic_hash": "60299ccc6a55151a969b3e648b9a3609"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\records\\batches.json": {
+    "mtime": 1788001920.7443562,
+    "seen": 1788076616.6754358,
+    "ast_hash": "082341d264ad550945626dc22d559fdb",
+    "semantic_hash": "082341d264ad550945626dc22d559fdb"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\records\\manifest.json": {
+    "mtime": 1786550841.7062228,
+    "seen": 1788076616.6754358,
+    "ast_hash": "233324635d8599245122ffbf77745c3e",
+    "semantic_hash": "233324635d8599245122ffbf77745c3e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\records\\profiles.json": {
+    "mtime": 1787911392.1873536,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5cf2150397dfe5bd39b14ed191f41efb",
+    "semantic_hash": "5cf2150397dfe5bd39b14ed191f41efb"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\records\\records\\batches.json": {
+    "mtime": 1786550841.5982227,
+    "seen": 1788076616.6754358,
+    "ast_hash": "d1f18ddff5a704e9aee0a19f495ce39a",
+    "semantic_hash": "d1f18ddff5a704e9aee0a19f495ce39a"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\records\\records\\profiles.json": {
+    "mtime": 1786550841.4942226,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a8cef594217b6507e4a4e55996ddc18c",
+    "semantic_hash": "a8cef594217b6507e4a4e55996ddc18c"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\records\\records\\shell.json": {
+    "mtime": 1786550909.666154,
+    "seen": 1788076616.6754358,
+    "ast_hash": "3e9c5e36f7f521ba4f36d2e1a3511626",
+    "semantic_hash": "3e9c5e36f7f521ba4f36d2e1a3511626"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\records\\shell.json": {
+    "mtime": 1788001932.3483562,
+    "seen": 1788076616.6754358,
+    "ast_hash": "427079ca035ede1b7433752bd72de615",
+    "semantic_hash": "427079ca035ede1b7433752bd72de615"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src-tauri\\Cargo.toml": {
+    "mtime": 1786548446.857528,
+    "seen": 1788076616.6754358,
+    "ast_hash": "d09ea210704ec075b106745a6781c69e",
+    "semantic_hash": "d09ea210704ec075b106745a6781c69e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src-tauri\\build.rs": {
+    "mtime": 1786525063.7756245,
+    "seen": 1788076616.6754358,
+    "ast_hash": "667702979da61fdc96948886b7cd7a33",
+    "semantic_hash": "667702979da61fdc96948886b7cd7a33"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src-tauri\\src\\main.rs": {
+    "mtime": 1786525063.7766323,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a64a882e0ef06bc6eeeb08193429766f",
+    "semantic_hash": "a64a882e0ef06bc6eeeb08193429766f"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src-tauri\\tauri.conf.json": {
+    "mtime": 1787052053.8338184,
+    "seen": 1788076616.6754358,
+    "ast_hash": "e4035a8ce4ea8b935c270dc9a06b46e2",
+    "semantic_hash": "e4035a8ce4ea8b935c270dc9a06b46e2"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\App.test.tsx": {
+    "mtime": 1787125427.130519,
+    "seen": 1788076616.6754358,
+    "ast_hash": "784f08019f47e59e01e29fda0b95794f",
+    "semantic_hash": "784f08019f47e59e01e29fda0b95794f"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\App.tsx": {
+    "mtime": 1787125509.9596887,
+    "seen": 1788076616.6754358,
+    "ast_hash": "7db15edd4b360e4c5414c963ed600744",
+    "semantic_hash": "7db15edd4b360e4c5414c963ed600744"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\domain\\batches.test.ts": {
+    "mtime": 1786525063.7806327,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c002073e3a90eae7d061d2807a56916b",
+    "semantic_hash": "c002073e3a90eae7d061d2807a56916b"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\domain\\batches.ts": {
+    "mtime": 1786525063.7816336,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c4c97a82fda2d4f330d9db0bedf7fc9f",
+    "semantic_hash": "c4c97a82fda2d4f330d9db0bedf7fc9f"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\domain\\profiles.test.ts": {
+    "mtime": 1786525063.782633,
+    "seen": 1788076616.6754358,
+    "ast_hash": "116aab89250c13d9ca1e74fbb4d9f597",
+    "semantic_hash": "116aab89250c13d9ca1e74fbb4d9f597"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\domain\\profiles.ts": {
+    "mtime": 1786525063.782633,
+    "seen": 1788076616.6754358,
+    "ast_hash": "92e98cd6ecb2353d15440c29f8201d83",
+    "semantic_hash": "92e98cd6ecb2353d15440c29f8201d83"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\domain\\shell.test.ts": {
+    "mtime": 1786525063.783633,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c55c710022feb29b3053a709f55f86ea",
+    "semantic_hash": "c55c710022feb29b3053a709f55f86ea"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\domain\\shell.ts": {
+    "mtime": 1786525063.784633,
+    "seen": 1788076616.6754358,
+    "ast_hash": "3bfe1322de9a4e6ddb413284a3e1de30",
+    "semantic_hash": "3bfe1322de9a4e6ddb413284a3e1de30"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\main.tsx": {
+    "mtime": 1786525063.7861488,
+    "seen": 1788076616.6754358,
+    "ast_hash": "822ea2edd97905fd87d863eb939d6dc2",
+    "semantic_hash": "822ea2edd97905fd87d863eb939d6dc2"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\archive.test.ts": {
+    "mtime": 1786525063.788158,
+    "seen": 1788076616.6754358,
+    "ast_hash": "9e2c21583b95904da6d119aa03655686",
+    "semantic_hash": "9e2c21583b95904da6d119aa03655686"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\archive.ts": {
+    "mtime": 1786525063.7891588,
+    "seen": 1788076616.6754358,
+    "ast_hash": "05e7df02dccb7f8f8e604028db8fe164",
+    "semantic_hash": "05e7df02dccb7f8f8e604028db8fe164"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\batch-store.test.ts": {
+    "mtime": 1786525063.790157,
+    "seen": 1788076616.6754358,
+    "ast_hash": "4fb4942319c5323b7d5eaf3d3ed8782a",
+    "semantic_hash": "4fb4942319c5323b7d5eaf3d3ed8782a"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\batch-store.ts": {
+    "mtime": 1786525063.790157,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ebc481983186ca02eeed7401052ff077",
+    "semantic_hash": "ebc481983186ca02eeed7401052ff077"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\camera.ts": {
+    "mtime": 1786525063.7911572,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c9bd89da7a79bdb174639ea1ebefc9b3",
+    "semantic_hash": "c9bd89da7a79bdb174639ea1ebefc9b3"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\native-store.ts": {
+    "mtime": 1786525063.7921574,
+    "seen": 1788076616.6754358,
+    "ast_hash": "f1abf2af5f52b88f4aa1b2e9d6b146b3",
+    "semantic_hash": "f1abf2af5f52b88f4aa1b2e9d6b146b3"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\native-transfer.ts": {
+    "mtime": 1786525063.7921574,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a1062e0e67b1a91c7cd3b56d2da5b55d",
+    "semantic_hash": "a1062e0e67b1a91c7cd3b56d2da5b55d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\profile-store.test.ts": {
+    "mtime": 1786525063.7931578,
+    "seen": 1788076616.6754358,
+    "ast_hash": "072c7964a8a7ffe0c0f71246cfa0b4af",
+    "semantic_hash": "072c7964a8a7ffe0c0f71246cfa0b4af"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\profile-store.ts": {
+    "mtime": 1786525063.7941573,
+    "seen": 1788076616.6754358,
+    "ast_hash": "503e1449188e4e7d5ac4f4e4bf59bbfd",
+    "semantic_hash": "503e1449188e4e7d5ac4f4e4bf59bbfd"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\reminders.ts": {
+    "mtime": 1786525063.7941573,
+    "seen": 1788076616.6754358,
+    "ast_hash": "150eed4aba4ac43b01b5acd34b274f3e",
+    "semantic_hash": "150eed4aba4ac43b01b5acd34b274f3e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\shared-data-store.test.ts": {
+    "mtime": 1786525063.7951577,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ac726a1eb026f31efe18ffbf6b9ca33f",
+    "semantic_hash": "ac726a1eb026f31efe18ffbf6b9ca33f"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\shared-data-store.ts": {
+    "mtime": 1786525063.7956653,
+    "seen": 1788076616.6754358,
+    "ast_hash": "994e12bddda614a86a05fc0a0031b22d",
+    "semantic_hash": "994e12bddda614a86a05fc0a0031b22d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\shared-directory-bridge.ts": {
+    "mtime": 1786525063.7956653,
+    "seen": 1788076616.6754358,
+    "ast_hash": "3734454beb37f8088240e354202251e0",
+    "semantic_hash": "3734454beb37f8088240e354202251e0"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\shell-store.test.ts": {
+    "mtime": 1786525063.7966733,
+    "seen": 1788076616.6754358,
+    "ast_hash": "eab4b1a94d178ca4d254204c6f0a8572",
+    "semantic_hash": "eab4b1a94d178ca4d254204c6f0a8572"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\platform\\shell-store.ts": {
+    "mtime": 1786525063.797682,
+    "seen": 1788076616.6754358,
+    "ast_hash": "f0b8afb6e0421c6144c733362e79c093",
+    "semantic_hash": "f0b8afb6e0421c6144c733362e79c093"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\styles.test.ts": {
+    "mtime": 1787654393.2336943,
+    "seen": 1788076616.6754358,
+    "ast_hash": "551c55bfe3353e98ce9d215c2b3a53b4",
+    "semantic_hash": "551c55bfe3353e98ce9d215c2b3a53b4"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\src\\vite-env.d.ts": {
+    "mtime": 1786525063.8006809,
+    "seen": 1788076616.6754358,
+    "ast_hash": "8f68c27c3fc38817b2726b20e2d4f1ee",
+    "semantic_hash": "8f68c27c3fc38817b2726b20e2d4f1ee"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\tsconfig.app.json": {
+    "mtime": 1786525063.8016796,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5cc13ce56260c96a7a5e67a1db3bf567",
+    "semantic_hash": "5cc13ce56260c96a7a5e67a1db3bf567"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\tsconfig.json": {
+    "mtime": 1786525063.8026814,
+    "seen": 1788076616.6754358,
+    "ast_hash": "852c3a5df14a4b43ac28e9554ebedf4a",
+    "semantic_hash": "852c3a5df14a4b43ac28e9554ebedf4a"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\tsconfig.node.json": {
+    "mtime": 1786525063.8026814,
+    "seen": 1788076616.6754358,
+    "ast_hash": "88986f740f96e051dec2c5f3a1ebdd48",
+    "semantic_hash": "88986f740f96e051dec2c5f3a1ebdd48"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\vite.config.ts": {
+    "mtime": 1786525063.8036819,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a96e553fcd204a42ecbc8d4ad96999f7",
+    "semantic_hash": "a96e553fcd204a42ecbc8d4ad96999f7"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\.github\\workflows\\openwiki-update.yml": {
+    "mtime": 1787859604.879542,
+    "seen": 1788076616.6754358,
+    "ast_hash": "6a0c16635fbdd7958bd4741be6acc1db",
+    "semantic_hash": "6a0c16635fbdd7958bd4741be6acc1db"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\agent-browser-6b53939dfa\\SKILL.md": {
+    "mtime": 1786522740.2287245,
+    "seen": 1788076616.6754358,
+    "ast_hash": "8ff3a4dc4d9427244d8c3a9361e2f217",
+    "semantic_hash": "8ff3a4dc4d9427244d8c3a9361e2f217"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\SKILL.md": {
+    "mtime": 1786522740.2637122,
+    "seen": 1788076616.6754358,
+    "ast_hash": "2a875bf6ab7afb0fd1595b2ddf05ee89",
+    "semantic_hash": "2a875bf6ab7afb0fd1595b2ddf05ee89"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\assets\\template.html": {
+    "mtime": 1786522740.2945993,
+    "seen": 1788076616.6754358,
+    "ast_hash": "1aa2c558c23cb943f605b5282f6e35c9",
+    "semantic_hash": "1aa2c558c23cb943f605b5282f6e35c9"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\example.html": {
+    "mtime": 1786522740.318864,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c9f3a0c012aa9aa697ef07b2985f38fd",
+    "semantic_hash": "c9f3a0c012aa9aa697ef07b2985f38fd"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\references\\checklist.md": {
+    "mtime": 1786522740.3847775,
+    "seen": 1788076616.6754358,
+    "ast_hash": "7bf5d465a7d525639b490ba85bfd338d",
+    "semantic_hash": "7bf5d465a7d525639b490ba85bfd338d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\.od-skills\\web-prototype-5eeb6149b9\\references\\layouts.md": {
+    "mtime": 1786522740.4226997,
+    "seen": 1788076616.6754358,
+    "ast_hash": "fcdd0804d7fb10538ebcdaf086218c16",
+    "semantic_hash": "fcdd0804d7fb10538ebcdaf086218c16"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\AFK_AGENT_LOG.md": {
+    "mtime": 1786525063.7085335,
+    "seen": 1788076616.6754358,
+    "ast_hash": "1ac258c4b1d6ce9ab600b6d2a9e430ac",
+    "semantic_hash": "1ac258c4b1d6ce9ab600b6d2a9e430ac"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\AGENTS.md": {
+    "mtime": 1787998707.9983008,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a169049d7cc3199aee137e949080c94d",
+    "semantic_hash": "a169049d7cc3199aee137e949080c94d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\CLAUDE.md": {
+    "mtime": 1787998707.9983008,
+    "seen": 1788076616.6754358,
+    "ast_hash": "2172bd7eec8dde7e566d81c628217fc4",
+    "semantic_hash": "2172bd7eec8dde7e566d81c628217fc4"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\CONTEXT.md": {
+    "mtime": 1786525063.7095063,
+    "seen": 1788076616.6754358,
+    "ast_hash": "13dc3c4104dda51131e3ee24f3936d2b",
+    "semantic_hash": "13dc3c4104dda51131e3ee24f3936d2b"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\README.md": {
+    "mtime": 1786525063.7105048,
+    "seen": 1788076616.6754358,
+    "ast_hash": "9ba5ece406c339bc9055ba1daf9ad5fc",
+    "semantic_hash": "9ba5ece406c339bc9055ba1daf9ad5fc"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\adr\\0001-unified-observation-logging.md": {
+    "mtime": 1786525063.732545,
+    "seen": 1788076616.6754358,
+    "ast_hash": "bf6957cfb7e51dc5f8bdd4fea501d525",
+    "semantic_hash": "bf6957cfb7e51dc5f8bdd4fea501d525"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\domain.md": {
+    "mtime": 1786525063.732545,
+    "seen": 1788076616.6754358,
+    "ast_hash": "6e320e9ef2c41f6b23d347d4ab0f8775",
+    "semantic_hash": "6e320e9ef2c41f6b23d347d4ab0f8775"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\issue-tracker.md": {
+    "mtime": 1786525063.7335453,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a625479612409536517c3a9afbdd84b1",
+    "semantic_hash": "a625479612409536517c3a9afbdd84b1"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\agents\\triage-labels.md": {
+    "mtime": 1786525063.7335453,
+    "seen": 1788076616.6754358,
+    "ast_hash": "fbee3c5c9d8c4ada7cc381e3c4456f98",
+    "semantic_hash": "fbee3c5c9d8c4ada7cc381e3c4456f98"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-desktop-implementation-gaps.md": {
+    "mtime": 1786525063.7335453,
+    "seen": 1788076616.6754358,
+    "ast_hash": "fffaa4cabdd21ae73686017055306de9",
+    "semantic_hash": "fffaa4cabdd21ae73686017055306de9"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\android-development-workflow.md": {
+    "mtime": 1786525063.735052,
+    "seen": 1788076616.6754358,
+    "ast_hash": "3b0cfecbff8155fbd4c33fbb330cf1dd",
+    "semantic_hash": "3b0cfecbff8155fbd4c33fbb330cf1dd"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\pH_levels.md": {
+    "mtime": 1786522745.5667994,
+    "seen": 1788076616.6754358,
+    "ast_hash": "d97c5be663b8ac778713ab0fe19a6511",
+    "semantic_hash": "d97c5be663b8ac778713ab0fe19a6511"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\docs\\shared-data-format.md": {
+    "mtime": 1786525063.7360604,
+    "seen": 1788076616.6754358,
+    "ast_hash": "6bdae65997da5b0dcb46d24ddf88fa25",
+    "semantic_hash": "6bdae65997da5b0dcb46d24ddf88fa25"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\index.html": {
+    "mtime": 1786548960.0908089,
+    "seen": 1788076616.6754358,
+    "ast_hash": "cd427cf1a1da34c63b4dad90f1c63b56",
+    "semantic_hash": "cd427cf1a1da34c63b4dad90f1c63b56"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\INSTRUCTIONS.md": {
+    "mtime": 1787998707.9663014,
+    "seen": 1788076616.6754358,
+    "ast_hash": "6c78f2e094ab0a559649ea1c10b740f7",
+    "semantic_hash": "6c78f2e094ab0a559649ea1c10b740f7"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\android-capacitor.md": {
+    "mtime": 1786730898.8361204,
+    "seen": 1788076616.6754358,
+    "ast_hash": "23e23bc2d04189e5f01afaf8fe1ea227",
+    "semantic_hash": "23e23bc2d04189e5f01afaf8fe1ea227"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\index.md": {
+    "mtime": 1786736226.3278432,
+    "seen": 1788076616.6754358,
+    "ast_hash": "3dac70d402dbe70e2c9383e6d3c00279",
+    "semantic_hash": "3dac70d402dbe70e2c9383e6d3c00279"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\native-contracts.md": {
+    "mtime": 1786782257.3282747,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5f0141d2f5c5dfe1f4eb2462c6299e2a",
+    "semantic_hash": "5f0141d2f5c5dfe1f4eb2462c6299e2a"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\overview.md": {
+    "mtime": 1786735536.2712579,
+    "seen": 1788076616.6754358,
+    "ast_hash": "75e4f244c78c39b5a204cecc2cd24b7e",
+    "semantic_hash": "75e4f244c78c39b5a204cecc2cd24b7e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\architecture\\ui.md": {
+    "mtime": 1787999741.4419634,
+    "seen": 1788076616.6754358,
+    "ast_hash": "348cc881250a83b9a084cfee5f024ce5",
+    "semantic_hash": "348cc881250a83b9a084cfee5f024ce5"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\desktop-tauri.md": {
+    "mtime": 1786732163.2296839,
+    "seen": 1788076616.6754358,
+    "ast_hash": "f3a9b43a001f17dda1d3f2fb47ce1c0a",
+    "semantic_hash": "f3a9b43a001f17dda1d3f2fb47ce1c0a"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\batches.md": {
+    "mtime": 1787999741.4450908,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ffdff262c7916bb7130d38312bd4226b",
+    "semantic_hash": "ffdff262c7916bb7130d38312bd4226b"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\index.md": {
+    "mtime": 1786732278.6582587,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ae3be5a0a7702fef96a13ccd52314064",
+    "semantic_hash": "ae3be5a0a7702fef96a13ccd52314064"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\profiles.md": {
+    "mtime": 1786782087.7084875,
+    "seen": 1788076616.6754358,
+    "ast_hash": "6729b351eb75f0a66f47c184cbb8ca21",
+    "semantic_hash": "6729b351eb75f0a66f47c184cbb8ca21"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\domains\\shell.md": {
+    "mtime": 1786730838.5214148,
+    "seen": 1788076616.6754358,
+    "ast_hash": "e1f170f9f53b6d943db262b9669f5aa7",
+    "semantic_hash": "e1f170f9f53b6d943db262b9669f5aa7"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\index.md": {
+    "mtime": 1787999741.421815,
+    "seen": 1788076616.6754358,
+    "ast_hash": "192822b3f32c0cd9cd230173107ade38",
+    "semantic_hash": "192822b3f32c0cd9cd230173107ade38"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\build.md": {
+    "mtime": 1787999741.4470887,
+    "seen": 1788076616.6754358,
+    "ast_hash": "fa7d51450577067c9c1f9a52a54faa31",
+    "semantic_hash": "fa7d51450577067c9c1f9a52a54faa31"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\deployment.md": {
+    "mtime": 1787999741.4511206,
+    "seen": 1788076616.6754358,
+    "ast_hash": "33d7dfe379ec15ad720b13e3fc1ac5aa",
+    "semantic_hash": "33d7dfe379ec15ad720b13e3fc1ac5aa"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\operations\\index.md": {
+    "mtime": 1786736226.3848698,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c673713eb397e5659a5c3b4955d9c45d",
+    "semantic_hash": "c673713eb397e5659a5c3b4955d9c45d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\android-capacitor.md": {
+    "mtime": 1787999278.750883,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c8dc9b9307fd39e1161dd31b6a296ceb",
+    "semantic_hash": "c8dc9b9307fd39e1161dd31b6a296ceb"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\archive.md": {
+    "mtime": 1786735992.851469,
+    "seen": 1788076616.6754358,
+    "ast_hash": "98dea5d0bc42bd612294c8e76a3b0af4",
+    "semantic_hash": "98dea5d0bc42bd612294c8e76a3b0af4"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\desktop-tauri.md": {
+    "mtime": 1787999267.018245,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ca8a5f7683ad00d35e79203edd883ac8",
+    "semantic_hash": "ca8a5f7683ad00d35e79203edd883ac8"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\device-integrations.md": {
+    "mtime": 1787999495.2253666,
+    "seen": 1788076616.6754358,
+    "ast_hash": "b0392099dc109303be19c825023c7545",
+    "semantic_hash": "b0392099dc109303be19c825023c7545"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\index.md": {
+    "mtime": 1787999741.3993633,
+    "seen": 1788076616.6754358,
+    "ast_hash": "7f687ef2d20d0a464938bb5fb333a1a3",
+    "semantic_hash": "7f687ef2d20d0a464938bb5fb333a1a3"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\platform\\storage.md": {
+    "mtime": 1786782103.3873918,
+    "seen": 1788076616.6754358,
+    "ast_hash": "e13ca4f64b0acbc2c6531ff3be7480ee",
+    "semantic_hash": "e13ca4f64b0acbc2c6531ff3be7480ee"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\quickstart.md": {
+    "mtime": 1787999645.052033,
+    "seen": 1788076616.6754358,
+    "ast_hash": "984b3468466013edd417247c935b23a3",
+    "semantic_hash": "984b3468466013edd417247c935b23a3"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\testing.md": {
+    "mtime": 1787999741.4752688,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c7339e603c78cf506ed47becbbf77150",
+    "semantic_hash": "c7339e603c78cf506ed47becbbf77150"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\archive-transfer.md": {
+    "mtime": 1786782251.7442577,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ea36b5697267b49631d9e1d5f9e22153",
+    "semantic_hash": "ea36b5697267b49631d9e1d5f9e22153"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\calendar.md": {
+    "mtime": 1787999741.4795585,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5be72a24ba38d259eb5429a3f793d28b",
+    "semantic_hash": "5be72a24ba38d259eb5429a3f793d28b"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\data-interchange.md": {
+    "mtime": 1786730872.9029362,
+    "seen": 1788076616.6754358,
+    "ast_hash": "220e5f3be44b014584596aeecd6e6445",
+    "semantic_hash": "220e5f3be44b014584596aeecd6e6445"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\index.md": {
+    "mtime": 1787999741.4122996,
+    "seen": 1788076616.6754358,
+    "ast_hash": "67f5a5550dd36e6c7d155b7b72bf97d8",
+    "semantic_hash": "67f5a5550dd36e6c7d155b7b72bf97d8"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\platform-lifecycle.md": {
+    "mtime": 1786782144.8163953,
+    "seen": 1788076616.6754358,
+    "ast_hash": "f0d35829609160fdcb84a4422851805b",
+    "semantic_hash": "f0d35829609160fdcb84a4422851805b"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\openwiki\\workflows\\shared-sync.md": {
+    "mtime": 1787999291.3405266,
+    "seen": 1788076616.6754358,
+    "ast_hash": "b8bd9e6afdd978409030dba10a1f8ace",
+    "semantic_hash": "b8bd9e6afdd978409030dba10a1f8ace"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\outputs\\repo-implementation-advisor-report.md": {
+    "mtime": 1786730300.942369,
+    "seen": 1788076616.6754358,
+    "ast_hash": "aaa18d3d786297ee9bc37d4c3b46fa5c",
+    "semantic_hash": "aaa18d3d786297ee9bc37d4c3b46fa5c"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\batch-components\\batch-components-prototype.html": {
+    "mtime": 1786525063.7420597,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a49d8ffea188b869fe21a4e947da6a07",
+    "semantic_hash": "a49d8ffea188b869fe21a4e947da6a07"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\batch-workflow-prototype.html": {
+    "mtime": 1786525063.7440593,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ed9f5f1236bd72343384a109e2f9cbbc",
+    "semantic_hash": "ed9f5f1236bd72343384a109e2f9cbbc"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-galaxy-z-fold6-prototype\\.file-versions\\bddbbd5c0b4fb29d0e311159\\0001-a22b1f19-2426-4e2b-9474-b998b69052fd.html": {
+    "mtime": 1786525063.745057,
+    "seen": 1788076616.6754358,
+    "ast_hash": "d920b1a1ebc5efa497bc6fb961559df8",
+    "semantic_hash": "d920b1a1ebc5efa497bc6fb961559df8"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-galaxy-z-fold6-prototype\\.file-versions\\bddbbd5c0b4fb29d0e311159\\0002-f8aca395-42bc-4dee-a6e8-d3c552dec82c.html": {
+    "mtime": 1786525063.7460923,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5c983fbca0ec9c3463764fc38dddfd9d",
+    "semantic_hash": "5c983fbca0ec9c3463764fc38dddfd9d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-galaxy-z-fold6-prototype\\fermentstation-fold6-concept.html": {
+    "mtime": 1786525063.7471032,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5c983fbca0ec9c3463764fc38dddfd9d",
+    "semantic_hash": "5c983fbca0ec9c3463764fc38dddfd9d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-v1-experience-direction-d6a9\\.file-versions\\0371badc8013c838aecf5840\\0001-3da3395e-abb1-4807-819c-63e7fbb7d881.html": {
+    "mtime": 1786525063.7490911,
+    "seen": 1788076616.6754358,
+    "ast_hash": "bf7268cc63364acc214e4dedbda21edc",
+    "semantic_hash": "bf7268cc63364acc214e4dedbda21edc"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-v1-experience-direction-d6a9\\fermentstation-v1-prototype.html": {
+    "mtime": 1786525063.7510943,
+    "seen": 1788076616.6754358,
+    "ast_hash": "bf7268cc63364acc214e4dedbda21edc",
+    "semantic_hash": "bf7268cc63364acc214e4dedbda21edc"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\profile-page\\ferment-profile-editor.html": {
+    "mtime": 1786525063.753094,
+    "seen": 1788076616.6754358,
+    "ast_hash": "9f26f59c84abe1ffae8f2ad8c05a177b",
+    "semantic_hash": "9f26f59c84abe1ffae8f2ad8c05a177b"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\research\\free-offline-sync-photo-storage.md": {
+    "mtime": 1786525063.7540941,
+    "seen": 1788076616.6754358,
+    "ast_hash": "b0a8e6fe17b1328662d87b514a1c55d2",
+    "semantic_hash": "b0a8e6fe17b1328662d87b514a1c55d2"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\research\\free-sync.md": {
+    "mtime": 1786525063.7555954,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a69099dd35ec6d8f10975668304203cf",
+    "semantic_hash": "a69099dd35ec6d8f10975668304203cf"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\research\\stack-options.md": {
+    "mtime": 1786525063.7555954,
+    "seen": 1788076616.6754358,
+    "ast_hash": "7ebb06e94b84500083a19efe3e63bb71",
+    "semantic_hash": "7ebb06e94b84500083a19efe3e63bb71"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\.stfolder\\syncthing-folder-9f80af.txt": {
+    "mtime": 1786525063.7586029,
+    "seen": 1788076616.6754358,
+    "ast_hash": "0bde66136313264ce894967d78d6fa69",
+    "semantic_hash": "0bde66136313264ce894967d78d6fa69"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-land-hdpi\\splash.png": {
+    "mtime": 1786522741.0227966,
+    "seen": 1788076616.6754358,
+    "ast_hash": "f7a80786dd355bd39014e58027aa6e19",
+    "semantic_hash": "f7a80786dd355bd39014e58027aa6e19"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-land-mdpi\\splash.png": {
+    "mtime": 1786522741.0735328,
+    "seen": 1788076616.6754358,
+    "ast_hash": "acc976d4a36479233371a53021525c0c",
+    "semantic_hash": "acc976d4a36479233371a53021525c0c"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-land-xhdpi\\splash.png": {
+    "mtime": 1786522741.1086082,
+    "seen": 1788076616.6754358,
+    "ast_hash": "b8c72969bc1f78aab71a76035360d4af",
+    "semantic_hash": "b8c72969bc1f78aab71a76035360d4af"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-land-xxhdpi\\splash.png": {
+    "mtime": 1786522741.1494095,
+    "seen": 1788076616.6754358,
+    "ast_hash": "f87e988387b07d843905f38b084929fb",
+    "semantic_hash": "f87e988387b07d843905f38b084929fb"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-land-xxxhdpi\\splash.png": {
+    "mtime": 1786522741.1933694,
+    "seen": 1788076616.6754358,
+    "ast_hash": "055a69553b16b0bf5f72094a2e459fc7",
+    "semantic_hash": "055a69553b16b0bf5f72094a2e459fc7"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-port-hdpi\\splash.png": {
+    "mtime": 1786522741.244791,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5eb10d16c81338abe8bbc033d49638a8",
+    "semantic_hash": "5eb10d16c81338abe8bbc033d49638a8"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-port-mdpi\\splash.png": {
+    "mtime": 1786522741.301677,
+    "seen": 1788076616.6754358,
+    "ast_hash": "d855a76a5070c8e6fcfd83a27549bdce",
+    "semantic_hash": "d855a76a5070c8e6fcfd83a27549bdce"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-port-xhdpi\\splash.png": {
+    "mtime": 1786522741.360844,
+    "seen": 1788076616.6754358,
+    "ast_hash": "df100b2a36bdb98b711cca58941728de",
+    "semantic_hash": "df100b2a36bdb98b711cca58941728de"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-port-xxhdpi\\splash.png": {
+    "mtime": 1786522741.4324522,
+    "seen": 1788076616.6754358,
+    "ast_hash": "2c1b668364e815256f67b71dcdfa4d6e",
+    "semantic_hash": "2c1b668364e815256f67b71dcdfa4d6e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable-port-xxxhdpi\\splash.png": {
+    "mtime": 1786522741.5054326,
+    "seen": 1788076616.6754358,
+    "ast_hash": "b5b1b22b59abe686c1df0d74a423d034",
+    "semantic_hash": "b5b1b22b59abe686c1df0d74a423d034"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\drawable\\splash.png": {
+    "mtime": 1786522741.7348268,
+    "seen": 1788076616.6754358,
+    "ast_hash": "acc976d4a36479233371a53021525c0c",
+    "semantic_hash": "acc976d4a36479233371a53021525c0c"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png": {
+    "mtime": 1786548845.4204597,
+    "seen": 1788076616.6754358,
+    "ast_hash": "cdf5524b957ff30184b1abc147a46436",
+    "semantic_hash": "cdf5524b957ff30184b1abc147a46436"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_foreground.png": {
+    "mtime": 1786548843.1068745,
+    "seen": 1788076616.6754358,
+    "ast_hash": "7f0fcccde72b665aefa006813c49ff6b",
+    "semantic_hash": "7f0fcccde72b665aefa006813c49ff6b"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.png": {
+    "mtime": 1786548845.2731624,
+    "seen": 1788076616.6754358,
+    "ast_hash": "1a4d1e00e9beaa4438336b64ad12532e",
+    "semantic_hash": "1a4d1e00e9beaa4438336b64ad12532e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.png": {
+    "mtime": 1786522742.0949416,
+    "seen": 1788076616.6754358,
+    "ast_hash": "7ed1b3739b83215d0c4a0b4a7f2dcab4",
+    "semantic_hash": "7ed1b3739b83215d0c4a0b4a7f2dcab4"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_foreground.png": {
+    "mtime": 1786522742.1322167,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5b77e8aec8b17eed320a97567c7cb8bf",
+    "semantic_hash": "5b77e8aec8b17eed320a97567c7cb8bf"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_round.png": {
+    "mtime": 1786522742.1613388,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a49547a32c7d9b529af607b033811d81",
+    "semantic_hash": "a49547a32c7d9b529af607b033811d81"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.png": {
+    "mtime": 1786522742.209749,
+    "seen": 1788076616.6754358,
+    "ast_hash": "5689511ee4e41a367d0342f37ac48bdf",
+    "semantic_hash": "5689511ee4e41a367d0342f37ac48bdf"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_foreground.png": {
+    "mtime": 1786522742.269319,
+    "seen": 1788076616.6754358,
+    "ast_hash": "15cdded29b9877ac98c5931024c5da5d",
+    "semantic_hash": "15cdded29b9877ac98c5931024c5da5d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_round.png": {
+    "mtime": 1786522742.3256772,
+    "seen": 1788076616.6754358,
+    "ast_hash": "c890fa4af62a63486d5dea62441ce7ab",
+    "semantic_hash": "c890fa4af62a63486d5dea62441ce7ab"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.png": {
+    "mtime": 1786522742.3978724,
+    "seen": 1788076616.6754358,
+    "ast_hash": "a3285eeaedda8201f04e7737b9df8421",
+    "semantic_hash": "a3285eeaedda8201f04e7737b9df8421"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_foreground.png": {
+    "mtime": 1786522742.4533725,
+    "seen": 1788076616.6754358,
+    "ast_hash": "4e9584ecc16d1fc75afb798688ce576f",
+    "semantic_hash": "4e9584ecc16d1fc75afb798688ce576f"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_round.png": {
+    "mtime": 1786522742.520358,
+    "seen": 1788076616.6754358,
+    "ast_hash": "14cde87848553e24d7106f56eb8ceb6f",
+    "semantic_hash": "14cde87848553e24d7106f56eb8ceb6f"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher.png": {
+    "mtime": 1786522742.6292622,
+    "seen": 1788076616.6754358,
+    "ast_hash": "9e029293ab1ae8e3a6a7b7d0b7177e46",
+    "semantic_hash": "9e029293ab1ae8e3a6a7b7d0b7177e46"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_foreground.png": {
+    "mtime": 1786522742.8176794,
+    "seen": 1788076616.6754358,
+    "ast_hash": "ed3696b7c52d9747411a475dbe3fa34a",
+    "semantic_hash": "ed3696b7c52d9747411a475dbe3fa34a"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\android\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_round.png": {
+    "mtime": 1786522742.9649217,
+    "seen": 1788076616.6754358,
+    "ast_hash": "85addb4159ecd3f76f02fbacd5ec86de",
+    "semantic_hash": "85addb4159ecd3f76f02fbacd5ec86de"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\app_logo.png": {
+    "mtime": 1786522745.0363095,
+    "seen": 1788076616.6754358,
+    "ast_hash": "dac5c4c27e056a5cb38bba88ec7bab40",
+    "semantic_hash": "dac5c4c27e056a5cb38bba88ec7bab40"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\fermentstation-galaxy-z-fold6-prototype\\drawing-2026-08-07T19-00-59-959Z.png": {
+    "mtime": 1786522746.4112062,
+    "seen": 1788076616.6754358,
+    "ast_hash": "db63c0e2b27691d5633f588708ff9b0e",
+    "semantic_hash": "db63c0e2b27691d5633f588708ff9b0e"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\public\\app_logo.png": {
+    "mtime": 1786522745.0363095,
+    "seen": 1788076616.6754358,
+    "ast_hash": "dac5c4c27e056a5cb38bba88ec7bab40",
+    "semantic_hash": "dac5c4c27e056a5cb38bba88ec7bab40"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\photos\\35bfd79e-ff36-4492-afa0-8b4fc9c0aefe\\e564628b-4b11-4810-8e86-593e4d297e1d.jpg": {
+    "mtime": 1787910586.9523847,
+    "seen": 1788076616.6754358,
+    "ast_hash": "8999fd48c5ecfcb5f34d9ba361466084",
+    "semantic_hash": "8999fd48c5ecfcb5f34d9ba361466084"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\photos\\43aa155f-fcd0-4aab-9da9-003226b780bf\\1a37b9ba-427f-409b-a029-f4ec29520bdb.jpg": {
+    "mtime": 1787910650.8003848,
+    "seen": 1788076616.6754358,
+    "ast_hash": "1e8fd6d2ec86e6379f5ae080d0281c69",
+    "semantic_hash": "1e8fd6d2ec86e6379f5ae080d0281c69"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\photos\\5f09dcc5-a4bd-49a3-9c12-0dd17d95330c\\8a8e2b78-11fe-4038-bd52-91c5e34101b9.jpg": {
+    "mtime": 1787910557.7643847,
+    "seen": 1788076616.6754358,
+    "ast_hash": "19b66febc9ce60d1fce7af7435cac1c9",
+    "semantic_hash": "19b66febc9ce60d1fce7af7435cac1c9"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\photos\\af9cdd33-7adb-4f58-a122-ca7e701d1a8d\\0459651b-808f-4311-92af-89cdb71d3680.jpg": {
+    "mtime": 1787911816.4563951,
+    "seen": 1788076616.6754358,
+    "ast_hash": "516190b4ee87189118c1a69c24732e3d",
+    "semantic_hash": "516190b4ee87189118c1a69c24732e3d"
+  },
+  "C:\\Users\\molze\\GitHub\\fermentstation\\shared\\photos\\af9cf859-72be-47f0-a8cd-f780f3491d27\\112f87ed-e3f6-470f-8200-e11e3440b31d.jpg": {
+    "mtime": 1787738220.3108702,
+    "seen": 1788076616.6754358,
+    "ast_hash": "df8623ea4d77dadcad92f77a0965fb5f",
+    "semantic_hash": "df8623ea4d77dadcad92f77a0965fb5f"
+  }
+}
