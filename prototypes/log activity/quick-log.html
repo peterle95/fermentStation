@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fermentStation / Quick log prototype</title>
+<style>
+:root {
+  --bg: #f5f4ed;
+  --surface: #faf9f5;
+  --surface-warm: #e8e6dc;
+  --fg: #141413;
+  --fg-2: #3d3d3a;
+  --muted: #5e5d59;
+  --meta: #87867f;
+  --border: #f0eee6;
+  --border-soft: #e8e6dc;
+  --accent: #c96442;
+  --accent-on: #faf9f5;
+  --accent-hover: color-mix(in oklab, var(--accent), black 8%);
+  --accent-active: color-mix(in oklab, var(--accent), black 14%);
+  --success: #17a34a;
+  --warn: #eab308;
+  --danger: #b53333;
+  --font-display: "Anthropic Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Anthropic Sans", "Arial", system-ui, -apple-system, sans-serif;
+  --font-mono: "Anthropic Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+  --text-xs: 10px; --text-sm: 14px; --text-base: 16px; --text-lg: 20px; --text-xl: 25px; --text-2xl: 32px; --text-3xl: 52px; --text-4xl: 64px;
+  --leading-body: 1.6; --leading-tight: 1.1; --tracking-display: 0em;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-12: 48px;
+  --section-y-desktop: 96px; --section-y-tablet: 64px; --section-y-phone: 48px;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-pill: 9999px;
+  --elev-flat: none; --elev-ring: 0 0 0 1px var(--border); --elev-raised: rgba(0, 0, 0, 0.05) 0px 4px 24px;
+  --focus-ring: 0 0 0 3px rgba(56, 152, 236, 0.3);
+  --motion-fast: 150ms; --motion-base: 200ms; --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --container-max: 1200px; --container-gutter-desktop: 24px; --container-gutter-tablet: 16px; --container-gutter-phone: 12px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: var(--text-base)/var(--leading-body) var(--font-body); }
+button, input, select, textarea { font: inherit; }
+button, select { cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.container { width: min(100% - 48px, 1040px); margin: 0 auto; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--border-soft); }
+.wordmark { font-weight: 600; letter-spacing: -.03em; }
+.batch-link { color: var(--muted); font-size: var(--text-sm); text-decoration: none; }
+main { padding: 72px 0 96px; }
+.eyebrow { color: var(--accent); font-size: var(--text-xs); letter-spacing: .12em; text-transform: uppercase; }
+h1, h2 { margin: 0; font-family: var(--font-display); font-weight: 500; line-height: var(--leading-tight); }
+h1 { max-width: 660px; margin-top: 10px; font-size: clamp(42px, 6vw, 64px); letter-spacing: var(--tracking-display); }
+.intro { max-width: 530px; margin: 18px 0 40px; color: var(--muted); font-size: var(--text-lg); }
+.log-shell { display: grid; grid-template-columns: 1fr 280px; gap: 24px; align-items: start; }
+.card { padding: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--elev-raised); }
+.card h2 { font-size: var(--text-xl); }
+.hint { margin: 4px 0 24px; color: var(--meta); font-size: var(--text-sm); }
+.field-label { display: block; margin-bottom: 8px; color: var(--fg-2); font-size: var(--text-sm); }
+.types { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.type { min-height: 44px; padding: 8px 14px; border: 1px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--surface); color: var(--fg-2); }
+.type:hover { background: var(--surface-warm); color: var(--fg); }
+.type[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-on); }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+input, textarea { width: 100%; border: 1px solid var(--border-soft); border-radius: var(--radius-sm); background: var(--surface); color: var(--fg); padding: 12px; }
+textarea { min-height: 116px; resize: vertical; }
+input::placeholder, textarea::placeholder { color: var(--meta); }
+.measure { display: grid; grid-template-columns: 1fr 112px; gap: 8px; }
+.measure input { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.measure select { width: 100%; border: 1px solid var(--border-soft); border-left: 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: var(--surface-warm); color: var(--fg-2); padding: 0 10px; }
+.actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; }
+.save { min-height: 48px; padding: 10px 18px; border: 0; border-radius: var(--radius-md); background: var(--accent); color: var(--accent-on); font-weight: 600; }
+.save:hover { background: var(--accent-hover); }
+.save:active { background: var(--accent-active); }
+.key { color: var(--meta); font-size: var(--text-sm); }
+kbd { padding: 2px 6px; border: 1px solid var(--border-soft); border-radius: 4px; background: var(--surface-warm); font: 12px var(--font-mono); }
+.side { padding: 20px; border-top: 2px solid var(--accent); background: var(--surface-warm); border-radius: var(--radius-sm); }
+.side strong { display: block; margin-bottom: 6px; font-size: var(--text-sm); }
+.side p { margin: 0; color: var(--muted); font-size: var(--text-sm); }
+.status { display: none; margin-top: 16px; color: var(--success); font-size: var(--text-sm); }
+.status.show { display: block; }
+@media (max-width: 760px) { .container { width: min(100% - 24px, 560px); } header { padding: 16px 0; } main { padding: 48px 0; } .log-shell { grid-template-columns: 1fr; } .side { order: -1; } }
+@media (max-width: 480px) { h1 { font-size: 42px; } .intro { font-size: 17px; } .card { padding: 20px; } .row, .measure { grid-template-columns: 1fr; } .measure input { border-radius: var(--radius-sm); } .measure select { min-height: 44px; border-left: 1px solid var(--border-soft); border-radius: var(--radius-sm); } .actions { align-items: flex-start; flex-direction: column-reverse; } .save { width: 100%; } }
+</style>
+</head>
+<body>
+
+<main class="container" style="transform: translate(183px, -12px);">
+  
+  <h1 data-od-id="page-heading"></h1>
+  
+  <div class="log-shell">
+    <section class="card" data-od-id="quick-log-card">
+      <h2 data-od-id="form-heading">Log activity</h2>
+      
+      <div class="types" data-od-id="activity-types" style="padding-top: 24px;">
+        <button class="type" aria-pressed="true" data-type="Measurement">Measurement</button><button class="type" aria-pressed="false" data-type="pH reading">pH reading</button><button class="type" aria-pressed="false" data-type="Temperature">Temperature</button><button class="type" aria-pressed="false" data-type="Status change">Status change</button><button class="type" aria-pressed="false" data-type="Note">Note</button>
+      </div>
+      <div class="row" id="dynamic-fields" data-od-id="dynamic-activity-fields"></div>
+      <label class="field-label" for="note" data-od-id="note-label">Context <span style="color:var(--meta)">(optional)</span></label><textarea id="note" placeholder="What should future-you know?" data-od-id="note-input"></textarea>
+      <div class="actions"><span class="key">Save with <kbd>Ctrl</kbd> <kbd>↵</kbd></span><button class="save" data-od-id="save-activity">Save activity</button></div><div class="status" role="status" data-od-id="save-status">Activity saved to Batch 24.</div>
+    </section>
+    
+  </div>
+</main>
+<script>
+const types = document.querySelectorAll('.type');
+const dynamicFields = document.querySelector('#dynamic-fields');
+const formHeading = document.querySelector('[data-od-id="form-heading"]');
+const dateField = '<div><label class="field-label" for="activity-date" data-od-id="date-label">Activity date</label><input id="activity-date" type="date" value="2026-09-01" data-od-id="date-input"></div>';
+const fieldTemplates = {
+  Measurement: '<div><label class="field-label" for="reading" data-od-id="reading-label">Reading</label><div class="measure"><input id="reading" inputmode="decimal" value="1.048" data-od-id="reading-input"><select aria-label="Reading unit" data-od-id="reading-unit"><option>SG</option><option>°F</option><option>pH</option></select></div></div>' + dateField,
+  'pH reading': '<div><label class="field-label" for="reading" data-od-id="reading-label">pH value</label><input id="reading" inputmode="decimal" value="4.18" data-od-id="reading-input"></div>' + dateField,
+  Temperature: '<div><label class="field-label" for="reading" data-od-id="reading-label">Temperature</label><div class="measure"><input id="reading" inputmode="decimal" value="20" data-od-id="reading-input"><select aria-label="Temperature unit" data-od-id="reading-unit"><option selected>°C</option><option>°F</option></select></div></div>' + dateField,
+  'Status change': '<div><label class="field-label" for="status" data-od-id="status-label">New status</label><input id="status" list="status-options" placeholder="Choose a status" data-od-id="status-input"><datalist id="status-options"><option value="Primary"><option value="Secondary"><option value="Conditioning"><option value="Bottled"></datalist></div>' + dateField,
+  Note: '<div><label class="field-label" for="note-title" data-od-id="note-title-label">Note title</label><input id="note-title" placeholder="Short description" data-od-id="note-title-input"></div>' + dateField
+};
+function renderActivityFields(type) { dynamicFields.innerHTML = fieldTemplates[type]; }
+renderActivityFields('Measurement');
+types.forEach(type => type.addEventListener('click', event => { const selectedType = event.currentTarget.dataset.type; types.forEach(item => item.setAttribute('aria-pressed', 'false')); event.currentTarget.setAttribute('aria-pressed', 'true'); formHeading.textContent = selectedType === 'Measurement' ? 'Log measurement' : 'Log ' + selectedType.toLowerCase(); renderActivityFields(selectedType); }));
+document.querySelector('.save').addEventListener('click', () => document.querySelector('.status').classList.add('show'));
+document.addEventListener('keydown', event => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') document.querySelector('.save').click(); });
+</script>
+
+
+
+
+
+</body></html>

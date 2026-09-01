@@ -1256,6 +1256,7 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   const latestPh = latestPhReading(batch);
   const phReadings = batch.timeline.filter((entry) => entry.kind === "ph");
   const dueCheck = dueBatchChecks(batch, localDate())[0];
+  const isAttention = batch.status === "active" && dueCheck !== undefined;
   const preferredCheckId = dueCheck?.id ?? batch.checks[0]?.id ?? "";
   const nextCheck = [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0];
   const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
@@ -1306,7 +1307,7 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
           <p className="eyebrow">{batch.profileSnapshot.name} · started {batch.startDate}</p>
           <div className="batch-title-row">
             <h3>{batch.name}</h3>
-            <span className={`status status-${batch.status}`}><StatusIcon status={batch.status} />{statusLabel(batch.status)}</span>
+            <span className={`status status-${isAttention ? "attention" : batch.status}`}><StatusIcon status={isAttention ? "attention" : batch.status} />{isAttention ? "Active · attention" : statusLabel(batch.status)}</span>
           </div>
           <p className="batch-lead">{nextAction.body}</p>
         </div>
@@ -1318,8 +1319,8 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
 
       <div className="workbench">
         <div className="wb-rail">
-          <section className="next-action" aria-labelledby="next-action-heading">
-            <div className="next-action-icon"><StatusIcon status={batch.status} /></div>
+          <section className={`next-action${isAttention ? " attention" : ""}`} aria-labelledby="next-action-heading">
+            <div className="next-action-icon"><StatusIcon status={isAttention ? "attention" : batch.status} /></div>
             <div>
               <p className="next-action-kick">{nextAction.kick}</p>
               <h4 id="next-action-heading">{nextAction.title}</h4>

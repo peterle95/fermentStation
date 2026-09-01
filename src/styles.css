@@ -12,6 +12,8 @@
   --green-bg: oklch(93% 0.045 150);
   --amber: oklch(50% 0.135 58);
   --amber-bg: oklch(93.5% 0.05 80);
+  --attention: oklch(42% 0.16 28);
+  --attention-bg: oklch(94% 0.05 28);
   --blue: oklch(42% 0.1 244);
   --border-2: oklch(82% 0.014 75);
   --safe-top: max(env(safe-area-inset-top, 0px), 24px);
@@ -109,6 +111,10 @@
   width: 100%;
 }
 
+.today-screen .queue-card.attention {
+  border-left-color: var(--attention);
+}
+
 .today-screen .queue-card > div,
 .today-screen .batch-overview,
 .today-screen .batch-summary {
@@ -130,12 +136,21 @@
   color: var(--green);
 }
 
+.today-screen .queue-card.attention .queue-icon {
+  background: var(--attention-bg);
+  color: var(--attention);
+}
+
 .today-screen .queue-card small {
   color: oklch(60% 0.013 60);
   font-family: "IBM Plex Mono", Consolas, monospace;
   font-size: 0.6875rem;
   font-weight: 400;
   letter-spacing: 0.05em;
+}
+
+.today-screen .queue-card.attention small {
+  color: var(--attention);
 }
 
 .today-screen .queue-card h4 {
@@ -247,6 +262,11 @@
   font-size: 0.6875rem;
   font-weight: 600;
   padding: 0.25rem 0.6875rem;
+}
+
+.today-screen .status-attention {
+  background: var(--attention-bg);
+  color: var(--attention);
 }
 
 .today-screen .status-ready {
@@ -1287,6 +1307,7 @@ textarea {
 }
 
 .status-active { color: #376337; }
+.status-attention { color: var(--attention); }
 .status-ready { color: #9d4934; }
 .status-to-fridge { color: #176274; }
 
@@ -1930,10 +1951,7 @@ button:disabled {
   text-transform: uppercase;
 }
 
-.calendar-status.attention {
-  background: var(--amber-bg);
-  color: var(--amber);
-}
+.calendar-status.attention { background: var(--attention-bg); color: var(--attention); }
 
 .calendar-status.ready {
   background: var(--green-bg);
@@ -2129,10 +2147,14 @@ button:disabled {
   width: 0.875rem;
 }
 
-.batches-screen .status-attention,
 .batches-screen .status-active {
   background: var(--amber-bg);
   color: var(--amber);
+}
+
+.batches-screen .status-attention {
+  background: var(--attention-bg);
+  color: var(--attention);
 }
 
 .batches-screen .status-ready {
@@ -2726,6 +2748,7 @@ button:disabled {
 }
 
 .batch-workspace .status-active { background: var(--amber-bg); color: var(--amber); }
+.batch-workspace .status-attention { background: var(--attention-bg); color: var(--attention); }
 .batch-workspace .status-ready { background: var(--green-bg); color: var(--green); }
 .batch-workspace .status-to-fridge { background: oklch(93.5% 0.04 245); color: var(--blue); }
 
@@ -2797,6 +2820,11 @@ button:disabled {
   gap: 0.75rem;
 }
 
+.next-action.attention {
+  background: var(--attention-bg);
+  border-color: var(--attention);
+}
+
 .next-action-icon {
   align-items: center;
   background: var(--amber);
@@ -2807,6 +2835,10 @@ button:disabled {
   height: 2.375rem;
   justify-content: center;
   width: 2.375rem;
+}
+
+.next-action.attention .next-action-icon {
+  background: var(--attention);
 }
 
 .next-action-icon svg {
