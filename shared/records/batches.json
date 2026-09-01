@@ -255,7 +255,14 @@
           "Taste after 7 days, then bottle when pleasantly tart."
         ]
       },
-      "timeline": [],
+      "timeline": [
+        {
+          "id": "a17b0b1a-e237-4c8e-bb05-50cd8e145aeb",
+          "date": "2026-09-01",
+          "kind": "check",
+          "checkName": "Mold"
+        }
+      ],
       "timelineTrash": [],
       "inputValues": {
         "water": 2730
@@ -274,7 +281,8 @@
           "id": "f161f2c0-de73-4364-979b-56368c2770e5",
           "name": "Mold",
           "intervalDays": 2,
-          "nextDueDate": "2026-08-30"
+          "nextDueDate": "2026-09-03",
+          "lastCompletedDate": "2026-09-01"
         }
       ]
     },

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "fermentStation/prototypes/quick-log.html",
+  "entry": "fermentStation/prototypes/quick-log.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-09-01T07:23:37.816Z",
+  "updatedAt": "2026-09-01T07:48:53.590Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}
