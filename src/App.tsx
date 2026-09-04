@@ -1126,7 +1126,7 @@ type LoggerKind = "note" | "measurement" | "ph" | "temperature" | "status" | "ph
 
 function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   const [editing, setEditing] = useState<TimelineEntry | null>(null);
-  const [loggerKind, setLoggerKind] = useState<LoggerKind>("note");
+  const [loggerKind, setLoggerKind] = useState<LoggerKind>("measurement");
   const [selectedCheckId, setSelectedCheckId] = useState("");
   const [checkDrafts, setCheckDrafts] = useState<Record<string, string>>({});
   const [checkError, setCheckError] = useState("");
@@ -1181,7 +1181,7 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
       };
       onChange(editing ? updateTimelineEntry(batch, photo) : addTimelineEntry(batch, photo));
       setEditing(null);
-      setLoggerKind("note");
+      setLoggerKind("measurement");
       setCapturedPhoto(null);
       form.reset();
       return;
@@ -1191,7 +1191,7 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
       if (!checkId) return;
       onChange(completeBatchCheck(batch, checkId, common.date, common.id));
       setEditing(null);
-      setLoggerKind("note");
+      setLoggerKind("measurement");
       event.currentTarget.reset();
       return;
     } else {
@@ -1202,14 +1202,14 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
       const phEntry = entry as Extract<TimelineEntry, { kind: "ph" }>;
       onChange(editing ? updatePhReading(batch, phEntry) : addPhReading(batch, phEntry));
       setEditing(null);
-      setLoggerKind("note");
+      setLoggerKind("measurement");
       event.currentTarget.reset();
       return;
     }
     const next = editing ? updateTimelineEntry(batch, entry, localDate()) : addTimelineEntry(batch, entry);
     onChange(next);
     setEditing(null);
-    setLoggerKind("note");
+    setLoggerKind("measurement");
     event.currentTarget.reset();
   }
 
@@ -1254,7 +1254,6 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   }
 
   const latestPh = latestPhReading(batch);
-  const phReadings = batch.timeline.filter((entry) => entry.kind === "ph");
   const dueCheck = dueBatchChecks(batch, localDate())[0];
   const isAttention = batch.status === "active" && dueCheck !== undefined;
   const preferredCheckId = dueCheck?.id ?? batch.checks[0]?.id ?? "";
@@ -1312,6 +1311,15 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
           <p className="batch-lead">{nextAction.body}</p>
         </div>
         <div className="batch-head-actions">
+          <button aria-label="Take photo" className="batch-head-camera" onClick={async () => {
+            setLoggerKind("photo");
+            setCapturedPhoto(null);
+            if (isNativeCameraAvailable()) {
+              try { setCapturedPhoto(await captureNativePhoto()); }
+              catch (error) { setCheckError(`Camera unavailable: ${(error as Error).message}`); }
+            }
+            requestAnimationFrame(() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" }));
+          }} type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M4 7h3l1.2-2h7.6L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" /><circle cx="12" cy="13" r="3.5" /></svg></button>
           <button className="primary-action" onClick={() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" })} type="button">Record observation</button>
           <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
         </div>
@@ -1366,42 +1374,32 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
         </div>
 
         <div className="wb-main">
-          <section className="wb-panel" aria-label={`${batch.name} pH log`}>
-            <h4>pH log <span>{phReadings.length} readings</span></h4>
-           <div className="ph-log">
-              <p><strong>Latest:</strong> {latestPh ? `${latestPh.value} on ${latestPh.date}` : "No readings yet."}{latestPh && phWarning(latestPh.value) && <span className="warning"> · {phWarning(latestPh.value)}</span>}</p>
-              <p className="muted-copy">Readings and profile zones appear in the timeline below.</p>
-            </div>
-          </section>
-
           <section className="wb-panel activity-logger" aria-labelledby="activity-logger-heading">
-            <div className="timeline-panel-heading"><h4 id="activity-logger-heading">Log activity <span>{editing ? "Editing entry" : "New entry"}</span></h4><p>Record one dated observation on this batch.</p></div>
-            <form className="timeline-form" id="batch-activity-form" key={editing?.id ?? "new"} onSubmit={saveEntry}>
-              <label>Activity type<select disabled={!!editing} name="kind" onChange={(event) => { const nextKind = event.target.value as LoggerKind; setLoggerKind(nextKind); setSelectedCheckId(nextKind === "check" ? preferredCheckId : ""); }} value={loggerKind}>
-                <option value="note">Note</option>
-                <option value="measurement">Measurement</option>
-                <option value="ph">pH reading</option>
-                <option value="temperature">Temperature</option>
-                <option value="status">Status change</option>
-                <option disabled={batch.status !== "active"} value="check">Check completion</option>
-                <option value="photo">Photo</option>
+            <h2 id="activity-logger-heading">Log {loggerKind === "ph" ? "pH reading" : loggerKind === "status" ? "status change" : loggerKind}</h2>
+            <form className="timeline-form quick-log-form" id="batch-activity-form" key={editing?.id ?? "new"} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") event.currentTarget.requestSubmit(); }} onSubmit={saveEntry}>
+              <label className="sr-only">Activity type<select disabled={!!editing} name="kind" onChange={(event) => { const nextKind = event.target.value as LoggerKind; setLoggerKind(nextKind); setSelectedCheckId(nextKind === "check" ? preferredCheckId : ""); }} value={loggerKind}>
+                <option value="measurement">Measurement</option><option value="ph">pH reading</option><option value="temperature">Temperature</option><option value="status">Status change</option><option value="note">Note</option><option disabled={batch.status !== "active"} value="check">Check completion</option><option value="photo">Photo</option>
               </select></label>
-              <label>Activity date<input defaultValue={editing?.date ?? localDate()} name="date" required type="date" /></label>
-              {(loggerKind === "note" || loggerKind === "measurement") && <label>Note or measurement<input defaultValue={editing && (editing.kind === "note" || editing.kind === "measurement") ? editing.text : ""} name="text" /></label>}
-              {loggerKind === "ph" && <label>pH value<input defaultValue={editing?.kind === "ph" ? editing.value : undefined} name="value" required step="0.01" type="number" /></label>}
-              {loggerKind === "temperature" && <label>Temperature ({units === "imperial" ? "°F" : "°C"})<input defaultValue={editing?.kind === "temperature" ? displayTemperature(editing.value, units) : undefined} name="value" required step="any" type="number" /></label>}
-              {loggerKind === "status" && <label>Activity status<select defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>}
-              {loggerKind === "check" && <label>Batch check<select disabled={batch.status !== "active" || batch.checks.length === 0} name="checkId" onChange={(event) => setSelectedCheckId(event.target.value)} value={selectedCheckId || preferredCheckId}>{batch.checks.map((check) => <option key={check.id} value={check.id}>{check.name}</option>)}</select></label>}
-               {loggerKind === "photo" && <>
-                 <label>Photo<input accept="image/*" capture="environment" name="photo" required={!editing && !capturedPhoto} type="file" /></label>
-                 {isNativeCameraAvailable() && <button onClick={async () => {
-                   try { setCapturedPhoto(await captureNativePhoto()); }
-                   catch (error) { setCheckError(`Camera unavailable: ${(error as Error).message}`); }
-                 }} type="button">Take photo</button>}
-                 {capturedPhoto && <p className="notice" role="status">Photo captured. Add a caption or save the activity.</p>}
-                 <label>Caption<input defaultValue={editing?.kind === "photo" ? editing.caption : ""} name="caption" /></label>
-               </>}
-              <div className="form-actions"><button className="primary-action" type="submit">{editing ? "Save activity" : "Log activity"}</button>{editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}</div>
+              <div className="quick-log-types" aria-label="Activity choices" role="group">
+                {(["measurement", "ph", "temperature", "status", "note"] as LoggerKind[]).map((kind) => {
+                  const label = kind === "ph" ? "pH reading" : kind === "status" ? "Status change" : kind === "check" ? "Check" : kind[0].toUpperCase() + kind.slice(1);
+                  return <button aria-pressed={loggerKind === kind} disabled={!!editing} key={kind} onClick={() => setLoggerKind(kind)} type="button">{label}</button>;
+                })}
+              </div>
+              <div className="quick-log-fields">
+                {loggerKind === "measurement" && <label>Reading<div className="quick-log-measure"><input aria-label="Reading" defaultValue={editing?.kind === "measurement" ? editing.text : ""} name="text" required /><select aria-label="Reading unit" defaultValue="SG"><option>SG</option></select></div></label>}
+                {loggerKind === "ph" && <label>pH value<input defaultValue={editing?.kind === "ph" ? editing.value : undefined} name="value" required step="0.01" type="number" /></label>}
+                {loggerKind === "temperature" && <label>Temperature ({units === "imperial" ? "°F" : "°C"})<div className="quick-log-measure"><input aria-label={`Temperature (${units === "imperial" ? "°F" : "°C"})`} defaultValue={editing?.kind === "temperature" ? displayTemperature(editing.value, units) : undefined} name="value" required step="any" type="number" /><span>{units === "imperial" ? "°F" : "°C"}</span></div></label>}
+                {loggerKind === "status" && <label>New status<select aria-label="Activity status" defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>}
+                {loggerKind === "check" && <label>Batch check<select disabled={batch.status !== "active" || batch.checks.length === 0} name="checkId" onChange={(event) => setSelectedCheckId(event.target.value)} value={selectedCheckId || preferredCheckId}>{batch.checks.map((check) => <option key={check.id} value={check.id}>{check.name}</option>)}</select></label>}
+                {loggerKind === "photo" && <label className="quick-log-wide">Photo<input accept="image/*" capture="environment" name="photo" required={!editing && !capturedPhoto} type="file" /></label>}
+                <label>Activity date<input defaultValue={editing?.date ?? localDate()} name="date" required type="date" /></label>
+                {loggerKind === "photo" && <label>Caption<input defaultValue={editing?.kind === "photo" ? editing.caption : ""} name="caption" /></label>}
+                <label className="quick-log-wide">Context <span>optional</span><textarea aria-label="Note or measurement" defaultValue={editing?.kind === "note" ? editing.text : ""} name={loggerKind === "note" ? "text" : undefined} placeholder="What should future-you know?" required={loggerKind === "note"} /></label>
+              </div>
+              {loggerKind === "photo" && isNativeCameraAvailable() && <button className="quick-log-camera" onClick={async () => { try { setCapturedPhoto(await captureNativePhoto()); } catch (error) { setCheckError(`Camera unavailable: ${(error as Error).message}`); } }} type="button">Take photo</button>}
+              {capturedPhoto && <p className="notice" role="status">Photo captured. Add a caption or save the activity.</p>}
+              <div className="quick-log-actions"><span>Save with <kbd>Ctrl</kbd> <kbd>↵</kbd></span><div><button aria-label={editing ? "Save activity" : "Log activity"} className="primary-action" type="submit">Save activity</button>{editing && <button onClick={() => setEditing(null)} type="button">Cancel</button>}</div></div>
             </form>
           </section>
 
@@ -1795,6 +1793,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
             <div className="profile-editor-grid">
               <form className="profile-editor-form" id="profile-editor-form" key={editing.id} onSubmit={save}>
                 <section className="profile-editor-section">
+                  <div className="profile-editor-section-head profile-editor-basics-head"><div><p className="profile-editor-kicker">01 / The profile</p><h2>Give it a clear name</h2><p className="profile-editor-intro">A profile is a reusable practice. Keep its guidance grounded in what you will actually observe.</p></div></div>
                   <div className="profile-editor-fields">
                     <div className="profile-editor-guidance">
                       <div className="profile-editor-guidance-head"><span>Guidance (optional)</span><button className="profile-editor-text-button" onClick={addGuidanceStep} type="button">Add step</button></div>
@@ -1853,6 +1852,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange }:
 
                <aside className="profile-editor-aside" aria-label="Profile context">
                  <article className="profile-editor-card"><p className="profile-editor-eyebrow">At a glance</p><h3>{editing.name || "Profile name"}</h3><p>{presentation.description}</p><div className="profile-editor-meta"><div><span>Temperature</span><strong>{presentation.params[0][0]}</strong></div><div><span>Expected duration</span><strong>{duration}</strong></div><div><span>Check cadence</span><strong>{presentation.params[3][0]}</strong></div></div></article>
+                 <article className="profile-editor-card profile-editor-note"><h3>Practical note</h3><p>Keep the profile focused on observations that make the next check easier to act on.</p></article>
                </aside>
             </div>
           </div>

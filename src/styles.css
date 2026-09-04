@@ -2710,6 +2710,20 @@ button:disabled {
   padding: 0.7rem 1rem;
 }
 
+.batch-head-actions > button.batch-head-camera {
+  align-items: center;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+  display: flex;
+  height: 2.75rem;
+  justify-content: center;
+  min-width: 4.875rem;
+  padding: 0.5rem;
+}
+
+.batch-head-camera svg { height: 1.25rem; width: 1.25rem; }
+
 .batch-workspace-head .eyebrow {
   margin-bottom: 0.35rem;
 }
@@ -3455,4 +3469,152 @@ button:disabled {
   .profile-editor-actions .profile-editor-text-button { display: none; }
   .profile-editor-actions > div { display: flex; flex: 1; }
   .profile-editor-actions .profile-editor-button { flex: 1; }
+}
+
+/* The activity form is the quick-log prototype, embedded in the batch workspace. */
+.activity-logger {
+  padding: 1.75rem !important;
+}
+
+.activity-logger > h2 {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.625rem;
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.quick-log-form {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr !important;
+  margin-top: 1.5rem !important;
+  padding: 0 !important;
+}
+
+.quick-log-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quick-log-types button {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 0.5rem;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 400;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.15rem;
+}
+
+.quick-log-types button:hover:not(:disabled) { background: var(--panel); color: var(--ink); }
+.quick-log-types button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+
+.quick-log-fields {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  row-gap: 1.6875rem;
+}
+
+.quick-log-fields label {
+  color: var(--ink);
+  display: grid;
+  font-family: "Karla", "Segoe UI", system-ui, sans-serif;
+  font-size: 0.875rem !important;
+  gap: 0.5rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.quick-log-fields label > span { color: var(--muted); font-weight: 400; }
+.quick-log-fields input,
+.quick-log-fields select,
+.quick-log-fields textarea {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  letter-spacing: 0;
+  padding: 0.75rem;
+  text-transform: none;
+}
+
+.quick-log-fields textarea { min-height: 7.25rem; resize: vertical; }
+.quick-log-fields input,
+.quick-log-fields select { line-height: 1.6; }
+.quick-log-wide { grid-column: 1 / -1; }
+.quick-log-fields .quick-log-wide { display: block; }
+.quick-log-fields .quick-log-wide textarea { display: block; margin-top: 0.6875rem; }
+
+.quick-log-measure {
+  column-gap: 0.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7rem;
+}
+
+.quick-log-measure input { border-radius: 0.5rem !important; }
+.quick-log-measure span,
+.quick-log-measure select {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border-2);
+  border-radius: 0.5rem;
+  color: var(--muted);
+  display: flex;
+  font-size: 0.875rem;
+  min-height: 100%;
+  padding: 0 0.75rem;
+  text-transform: none;
+}
+
+.quick-log-measure select { width: 100%; }
+
+.quick-log-camera {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 0.5rem;
+  color: var(--ink);
+  justify-self: start;
+  padding: 0.5rem 0.875rem;
+}
+
+.quick-log-actions {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 0.375rem;
+}
+
+.quick-log-actions > span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.quick-log-actions kbd {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  font-family: Consolas, monospace;
+  padding: 0.125rem 0.3rem;
+}
+
+.quick-log-actions > div { display: flex; gap: 0.5rem; }
+.quick-log-actions .primary-action { min-width: 8rem; }
+
+@media (max-width: 599px) {
+  .quick-log-form { padding: 1rem !important; }
+  .quick-log-fields { grid-template-columns: 1fr; }
+  .quick-log-wide { grid-column: auto; }
+  .quick-log-actions { align-items: stretch; flex-direction: column-reverse; }
+  .quick-log-actions > div, .quick-log-actions .primary-action { width: 100%; }
 }

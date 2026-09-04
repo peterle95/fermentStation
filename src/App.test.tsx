@@ -129,6 +129,7 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
 
+    fireEvent.click(screen.getByRole("button", { name: "Note" }));
     fireEvent.change(screen.getByLabelText("Activity date"), {
       target: { value: "2026-08-02" },
     });
@@ -420,7 +421,8 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("pH value"), { target: { value: "3.45" } });
     fireEvent.click(screen.getByRole("button", { name: "Save activity" }));
     expect(screen.getByText("optimal")).toBeTruthy();
-    expect(screen.getByText("Latest:").parentElement?.textContent).toContain("3.45 on 2026-08-02");
+    expect(phMeasurement.textContent).toContain("3.45 · optimal");
+    expect(phMeasurement.textContent).toContain("Latest read 2026-08-02");
     expect(phMeasurement.className).not.toContain("meas-alert");
     expect(Number(phMeasurement.querySelector<HTMLElement>(".measurement-zone i")!.style.left.replace("%", ""))).toBeCloseTo(62.5);
   });
@@ -469,7 +471,8 @@ describe("batch workflow", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
-    fireEvent.change(screen.getByLabelText("Activity type"), { target: { value: "photo" } });
+    fireEvent.click(screen.getByRole("button", { name: "Take photo" }));
+    expect(screen.getByLabelText("Photo")).toBeTruthy();
     const file = new File(["original photo bytes"], "jar.jpg", { type: "image/jpeg" });
     fireEvent.change(screen.getByLabelText("Photo"), { target: { files: [file] } });
     fireEvent.change(screen.getByLabelText("Caption"), { target: { value: "Jar day one" } });
@@ -492,6 +495,7 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Batches" }));
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
+    fireEvent.click(screen.getByRole("button", { name: "Note" }));
     fireEvent.change(screen.getByLabelText("Note or measurement"), {
       target: { value: "Unsaved cover-screen observation" },
     });

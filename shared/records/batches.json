@@ -103,6 +103,12 @@
           "date": "2026-08-29",
           "kind": "check",
           "checkName": "Mold"
+        },
+        {
+          "id": "0900e942-dec4-4dfb-a8dd-88add81b9903",
+          "date": "2026-09-01",
+          "kind": "check",
+          "checkName": "Mold"
         }
       ],
       "timelineTrash": [],
@@ -120,8 +126,8 @@
           "id": "f8f29d7d-840c-4047-bb49-cdd2c9596088",
           "name": "Mold",
           "intervalDays": 3,
-          "nextDueDate": "2026-09-01",
-          "lastCompletedDate": "2026-08-29"
+          "nextDueDate": "2026-09-04",
+          "lastCompletedDate": "2026-09-01"
         }
       ]
     },

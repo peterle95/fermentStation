@@ -1,5 +1,5 @@
 {
-  "destination": "today",
+  "destination": "batches",
   "formulaTerms": [
     "totalWeight",
     "water",
