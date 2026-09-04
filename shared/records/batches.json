@@ -60,7 +60,7 @@
       "id": "af9cf859-72be-47f0-a8cd-f780f3491d27",
       "name": "Red bell pepper on top",
       "startDate": "2026-08-26",
-      "status": "active",
+      "status": "ready",
       "profileSnapshot": {
         "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
         "name": "Anaerobic fermentation",
@@ -109,6 +109,12 @@
           "date": "2026-09-01",
           "kind": "check",
           "checkName": "Mold"
+        },
+        {
+          "id": "edc9ed01-9f3a-4a94-923a-eade606e9e16",
+          "date": "2026-09-04",
+          "kind": "note",
+          "text": "Test"
         }
       ],
       "timelineTrash": [],
@@ -129,7 +135,8 @@
           "nextDueDate": "2026-09-04",
           "lastCompletedDate": "2026-09-01"
         }
-      ]
+      ],
+      "checksPausedAt": "2026-09-02"
     },
     {
       "id": "5f09dcc5-a4bd-49a3-9c12-0dd17d95330c",
@@ -161,6 +168,12 @@
           "mimeType": "image/jpeg",
           "caption": "",
           "photoRef": "photos/5f09dcc5-a4bd-49a3-9c12-0dd17d95330c/8a8e2b78-11fe-4038-bd52-91c5e34101b9.jpg"
+        },
+        {
+          "id": "96326af2-d451-4a5f-8cdd-eb643784c75d",
+          "date": "2026-09-04",
+          "kind": "check",
+          "checkName": "Bubbles"
         }
       ],
       "timelineTrash": [],
@@ -172,7 +185,8 @@
           "id": "2d76e771-a956-444c-97a1-1de3f1f375ad",
           "name": "Bubbles",
           "intervalDays": 3,
-          "nextDueDate": "2026-08-31"
+          "nextDueDate": "2026-09-07",
+          "lastCompletedDate": "2026-09-04"
         }
       ]
     },
@@ -206,9 +220,26 @@
           "mimeType": "image/jpeg",
           "caption": "",
           "photoRef": "photos/35bfd79e-ff36-4492-afa0-8b4fc9c0aefe/e564628b-4b11-4810-8e86-593e4d297e1d.jpg"
+        },
+        {
+          "id": "4171e7ff-a55c-4f27-aca3-77c46342b6c5",
+          "date": "2026-09-04",
+          "kind": "check",
+          "checkName": "Bubbles"
         }
       ],
-      "timelineTrash": [],
+      "timelineTrash": [
+        {
+          "id": "39450bd6-3ac4-439d-828a-560e75ddc95f",
+          "date": "2026-09-04",
+          "kind": "photo",
+          "name": "camera-1788511415516.jpeg",
+          "mimeType": "image/jpeg",
+          "caption": "",
+          "deletedAt": 1788511474725,
+          "photoRef": "photos/35bfd79e-ff36-4492-afa0-8b4fc9c0aefe/39450bd6-3ac4-439d-828a-560e75ddc95f.jpg"
+        }
+      ],
       "inputValues": {},
       "calculationValues": {},
       "finishDate": "2026-09-07",
@@ -217,7 +248,8 @@
           "id": "033f80a8-840a-4e67-93b2-9b1f3f8f2fad",
           "name": "Bubbles",
           "intervalDays": 3,
-          "nextDueDate": "2026-08-31"
+          "nextDueDate": "2026-09-07",
+          "lastCompletedDate": "2026-09-04"
         }
       ]
     },
@@ -267,6 +299,12 @@
           "date": "2026-09-01",
           "kind": "check",
           "checkName": "Mold"
+        },
+        {
+          "id": "71f1b7ec-07a9-4b9b-98f8-e10147bbc32d",
+          "date": "2026-09-04",
+          "kind": "check",
+          "checkName": "Mold"
         }
       ],
       "timelineTrash": [],
@@ -287,8 +325,8 @@
           "id": "f161f2c0-de73-4364-979b-56368c2770e5",
           "name": "Mold",
           "intervalDays": 2,
-          "nextDueDate": "2026-09-03",
-          "lastCompletedDate": "2026-09-01"
+          "nextDueDate": "2026-09-06",
+          "lastCompletedDate": "2026-09-04"
         }
       ]
     },
@@ -322,6 +360,21 @@
           "mimeType": "image/jpeg",
           "caption": "",
           "photoRef": "photos/af9cdd33-7adb-4f58-a122-ca7e701d1a8d/0459651b-808f-4311-92af-89cdb71d3680.jpg"
+        },
+        {
+          "id": "fb622ac3-bdfb-4725-a35e-30c71a1d5840",
+          "date": "2026-09-04",
+          "kind": "check",
+          "checkName": "Bubbles"
+        },
+        {
+          "id": "c239f2b9-3ea3-4959-99e3-1a081103ed22",
+          "date": "2026-09-04",
+          "kind": "photo",
+          "name": "camera-1788511535271.jpeg",
+          "mimeType": "image/jpeg",
+          "caption": "",
+          "photoRef": "photos/af9cdd33-7adb-4f58-a122-ca7e701d1a8d/c239f2b9-3ea3-4959-99e3-1a081103ed22.jpg"
         }
       ],
       "timelineTrash": [],
@@ -333,131 +386,13 @@
           "id": "e89fe4a5-fa25-41df-a4f5-5498b5330d99",
           "name": "Bubbles",
           "intervalDays": 5,
-          "nextDueDate": "2026-09-02"
+          "nextDueDate": "2026-09-09",
+          "lastCompletedDate": "2026-09-04"
         }
       ]
     }
   ],
   "trash": [
-    {
-      "id": "3478ce89-14d8-4889-ae94-44f60b0783dc",
-      "name": "Kombucha F1",
-      "startDate": "2026-08-18",
-      "status": "ready",
-      "profileSnapshot": {
-        "id": "starter-kombucha-f1",
-        "name": "Kombucha F1",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [
-          {
-            "name": "water",
-            "unit": "ml"
-          }
-        ],
-        "calculations": [
-          {
-            "name": "tea",
-            "unit": "g",
-            "formula": "water / 200"
-          },
-          {
-            "name": "sugar",
-            "unit": "g",
-            "formula": "water / 20"
-          }
-        ],
-        "checks": [
-          {
-            "id": "1e25a145-89b2-4c37-afa3-b4157a1684a8",
-            "name": "Mold",
-            "intervalDays": 2
-          }
-        ],
-        "guidance": [
-          "Keep at room temperature and cover with a breathable cloth.",
-          "Taste after 7 days, then bottle when pleasantly tart."
-        ]
-      },
-      "timeline": [
-        {
-          "id": "8dcb1552-405e-4b0e-8179-3dff19b3dad0",
-          "date": "2026-08-24",
-          "kind": "check",
-          "checkName": "Mold"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {
-        "water": 1200
-      },
-      "calculationValues": {
-        "tea": {
-          "suggested": 6
-        },
-        "sugar": {
-          "suggested": 60
-        }
-      },
-      "finishDate": "2026-08-25",
-      "checks": [
-        {
-          "id": "fec890cc-5584-4e30-91e4-aa0826422008",
-          "name": "Mold",
-          "intervalDays": 2,
-          "nextDueDate": "2026-08-26",
-          "lastCompletedDate": "2026-08-24"
-        }
-      ],
-      "checksPausedAt": "2026-08-25",
-      "deletedAt": 1787910502477
-    },
-    {
-      "id": "43aa155f-fcd0-4aab-9da9-003226b780bf",
-      "name": "Pear Berries",
-      "startDate": "2026-08-28",
-      "status": "active",
-      "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
-        "phZones": [],
-        "expectedDurationDays": 10,
-        "inputs": [],
-        "calculations": [],
-        "checks": [
-          {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
-            "intervalDays": 3
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "1a37b9ba-427f-409b-a029-f4ec29520bdb",
-          "date": "2026-08-28",
-          "kind": "photo",
-          "name": "camera-1787910648881.jpeg",
-          "mimeType": "image/jpeg",
-          "caption": "",
-          "photoRef": "photos/43aa155f-fcd0-4aab-9da9-003226b780bf/1a37b9ba-427f-409b-a029-f4ec29520bdb.jpg"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {},
-      "finishDate": "2026-09-07",
-      "checks": [
-        {
-          "id": "1e7a9afa-1b18-4da6-8193-68fe31303bc5",
-          "name": "Bubbles",
-          "intervalDays": 3,
-          "nextDueDate": "2026-08-31"
-        }
-      ],
-      "deletedAt": 1787911784537
-    },
     {
       "id": "b79c0c3a-f01b-495a-8181-bf923d24b4b6",
       "name": "Apple Orange",

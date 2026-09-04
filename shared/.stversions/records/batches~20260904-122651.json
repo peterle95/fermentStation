@@ -1,50 +1,6 @@
 {
   "batches": [
     {
-      "id": "b79c0c3a-f01b-495a-8181-bf923d24b4b6",
-      "name": "Apple Orange",
-      "startDate": "2026-08-18",
-      "status": "ready",
-      "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [],
-        "calculations": [],
-        "checks": [
-          {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
-            "intervalDays": 3
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "0d96dd20-8cec-4eb5-8c92-0bed9ccd8d1c",
-          "date": "2026-08-24",
-          "kind": "check",
-          "checkName": "Bubbles"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {},
-      "finishDate": "2026-08-25",
-      "checks": [
-        {
-          "id": "73b05e5b-66f8-4a92-9b45-4f55a14c46d3",
-          "name": "Bubbles",
-          "intervalDays": 3,
-          "nextDueDate": "2026-08-27",
-          "lastCompletedDate": "2026-08-24"
-        }
-      ],
-      "checksPausedAt": "2026-08-25"
-    },
-    {
       "id": "9847effa-75b5-4268-b9ae-08831f9f7dee",
       "name": "Apple Beeren",
       "startDate": "2026-08-18",
@@ -141,6 +97,18 @@
           "mimeType": "image/jpeg",
           "caption": "",
           "photoRef": "photos/af9cf859-72be-47f0-a8cd-f780f3491d27/112f87ed-e3f6-470f-8200-e11e3440b31d.jpg"
+        },
+        {
+          "id": "d475d266-f375-461a-9de1-ce6eb01fef53",
+          "date": "2026-08-29",
+          "kind": "check",
+          "checkName": "Mold"
+        },
+        {
+          "id": "0900e942-dec4-4dfb-a8dd-88add81b9903",
+          "date": "2026-09-01",
+          "kind": "check",
+          "checkName": "Mold"
         }
       ],
       "timelineTrash": [],
@@ -158,7 +126,8 @@
           "id": "f8f29d7d-840c-4047-bb49-cdd2c9596088",
           "name": "Mold",
           "intervalDays": 3,
-          "nextDueDate": "2026-08-29"
+          "nextDueDate": "2026-09-04",
+          "lastCompletedDate": "2026-09-01"
         }
       ]
     },
@@ -253,51 +222,6 @@
       ]
     },
     {
-      "id": "43aa155f-fcd0-4aab-9da9-003226b780bf",
-      "name": "Pear Berries",
-      "startDate": "2026-08-28",
-      "status": "active",
-      "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
-        "phZones": [],
-        "expectedDurationDays": 10,
-        "inputs": [],
-        "calculations": [],
-        "checks": [
-          {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
-            "intervalDays": 3
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "1a37b9ba-427f-409b-a029-f4ec29520bdb",
-          "date": "2026-08-28",
-          "kind": "photo",
-          "name": "camera-1787910648881.jpeg",
-          "mimeType": "image/jpeg",
-          "caption": "",
-          "photoRef": "photos/43aa155f-fcd0-4aab-9da9-003226b780bf/1a37b9ba-427f-409b-a029-f4ec29520bdb.jpg"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {},
-      "finishDate": "2026-09-07",
-      "checks": [
-        {
-          "id": "1e7a9afa-1b18-4da6-8193-68fe31303bc5",
-          "name": "Bubbles",
-          "intervalDays": 3,
-          "nextDueDate": "2026-08-31"
-        }
-      ]
-    },
-    {
       "id": "9de8c46c-45a6-44b5-b391-f1a3a51823f8",
       "name": "Kombucha F1",
       "startDate": "2026-08-28",
@@ -337,7 +261,14 @@
           "Taste after 7 days, then bottle when pleasantly tart."
         ]
       },
-      "timeline": [],
+      "timeline": [
+        {
+          "id": "a17b0b1a-e237-4c8e-bb05-50cd8e145aeb",
+          "date": "2026-09-01",
+          "kind": "check",
+          "checkName": "Mold"
+        }
+      ],
       "timelineTrash": [],
       "inputValues": {
         "water": 2730
@@ -356,7 +287,53 @@
           "id": "f161f2c0-de73-4364-979b-56368c2770e5",
           "name": "Mold",
           "intervalDays": 2,
-          "nextDueDate": "2026-08-30"
+          "nextDueDate": "2026-09-03",
+          "lastCompletedDate": "2026-09-01"
+        }
+      ]
+    },
+    {
+      "id": "af9cdd33-7adb-4f58-a122-ca7e701d1a8d",
+      "name": "Pear Orange Rosmarin",
+      "startDate": "2026-08-28",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "phZones": [],
+        "expectedDurationDays": 10,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 5
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "0459651b-808f-4311-92af-89cdb71d3680",
+          "date": "2026-08-28",
+          "kind": "photo",
+          "name": "JPEG_20260828_121005_5346890130885471919.jpg",
+          "mimeType": "image/jpeg",
+          "caption": "",
+          "photoRef": "photos/af9cdd33-7adb-4f58-a122-ca7e701d1a8d/0459651b-808f-4311-92af-89cdb71d3680.jpg"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-09-07",
+      "checks": [
+        {
+          "id": "e89fe4a5-fa25-41df-a4f5-5498b5330d99",
+          "name": "Bubbles",
+          "intervalDays": 5,
+          "nextDueDate": "2026-09-02"
         }
       ]
     }
@@ -434,6 +411,97 @@
       ],
       "checksPausedAt": "2026-08-25",
       "deletedAt": 1787910502477
+    },
+    {
+      "id": "43aa155f-fcd0-4aab-9da9-003226b780bf",
+      "name": "Pear Berries",
+      "startDate": "2026-08-28",
+      "status": "active",
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "phZones": [],
+        "expectedDurationDays": 10,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 3
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "1a37b9ba-427f-409b-a029-f4ec29520bdb",
+          "date": "2026-08-28",
+          "kind": "photo",
+          "name": "camera-1787910648881.jpeg",
+          "mimeType": "image/jpeg",
+          "caption": "",
+          "photoRef": "photos/43aa155f-fcd0-4aab-9da9-003226b780bf/1a37b9ba-427f-409b-a029-f4ec29520bdb.jpg"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-09-07",
+      "checks": [
+        {
+          "id": "1e7a9afa-1b18-4da6-8193-68fe31303bc5",
+          "name": "Bubbles",
+          "intervalDays": 3,
+          "nextDueDate": "2026-08-31"
+        }
+      ],
+      "deletedAt": 1787911784537
+    },
+    {
+      "id": "b79c0c3a-f01b-495a-8181-bf923d24b4b6",
+      "name": "Apple Orange",
+      "startDate": "2026-08-18",
+      "status": "ready",
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 3
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "0d96dd20-8cec-4eb5-8c92-0bed9ccd8d1c",
+          "date": "2026-08-24",
+          "kind": "check",
+          "checkName": "Bubbles"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-08-25",
+      "checks": [
+        {
+          "id": "73b05e5b-66f8-4a92-9b45-4f55a14c46d3",
+          "name": "Bubbles",
+          "intervalDays": 3,
+          "nextDueDate": "2026-08-27",
+          "lastCompletedDate": "2026-08-24"
+        }
+      ],
+      "checksPausedAt": "2026-08-25",
+      "deletedAt": 1788001919778
     }
   ]
 }
