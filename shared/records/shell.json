@@ -1,5 +1,5 @@
 {
-  "destination": "batches",
+  "destination": "calendar",
   "formulaTerms": [
     "totalWeight",
     "water",
