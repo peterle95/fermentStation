@@ -35,6 +35,7 @@ FermentStation is a local-first household fermentation journal. `src/main.tsx` m
 |---|---|---|---|---|
 | Change profile fields or formulas | [Profile domain](domains/profiles.md) | `src/domain/profiles.ts`, profile editor in `src/App.tsx` | `src/domain/profiles.test.ts` | `npm test -- profiles` |
 | Change batch status, checks, timeline, pH, or trash | [Batch domain](domains/batches.md) | `src/domain/batches.ts`, batch handlers in `src/App.tsx` | `src/domain/batches.test.ts` | `npm test -- batches` |
+| Change due-check attention queue/filter or status presentation | [React UI](architecture/ui.md), [Calendar workflow](workflows/calendar.md) | `BatchView`, `CompactBatchCard`, `BatchCard`, `dueBatchChecks` in `src/App.tsx`; attention selectors in `src/styles.css` | `src/App.test.tsx` (add coverage for attention behavior) | `npm test -- src/App.test.tsx` |
 | Change navigation/preferences/layout | [UI architecture](architecture/ui.md), [Shell domain](domains/shell.md) | `src/App.tsx`, `src/domain/shell.ts`, `src/styles.css` | `src/App.test.tsx`, `src/styles.test.ts` | `npm test` |
 | Change JSON persistence or migrations | [Storage](platform/storage.md) | `src/platform/*-store.ts` | store tests | `npm test` |
 | Change shared-folder sync or conflicts | [Shared synchronization](workflows/shared-sync.md) | `shared-data-store.ts`, bridge, platform implementation | `shared-data-store.test.ts` | `npm test` |
@@ -46,7 +47,7 @@ FermentStation is a local-first household fermentation journal. `src/main.tsx` m
 
 ## Core invariants
 
-A new batch owns a cloned profile snapshot; profile edits affect future batches, not existing records. Batch inputs and formula outputs reject invalid negative values and incompatible units. Recurring checks are authoritative in batch state; notifications are only a native projection. Shared datasets are accepted as complete versioned snapshots, preserve sync-conflict files, and reject interrupted or malformed generations. Archives verify structure, hashes, stable IDs, and domain validity before reaching the UI.
+A new batch owns a cloned profile snapshot; profile edits affect future batches, not existing records. Batch inputs and formula outputs reject invalid negative values and incompatible units. Recurring checks are authoritative in batch state; notifications are only a native projection. `Active · attention` is a derived UI label for an active batch with a due or overdue check, not a fourth persisted status. Shared datasets are accepted as complete versioned snapshots, preserve sync-conflict files, and reject interrupted or malformed generations. Archives verify structure, hashes, stable IDs, and domain validity before reaching the UI.
 
 ## Validation baseline
 
