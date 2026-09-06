@@ -50,6 +50,7 @@ describe("batches", () => {
       name: "Kitchen kombucha",
       startDate: "2026-08-08",
       status: "active",
+      notificationsMuted: false,
       timeline: [],
       timelineTrash: [],
       inputValues: {},

@@ -837,6 +837,10 @@ h2 {
   font-weight: 700;
 }
 
+.notification-segment {
+  flex-wrap: wrap;
+}
+
 .setting-export {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -2723,6 +2727,22 @@ button:disabled {
 }
 
 .batch-head-camera svg { height: 1.25rem; width: 1.25rem; }
+
+.batch-head-actions > button.batch-head-notifications {
+  align-items: center;
+  display: flex;
+  height: 2.75rem;
+  justify-content: center;
+  min-width: 2.75rem;
+  padding: 0.5rem;
+}
+
+.batch-head-actions > button.batch-head-notifications[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+.batch-head-notifications svg { height: 1.25rem; width: 1.25rem; }
 
 .batch-workspace-head .eyebrow {
   margin-bottom: 0.35rem;
