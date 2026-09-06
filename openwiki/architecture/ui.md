@@ -3,6 +3,14 @@ type: component
 title: React UI and state orchestration
 description: App.tsx composes navigation, fermentation views, dialogs, persistence effects, archive flows, and platform fallbacks around the domain and platform layers.
 tags: [ui, react, workflows]
+openwiki:
+  roles: [architecture, workflow, testing]
+  change_kinds: [ui, lifecycle]
+  source_paths: [src/App.tsx, src/styles.css]
+  symbols: [App, BatchView, CompactBatchCard, BatchCard, dueBatchChecks]
+  test_paths: [src/App.test.tsx]
+  invariants: [Active batches with due checks are presented as Active · attention without changing the stored batch status.]
+  validation_commands: [npm test -- src/App.test.tsx]
 ---
 
 # React UI and state orchestration
@@ -21,7 +29,9 @@ The shell renders the same selected destination in responsive layouts; React sta
 - **Profiles** edits guidance, inputs, calculations, pH zones, temperatures, durations, and checks; save uses `validateProfile` before publishing.
 - **Settings** edits units, reminders, suggestions, formula terms, shared-folder selection, archive import/export, journal export, and trash restoration.
 
-`BatchView` and `BatchCard` are the primary batch workflow boundary: forms add notes, measurements, pH, temperature, photos, status changes, checks, inputs, and calculation overrides through domain functions. `BatchCard` renders the latest pH and temperature timeline readings against the profile snapshot's pH zones and temperature bounds, marking out-of-range pH as an alert and below-range temperature as cool. `CalendarView` and the Today upcoming strip open a single owning batch directly; when several batches share a date, `BatchPicker` provides a dismissible accessible chooser. `Profiles` edits structured rows rather than evaluating arbitrary JavaScript. `SettingsView` owns archive file selection/download and shared-storage migration dialogs.
+`BatchView` and `BatchCard` are the primary batch workflow boundary: forms add notes, measurements, pH, temperature, photos, status changes, checks, inputs, and calculation overrides through domain functions. `BatchView` also exposes an `attention` filter for active batches with at least one due or overdue check; the Today action queue uses the same predicate. `CompactBatchCard` and `BatchCard` render this as `Active · attention`, while the underlying domain status remains `active`. `BatchCard` renders the latest pH and temperature timeline readings against the profile snapshot's pH zones and temperature bounds, marking out-of-range pH as an alert and below-range temperature as cool. `CalendarView` and the Today upcoming strip open a single owning batch directly; when several batches share a date, `BatchPicker` provides a dismissible accessible chooser. `Profiles` edits structured rows rather than evaluating arbitrary JavaScript. `SettingsView` owns archive file selection/download and shared-storage migration dialogs.
+
+The attention presentation is a UI projection, not a new persisted lifecycle state: `dueBatchChecks(batch, localDate())` must remain the source of truth, and `src/styles.css` owns the attention color treatment for queue cards, badges, and the expanded next-action panel. The current UI test suite covers the broader batch/filter flow, but does not yet assert the `Active · attention` filter or badge specifically; add those assertions when changing this seam.
 
 Calendar selection behavior is detailed in [calendar and upcoming navigation](../workflows/calendar.md).
 
