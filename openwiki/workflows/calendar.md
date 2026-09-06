@@ -17,6 +17,8 @@ openwiki:
 
 The Calendar destination and the Today batch view consume the same derived `calendarEvents` projection from `src/domain/batches.ts`. Events represent finish dates and active-batch checks; they are not persisted calendar records. `App` supplies `CalendarView` with the current batches and an `onOpen` callback that navigates to Batches and sets `openBatchId`, so calendar navigation ends at the owning `BatchCard`.
 
+Today also has a separate due-check action queue: `BatchView` computes `dueBatchChecks(batch, localDate())`, renders due/overdue checks as attention cards, and exposes the same set through the Batches `attention` filter. This is a status presentation (`Active · attention`), not a new calendar event or stored batch status; lifecycle rules remain canonical in [the batch domain](../domains/batches.md).
+
 ```mermaid
 flowchart LR
   Batches[Batch state] --> Events[calendarEvents projection]
