@@ -3,10 +3,6 @@
     {
       "id": "starter-kombucha-f1",
       "name": "Kombucha F1",
-      "guidance": [
-        "Keep at room temperature and cover with a breathable cloth.",
-        "Taste after 7 days, then bottle when pleasantly tart."
-      ],
       "phZones": [],
       "expectedDurationDays": 10,
       "inputs": [
@@ -33,6 +29,10 @@
           "name": "Mold",
           "intervalDays": 4
         }
+      ],
+      "guidance": [
+        "Keep at room temperature and cover with a breathable cloth.",
+        "Taste after 7 days, then bottle when pleasantly tart."
       ]
     },
     {
@@ -81,8 +81,10 @@
       "id": "a1f42d1d-a006-4d55-a448-184259650a34",
       "name": "Kombucha F2",
       "guidance": [],
+      "temperatureMinC": 23,
+      "temperatureMaxC": 29,
       "phZones": [],
-      "expectedDurationDays": 10,
+      "expectedDurationDays": 14,
       "inputs": [],
       "calculations": [],
       "checks": [
