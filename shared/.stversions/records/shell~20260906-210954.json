@@ -8,6 +8,6 @@
     "tea"
   ],
   "units": "metric",
-  "checkReminders": true,
+  "notificationMode": "checks",
   "suggestions": true
 }

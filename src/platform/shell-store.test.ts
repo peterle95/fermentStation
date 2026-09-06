@@ -16,9 +16,9 @@ describe("shell store", () => {
       },
     });
 
-    browserShellStore.save({ destination: "calendar", formulaTerms: ["water", "tea"], units: "imperial", checkReminders: false, suggestions: true });
+    browserShellStore.save({ destination: "calendar", formulaTerms: ["water", "tea"], units: "imperial", notificationMode: "off", suggestions: true });
 
-    expect(browserShellStore.load()).toEqual({ destination: "calendar", formulaTerms: ["water", "tea"], units: "imperial", checkReminders: false, suggestions: true });
+    expect(browserShellStore.load()).toEqual({ destination: "calendar", formulaTerms: ["water", "tea"], units: "imperial", notificationMode: "off", suggestions: true });
   });
 
   it("round-trips a selected destination", () => {
@@ -28,9 +28,9 @@ describe("shell store", () => {
       setItem: (key, value) => values.set(key, value),
     });
 
-    store.save({ destination: "batches", formulaTerms: ["totalWeight", "salt"], units: "metric", checkReminders: true, suggestions: false });
+    store.save({ destination: "batches", formulaTerms: ["totalWeight", "salt"], units: "metric", notificationMode: "ready", suggestions: false });
 
-    expect(store.load()).toEqual({ destination: "batches", formulaTerms: ["totalWeight", "salt"], units: "metric", checkReminders: true, suggestions: false });
+    expect(store.load()).toEqual({ destination: "batches", formulaTerms: ["totalWeight", "salt"], units: "metric", notificationMode: "ready", suggestions: false });
   });
 
   it("adds default formula terms to older persisted state", () => {
@@ -39,7 +39,25 @@ describe("shell store", () => {
       setItem: () => undefined,
     });
 
-    expect(store.load()).toEqual({ destination: "profiles", formulaTerms: defaultFormulaTerms, units: "metric", checkReminders: true, suggestions: true });
+    expect(store.load()).toEqual({ destination: "profiles", formulaTerms: defaultFormulaTerms, units: "metric", notificationMode: "off", suggestions: true });
+  });
+
+  it("migrates enabled legacy check reminders", () => {
+    const store = createShellStore({
+      getItem: () => '{"destination":"profiles","checkReminders":true}',
+      setItem: () => undefined,
+    });
+
+    expect(store.load()?.notificationMode).toBe("checks");
+  });
+
+  it("ignores an invalid notification mode", () => {
+    const store = createShellStore({
+      getItem: () => '{"destination":"profiles","notificationMode":"loud"}',
+      setItem: () => undefined,
+    });
+
+    expect(store.load()).toBeNull();
   });
 
   it.each([

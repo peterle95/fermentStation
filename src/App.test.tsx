@@ -100,6 +100,11 @@ describe("batch workflow", () => {
 
     expect(screen.getByText("Kitchen kombucha")).toBeTruthy();
     expect(screen.getByText("Active", { selector: ".status" })).toBeTruthy();
+    const notifications = screen.getByRole("button", { name: "Notifications for Kitchen kombucha" });
+    expect(notifications.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(notifications);
+    expect(notifications.getAttribute("aria-pressed")).toBe("false");
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].notificationsMuted).toBe(true);
 
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
@@ -239,19 +244,21 @@ describe("batch workflow", () => {
     const view = render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     fireEvent.click(screen.getByRole("button", { name: "°F / qt" }));
-    fireEvent.click(screen.getAllByRole("button", { name: "Off" })[0]);
-
-    expect(JSON.parse(localStorage.getItem("fermentstation.shell")!)).toMatchObject({
-      units: "imperial",
-      checkReminders: false,
-      suggestions: true,
-    });
+    const notifications = within(screen.getByRole("group", { name: "Notifications" }));
+    for (const [label, mode] of [["All", "all"], ["Checks", "checks"], ["Ready", "ready"], ["Off", "off"]]) {
+      fireEvent.click(notifications.getByRole("button", { name: label }));
+      expect(JSON.parse(localStorage.getItem("fermentstation.shell")!)).toMatchObject({
+        units: "imperial",
+        notificationMode: mode,
+        suggestions: true,
+      });
+    }
 
     view.unmount();
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     expect(screen.getByRole("button", { name: "°F / qt" }).getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getAllByRole("button", { name: "Off" })[0].getAttribute("aria-pressed")).toBe("true");
+    expect(within(screen.getByRole("group", { name: "Notifications" })).getByRole("button", { name: "Off" }).getAttribute("aria-pressed")).toBe("true");
   });
 
   it("keeps calculation-only results out of sources and chooses unused results", () => {

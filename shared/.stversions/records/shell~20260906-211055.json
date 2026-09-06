@@ -1,5 +1,5 @@
 {
-  "destination": "profiles",
+  "destination": "settings",
   "formulaTerms": [
     "totalWeight",
     "water",
@@ -8,6 +8,6 @@
     "tea"
   ],
   "units": "metric",
-  "checkReminders": true,
+  "notificationMode": "checks",
   "suggestions": true
 }

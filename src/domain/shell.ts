@@ -17,10 +17,12 @@ export const defaultFormulaTerms = [
 ] as const;
 
 export type UnitSystem = "metric" | "imperial";
+export const notificationModes = ["all", "checks", "ready", "off"] as const;
+export type NotificationMode = (typeof notificationModes)[number];
 
 export interface ShellPreferences {
   units: UnitSystem;
-  checkReminders: boolean;
+  notificationMode: NotificationMode;
   suggestions: boolean;
 }
 
@@ -34,7 +36,7 @@ export function createShellState(): ShellState {
     destination: "today",
     formulaTerms: [...defaultFormulaTerms],
     units: "metric",
-    checkReminders: true,
+    notificationMode: "off",
     suggestions: true,
   };
 }

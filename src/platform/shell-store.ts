@@ -1,4 +1,4 @@
-import { defaultFormulaTerms, destinations, type ShellPreferences, type ShellState } from "../domain/shell";
+import { defaultFormulaTerms, destinations, notificationModes, type ShellPreferences, type ShellState } from "../domain/shell";
 
 export interface ShellStore {
   load(): ShellState | null;
@@ -17,10 +17,12 @@ export function parseShellState(value: unknown): ShellState | null {
     return null;
   }
 
-  const { destination, formulaTerms, units, checkReminders, suggestions } = value as {
+  const { destination, formulaTerms, units, notificationMode, checkReminders, suggestions } = value as {
     destination?: unknown;
     formulaTerms?: unknown;
     units?: unknown;
+    notificationMode?: unknown;
+    // Legacy preference from the check-only notification implementation.
     checkReminders?: unknown;
     suggestions?: unknown;
   };
@@ -34,12 +36,15 @@ export function parseShellState(value: unknown): ShellState | null {
     return null;
   }
   if (units !== undefined && units !== "metric" && units !== "imperial") return null;
+  if (notificationMode !== undefined && !notificationModes.some((mode) => mode === notificationMode)) return null;
   if (checkReminders !== undefined && typeof checkReminders !== "boolean") return null;
   if (suggestions !== undefined && typeof suggestions !== "boolean") return null;
 
   const preferences: ShellPreferences = {
     units: units ?? "metric",
-    checkReminders: checkReminders ?? true,
+    notificationMode: notificationMode === undefined
+      ? checkReminders === true ? "checks" : "off"
+      : notificationMode as ShellPreferences["notificationMode"],
     suggestions: suggestions ?? true,
   };
   return {

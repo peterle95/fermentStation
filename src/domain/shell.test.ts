@@ -13,7 +13,7 @@ describe("shell state", () => {
       destination: "batches",
       formulaTerms: defaultFormulaTerms,
       units: "metric",
-      checkReminders: true,
+      notificationMode: "off",
       suggestions: true,
     });
   });

@@ -40,6 +40,7 @@ export interface Batch {
   name: string;
   startDate: string;
   status: BatchStatus;
+  notificationsMuted: boolean;
   profileSnapshot: FermentationProfile;
   timeline: TimelineEntry[];
   timelineTrash: TrashedTimelineEntry[];
@@ -89,6 +90,7 @@ export function createBatch(
     name: name?.trim() || profile.name,
     startDate,
     status: "active",
+    notificationsMuted: false,
     profileSnapshot,
     timeline: [],
     timelineTrash: [],

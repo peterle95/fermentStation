@@ -34,6 +34,7 @@ function isBatch(value: unknown): value is Batch {
     ["id", "name", "startDate"].every((key) => typeof batch[key] === "string") &&
     typeof batch.status === "string" &&
     batchStatuses.includes(batch.status as Batch["status"]) &&
+    (batch.notificationsMuted === undefined || typeof batch.notificationsMuted === "boolean") &&
     !!profile &&
     typeof profile === "object" &&
     ["id", "name"].every((key) => typeof profileRecord[key] === "string") &&
@@ -122,6 +123,7 @@ function normalizeBatch(batch: Batch): Batch {
   };
   return {
     ...batch,
+    notificationsMuted: batch.notificationsMuted ?? false,
     profileSnapshot,
     timeline: batch.timeline ?? [],
     timelineTrash: batch.timelineTrash ?? [],

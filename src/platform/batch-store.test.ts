@@ -89,6 +89,21 @@ describe("batch store", () => {
     expect(store.load()?.batches[0].checks[0].id).toBe(loaded.batches[0].checks[0].id);
   });
 
+  it("defaults legacy batches to unmuted notifications", () => {
+    const values = new Map<string, string>();
+    const store = createBatchStore({
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+    });
+    const batch = createBatch(createProfileState().profiles[0], {
+      id: "batch-1", startDate: "2026-08-08",
+    });
+    delete (batch as { notificationsMuted?: boolean }).notificationsMuted;
+    values.set("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+
+    expect(store.load()?.batches[0].notificationsMuted).toBe(false);
+  });
+
   it("migrates legacy guidance in profile snapshots", () => {
     const values = new Map<string, string>();
     const store = createBatchStore({
