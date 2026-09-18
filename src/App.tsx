@@ -1133,12 +1133,12 @@ interface BatchCardProps {
   units: ShellPreferences["units"];
 }
 
-type LoggerKind = "note" | "measurement" | "ph" | "temperature" | "status" | "photo" | "check";
+type LoggerKind = "note" | "ph" | "temperature" | "status" | "photo";
+type EditableTimelineEntry = Extract<TimelineEntry, { kind: LoggerKind }>;
 
 function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
-  const [editing, setEditing] = useState<TimelineEntry | null>(null);
-  const [loggerKind, setLoggerKind] = useState<LoggerKind>("measurement");
-  const [selectedCheckId, setSelectedCheckId] = useState("");
+  const [editing, setEditing] = useState<EditableTimelineEntry | null>(null);
+  const [loggerKind, setLoggerKind] = useState<LoggerKind>("status");
   const [checkDrafts, setCheckDrafts] = useState<Record<string, string>>({});
   const [checkError, setCheckError] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<CapturedPhoto | null>(null);
@@ -1192,18 +1192,9 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
       };
       onChange(editing ? updateTimelineEntry(batch, photo) : addTimelineEntry(batch, photo));
       setEditing(null);
-      setLoggerKind("measurement");
+      setLoggerKind("status");
       setCapturedPhoto(null);
       form.reset();
-      return;
-    } else if (kind === "check") {
-      if (batch.status !== "active") return;
-      const checkId = String(data.get("checkId") ?? "");
-      if (!checkId) return;
-      onChange(completeBatchCheck(batch, checkId, common.date, common.id));
-      setEditing(null);
-      setLoggerKind("measurement");
-      event.currentTarget.reset();
       return;
     } else {
       entry = { ...common, kind, text: String(data.get("text") ?? "").trim() };
@@ -1213,14 +1204,14 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
       const phEntry = entry as Extract<TimelineEntry, { kind: "ph" }>;
       onChange(editing ? updatePhReading(batch, phEntry) : addPhReading(batch, phEntry));
       setEditing(null);
-      setLoggerKind("measurement");
+      setLoggerKind("status");
       event.currentTarget.reset();
       return;
     }
     const next = editing ? updateTimelineEntry(batch, entry, localDate()) : addTimelineEntry(batch, entry);
     onChange(next);
     setEditing(null);
-    setLoggerKind("measurement");
+    setLoggerKind("status");
     event.currentTarget.reset();
   }
 
@@ -1236,7 +1227,7 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   }
 
   function editEntry(entry: TimelineEntry) {
-    if (entry.kind === "check") return;
+    if (entry.kind === "check" || entry.kind === "measurement") return;
     setLoggerKind(entry.kind);
     setEditing(entry);
   }
@@ -1267,7 +1258,6 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   const latestPh = latestPhReading(batch);
   const dueCheck = dueBatchChecks(batch, localDate())[0];
   const isAttention = batch.status === "active" && dueCheck !== undefined;
-  const preferredCheckId = dueCheck?.id ?? batch.checks[0]?.id ?? "";
   const nextCheck = [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0];
   const day = Math.max(1, Math.floor((Date.parse(`${localDate()}T00:00:00Z`) - Date.parse(`${batch.startDate}T00:00:00Z`)) / 86_400_000) + 1);
   const temperatureReadings = batch.timeline.filter((entry) => entry.kind === "temperature");
@@ -1296,8 +1286,6 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
   const phPosition = latestPh && phBounds
     ? Math.max(0, Math.min(100, ((latestPh.value - phBounds.min) / Math.max(0.01, phBounds.max - phBounds.min)) * 100))
     : 50;
-  const firstCalculation = batch.profileSnapshot.calculations[0];
-  const firstCalculationValue = firstCalculation ? batch.calculationValues[firstCalculation.name] : undefined;
   const nextAction = dueCheck
     ? {
         kick: dueCheck.overdue ? `Profile check · overdue since ${dueCheck.nextDueDate}` : "Profile check · due today",
@@ -1355,6 +1343,7 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
               <h4 id="next-action-heading">{nextAction.title}</h4>
               <p>{nextAction.body}</p>
             </div>
+            {dueCheck && <button aria-label={`Complete ${dueCheck.name} check`} className="next-action-complete" onClick={() => onChange(completeBatchCheck(batch, dueCheck.id, localDate(), createClientId()))} title={`Complete ${dueCheck.name}`} type="button"><span aria-hidden="true">✓</span></button>}
           </section>
 
           <section className="wb-panel" aria-labelledby="measurements-heading">
@@ -1376,11 +1365,18 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
                 <strong className="meas-value">{day}</strong>
                 <p className="meas-note">{nextCheck ? `Check cadence · every ${nextCheck.intervalDays} days` : "No recurring check set"}</p>
               </div>
-              <div className="meas">
+              {batch.profileSnapshot.calculations.length > 0 ? batch.profileSnapshot.calculations.map((calculation) => {
+                const value = batch.calculationValues[calculation.name];
+                return <div className="meas" key={calculation.name}>
+                  <div className="meas-label"><span>Profile calculation</span></div>
+                  <strong className="meas-value meas-value-small">{formatCalculationValue(value?.override ?? value?.suggested)}<small>{calculation.unit}</small></strong>
+                  <p className="meas-note">{calculation.name}</p>
+                </div>;
+              }) : <div className="meas">
                 <div className="meas-label"><span>Profile calculation</span></div>
-                <strong className="meas-value meas-value-small">{firstCalculationValue?.override ?? firstCalculationValue?.suggested ?? "—"}<small>{firstCalculation?.unit ?? "incomplete"}</small></strong>
-                <p className="meas-note">{firstCalculation ? firstCalculation.name : "No calculation defined"}</p>
-              </div>
+                <strong className="meas-value meas-value-small">—<small>incomplete</small></strong>
+                <p className="meas-note">No calculation defined</p>
+              </div>}
             </div>
             <p className="hint">Suggested values recalculate from the profile snapshot. Overrides and input editing remain available below.</p>
           </section>
@@ -1398,25 +1394,23 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
           <section className="wb-panel activity-logger" aria-labelledby="activity-logger-heading">
             <h2 id="activity-logger-heading">Log {loggerKind === "ph" ? "pH reading" : loggerKind === "status" ? "status change" : loggerKind}</h2>
             <form className="timeline-form quick-log-form" id="batch-activity-form" key={editing?.id ?? "new"} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") event.currentTarget.requestSubmit(); }} onSubmit={saveEntry}>
-              <label className="sr-only">Activity type<select disabled={!!editing} name="kind" onChange={(event) => { const nextKind = event.target.value as LoggerKind; setLoggerKind(nextKind); setSelectedCheckId(nextKind === "check" ? preferredCheckId : ""); }} value={loggerKind}>
-                <option value="measurement">Measurement</option><option value="ph">pH reading</option><option value="temperature">Temperature</option><option value="status">Status change</option><option value="note">Note</option><option disabled={batch.status !== "active"} value="check">Check completion</option><option value="photo">Photo</option>
+              <label className="sr-only">Activity type<select disabled={!!editing} name="kind" onChange={(event) => setLoggerKind(event.target.value as LoggerKind)} value={loggerKind}>
+                <option value="status">Status change</option><option value="ph">pH reading</option><option value="temperature">Temperature</option><option value="note">Note</option><option value="photo">Photo</option>
               </select></label>
               <div className="quick-log-types" aria-label="Activity choices" role="group">
-                {(["measurement", "ph", "temperature", "status", "note"] as LoggerKind[]).map((kind) => {
-                  const label = kind === "ph" ? "pH reading" : kind === "status" ? "Status change" : kind === "check" ? "Check" : kind[0].toUpperCase() + kind.slice(1);
+                {(["status", "ph", "temperature", "note"] as LoggerKind[]).map((kind) => {
+                  const label = kind === "ph" ? "pH reading" : kind === "status" ? "Status change" : kind[0].toUpperCase() + kind.slice(1);
                   return <button aria-pressed={loggerKind === kind} disabled={!!editing} key={kind} onClick={() => setLoggerKind(kind)} type="button">{label}</button>;
                 })}
               </div>
               <div className="quick-log-fields">
-                {loggerKind === "measurement" && <label>Reading<div className="quick-log-measure"><input aria-label="Reading" defaultValue={editing?.kind === "measurement" ? editing.text : ""} name="text" required /><select aria-label="Reading unit" defaultValue="SG"><option>SG</option></select></div></label>}
                 {loggerKind === "ph" && <label>pH value<input defaultValue={editing?.kind === "ph" ? editing.value : undefined} name="value" required step="0.01" type="number" /></label>}
                 {loggerKind === "temperature" && <label>Temperature ({units === "imperial" ? "°F" : "°C"})<div className="quick-log-measure"><input aria-label={`Temperature (${units === "imperial" ? "°F" : "°C"})`} defaultValue={editing?.kind === "temperature" ? displayTemperature(editing.value, units) : undefined} name="value" required step="any" type="number" /><span>{units === "imperial" ? "°F" : "°C"}</span></div></label>}
                 {loggerKind === "status" && <label>New status<select aria-label="Activity status" defaultValue={editing?.kind === "status" ? editing.status : batch.status} name="status">{batchStatuses.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>}
-                {loggerKind === "check" && <label>Batch check<select disabled={batch.status !== "active" || batch.checks.length === 0} name="checkId" onChange={(event) => setSelectedCheckId(event.target.value)} value={selectedCheckId || preferredCheckId}>{batch.checks.map((check) => <option key={check.id} value={check.id}>{check.name}</option>)}</select></label>}
                 {loggerKind === "photo" && <label className="quick-log-wide">Photo<input accept="image/*" capture="environment" name="photo" required={!editing && !capturedPhoto} type="file" /></label>}
                 <label>Activity date<input defaultValue={editing?.date ?? localDate()} name="date" required type="date" /></label>
                 {loggerKind === "photo" && <label>Caption<input defaultValue={editing?.kind === "photo" ? editing.caption : ""} name="caption" /></label>}
-                <label className="quick-log-wide">Context <span>optional</span><textarea aria-label="Note or measurement" defaultValue={editing?.kind === "note" ? editing.text : ""} name={loggerKind === "note" ? "text" : undefined} placeholder="What should future-you know?" required={loggerKind === "note"} /></label>
+                <label className="quick-log-wide">Context <span>optional</span><textarea aria-label="Activity context" defaultValue={editing?.kind === "note" ? editing.text : ""} name={loggerKind === "note" ? "text" : undefined} placeholder="What should future-you know?" required={loggerKind === "note"} /></label>
               </div>
               {loggerKind === "photo" && isNativeCameraAvailable() && <button className="quick-log-camera" onClick={async () => { try { setCapturedPhoto(await captureNativePhoto()); } catch (error) { setCheckError(`Camera unavailable: ${(error as Error).message}`); } }} type="button">Take photo</button>}
               {capturedPhoto && <p className="notice" role="status">Photo captured. Add a caption or save the activity.</p>}
@@ -1433,7 +1427,7 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
                   <span className="timeline-dot" aria-hidden="true" />
                   <time dateTime={entry.date}>{entry.date}</time>
                   <span className="timeline-content">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}</span>
-                  {entry.kind !== "check" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} onClick={() => editEntry(entry)} type="button">Edit</button>}
+                  {entry.kind !== "check" && entry.kind !== "measurement" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} onClick={() => editEntry(entry)} type="button">Edit</button>}
                   <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
                 </div>
               ))}
@@ -1470,8 +1464,8 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
                 return (
                   <div className="component-calculation" key={calculation.name}>
                     <span className="component-pair-label">{calculation.name}:</span>
-                    <div className="component-calculation-value"><strong>{value?.override ?? value?.suggested ?? "Incomplete"} {calculation.unit}</strong><span>{value?.override !== undefined ? " (overridden)" : " suggested"}</span></div>
-                    <span className="sr-only">{value?.override ?? value?.suggested ?? "Incomplete"} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
+                    <div className="component-calculation-value"><strong>{formatCalculationValue(value?.override ?? value?.suggested)} {calculation.unit}</strong><span>{value?.override !== undefined ? " (overridden)" : " suggested"}</span></div>
+                    <span className="sr-only">{formatCalculationValue(value?.override ?? value?.suggested)} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
                     <form className="component-override" onSubmit={(event) => {
                       event.preventDefault();
                       const raw = String(new FormData(event.currentTarget).get("override") ?? "");
@@ -1570,6 +1564,10 @@ function presentationFor(profile: FermentationProfile): ProfilePresentation {
 
 function formatNumber(value: number) {
   return Number.isInteger(value) ? String(value) : String(value).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function formatCalculationValue(value: number | null | undefined) {
+  return value === null || value === undefined ? "Incomplete" : formatNumber(Number(value.toFixed(2)));
 }
 
 function displayTemperature(celsius: number, units: ShellPreferences["units"]): string {

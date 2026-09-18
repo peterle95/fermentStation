@@ -1,92 +1,10 @@
 {
   "batches": [
     {
-      "id": "af9cf859-72be-47f0-a8cd-f780f3491d27",
-      "name": "Red bell pepper on top",
-      "startDate": "2026-08-26",
-      "status": "ready",
-      "profileSnapshot": {
-        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
-        "name": "Anaerobic fermentation",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [
-          {
-            "name": "totalWeight",
-            "unit": "g"
-          }
-        ],
-        "calculations": [
-          {
-            "name": "salt",
-            "unit": "g",
-            "formula": "totalWeight * 2%"
-          }
-        ],
-        "checks": [
-          {
-            "id": "b2bf2b30-6823-49c4-8d8c-6912287bf3ae",
-            "name": "Mold",
-            "intervalDays": 3
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "112f87ed-e3f6-470f-8200-e11e3440b31d",
-          "date": "2026-08-26",
-          "kind": "photo",
-          "name": "camera-1787738210301.jpeg",
-          "mimeType": "image/jpeg",
-          "caption": "",
-          "photoRef": "photos/af9cf859-72be-47f0-a8cd-f780f3491d27/112f87ed-e3f6-470f-8200-e11e3440b31d.jpg"
-        },
-        {
-          "id": "d475d266-f375-461a-9de1-ce6eb01fef53",
-          "date": "2026-08-29",
-          "kind": "check",
-          "checkName": "Mold"
-        },
-        {
-          "id": "0900e942-dec4-4dfb-a8dd-88add81b9903",
-          "date": "2026-09-01",
-          "kind": "check",
-          "checkName": "Mold"
-        },
-        {
-          "id": "edc9ed01-9f3a-4a94-923a-eade606e9e16",
-          "date": "2026-09-04",
-          "kind": "note",
-          "text": "Test"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {
-        "totalWeight": 1563
-      },
-      "calculationValues": {
-        "salt": {
-          "suggested": 31.26
-        }
-      },
-      "finishDate": "2026-09-02",
-      "checks": [
-        {
-          "id": "f8f29d7d-840c-4047-bb49-cdd2c9596088",
-          "name": "Mold",
-          "intervalDays": 3,
-          "nextDueDate": "2026-09-04",
-          "lastCompletedDate": "2026-09-01"
-        }
-      ],
-      "checksPausedAt": "2026-09-02"
-    },
-    {
       "id": "5f09dcc5-a4bd-49a3-9c12-0dd17d95330c",
       "name": "Pear Orange",
       "startDate": "2026-08-28",
-      "status": "active",
+      "status": "ready",
       "profileSnapshot": {
         "id": "a1f42d1d-a006-4d55-a448-184259650a34",
         "name": "Kombucha F2",
@@ -132,24 +50,38 @@
           "nextDueDate": "2026-09-07",
           "lastCompletedDate": "2026-09-04"
         }
-      ]
+      ],
+      "notificationsMuted": false,
+      "checksPausedAt": "2026-09-07"
     },
     {
-      "id": "35bfd79e-ff36-4492-afa0-8b4fc9c0aefe",
-      "name": "Pear Orange",
-      "startDate": "2026-08-28",
-      "status": "active",
+      "id": "1b78d8d6-d147-4e6a-a06d-9936419510d1",
+      "name": "Spicy",
+      "startDate": "2026-09-08",
+      "status": "to-fridge",
+      "notificationsMuted": false,
       "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
+        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
+        "name": "Anaerobic fermentation",
         "phZones": [],
-        "expectedDurationDays": 10,
-        "inputs": [],
-        "calculations": [],
+        "expectedDurationDays": 7,
+        "inputs": [
+          {
+            "name": "totalWeight",
+            "unit": "g"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "salt",
+            "unit": "g",
+            "formula": "totalWeight * 2%"
+          }
+        ],
         "checks": [
           {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
+            "id": "b2bf2b30-6823-49c4-8d8c-6912287bf3ae",
+            "name": "Mold",
             "intervalDays": 3
           }
         ],
@@ -157,128 +89,243 @@
       },
       "timeline": [
         {
-          "id": "e564628b-4b11-4810-8e86-593e4d297e1d",
-          "date": "2026-08-28",
-          "kind": "photo",
-          "name": "camera-1787910585560.jpeg",
-          "mimeType": "image/jpeg",
-          "caption": "",
-          "photoRef": "photos/35bfd79e-ff36-4492-afa0-8b4fc9c0aefe/e564628b-4b11-4810-8e86-593e4d297e1d.jpg"
+          "id": "edd719bf-cee1-4137-a2ad-5c751ba308fd",
+          "date": "2026-09-11",
+          "kind": "check",
+          "checkName": "Mold"
         },
         {
-          "id": "4171e7ff-a55c-4f27-aca3-77c46342b6c5",
-          "date": "2026-09-04",
+          "id": "3aa90302-a64b-47c8-a17d-488f205db9a6",
+          "date": "2026-09-14",
           "kind": "check",
-          "checkName": "Bubbles"
-        }
-      ],
-      "timelineTrash": [
+          "checkName": "Mold"
+        },
         {
-          "id": "39450bd6-3ac4-439d-828a-560e75ddc95f",
-          "date": "2026-09-04",
-          "kind": "photo",
-          "name": "camera-1788511415516.jpeg",
-          "mimeType": "image/jpeg",
-          "caption": "",
-          "deletedAt": 1788511474725,
-          "photoRef": "photos/35bfd79e-ff36-4492-afa0-8b4fc9c0aefe/39450bd6-3ac4-439d-828a-560e75ddc95f.jpg"
+          "id": "c752d197-824e-43c8-b612-29c58584c434",
+          "date": "2026-09-17",
+          "kind": "status",
+          "status": "to-fridge"
         }
       ],
-      "inputValues": {},
-      "calculationValues": {},
-      "finishDate": "2026-09-07",
+      "timelineTrash": [],
+      "inputValues": {
+        "totalWeight": 1612
+      },
+      "calculationValues": {
+        "salt": {
+          "suggested": 32.24
+        }
+      },
+      "finishDate": "2026-09-15",
       "checks": [
         {
-          "id": "033f80a8-840a-4e67-93b2-9b1f3f8f2fad",
-          "name": "Bubbles",
+          "id": "648b9a14-d971-492e-8b16-ef31490ae020",
+          "name": "Mold",
           "intervalDays": 3,
-          "nextDueDate": "2026-09-07",
-          "lastCompletedDate": "2026-09-04"
+          "nextDueDate": "2026-09-17",
+          "lastCompletedDate": "2026-09-14"
+        }
+      ],
+      "checksPausedAt": "2026-09-15"
+    },
+    {
+      "id": "0d537b2a-34b0-4cb0-94e8-6bad87020067",
+      "name": "Traube Berries",
+      "startDate": "2026-09-17",
+      "status": "active",
+      "notificationsMuted": false,
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "temperatureMinC": 23,
+        "temperatureMaxC": 29,
+        "phZones": [],
+        "expectedDurationDays": 14,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 5
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "1e07c71e-dcd2-4706-a98a-563b9d23ca89",
+          "date": "2026-09-17",
+          "kind": "note",
+          "text": "556ml of F1\n30g of berries\n48ml grape juice"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-10-01",
+      "checks": [
+        {
+          "id": "54f5a65a-fad4-441b-8af7-4464bc878071",
+          "name": "Bubbles",
+          "intervalDays": 5,
+          "nextDueDate": "2026-09-22"
         }
       ]
     },
     {
-      "id": "9de8c46c-45a6-44b5-b391-f1a3a51823f8",
-      "name": "Kombucha F1",
-      "startDate": "2026-08-28",
+      "id": "defc7889-1a65-40c6-9000-a6dde00eda33",
+      "name": "Traube Orange",
+      "startDate": "2026-09-17",
       "status": "active",
+      "notificationsMuted": false,
       "profileSnapshot": {
-        "id": "starter-kombucha-f1",
-        "name": "Kombucha F1",
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "temperatureMinC": 23,
+        "temperatureMaxC": 29,
         "phZones": [],
-        "expectedDurationDays": 10,
+        "expectedDurationDays": 14,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 5
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "f9cffcb8-273e-4aeb-adcf-466c5ccf6cf4",
+          "date": "2026-09-17",
+          "kind": "note",
+          "text": "644ml F1\n10mg dried oranges\n62ml traube"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-10-01",
+      "checks": [
+        {
+          "id": "6a30f30b-38a4-44d3-a179-59c9a2126e72",
+          "name": "Bubbles",
+          "intervalDays": 5,
+          "nextDueDate": "2026-09-22"
+        }
+      ]
+    },
+    {
+      "id": "6a908d9b-da5c-4b5c-ba32-df0b3000f42a",
+      "name": "Traube Orange Berries",
+      "startDate": "2026-09-17",
+      "status": "active",
+      "notificationsMuted": false,
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "temperatureMinC": 23,
+        "temperatureMaxC": 29,
+        "phZones": [],
+        "expectedDurationDays": 14,
+        "inputs": [],
+        "calculations": [],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 5
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {},
+      "calculationValues": {},
+      "finishDate": "2026-10-01",
+      "checks": [
+        {
+          "id": "61954866-ae84-4379-96f7-39a63cc4c3d2",
+          "name": "Bubbles",
+          "intervalDays": 5,
+          "nextDueDate": "2026-09-22"
+        }
+      ]
+    },
+    {
+      "id": "53eb9f9f-5588-4df8-bb5b-050cae1bb05f",
+      "name": "Kombucha F2",
+      "startDate": "2026-09-17",
+      "status": "active",
+      "notificationsMuted": false,
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "temperatureMinC": 23,
+        "temperatureMaxC": 29,
+        "phZones": [],
+        "expectedDurationDays": 14,
         "inputs": [
           {
-            "name": "water",
+            "name": "tea",
             "unit": "ml"
           }
         ],
         "calculations": [
           {
-            "name": "tea",
+            "name": "fruit",
             "unit": "g",
-            "formula": "water / 200"
+            "formula": "tea * 0.051"
           },
           {
-            "name": "sugar",
-            "unit": "g",
-            "formula": "water / 20"
+            "name": "juice",
+            "unit": "ml",
+            "formula": "tea * 0.065"
           }
         ],
         "checks": [
           {
-            "id": "1e25a145-89b2-4c37-afa3-b4157a1684a8",
-            "name": "Mold",
-            "intervalDays": 2
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 5
           }
         ],
-        "guidance": [
-          "Keep at room temperature and cover with a breathable cloth.",
-          "Taste after 7 days, then bottle when pleasantly tart."
-        ]
+        "guidance": []
       },
-      "timeline": [
-        {
-          "id": "a17b0b1a-e237-4c8e-bb05-50cd8e145aeb",
-          "date": "2026-09-01",
-          "kind": "check",
-          "checkName": "Mold"
-        },
-        {
-          "id": "71f1b7ec-07a9-4b9b-98f8-e10147bbc32d",
-          "date": "2026-09-04",
-          "kind": "check",
-          "checkName": "Mold"
-        }
-      ],
+      "timeline": [],
       "timelineTrash": [],
       "inputValues": {
-        "water": 2730
+        "tea": 556
       },
       "calculationValues": {
-        "tea": {
-          "suggested": 13.65
+        "fruit": {
+          "suggested": 28.355999999999998
         },
-        "sugar": {
-          "suggested": 136.5
+        "juice": {
+          "suggested": 36.14
         }
       },
-      "finishDate": "2026-09-07",
+      "finishDate": "2026-10-01",
       "checks": [
         {
-          "id": "f161f2c0-de73-4364-979b-56368c2770e5",
-          "name": "Mold",
-          "intervalDays": 2,
-          "nextDueDate": "2026-09-06",
-          "lastCompletedDate": "2026-09-04"
+          "id": "87d5817a-9d24-4ca9-b9f0-b1a471db8417",
+          "name": "Bubbles",
+          "intervalDays": 5,
+          "nextDueDate": "2026-09-22"
         }
       ]
-    },
+    }
+  ],
+  "trash": [
     {
       "id": "af9cdd33-7adb-4f58-a122-ca7e701d1a8d",
       "name": "Pear Orange Rosmarin",
       "startDate": "2026-08-28",
-      "status": "active",
+      "status": "ready",
       "profileSnapshot": {
         "id": "a1f42d1d-a006-4d55-a448-184259650a34",
         "name": "Kombucha F2",
@@ -333,20 +380,21 @@
           "nextDueDate": "2026-09-09",
           "lastCompletedDate": "2026-09-04"
         }
-      ]
-    }
-  ],
-  "trash": [
+      ],
+      "notificationsMuted": false,
+      "checksPausedAt": "2026-09-07",
+      "deletedAt": 1789628528468
+    },
     {
-      "id": "9847effa-75b5-4268-b9ae-08831f9f7dee",
-      "name": "Apple Beeren",
-      "startDate": "2026-08-18",
+      "id": "35bfd79e-ff36-4492-afa0-8b4fc9c0aefe",
+      "name": "Pear Orange",
+      "startDate": "2026-08-28",
       "status": "ready",
       "profileSnapshot": {
         "id": "a1f42d1d-a006-4d55-a448-184259650a34",
         "name": "Kombucha F2",
         "phZones": [],
-        "expectedDurationDays": 7,
+        "expectedDurationDays": 10,
         "inputs": [],
         "calculations": [],
         "checks": [
@@ -360,20 +408,17 @@
       },
       "timeline": [
         {
-          "id": "dd993311-6a56-4609-8a26-0af6d3b00326",
-          "date": "2026-08-19",
-          "kind": "ph",
-          "value": 3
+          "id": "e564628b-4b11-4810-8e86-593e4d297e1d",
+          "date": "2026-08-28",
+          "kind": "photo",
+          "name": "camera-1787910585560.jpeg",
+          "mimeType": "image/jpeg",
+          "caption": "",
+          "photoRef": "photos/35bfd79e-ff36-4492-afa0-8b4fc9c0aefe/e564628b-4b11-4810-8e86-593e4d297e1d.jpg"
         },
         {
-          "id": "e9fd5712-b6c4-4aea-96c9-97b7fe7cf005",
-          "date": "2026-08-19",
-          "kind": "temperature",
-          "value": 22
-        },
-        {
-          "id": "20465ab2-a65c-40e6-826f-7370d66dc5b8",
-          "date": "2026-08-24",
+          "id": "4171e7ff-a55c-4f27-aca3-77c46342b6c5",
+          "date": "2026-09-04",
           "kind": "check",
           "checkName": "Bubbles"
         }
@@ -381,18 +426,260 @@
       "timelineTrash": [],
       "inputValues": {},
       "calculationValues": {},
-      "finishDate": "2026-08-25",
+      "finishDate": "2026-09-07",
       "checks": [
         {
-          "id": "9c52e07d-6610-4044-b204-135f9875e3fb",
+          "id": "033f80a8-840a-4e67-93b2-9b1f3f8f2fad",
           "name": "Bubbles",
           "intervalDays": 3,
-          "nextDueDate": "2026-08-27",
-          "lastCompletedDate": "2026-08-24"
+          "nextDueDate": "2026-09-07",
+          "lastCompletedDate": "2026-09-04"
         }
       ],
-      "checksPausedAt": "2026-08-25",
-      "deletedAt": 1788715998027
+      "notificationsMuted": false,
+      "checksPausedAt": "2026-09-07",
+      "deletedAt": 1789628533926
+    },
+    {
+      "id": "9de8c46c-45a6-44b5-b391-f1a3a51823f8",
+      "name": "Kombucha F1",
+      "startDate": "2026-08-28",
+      "status": "ready",
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "phZones": [],
+        "expectedDurationDays": 10,
+        "inputs": [
+          {
+            "name": "water",
+            "unit": "ml"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "tea",
+            "unit": "g",
+            "formula": "water / 200"
+          },
+          {
+            "name": "sugar",
+            "unit": "g",
+            "formula": "water / 20"
+          }
+        ],
+        "checks": [
+          {
+            "id": "1e25a145-89b2-4c37-afa3-b4157a1684a8",
+            "name": "Mold",
+            "intervalDays": 2
+          }
+        ],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [
+        {
+          "id": "a17b0b1a-e237-4c8e-bb05-50cd8e145aeb",
+          "date": "2026-09-01",
+          "kind": "check",
+          "checkName": "Mold"
+        },
+        {
+          "id": "71f1b7ec-07a9-4b9b-98f8-e10147bbc32d",
+          "date": "2026-09-04",
+          "kind": "check",
+          "checkName": "Mold"
+        },
+        {
+          "id": "ab34a929-ad93-4c29-b3b2-c18868654efb",
+          "date": "2026-09-06",
+          "kind": "check",
+          "checkName": "Mold"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {
+        "water": 2730
+      },
+      "calculationValues": {
+        "tea": {
+          "suggested": 13.65
+        },
+        "sugar": {
+          "suggested": 136.5
+        }
+      },
+      "finishDate": "2026-09-07",
+      "checks": [
+        {
+          "id": "f161f2c0-de73-4364-979b-56368c2770e5",
+          "name": "Mold",
+          "intervalDays": 2,
+          "nextDueDate": "2026-09-08",
+          "lastCompletedDate": "2026-09-06"
+        }
+      ],
+      "notificationsMuted": false,
+      "checksPausedAt": "2026-09-07",
+      "deletedAt": 1789660247062
+    },
+    {
+      "id": "0049c9a5-0a95-47cd-af06-315375a94398",
+      "name": "Kombucha F1",
+      "startDate": "2026-09-18",
+      "status": "active",
+      "notificationsMuted": false,
+      "profileSnapshot": {
+        "id": "starter-kombucha-f1",
+        "name": "Kombucha F1",
+        "phZones": [],
+        "expectedDurationDays": 10,
+        "inputs": [
+          {
+            "name": "water",
+            "unit": "ml"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "tea",
+            "unit": "g",
+            "formula": "water / 200"
+          },
+          {
+            "name": "sugar",
+            "unit": "g",
+            "formula": "water / 20"
+          }
+        ],
+        "checks": [
+          {
+            "id": "1e25a145-89b2-4c37-afa3-b4157a1684a8",
+            "name": "Mold",
+            "intervalDays": 4
+          }
+        ],
+        "guidance": [
+          "Keep at room temperature and cover with a breathable cloth.",
+          "Taste after 7 days, then bottle when pleasantly tart."
+        ]
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {
+        "water": 70000
+      },
+      "calculationValues": {
+        "tea": {
+          "suggested": 350
+        },
+        "sugar": {
+          "suggested": 3500
+        }
+      },
+      "finishDate": "2026-09-28",
+      "checks": [
+        {
+          "id": "4879d344-43e7-45cd-aa6e-a5ce1534eb79",
+          "name": "Mold",
+          "intervalDays": 4,
+          "nextDueDate": "2026-09-22"
+        }
+      ],
+      "deletedAt": 1789715821242
+    },
+    {
+      "id": "af9cf859-72be-47f0-a8cd-f780f3491d27",
+      "name": "Red bell pepper on top",
+      "startDate": "2026-08-26",
+      "status": "to-fridge",
+      "profileSnapshot": {
+        "id": "c2fa7c05-ed4e-4caf-a6f7-fd87c49060b4",
+        "name": "Anaerobic fermentation",
+        "phZones": [],
+        "expectedDurationDays": 7,
+        "inputs": [
+          {
+            "name": "totalWeight",
+            "unit": "g"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "salt",
+            "unit": "g",
+            "formula": "totalWeight * 2%"
+          }
+        ],
+        "checks": [
+          {
+            "id": "b2bf2b30-6823-49c4-8d8c-6912287bf3ae",
+            "name": "Mold",
+            "intervalDays": 3
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [
+        {
+          "id": "112f87ed-e3f6-470f-8200-e11e3440b31d",
+          "date": "2026-08-26",
+          "kind": "photo",
+          "name": "camera-1787738210301.jpeg",
+          "mimeType": "image/jpeg",
+          "caption": "",
+          "photoRef": "photos/af9cf859-72be-47f0-a8cd-f780f3491d27/112f87ed-e3f6-470f-8200-e11e3440b31d.jpg"
+        },
+        {
+          "id": "d475d266-f375-461a-9de1-ce6eb01fef53",
+          "date": "2026-08-29",
+          "kind": "check",
+          "checkName": "Mold"
+        },
+        {
+          "id": "0900e942-dec4-4dfb-a8dd-88add81b9903",
+          "date": "2026-09-01",
+          "kind": "check",
+          "checkName": "Mold"
+        },
+        {
+          "id": "edc9ed01-9f3a-4a94-923a-eade606e9e16",
+          "date": "2026-09-04",
+          "kind": "note",
+          "text": "Test"
+        },
+        {
+          "id": "97699049-586e-4b42-8a10-a3314fb4f431",
+          "date": "2026-09-07",
+          "kind": "status",
+          "status": "to-fridge"
+        }
+      ],
+      "timelineTrash": [],
+      "inputValues": {
+        "totalWeight": 1563
+      },
+      "calculationValues": {
+        "salt": {
+          "suggested": 31.26
+        }
+      },
+      "finishDate": "2026-09-02",
+      "checks": [
+        {
+          "id": "f8f29d7d-840c-4047-bb49-cdd2c9596088",
+          "name": "Mold",
+          "intervalDays": 3,
+          "nextDueDate": "2026-09-04",
+          "lastCompletedDate": "2026-09-01"
+        }
+      ],
+      "checksPausedAt": "2026-09-02",
+      "notificationsMuted": false,
+      "deletedAt": 1789715934626
     }
   ]
 }

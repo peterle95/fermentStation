@@ -100,6 +100,8 @@ describe("batch workflow", () => {
 
     expect(screen.getByText("Kitchen kombucha")).toBeTruthy();
     expect(screen.getByText("Active", { selector: ".status" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Status change" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.queryByRole("button", { name: "Measurement" })).toBeNull();
     const notifications = screen.getByRole("button", { name: "Notifications for Kitchen kombucha" });
     expect(notifications.getAttribute("aria-pressed")).toBe("true");
     fireEvent.click(notifications);
@@ -138,7 +140,7 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("Activity date"), {
       target: { value: "2026-08-02" },
     });
-    fireEvent.change(screen.getByLabelText("Note or measurement"), {
+    fireEvent.change(screen.getByLabelText("Activity context"), {
       target: { value: "Tasted tart" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
@@ -146,7 +148,7 @@ describe("batch workflow", () => {
     expect(screen.getByRole("region", { name: /timeline$/i }).querySelector("form")).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Edit note from 2026-08-02" }));
-    fireEvent.change(screen.getByLabelText("Note or measurement"), {
+    fireEvent.change(screen.getByLabelText("Activity context"), {
       target: { value: "Tasted pleasantly tart" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Save activity" }));
@@ -182,7 +184,7 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("Source term row 2"), { target: { value: "water" } });
     fireEvent.change(screen.getByLabelText("Source unit row 2"), { target: { value: "l" } });
     fireEvent.change(screen.getByLabelText("Operator row 2"), { target: { value: "/" } });
-    fireEvent.change(screen.getByLabelText("Operand row 2"), { target: { value: "200" } });
+    fireEvent.change(screen.getByLabelText("Operand row 2"), { target: { value: "17.63" } });
     fireEvent.change(screen.getByLabelText("Operand type row 2"), { target: { value: "number" } });
     fireEvent.change(screen.getByLabelText("Result term row 2"), { target: { value: "tea" } });
     fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
@@ -207,7 +209,9 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("water (l)"), { target: { value: "1" } });
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
     expect(screen.getByText(/25 g suggested/)).toBeTruthy();
-    expect(screen.getByText("tea:").parentElement?.textContent).toContain("5 g suggested");
+    expect(screen.getByText("tea:").parentElement?.textContent).toContain("56.72 g suggested");
+    expect(screen.getByText("salt").closest(".meas")?.textContent).toContain("25g");
+    expect(screen.getByText("tea").closest(".meas")?.textContent).toContain("56.72g");
 
     fireEvent.change(screen.getByLabelText("totalWeight (kg)"), { target: { value: "2.5" } });
     fireEvent.click(screen.getByRole("button", { name: "Update inputs" }));
@@ -319,14 +323,16 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: /Back to today/i }));
     expect(screen.getByRole("heading", { name: /Action queue/i })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Open Kombucha F1 for Taste" }));
+    const completeCheck = screen.getByRole("button", { name: "Complete Taste check" });
+    expect(completeCheck.textContent).toBe("✓");
+    fireEvent.click(completeCheck);
+    expect(screen.getByText("Completed check: Taste")).toBeTruthy();
+    expect(screen.getByText(new RegExp(`Next ${addDaysForTest(today, 2)}`))).toBeTruthy();
+
     fireEvent.change(screen.getByLabelText("Taste interval days"), { target: { value: "3" } });
     const adjustedDateValue = addDaysForTest(today, 3);
     expect(screen.getByText(new RegExp(`Next ${adjustedDateValue}|Overdue ${adjustedDateValue}`))).toBeTruthy();
-    fireEvent.change(screen.getByLabelText("Activity type"), { target: { value: "check" } });
-    fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
-    expect(screen.getByText("Completed check: Taste")).toBeTruthy();
     const expectedNextDate = addDaysForTest(today, 3);
-    expect(screen.getByText(new RegExp(`Next ${expectedNextDate}`))).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
     expect(screen.getByText("Finish date")).toBeTruthy();
@@ -503,20 +509,20 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Start batch" }));
     fireEvent.click(screen.getByRole("button", { name: "Create active batch" }));
     fireEvent.click(screen.getByRole("button", { name: "Note" }));
-    fireEvent.change(screen.getByLabelText("Note or measurement"), {
+    fireEvent.change(screen.getByLabelText("Activity context"), {
       target: { value: "Unsaved cover-screen observation" },
     });
 
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 344 });
     fireEvent(window, new Event("resize"));
     expect(screen.getByRole("button", { name: "Batches" }).getAttribute("aria-current")).toBe("page");
-    expect((screen.getByLabelText("Note or measurement") as HTMLInputElement).value)
+    expect((screen.getByLabelText("Activity context") as HTMLInputElement).value)
       .toBe("Unsaved cover-screen observation");
 
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 884 });
     fireEvent(window, new Event("resize"));
     expect(screen.getByRole("button", { name: "Batches" }).getAttribute("aria-current")).toBe("page");
-    expect((screen.getByLabelText("Note or measurement") as HTMLInputElement).value)
+    expect((screen.getByLabelText("Activity context") as HTMLInputElement).value)
       .toBe("Unsaved cover-screen observation");
     expect(screen.getByText("More")).toBeTruthy();
   });

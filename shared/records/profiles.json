@@ -85,8 +85,24 @@
       "temperatureMaxC": 29,
       "phZones": [],
       "expectedDurationDays": 14,
-      "inputs": [],
-      "calculations": [],
+      "inputs": [
+        {
+          "name": "tea",
+          "unit": "ml"
+        }
+      ],
+      "calculations": [
+        {
+          "name": "fruit",
+          "unit": "g",
+          "formula": "tea * 0.051"
+        },
+        {
+          "name": "juice",
+          "unit": "ml",
+          "formula": "tea * 0.065"
+        }
+      ],
       "checks": [
         {
           "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
