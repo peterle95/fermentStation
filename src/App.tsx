@@ -122,6 +122,7 @@ export function App() {
   const browserHadData = useRef(
     browserShellStore.load() !== null || browserProfileStore.load() !== null || browserBatchStore.load() !== null,
   );
+  const notificationPermissionRequest = useRef(0);
   const [shell, setShell] = useState(
     () => browserShellStore.load() ?? createShellState(),
   );
@@ -189,8 +190,9 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    void reconcileReminders(batchState, shell.checkReminders);
-  }, [batchState, shell.checkReminders]);
+    if (!nativeReady) return;
+    void reconcileReminders(batchState, shell.notificationMode);
+  }, [batchState, nativeReady, shell.notificationMode]);
 
   function saveProfiles(next: typeof profileState) {
     browserHadData.current = true;
@@ -208,14 +210,22 @@ export function App() {
     setEditingProfileId(null);
   }
 
-  function updatePreferences(preferences: ShellPreferences) {
+  function updatePreferences(preferences: ShellPreferences, requestNotificationPermission = false) {
     browserHadData.current = true;
-    if (preferences.checkReminders && !shell.checkReminders && isNativePlatform()) {
+    if (requestNotificationPermission) notificationPermissionRequest.current += 1;
+    const request = notificationPermissionRequest.current;
+    if (requestNotificationPermission && preferences.notificationMode !== "off" && isNativePlatform()) {
       void requestReminderPermission().then((granted) => {
-        const next = { ...shell, ...preferences, checkReminders: granted };
+        if (request !== notificationPermissionRequest.current) return;
+        const modeChanged = stateRef.current.shell.notificationMode !== preferences.notificationMode;
+        const next = {
+          ...stateRef.current.shell,
+          notificationMode: granted ? preferences.notificationMode : "off" as const,
+        };
         browserShellStore.save(next);
         setShell(next);
         persistShared(sharedDataStore.saveShell(next));
+        if (granted && !modeChanged) void reconcileReminders(stateRef.current.batchState, next.notificationMode);
       });
       return;
     }
@@ -453,7 +463,7 @@ interface SettingsViewProps {
   preferences: ShellPreferences;
   profileState: ReturnType<typeof createProfileState>;
   onFormulaTermsChange(formulaTerms: string[]): void;
-  onPreferencesChange(preferences: ShellPreferences): void;
+  onPreferencesChange(preferences: ShellPreferences, requestNotificationPermission?: boolean): void;
   onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
   onRestoreBatch(id: string): void;
   storageStatus: SharedStorageStatus;
@@ -605,10 +615,11 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
           </div>
         </div>
         <div className="setting-row">
-          <div className="setting-body"><b>Check reminders</b><p>A quiet nudge the morning a profile check is due.</p></div>
-          <div className="setting-segment" aria-label="Check reminders">
-            <button aria-pressed={preferences.checkReminders} onClick={() => onPreferencesChange({ ...preferences, checkReminders: true })} type="button">On</button>
-            <button aria-pressed={!preferences.checkReminders} onClick={() => onPreferencesChange({ ...preferences, checkReminders: false })} type="button">Off</button>
+          <div className="setting-body"><b>Notifications</b><p>Choose alerts for due checks, ready batches, both, or neither.</p></div>
+          <div className="setting-segment notification-segment" aria-label="Notifications" role="group">
+            {([["all", "All"], ["checks", "Checks"], ["ready", "Ready"], ["off", "Off"]] as const).map(([mode, label]) => (
+              <button aria-pressed={preferences.notificationMode === mode} key={mode} onClick={() => onPreferencesChange({ ...preferences, notificationMode: mode }, true)} type="button">{label}</button>
+            ))}
           </div>
         </div>
         <div className="setting-row">
@@ -1320,6 +1331,16 @@ function BatchCard({ batch, onChange, onDelete, units }: BatchCardProps) {
             }
             requestAnimationFrame(() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" }));
           }} type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M4 7h3l1.2-2h7.6L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" /><circle cx="12" cy="13" r="3.5" /></svg></button>
+          <button
+            aria-label={`Notifications for ${batch.name}`}
+            aria-pressed={!batch.notificationsMuted}
+            className="batch-head-notifications"
+            onClick={() => onChange({ ...batch, notificationsMuted: !batch.notificationsMuted })}
+            title={batch.notificationsMuted ? "Enable notifications for this batch" : "Mute notifications for this batch"}
+            type="button"
+          >
+            <svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />{batch.notificationsMuted && <path d="M4 4l16 16" />}</svg>
+          </button>
           <button className="primary-action" onClick={() => document.getElementById("batch-activity-form")?.scrollIntoView?.({ behavior: "smooth", block: "center" })} type="button">Record observation</button>
           <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
         </div>

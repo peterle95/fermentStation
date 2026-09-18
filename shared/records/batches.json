@@ -1,62 +1,6 @@
 {
   "batches": [
     {
-      "id": "9847effa-75b5-4268-b9ae-08831f9f7dee",
-      "name": "Apple Beeren",
-      "startDate": "2026-08-18",
-      "status": "ready",
-      "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
-        "phZones": [],
-        "expectedDurationDays": 7,
-        "inputs": [],
-        "calculations": [],
-        "checks": [
-          {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
-            "intervalDays": 3
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [
-        {
-          "id": "dd993311-6a56-4609-8a26-0af6d3b00326",
-          "date": "2026-08-19",
-          "kind": "ph",
-          "value": 3
-        },
-        {
-          "id": "e9fd5712-b6c4-4aea-96c9-97b7fe7cf005",
-          "date": "2026-08-19",
-          "kind": "temperature",
-          "value": 22
-        },
-        {
-          "id": "20465ab2-a65c-40e6-826f-7370d66dc5b8",
-          "date": "2026-08-24",
-          "kind": "check",
-          "checkName": "Bubbles"
-        }
-      ],
-      "timelineTrash": [],
-      "inputValues": {},
-      "calculationValues": {},
-      "finishDate": "2026-08-25",
-      "checks": [
-        {
-          "id": "9c52e07d-6610-4044-b204-135f9875e3fb",
-          "name": "Bubbles",
-          "intervalDays": 3,
-          "nextDueDate": "2026-08-27",
-          "lastCompletedDate": "2026-08-24"
-        }
-      ],
-      "checksPausedAt": "2026-08-25"
-    },
-    {
       "id": "af9cf859-72be-47f0-a8cd-f780f3491d27",
       "name": "Red bell pepper on top",
       "startDate": "2026-08-26",
@@ -394,8 +338,8 @@
   ],
   "trash": [
     {
-      "id": "b79c0c3a-f01b-495a-8181-bf923d24b4b6",
-      "name": "Apple Orange",
+      "id": "9847effa-75b5-4268-b9ae-08831f9f7dee",
+      "name": "Apple Beeren",
       "startDate": "2026-08-18",
       "status": "ready",
       "profileSnapshot": {
@@ -416,7 +360,19 @@
       },
       "timeline": [
         {
-          "id": "0d96dd20-8cec-4eb5-8c92-0bed9ccd8d1c",
+          "id": "dd993311-6a56-4609-8a26-0af6d3b00326",
+          "date": "2026-08-19",
+          "kind": "ph",
+          "value": 3
+        },
+        {
+          "id": "e9fd5712-b6c4-4aea-96c9-97b7fe7cf005",
+          "date": "2026-08-19",
+          "kind": "temperature",
+          "value": 22
+        },
+        {
+          "id": "20465ab2-a65c-40e6-826f-7370d66dc5b8",
           "date": "2026-08-24",
           "kind": "check",
           "checkName": "Bubbles"
@@ -428,7 +384,7 @@
       "finishDate": "2026-08-25",
       "checks": [
         {
-          "id": "73b05e5b-66f8-4a92-9b45-4f55a14c46d3",
+          "id": "9c52e07d-6610-4044-b204-135f9875e3fb",
           "name": "Bubbles",
           "intervalDays": 3,
           "nextDueDate": "2026-08-27",
@@ -436,7 +392,7 @@
         }
       ],
       "checksPausedAt": "2026-08-25",
-      "deletedAt": 1788001919778
+      "deletedAt": 1788715998027
     }
   ]
 }
