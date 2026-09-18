@@ -5,9 +5,11 @@
     "water",
     "salt",
     "sugar",
-    "tea"
+    "tea",
+    "fruit",
+    "juice"
   ],
   "units": "metric",
-  "checkReminders": true,
+  "notificationMode": "checks",
   "suggestions": true
 }
