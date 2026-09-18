@@ -2880,6 +2880,24 @@ button:disabled {
   width: 1rem;
 }
 
+.next-action-complete {
+  align-items: center;
+  align-self: center;
+  background: var(--surface);
+  border: 1px solid var(--attention);
+  border-radius: 0.55rem;
+  color: var(--attention);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 2.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  justify-content: center;
+  margin-left: auto;
+  padding: 0;
+  width: 2.75rem;
+}
+
 .next-action-kick {
   color: var(--amber);
   font-family: "IBM Plex Mono", Consolas, monospace;
