@@ -255,6 +255,69 @@
           "nextDueDate": "2026-09-22"
         }
       ]
+    },
+    {
+      "id": "53eb9f9f-5588-4df8-bb5b-050cae1bb05f",
+      "name": "Kombucha F2",
+      "startDate": "2026-09-17",
+      "status": "active",
+      "notificationsMuted": false,
+      "profileSnapshot": {
+        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
+        "name": "Kombucha F2",
+        "temperatureMinC": 23,
+        "temperatureMaxC": 29,
+        "phZones": [],
+        "expectedDurationDays": 14,
+        "inputs": [
+          {
+            "name": "tea",
+            "unit": "ml"
+          }
+        ],
+        "calculations": [
+          {
+            "name": "fruit",
+            "unit": "g",
+            "formula": "tea * 0.051"
+          },
+          {
+            "name": "juice",
+            "unit": "ml",
+            "formula": "tea * 0.065"
+          }
+        ],
+        "checks": [
+          {
+            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
+            "name": "Bubbles",
+            "intervalDays": 5
+          }
+        ],
+        "guidance": []
+      },
+      "timeline": [],
+      "timelineTrash": [],
+      "inputValues": {
+        "tea": 556
+      },
+      "calculationValues": {
+        "fruit": {
+          "suggested": 28.355999999999998
+        },
+        "juice": {
+          "suggested": 36.14
+        }
+      },
+      "finishDate": "2026-10-01",
+      "checks": [
+        {
+          "id": "87d5817a-9d24-4ca9-b9f0-b1a471db8417",
+          "name": "Bubbles",
+          "intervalDays": 5,
+          "nextDueDate": "2026-09-22"
+        }
+      ]
     }
   ],
   "trash": [
@@ -617,70 +680,6 @@
       "checksPausedAt": "2026-09-02",
       "notificationsMuted": false,
       "deletedAt": 1789715934626
-    },
-    {
-      "id": "53eb9f9f-5588-4df8-bb5b-050cae1bb05f",
-      "name": "Kombucha F2",
-      "startDate": "2026-09-17",
-      "status": "active",
-      "notificationsMuted": false,
-      "profileSnapshot": {
-        "id": "a1f42d1d-a006-4d55-a448-184259650a34",
-        "name": "Kombucha F2",
-        "temperatureMinC": 23,
-        "temperatureMaxC": 29,
-        "phZones": [],
-        "expectedDurationDays": 14,
-        "inputs": [
-          {
-            "name": "tea",
-            "unit": "ml"
-          }
-        ],
-        "calculations": [
-          {
-            "name": "fruit",
-            "unit": "g",
-            "formula": "tea * 0.051"
-          },
-          {
-            "name": "juice",
-            "unit": "ml",
-            "formula": "tea * 0.065"
-          }
-        ],
-        "checks": [
-          {
-            "id": "4eb10522-24a9-4969-8098-d5b0f43629b6",
-            "name": "Bubbles",
-            "intervalDays": 5
-          }
-        ],
-        "guidance": []
-      },
-      "timeline": [],
-      "timelineTrash": [],
-      "inputValues": {
-        "tea": 556
-      },
-      "calculationValues": {
-        "fruit": {
-          "suggested": 28.355999999999998
-        },
-        "juice": {
-          "suggested": 36.14
-        }
-      },
-      "finishDate": "2026-10-01",
-      "checks": [
-        {
-          "id": "87d5817a-9d24-4ca9-b9f0-b1a471db8417",
-          "name": "Bubbles",
-          "intervalDays": 5,
-          "nextDueDate": "2026-09-22"
-        }
-      ],
-      "deletedAt": 1789722293485
     }
   ]
 }
