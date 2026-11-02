@@ -8,3 +8,8 @@ src-tauri/gen/
 src-tauri/icons/*
 !src-tauri/icons/icon.ico
 /shared/
+/outputs/syncthing-recovery-*/
+.stfolder/
+.stversions/
+*.sync-conflict-*
+migration-backup/
