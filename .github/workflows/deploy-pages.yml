@@ -31,7 +31,7 @@ jobs:
         run: npm ci
 
       - name: Build for Pages
-        run: npm run build -- --base=/fermentstation/
+        run: npm run build -- --base=/fermentStation/
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
