@@ -1,6 +1,12 @@
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
-import { addTimelineEntry, createBatch, createBatchState } from "../domain/batches";
+import {
+  addTimelineEntry,
+  createBatch,
+  createBatchState,
+  deleteBatch,
+  deleteTimelineEntry,
+} from "../domain/batches";
 import { createProfileState } from "../domain/profiles";
 import { createArchive, importArchive, resolveArchiveCollisions } from "./archive";
 
@@ -76,6 +82,44 @@ describe("FermentStation archive boundary", () => {
 
     await expect(importArchive(archive, emptyProfiles, emptyBatches))
       .rejects.toThrow("invalid batch check");
+  });
+
+  it("round-trips trashed batches and trashed photo entries", async () => {
+    const source = statesWithPhoto();
+    const trashedPhotoBatch = deleteTimelineEntry(
+      addTimelineEntry(
+        source.batchState.batches[0],
+        {
+          id: "photo-trashed", date: "2026-08-09", kind: "photo", name: "trashed.jpg",
+          mimeType: "image/jpeg", dataUrl: "data:image/jpeg;base64,dHJhc2hlZA==", caption: "Trashed",
+        },
+      ),
+      "photo-1",
+      Date.now(),
+    );
+    const withTrash = deleteBatch(
+      { batches: [trashedPhotoBatch], trash: [] },
+      "batch-1",
+      Date.now(),
+    );
+    const archive = await createArchive(source.profileState, withTrash);
+    const files = unzipSync(archive);
+    const manifest = JSON.parse(strFromU8(files["manifest.json"]));
+
+    expect(manifest.photos).toHaveLength(2);
+    const imported = await importArchive(archive, emptyProfiles, emptyBatches);
+    expect(imported.collisions).toEqual([]);
+    expect(imported.batchState.trash).toHaveLength(1);
+    expect(imported.batchState.trash[0].timelineTrash.map(({ id }) => id)).toContain("photo-1");
+    expect(imported.batchState.trash[0].timeline.map(({ id }) => id)).toContain("photo-trashed");
+    const trashedPhoto = imported.batchState.trash[0].timeline.find(({ id }) => id === "photo-trashed");
+    expect(trashedPhoto).toMatchObject({
+      kind: "photo", dataUrl: "data:image/jpeg;base64,dHJhc2hlZA==",
+    });
+    const restoredPhoto = imported.batchState.trash[0].timelineTrash.find(({ id }) => id === "photo-1");
+    expect(restoredPhoto).toMatchObject({
+      kind: "photo", dataUrl: "data:image/jpeg;base64,b3JpZ2luYWw=",
+    });
   });
 
   it("preserves both sides of identifier collisions without changing local state", async () => {
