@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { App as CapacitorApp } from "@capacitor/app";
+import { isTauri } from "@tauri-apps/api/core";
 import type { PluginListenerHandle } from "@capacitor/core";
 import {
   addTimelineEntry,
@@ -59,6 +60,7 @@ import {
 import { browserShellStore } from "./platform/shell-store";
 import { browserProfileStore } from "./platform/profile-store";
 import { browserBatchStore } from "./platform/batch-store";
+import { loadWebState, saveWebState } from "./platform/web-store";
 import {
   createArchive,
   importArchive,
@@ -120,6 +122,13 @@ function StatusIcon({ status }: { status: BatchStatus | "attention" }) {
 }
 
 export function App() {
+  const webStorage = useRef<"loading" | "indexeddb" | "fallback" | "failed">(
+    !isNativePlatform() && !isTauri() && typeof indexedDB !== "undefined" ? "loading" : "fallback",
+  );
+  const [webReady, setWebReady] = useState(webStorage.current !== "loading");
+  const [webStorageError, setWebStorageError] = useState(!isNativePlatform() && !isTauri() && typeof indexedDB === "undefined");
+  const [webRetry, setWebRetry] = useState(0);
+  const [webLoadRetry, setWebLoadRetry] = useState(0);
   const [showIosGuide, setShowIosGuide] = useState(() => {
     let dismissed = false;
     try { dismissed = localStorage.getItem(iosGuideDismissedKey) === "true"; } catch { /* Storage may be unavailable. */ }
@@ -154,6 +163,40 @@ export function App() {
   const [storageStatus, setStorageStatus] = useState(() => sharedDataStore.getStatus());
   const stateRef = useRef<SharedSnapshot>({ shell, profileState, batchState });
   stateRef.current = { shell, profileState, batchState };
+
+  useEffect(() => {
+    if (webStorage.current !== "loading") return;
+    let active = true;
+    void loadWebState().then((stored) => {
+      if (!active) return;
+      if (stored?.shell) setShell(stored.shell);
+      if (stored?.profileState) setProfileState(stored.profileState);
+      if (stored?.batchState) setBatchState(updateBatchDates(discardExpiredBatches(stored.batchState, Date.now())));
+      if (stored) browserHadData.current = true;
+      webStorage.current = "indexeddb";
+    }).catch(() => {
+      if (!active) return;
+      webStorage.current = "failed";
+      setWebStorageError(true);
+    }).finally(() => { if (active) setWebReady(true); });
+    return () => { active = false; };
+  }, [webLoadRetry]);
+
+  function retryWebLoad() {
+    webStorage.current = "loading";
+    setWebReady(false);
+    setWebStorageError(false);
+    setWebLoadRetry((value) => value + 1);
+  }
+
+  useEffect(() => {
+    if (!webReady || webStorage.current !== "indexeddb") return;
+    let active = true;
+    void saveWebState({ shell, profileState, batchState }).then(() => {
+      if (active) setWebStorageError(false);
+    }).catch(() => { if (active) setWebStorageError(true); });
+    return () => { active = false; };
+  }, [webReady, shell, profileState, batchState, webRetry]);
 
   useEffect(() => {
     let active = true;
@@ -210,14 +253,14 @@ export function App() {
 
   function saveProfiles(next: typeof profileState) {
     browserHadData.current = true;
-    browserProfileStore.save(next);
+    if (webStorage.current === "fallback") browserProfileStore.save(next);
     setProfileState(next);
     persistShared(sharedDataStore.saveProfiles(next));
   }
 
   function navigate(destination: Destination) {
     const next = selectDestination(shell, destination);
-    browserShellStore.save(next);
+    if (webStorage.current === "fallback") browserShellStore.save(next);
     setShell(next);
     persistShared(sharedDataStore.saveShell(next));
     setOpenBatchId(null);
@@ -236,7 +279,7 @@ export function App() {
           ...stateRef.current.shell,
           notificationMode: granted ? preferences.notificationMode : "off" as const,
         };
-        browserShellStore.save(next);
+        if (webStorage.current === "fallback") browserShellStore.save(next);
         setShell(next);
         persistShared(sharedDataStore.saveShell(next));
         if (granted && !modeChanged) void reconcileReminders(stateRef.current.batchState, next.notificationMode);
@@ -244,7 +287,7 @@ export function App() {
       return;
     }
     const next = { ...shell, ...preferences };
-    browserShellStore.save(next);
+    if (webStorage.current === "fallback") browserShellStore.save(next);
     setShell(next);
     persistShared(sharedDataStore.saveShell(next));
   }
@@ -252,7 +295,7 @@ export function App() {
   function saveBatches(next: BatchState) {
     browserHadData.current = true;
     const current = updateBatchDates(discardExpiredBatches(next, Date.now()));
-    browserBatchStore.save(current);
+    if (webStorage.current === "fallback") browserBatchStore.save(current);
     setBatchState(current);
     persistShared(sharedDataStore.saveBatches(current));
   }
@@ -263,9 +306,11 @@ export function App() {
 
   function applySharedSnapshot(snapshot: SharedSnapshot) {
     const batches = updateBatchDates(discardExpiredBatches(snapshot.batchState, Date.now()));
-    browserShellStore.save(snapshot.shell);
-    browserProfileStore.save(snapshot.profileState);
-    browserBatchStore.save(batches);
+    if (webStorage.current === "fallback") {
+      browserShellStore.save(snapshot.shell);
+      browserProfileStore.save(snapshot.profileState);
+      browserBatchStore.save(batches);
+    }
     setShell(snapshot.shell);
     setProfileState(snapshot.profileState);
     setBatchState(batches);
@@ -292,6 +337,8 @@ export function App() {
     const exists = profileState.profiles.some(({ id }) => id === profile.id);
     saveProfiles(exists ? updateProfile(profileState, profile) : addProfile(profileState, profile));
   }
+
+  if (!webReady) return <p role="status">Loading saved data…</p>;
 
   return (
     <div className={`app-shell${editingProfileId && shell.destination === "profiles" ? " profile-editor-shell" : ""}`}>
@@ -320,6 +367,12 @@ export function App() {
       </aside>
 
       <div className="content-shell">
+        {webStorageError && <section role="alert" className="storage-warning">
+          <strong>Changes may not be saved on this device.</strong>{" "}
+          Export a backup from Settings before closing the app.
+          {webStorage.current === "indexeddb" && <button type="button" onClick={() => setWebRetry((value) => value + 1)}>Retry saving</button>}
+          {webStorage.current === "failed" && <button type="button" onClick={retryWebLoad}>Retry loading</button>}
+        </section>}
         {showIosGuide && (
           <section className="ios-install-guide" aria-labelledby="ios-install-title">
             <button type="button" className="ios-install-dismiss" aria-label="Dismiss install guide" onClick={() => {
@@ -442,7 +495,7 @@ export function App() {
                onFormulaTermsChange={(formulaTerms) => {
                  browserHadData.current = true;
                 const next = { ...shell, formulaTerms };
-                 browserShellStore.save(next);
+                 if (webStorage.current === "fallback") browserShellStore.save(next);
                  setShell(next);
                  persistShared(sharedDataStore.saveShell(next));
                }}
@@ -710,6 +763,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
       <section className="settings-card settings-exchange">
         <h3>Data exchange</h3>
         <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
+        <p>Archives contain profiles, batches (including trash), and photos, up to 200 MB zipped (250 MB expanded). They do not include app settings such as destination, units, notifications, suggestions, or formula terms.</p>
         <button className="primary-action" onClick={downloadArchive} type="button">Export ZIP archive</button>
         {isNativeTransferAvailable() && <button onClick={pickArchive} type="button">Choose ZIP from device</button>}
         <label>Import ZIP archive <input accept=".zip,application/zip" onChange={uploadArchive} type="file" /></label>

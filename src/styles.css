@@ -3681,3 +3681,9 @@ button:disabled {
   .quick-log-actions { align-items: stretch; flex-direction: column-reverse; }
   .quick-log-actions > div, .quick-log-actions .primary-action { width: 100%; }
 }
+.storage-warning {
+  padding: 1rem;
+  border: 2px solid #a43d25;
+  background: #fff1e9;
+  color: #5b1b10;
+}
