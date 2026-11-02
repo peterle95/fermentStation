@@ -66,6 +66,7 @@ import {
   type ArchiveImport,
 } from "./platform/archive";
 import { loadNativeState, isNativePlatform, saveNativeState } from "./platform/native-store";
+import { iosGuideDismissedKey, shouldShowIosInstallGuide } from "./platform/ios-install-guide";
 import { isNativeTransferAvailable, pickNativeArchive, shareNativeFile } from "./platform/native-transfer";
 import { requestReminderPermission, reconcileReminders } from "./platform/reminders";
 import { captureNativePhoto, isNativeCameraAvailable, listenForRestoredCameraPhoto, type CapturedPhoto } from "./platform/camera";
@@ -119,6 +120,19 @@ function StatusIcon({ status }: { status: BatchStatus | "attention" }) {
 }
 
 export function App() {
+  const [showIosGuide, setShowIosGuide] = useState(() => {
+    let dismissed = false;
+    try { dismissed = localStorage.getItem(iosGuideDismissedKey) === "true"; } catch { /* Storage may be unavailable. */ }
+    return shouldShowIosInstallGuide({
+      native: isNativePlatform(),
+      vendor: navigator.vendor,
+      userAgent: navigator.userAgent,
+      maxTouchPoints: navigator.maxTouchPoints,
+      standalone: (navigator as Navigator & { standalone?: boolean }).standalone === true,
+      displayModeStandalone: window.matchMedia?.("(display-mode: standalone)").matches ?? false,
+      dismissed,
+    });
+  });
   const browserHadData = useRef(
     browserShellStore.load() !== null || browserProfileStore.load() !== null || browserBatchStore.load() !== null,
   );
@@ -306,6 +320,23 @@ export function App() {
       </aside>
 
       <div className="content-shell">
+        {showIosGuide && (
+          <section className="ios-install-guide" aria-labelledby="ios-install-title">
+            <button type="button" className="ios-install-dismiss" aria-label="Dismiss install guide" onClick={() => {
+              setShowIosGuide(false);
+              try { localStorage.setItem(iosGuideDismissedKey, "true"); } catch { /* Dismiss for this session. */ }
+            }}>✕</button>
+            <p className="eyebrow">Install on iPhone</p>
+            <h2 id="ios-install-title">Add FermentStation to your Home Screen</h2>
+            <p>Keep your fermentation journal handy and open it like an app.</p>
+            <ol>
+              <li>Tap the <strong>Share</strong> button (square with the arrow) at the bottom of Safari.</li>
+              <li>Choose <strong>Add to Home Screen</strong>.</li>
+              <li>Tap <strong>Add</strong> — FermentStation opens full screen, like a real app.</li>
+            </ol>
+            <p>Install first: data entered in a Safari tab will not transfer to the Home Screen app because their storage is separate.</p>
+          </section>
+        )}
         <main className="main-content">
           {shell.destination === "today" ? (
             <section className="today-screen">

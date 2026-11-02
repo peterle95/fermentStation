@@ -1,9 +1,29 @@
 // @vitest-environment jsdom
 
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { createProfileState } from "./domain/profiles";
+import { iosGuideDismissedKey } from "./platform/ios-install-guide";
+
+it("dismisses the iOS install guide persistently", () => {
+  localStorage.clear();
+  vi.spyOn(navigator, "vendor", "get").mockReturnValue("Apple Computer, Inc.");
+  vi.spyOn(navigator, "userAgent", "get").mockReturnValue("iPhone");
+  try {
+    const view = render(<App />);
+    expect(screen.getByRole("heading", { name: "Add FermentStation to your Home Screen" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss install guide" }));
+    expect(screen.queryByRole("button", { name: "Dismiss install guide" })).toBeNull();
+    expect(localStorage.getItem(iosGuideDismissedKey)).toBe("true");
+    view.unmount();
+    render(<App />);
+    expect(screen.queryByRole("button", { name: "Dismiss install guide" })).toBeNull();
+  } finally {
+    cleanup();
+    vi.restoreAllMocks();
+  }
+});
 
 function localDateForTest() {
   const now = new Date();

@@ -588,6 +588,31 @@ button {
   min-width: 0;
 }
 
+.ios-install-guide {
+  background: var(--panel);
+  border-left: 3px solid var(--amber);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.08);
+  margin: 1rem;
+  padding: 1rem 3.5rem 1rem 1rem;
+  position: relative;
+}
+
+.ios-install-guide .eyebrow { font-family: "IBM Plex Mono", Consolas, monospace; }
+.ios-install-guide h2 { font-family: "Source Serif 4", Georgia, serif; font-size: 1.35rem; }
+.ios-install-guide p { margin: 0.5rem 0; }
+.ios-install-guide ol { padding-left: 1.5rem; }
+.ios-install-dismiss {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  width: 2.75rem;
+}
+
 .eyebrow {
   color: var(--muted);
   font-family: Consolas, monospace;
