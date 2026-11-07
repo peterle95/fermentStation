@@ -1,0 +1,2361 @@
+{
+ "page": "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\new_design\\desktop\\index.html",
+ "url": "http://127.0.0.1:5200/index.html",
+ "at": "2026-11-07T15:59:50.734Z",
+ "out": "C:\\Users\\molze\\GitHub\\fermentstation\\prototypes\\new_design\\desktop\\.taste-skill\\consistency",
+ "widths": [
+  {
+   "width": 1440,
+   "height": 900,
+   "screens": 1,
+   "held": 0,
+   "errors": [
+    "effect-kind: could not read http://127.0.0.1:5200/assets/motion/motion.js (HTTP 404)"
+   ],
+   "findings": [
+    {
+     "check": "hero-fill",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "Good things are growing.",
+     "msg": "the next section shows on the first screen: it starts at 187px on a 900px screen (the hero ends at 170px)",
+     "stop": 0,
+     "crop": "1440-01-hero-fill.jpg",
+     "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row > label.search-box",
+     "text": "Search batches",
+     "msg": "its last line sits 0px above the lower edge of div.search-row, where the ground changes to section.summary.hero",
+     "stop": 0,
+     "crop": "1440-02-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(1)",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "its first line sits 0px under the top edge of div#batch-list, where the ground changes",
+     "stop": 0,
+     "crop": "1440-03-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(3)",
+     "text": "Sunday sourdough 23 °C 🌾 500 g Day 2 / 3 Finish",
+     "msg": "its button sits 0px above the lower edge of div#batch-list, where the ground changes to div.care-block",
+     "stop": 0,
+     "crop": "1440-04-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "nav",
+     "sev": "FAIL",
+     "sel": "div.app-frame > div.work-area > header.topbar",
+     "text": "",
+     "stop": 0,
+     "msg": "the nav has no bar, and its pieces sit past the content's edges (1175-1386px against 254-1051px)",
+     "crop": "1440-05-nav.jpg",
+     "fix": "make the nav one bar from the content's left edge to its right edge, with every link and action inside it"
+    },
+    {
+     "check": "overlap-text",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "lies over the text \"4\" (strong#batch-total)",
+     "stop": 0,
+     "crop": "1440-06-overlap-text.jpg",
+     "fix": "move the box off the text (or the text off the box)"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row",
+     "text": "",
+     "msg": "the hero has no button (the nav's does not count)",
+     "stop": 0,
+     "crop": "1440-07-cta.jpg",
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "copy-headline",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.section-head > h1",
+     "text": "Your batches 4",
+     "msg": "\"Your batches 4\" does not name what is sold (household fermentation tracker, household, fermentation, tracker, from flags)",
+     "stop": 0,
+     "crop": "1440-08-copy-headline.jpg",
+     "fix": "put the category noun in the h1 (and who it is for, or where), in 2 to 8 words"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "aside.sidebar > div.sidebar-bottom > div.side-note > h2",
+     "text": "A little care. A living kitchen.",
+     "msg": "an h2 at 20px, as large as the h1 (20px) or larger (and 2 more like it: \"Good things are growing.\", \"A little care today\")",
+     "stop": 0,
+     "crop": "1440-09-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "div.detail-card > div.detail-heading > div > h3",
+     "text": "Garden kimchi",
+     "msg": "an h3 at 15px, as large as the smallest h2 (15px) or larger (and 2 more like it: \"Profile inputs\", \"Batch timeline\")",
+     "stop": 0,
+     "crop": "1440-10-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.summary-label > h2",
+     "text": "Good things are growing.",
+     "msg": "h2 headings in 3 sizes, 15px (\"Batch details\") to 23px (x1.53)",
+     "stop": 0,
+     "crop": "1440-11-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "strong#batch-total",
+     "text": "4",
+     "msg": "the figure \"4\" is set at 45px, larger than the h1 (20px) (and 1 more like it: \"5 / 7 days\")",
+     "fix": "set figures below the h1: a stat reads as data, not as the headline",
+     "stop": 0,
+     "crop": "1440-12-heading-scale.jpg"
+    },
+    {
+     "check": "text-contrast",
+     "sev": "FAIL",
+     "sel": "div.sidebar-bottom > button.account > span.account-name > small",
+     "text": "Home fermenter",
+     "stop": 0,
+     "msg": "a caption, label or muted line in #67715f on #e9eedf reads 4.33:1 (needs 4.5:1)",
+     "crop": "1440-13-text-contrast.jpg",
+     "fix": "body text in the ink at 7:1 or more; grey (4.5:1 or more) only for captions and labels"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row / div#batches-view > section.summary.hero",
+     "text": "",
+     "stop": 0,
+     "msg": "31px between these sections, +94% against the median 16px of gaps at a change of ground",
+     "crop": "1440-14-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero / div#batches-view > div.section-head",
+     "text": "",
+     "stop": 0,
+     "msg": "32px between these sections, +100% against the median 16px of gaps at a change of ground",
+     "crop": "1440-15-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "motion-layer",
+     "sev": "FAIL",
+     "sel": "html[data-motion]",
+     "text": "",
+     "msg": "the page marks <html data-motion> but motion.css is not loaded: buttons, links, cards and photos answer nothing on hover",
+     "stop": null,
+     "fix": "link assets/motion/motion.css after cards.css and keep data-motion on <html> (both, or neither)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its first line sits 14px under the top edge of section.summary.hero, where the ground changes",
+     "stop": 0,
+     "crop": "1440-16-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its last line sits 14px above the lower edge of section.summary.hero, where the ground changes to div.section-head",
+     "stop": 0,
+     "crop": "1440-17-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.section-head > h1",
+     "text": "Your batches 4",
+     "msg": "div.section-head and div.filters run together: 13px between their content, on one ground",
+     "stop": 0,
+     "crop": "1440-18-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "card-layout",
+     "sev": "WARN",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "4 cards with 1 placement of their UI (vary them: rise, corner, a low stack, right)",
+     "fix": "vary the cards of a group: at least three placements, and the ground in its own light on each",
+     "stop": 0,
+     "crop": "1440-19-card-layout.jpg"
+    },
+    {
+     "check": "copy-headings",
+     "sev": "WARN",
+     "sel": "aside.sidebar > div.sidebar-bottom > div.side-note > h2",
+     "text": "A little care. A living kitchen.",
+     "msg": "\"A little care. A living kitchen.\" names no product, part, place or section (the one brand line a page may have)",
+     "stop": 0,
+     "crop": "1440-20-copy-headings.jpg",
+     "fix": "name the thing in every heading: the product, a part, the place or a section noun"
+    },
+    {
+     "check": "copy-buttons",
+     "sev": "WARN",
+     "sel": "div.app-frame > aside.sidebar > nav.side-nav > button:nth-of-type(1)",
+     "text": "My batches 4",
+     "msg": "\"My batches 4\" does not start with a verb (book, buy, try, start, get, see...)",
+     "stop": 0,
+     "crop": "1440-21-copy-buttons.jpg",
+     "fix": "label buttons with a verb and what the visitor gets (\"Book a room\", \"Start free trial\")"
+    },
+    {
+     "check": "copy-actions",
+     "sev": "WARN",
+     "sel": "(the page)",
+     "text": "",
+     "msg": "the main action \"Start a batch\" does not read word for word the same in the closing section",
+     "stop": null,
+     "fix": "few actions, one wording: at most 2 in the hero, the main action word for word in nav, hero and close"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "WARN",
+     "sel": "aside#batch-detail > section.detail-timeline > div.section-head > h3",
+     "text": "Batch timeline",
+     "msg": "h3 headings in 2 sizes, 15px (\"Profile inputs\") to 17.6px (x1.17)",
+     "stop": 0,
+     "crop": "1440-22-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "WARN",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(1) > div.batch-copy > h3",
+     "text": "Garden kimchi",
+     "msg": "the h3s (14px) are only 1.25x smaller than the h2s (17.5px): one level a clear step (1.3x or more) below the other",
+     "stop": 0,
+     "crop": "1440-23-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "WARN",
+     "sel": "strong#batch-total",
+     "text": "4",
+     "msg": "figures in 2 sizes, 29, 45px (\"5 / 7 days\" at 29px, \"4\" at 45px)",
+     "fix": "set the page's figures (stats, measures, prices) in one or two sizes",
+     "stop": 0,
+     "crop": "1440-24-heading-scale.jpg"
+    },
+    {
+     "check": "off-grid",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "the section's heading starts at 308px, 54px off the page margin (254px), and no other section starts there",
+     "stop": 0,
+     "crop": "1440-25-off-grid.jpg",
+     "fix": "move it onto the page margin, or the column edge its section uses"
+    },
+    {
+     "check": "off-grid",
+     "sev": "WARN",
+     "sel": "aside#batch-detail > div.detail-top > h2",
+     "text": "Batch details",
+     "msg": "the section's heading starts at 1205px, 951px off the page margin (254px), and no other section starts there",
+     "stop": 0,
+     "crop": "1440-26-off-grid.jpg",
+     "fix": "move it onto the page margin, or the column edge its section uses"
+    },
+    {
+     "check": "centre-axis",
+     "sev": "WARN",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "centred text 8px right of the middle of its column (364px against 356px)",
+     "stop": 0,
+     "crop": "1440-27-centre-axis.jpg",
+     "fix": "centre the block on its container (margin-inline: auto), or set it on the left grid"
+    },
+    {
+     "check": "photo-credit",
+     "sev": "WARN",
+     "sel": "(the page text)",
+     "text": "",
+     "stop": null,
+     "msg": "1 library source (wikimedia): the page credits wikimedia; confirm each shows the client's own product, place or people",
+     "fix": "confirm the library photograph shows the client's own product, place or people; otherwise replace it"
+    },
+    {
+     "check": "button-contrast",
+     "sev": "WARN",
+     "sel": "div.app-frame > aside.sidebar > div.sidebar-bottom > button.account",
+     "text": "My kitchen Home fermenter",
+     "stop": 0,
+     "msg": "the button \"My kitchen Home fermenter\" (#c7dcc0) stands only 1.23:1 off the ground around it: it reads as part of the ground, or as switched off",
+     "crop": "1440-28-button-contrast.jpg",
+     "fix": "give the button a fill that stands at least 1.5:1 off what is around it, or an outline in the ink"
+    },
+    {
+     "check": "moment-none",
+     "sev": "WARN",
+     "sel": "(the page)",
+     "text": "",
+     "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+     "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+     "stop": null
+    },
+    {
+     "check": "share-meta",
+     "sev": "WARN",
+     "sel": "head",
+     "text": "",
+     "msg": "the head lacks og:title, og:description, og:image, twitter:card, an icon: a shared link shows no picture or title of its own",
+     "stop": null,
+     "fix": "copy the head block of starter.html: og tags, twitter:card, the icon and theme-color (references/system.md, Head)"
+    },
+    {
+     "check": "hero-screen",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the hero ends at 876px on a 900px screen, 24px above the fold: it ends at the fold, 1px either way (SR-1)",
+     "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+     "rule": "SR-1 T1",
+     "crop": "1440-rhythm-01-hero-screen.jpg"
+    },
+    {
+     "check": "hero-screen",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail",
+     "text": "Batch detailsGarden kimchiKimchi batch 2",
+     "msg": "776px of the next section shows on the first screen (from 124px on a 900px screen): nothing below the hero shows at load (SR-1)",
+     "fix": "end the hero at the fold so nothing of the next section shows at load (hero height: 100svh)",
+     "rule": "SR-1 T2",
+     "crop": "1440-rhythm-02-hero-screen.jpg"
+    },
+    {
+     "check": "hero-screen",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the hero's content is 128px taller than the hero (scrollHeight 880, clientHeight 752): it spills out or scrolls inside it (SR-1)",
+     "fix": "fit the hero's content inside the hero's box: shorten the text or the picture, never let it spill",
+     "rule": "SR-1 T3",
+     "crop": "1440-rhythm-03-hero-screen.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail",
+     "text": "Batch detailsGarden kimchiKimchi batch 2",
+     "msg": "the section is 752px tall (0.8 screens), 148px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+     "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+     "rule": "SR-2 T-height",
+     "crop": "1440-rhythm-04-section-height.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the section starts at 124px, 124px below the screen grid (0 x 900px): sections start on whole screens (SR-2)",
+     "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+     "rule": "SR-2 T-grid",
+     "crop": "1440-rhythm-05-section-height.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail",
+     "text": "Batch detailsGarden kimchiKimchi batch 2",
+     "msg": "the section starts at 124px, 124px below the screen grid (0 x 900px): sections start on whole screens (SR-2)",
+     "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+     "rule": "SR-2 T-grid",
+     "crop": "1440-rhythm-06-section-height.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail",
+     "text": "Batch detailsGarden kimchiKimchi batch 2",
+     "msg": "the section's content does not fit it: its content is 140px taller than the section (scrollHeight 892, clientHeight 752); its lowest content ends 746px below its top, past 680px (the section less 72px of bottom padding) (SR-2)",
+     "fix": "fit the content above the section's bottom padding (--padb), or make it two screens (.g2) in two groups",
+     "rule": "SR-2 T-fit",
+     "crop": "1440-rhythm-07-section-height.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > div.detail-top > h2",
+     "text": "Batch details",
+     "msg": "the screen at scroll 0px (stride 0) shows 752px of section 2 and the heading of section 2 whole and the content of 2 sections, over 24px each beside section 1: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+     "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+     "rule": "SR-4 T-views",
+     "crop": "1440-rhythm-08-one-section.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "a <div> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+     "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+     "rule": "SR-4 T-dom",
+     "crop": "1440-rhythm-09-one-section.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail",
+     "text": "Batch detailsGarden kimchiKimchi batch 2",
+     "msg": "a <aside> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+     "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+     "rule": "SR-4 T-dom",
+     "crop": "1440-rhythm-10-one-section.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "4batches in your kitchen1 ready to enjoy",
+     "msg": "a band: a box 93% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (and 1 more like it: \"Garden kimchiKimchi batc\") (SR-4)",
+     "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+     "rule": "SR-4 T-dom",
+     "crop": "1440-rhythm-11-one-section.jpg"
+    },
+    {
+     "check": "one-heading",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.summary-label > h2",
+     "text": "Good thingsare growing.",
+     "msg": "the hero holds an h2 (2): its heading is the h1, and an h2 opens the next section (SR-5)",
+     "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+     "rule": "SR-5 T1",
+     "crop": "1440-rhythm-12-one-heading.jpg"
+    },
+    {
+     "check": "one-heading",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > div.detail-top > h2",
+     "text": "Batch details",
+     "msg": "headings of two sections show whole on one screen at 1 of 1 scroll positions (100%; at scroll 0px), here with \"4\": at most 3% on a desktop (SR-5)",
+     "fix": "make the sections one screen tall so their headings sit a screen apart and two never share one",
+     "rule": "SR-5 T2",
+     "crop": "1440-rhythm-13-one-heading.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.app-frame > div.work-area > header.topbar",
+     "text": "Saturday, 7 NovemberYour fermentation st",
+     "msg": "the nav's content runs 254px from the left and 54px from the right (read from its outermost blocks: no .wrap): 254 and 54px are not one margin; the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (SR-6)",
+     "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+     "rule": "SR-6 T1-margins",
+     "crop": "1440-rhythm-14-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the content of section 1 runs 254px from the left and 389px from the right (read from its outermost blocks: no .wrap): 254 and 389px are not one margin; the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (SR-6)",
+     "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+     "rule": "SR-6 T1-margins",
+     "crop": "1440-rhythm-15-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "a.skip-link",
+     "text": "Skip to batches",
+     "msg": "a <a> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.app-frame",
+     "text": "FermentStation My batches4 Checks Profil",
+     "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (and 2 more like it: \"Search batches 4batches \", \"Batch detailsGarden kimc\") (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure",
+     "crop": "1440-rhythm-16-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > div.detail-top > button.icon-button.btn:nth-of-type(2)",
+     "text": "View batch dates",
+     "msg": "\"View batch dates\" runs 1359-1397px, outside the container lines of section 2 at 254-1051px: full width is for background layers and grounds only (SR-6)",
+     "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+     "rule": "SR-6 T2-containment",
+     "crop": "1440-rhythm-17-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > section.detail-section > div.section-head > button.quiet-button",
+     "text": "See all",
+     "msg": "\"See all\" runs 1366-1397px, outside the container lines of section 2 at 254-1051px: full width is for background layers and grounds only (and 43 more like it: \"Start a batch\", \"Add observation\", \"/ 7 days\") (SR-6)",
+     "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+     "rule": "SR-6 T2-containment",
+     "crop": "1440-rhythm-18-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > div.detail-top > h2",
+     "text": "Batch details",
+     "msg": "1 text block starts on a left line at x 1205, 951px from the container's left: text starts on the container's left, or on one split line (x 596, 665, 733) (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "1440-rhythm-19-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > div.detail-top > h2",
+     "text": "Batch details",
+     "msg": "the h2 starts 951px right of the container's left: every h1 and h2 starts on it, 2px either way (and 5 more like it: x 1098, \"Good thingsare growing.\", x 327) (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "1440-rhythm-20-container-edges.jpg"
+    },
+    {
+     "check": "row-lines",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > div.detail-top > button.icon-button.btn:nth-of-type(2)",
+     "text": "View batch dates",
+     "msg": "\"View batch dates\" ends at 1397px, past the container's right line at 1051px (SR-7)",
+     "fix": "end it at the container's right line",
+     "rule": "SR-7 T-right",
+     "crop": "1440-rhythm-21-row-lines.jpg"
+    },
+    {
+     "check": "row-lines",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > section.detail-section > div.section-head > button.quiet-button",
+     "text": "See all",
+     "msg": "\"See all\" ends at 1397px, past the container's right line at 1051px (SR-7)",
+     "fix": "end it at the container's right line",
+     "rule": "SR-7 T-right",
+     "crop": "1440-rhythm-22-row-lines.jpg"
+    },
+    {
+     "check": "row-lines",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > div.detail-card > div.detail-heading > button.icon-button.btn",
+     "text": "Add observation",
+     "msg": "\"Add observation\" ends at 1384px, past the container's right line at 1051px (and 23 more like it: \"/ 7 days\", \"A glass jar of red cabba\", \"Keep the vegetables belo\") (SR-7)",
+     "fix": "end it at the container's right line",
+     "rule": "SR-7 T-right",
+     "crop": "1440-rhythm-23-row-lines.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail",
+     "text": "Batch detailsGarden kimchiKimchi batch 2",
+     "msg": "with every answer and tab open, the section's content does not fit it: its content is 140px taller than the section (scrollHeight 892, clientHeight 752); its lowest content ends 746px below its top, past 680px (the section less 72px of bottom padding) (SR-2)",
+     "fix": "show answers and panels open and size the section for its open content, or make it two screens (.g2)",
+     "rule": "SR-2 T-fit-expanded",
+     "crop": "1440-rhythm-24-section-height.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "with every answer and tab open, the section starts at 124px, 124px below the screen grid (0 x 900px): sections start on whole screens (SR-2)",
+     "fix": "size each section for its content with every answer and tab open, so the tops below stay on whole screens",
+     "rule": "SR-2 T-grid-expanded",
+     "crop": "1440-rhythm-25-section-height.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail",
+     "text": "Batch detailsGarden kimchiKimchi batch 2",
+     "msg": "with every answer and tab open, the section starts at 124px, 124px below the screen grid (0 x 900px): sections start on whole screens (SR-2)",
+     "fix": "size each section for its content with every answer and tab open, so the tops below stay on whole screens",
+     "rule": "SR-2 T-grid-expanded",
+     "crop": "1440-rhythm-26-section-height.jpg"
+    }
+   ],
+   "glAsked": 0
+  },
+  {
+   "width": 1024,
+   "height": 768,
+   "screens": 1,
+   "held": 0,
+   "errors": [],
+   "findings": [
+    {
+     "check": "hero-fill",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "Good thingsare growing.",
+     "msg": "the next section shows on the first screen: it starts at 187px on a 768px screen (the hero ends at 170px)",
+     "stop": 0,
+     "crop": "1024-01-hero-fill.jpg",
+     "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row > label.search-box",
+     "text": "Search batches",
+     "msg": "its last line sits 0px above the lower edge of div.search-row, where the ground changes to section.summary.hero",
+     "stop": 0,
+     "crop": "1024-02-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.section-head > h1",
+     "text": "Your batches 4",
+     "msg": "its last line sits 10px above the lower edge of div.section-head, where the ground changes to div.filters",
+     "stop": 0,
+     "crop": "1024-03-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its first line sits 0px under the top edge of div.filters, where the ground changes",
+     "stop": 0,
+     "crop": "1024-04-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its button sits 0px above the lower edge of div.filters, where the ground changes to div#batch-list",
+     "stop": 0,
+     "crop": "1024-05-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(1)",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "its first line sits 0px under the top edge of div#batch-list, where the ground changes",
+     "stop": 0,
+     "crop": "1024-06-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "overlap-text",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "lies over the text \"4\" (strong#batch-total)",
+     "stop": 0,
+     "crop": "1024-07-overlap-text.jpg",
+     "fix": "move the box off the text (or the text off the box)"
+    },
+    {
+     "check": "cut-text",
+     "sev": "FAIL",
+     "sel": "aside#batch-detail > div.guidance > p",
+     "text": "Keep the vegetables below the brine. This profil",
+     "msg": "cut 12px at the bottom by the overflow of div.app-frame",
+     "stop": 0,
+     "crop": "1024-08-cut-text.jpg",
+     "fix": "give the text room: no overflow clipping a line, no line past its box"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row",
+     "text": "",
+     "msg": "the hero has no button (the nav's does not count)",
+     "stop": 0,
+     "crop": "1024-09-cta.jpg",
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "aside.sidebar > div.sidebar-bottom > div.side-note > h2",
+     "text": "A little care. A living kitchen.",
+     "msg": "an h2 at 20px, as large as the h1 (20px) or larger (and 1 more like it: \"A little care today\")",
+     "stop": 0,
+     "crop": "1024-10-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "div.detail-card > div.detail-heading > div > h3",
+     "text": "Garden kimchi",
+     "msg": "an h3 at 15px, as large as the smallest h2 (15px) or larger (and 2 more like it: \"Profile inputs\", \"Batch timeline\")",
+     "stop": 0,
+     "crop": "1024-11-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "aside.sidebar > div.sidebar-bottom > div.side-note > h2",
+     "text": "A little care. A living kitchen.",
+     "msg": "h2 headings in 2 sizes, 15px (\"Batch details\") to 20px (x1.33)",
+     "stop": 0,
+     "crop": "1024-12-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "strong#batch-total",
+     "text": "4",
+     "msg": "the figure \"4\" is set at 45px, larger than the h1 (20px) (and 1 more like it: \"5 / 7 days\")",
+     "fix": "set figures below the h1: a stat reads as data, not as the headline",
+     "stop": 0,
+     "crop": "1024-13-heading-scale.jpg"
+    },
+    {
+     "check": "text-contrast",
+     "sev": "FAIL",
+     "sel": "div.sidebar-bottom > button.account > span.account-name > small",
+     "text": "Home fermenter",
+     "stop": 0,
+     "msg": "a caption, label or muted line in #67715f on #e9eedf reads 4.33:1 (needs 4.5:1)",
+     "crop": "1024-14-text-contrast.jpg",
+     "fix": "body text in the ink at 7:1 or more; grey (4.5:1 or more) only for captions and labels"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its first line sits 14px under the top edge of section.summary.hero, where the ground changes",
+     "stop": 0,
+     "crop": "1024-15-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its last line sits 14px above the lower edge of section.summary.hero, where the ground changes to div.section-head",
+     "stop": 0,
+     "crop": "1024-16-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "card-layout",
+     "sev": "WARN",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "4 cards with 1 placement of their UI (vary them: rise, corner, a low stack, right)",
+     "fix": "vary the cards of a group: at least three placements, and the ground in its own light on each",
+     "stop": 0,
+     "crop": "1024-17-card-layout.jpg"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "WARN",
+     "sel": "aside#batch-detail > section.detail-timeline > div.section-head > h3",
+     "text": "Batch timeline",
+     "msg": "h3 headings in 2 sizes, 15px (\"Profile inputs\") to 17.6px (x1.17)",
+     "stop": null,
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "WARN",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(1) > div.batch-copy > h3",
+     "text": "Garden kimchi",
+     "msg": "the h3s (14px) are only 1.25x smaller than the h2s (17.5px): one level a clear step (1.3x or more) below the other",
+     "stop": 0,
+     "crop": "1024-18-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "WARN",
+     "sel": "strong#batch-total",
+     "text": "4",
+     "msg": "figures in 2 sizes, 29, 45px (\"5 / 7 days\" at 29px, \"4\" at 45px)",
+     "fix": "set the page's figures (stats, measures, prices) in one or two sizes",
+     "stop": 0,
+     "crop": "1024-19-heading-scale.jpg"
+    },
+    {
+     "check": "centre-axis",
+     "sev": "WARN",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "centred text 8px right of the middle of its column (324px against 316px)",
+     "stop": 0,
+     "crop": "1024-20-centre-axis.jpg",
+     "fix": "centre the block on its container (margin-inline: auto), or set it on the left grid"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "main#main > div.dashboard > div.search-row / div#batches-view > section.summary.hero",
+     "text": "",
+     "stop": 0,
+     "msg": "31px between these sections, +32% against the median 24px of gaps at a change of ground",
+     "crop": "1024-21-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero / div#batches-view > div.section-head",
+     "text": "",
+     "stop": 0,
+     "msg": "32px between these sections, +36% against the median 24px of gaps at a change of ground",
+     "crop": "1024-22-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.section-head / div#batches-view > div.filters",
+     "text": "",
+     "stop": 0,
+     "msg": "13px between these sections, -45% against the median 24px",
+     "crop": "1024-23-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.filters / div#batch-list",
+     "text": "",
+     "stop": 0,
+     "msg": "16px between these sections, -32% against the median 24px",
+     "crop": "1024-24-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "one-screen",
+     "sev": "WARN",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi",
+     "msg": "1 section is shorter than the screen, so the next one's heading or picture shows with it: \"Garden kimchi\" is 567px of the 768px under the nav, and \"A little care today\" shows below it",
+     "fix": "give each section the screen (min-height: 100svh less the nav, its content centred), or join two short ones into one",
+     "stop": 0,
+     "crop": "1024-25-one-screen.jpg"
+    }
+   ],
+   "glAsked": 0
+  },
+  {
+   "width": 820,
+   "height": 1180,
+   "screens": 1,
+   "held": 0,
+   "errors": [],
+   "findings": [
+    {
+     "check": "hero-fill",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "Good things are growing.",
+     "msg": "the next section shows on the first screen: it starts at 168px on a 1180px screen (the hero ends at 151px)",
+     "stop": 0,
+     "crop": "820-01-hero-fill.jpg",
+     "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row > label.search-box",
+     "text": "Search batches",
+     "msg": "its last line sits 0px above the lower edge of div.search-row, where the ground changes to section.summary.hero",
+     "stop": 0,
+     "crop": "820-02-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.section-head > h1",
+     "text": "Your batches 4",
+     "msg": "its last line sits 10px above the lower edge of div.section-head, where the ground changes to div.filters",
+     "stop": 0,
+     "crop": "820-03-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its first line sits 0px under the top edge of div.filters, where the ground changes",
+     "stop": 0,
+     "crop": "820-04-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its button sits 0px above the lower edge of div.filters, where the ground changes to div#batch-list",
+     "stop": 0,
+     "crop": "820-05-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(1)",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "its first line sits 0px under the top edge of div#batch-list, where the ground changes",
+     "stop": 0,
+     "crop": "820-06-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(3)",
+     "text": "Sunday sourdough 23 °C 🌾 500 g Day 2 / 3 Finish",
+     "msg": "its button sits 0px above the lower edge of div#batch-list, where the ground changes to div.care-block",
+     "stop": 0,
+     "crop": "820-07-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#dashboard-checks > div.check-row:nth-of-type(1)",
+     "text": "Check the brine Garden kimchi · Today",
+     "msg": "its last line sits 0px above the lower edge of div.care-block, where the ground changes to div.tip-panel",
+     "stop": 0,
+     "crop": "820-08-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "overlap-text",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "lies over the text \"4\" (strong#batch-total)",
+     "stop": 0,
+     "crop": "820-09-overlap-text.jpg",
+     "fix": "move the box off the text (or the text off the box)"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row",
+     "text": "",
+     "msg": "the hero has no button (the nav's does not count)",
+     "stop": 0,
+     "crop": "820-10-cta.jpg",
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.tip-panel",
+     "text": "Keep an eye on the temperature",
+     "msg": "the last section before the footer ends with no button",
+     "stop": 0,
+     "crop": "820-11-cta.jpg",
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.summary-label > h2",
+     "text": "Good things are growing.",
+     "msg": "an h2 at 23px, as large as the h1 (20px) or larger (and 1 more like it: \"A little care today\")",
+     "stop": 0,
+     "crop": "820-12-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "strong#batch-total",
+     "text": "4",
+     "msg": "the figure \"4\" is set at 45px, larger than the h1 (20px)",
+     "fix": "set figures below the h1: a stat reads as data, not as the headline",
+     "stop": 0,
+     "crop": "820-13-heading-scale.jpg"
+    },
+    {
+     "check": "off-grid",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > details.photo-credits > summary",
+     "text": "Photographs via Wikimedia Commons",
+     "stop": 0,
+     "msg": "left edge at 120.5px, 10.5px off the page margin at 110px (11 elements, like div.tip-panel)",
+     "crop": "820-14-off-grid.jpg",
+     "fix": "move it onto the page margin, or the column edge its section uses"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its first line sits 14px under the top edge of section.summary.hero, where the ground changes",
+     "stop": 0,
+     "crop": "820-15-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its last line sits 14px above the lower edge of section.summary.hero, where the ground changes to div.section-head",
+     "stop": 0,
+     "crop": "820-16-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "its first line sits 16px under the top edge of div.tip-panel, where the ground changes",
+     "stop": 0,
+     "crop": "820-17-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "card-layout",
+     "sev": "WARN",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "4 cards with 1 placement of their UI (vary them: rise, corner, a low stack, right)",
+     "fix": "vary the cards of a group: at least three placements, and the ground in its own light on each",
+     "stop": 0,
+     "crop": "820-18-card-layout.jpg"
+    },
+    {
+     "check": "off-grid",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "the section's heading starts at 164px, 54px off the page margin (110px), and no other section starts there",
+     "stop": 0,
+     "crop": "820-19-off-grid.jpg",
+     "fix": "move it onto the page margin, or the column edge its section uses"
+    },
+    {
+     "check": "centre-axis",
+     "sev": "WARN",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "centred text 8px right of the middle of its column (220px against 212px)",
+     "stop": 0,
+     "crop": "820-20-centre-axis.jpg",
+     "fix": "centre the block on its container (margin-inline: auto), or set it on the left grid"
+    },
+    {
+     "check": "hero-screen",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the hero ends at 1168px on a 1180px screen, 12px above the fold: it ends at the fold, 1px either way (SR-1)",
+     "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+     "rule": "SR-1 T1",
+     "crop": "820-rhythm-01-hero-screen.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the section starts at 105px, 105px below the screen grid (0 x 1180px): sections start on whole screens (SR-2)",
+     "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+     "rule": "SR-2 T-grid",
+     "crop": "820-rhythm-02-section-height.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "a <div> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+     "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+     "rule": "SR-4 T-dom",
+     "crop": "820-rhythm-03-one-section.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "4batches in your kitchen1 ready to enjoy",
+     "msg": "a band: a box 94% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (SR-4)",
+     "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+     "rule": "SR-4 T-dom",
+     "crop": "820-rhythm-04-one-section.jpg"
+    },
+    {
+     "check": "one-heading",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.summary-label > h2",
+     "text": "Good thingsare growing.",
+     "msg": "the hero holds an h2 (2): its heading is the h1, and an h2 opens the next section (SR-5)",
+     "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+     "rule": "SR-5 T1",
+     "crop": "820-rhythm-05-one-heading.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.app-frame > div.work-area > header.topbar",
+     "text": "Saturday, 7 NovemberYour fermentation st",
+     "msg": "the nav's content runs 110px from the left and 34px from the right (read from its outermost blocks: no .wrap): 110 and 34px are not one margin (one container, equal margins, 2px either way) (SR-6)",
+     "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+     "rule": "SR-6 T1-margins",
+     "crop": "820-rhythm-06-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the content of section 1 runs 110px from the left and 34px from the right (read from its outermost blocks: no .wrap): 110 and 34px are not one margin (one container, equal margins, 2px either way) (SR-6)",
+     "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+     "rule": "SR-6 T1-margins",
+     "crop": "820-rhythm-07-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "a.skip-link",
+     "text": "Skip to batches",
+     "msg": "a <a> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.app-frame",
+     "text": "FermentStation My batches4 Checks Profil",
+     "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure",
+     "crop": "820-rhythm-08-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the section needs exactly one in-flow child .wrap (it has 3 in-flow children, 0 .wrap) (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure",
+     "crop": "820-rhythm-09-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.summary-label > h2",
+     "text": "Good thingsare growing.",
+     "msg": "the h2 starts 201px right of the container's left: every h1 and h2 starts on it, 2px either way (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "820-rhythm-10-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "1 text block starts on a left line at x 183, 73px from the container's left: text starts on the container's left, or on one split line (x 402, 460, 518) (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "820-rhythm-11-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "2 text blocks start on a left line at x 164, 54px from the container's left: text starts on the container's left, or on one split line (x 402, 460, 518) (also \"A temperature reading helps you \") (and 2 more like it: x 152, x 125) (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "820-rhythm-12-container-edges.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "with every answer and tab open, the section starts at 105px, 105px below the screen grid (0 x 1180px): sections start on whole screens (SR-2)",
+     "fix": "size each section for its content with every answer and tab open, so the tops below stay on whole screens",
+     "rule": "SR-2 T-grid-expanded",
+     "crop": "820-rhythm-13-section-height.jpg"
+    }
+   ],
+   "glAsked": 0
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "screens": 1,
+   "held": 0,
+   "errors": [],
+   "findings": [
+    {
+     "check": "hero-fill",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "Good things are growing.",
+     "msg": "the next section shows on the first screen: it starts at 168px on a 1024px screen (the hero ends at 151px)",
+     "stop": 0,
+     "crop": "768-01-hero-fill.jpg",
+     "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row > label.search-box",
+     "text": "Search batches",
+     "msg": "its last line sits 0px above the lower edge of div.search-row, where the ground changes to section.summary.hero",
+     "stop": 0,
+     "crop": "768-02-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.section-head > h1",
+     "text": "Your batches 4",
+     "msg": "its last line sits 10px above the lower edge of div.section-head, where the ground changes to div.filters",
+     "stop": 0,
+     "crop": "768-03-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its first line sits 0px under the top edge of div.filters, where the ground changes",
+     "stop": 0,
+     "crop": "768-04-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its button sits 0px above the lower edge of div.filters, where the ground changes to div#batch-list",
+     "stop": 0,
+     "crop": "768-05-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(1)",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "its first line sits 0px under the top edge of div#batch-list, where the ground changes",
+     "stop": 0,
+     "crop": "768-06-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(3)",
+     "text": "Sunday sourdough 23 °C 🌾 500 g Day 2 / 3 Finish",
+     "msg": "its button sits 0px above the lower edge of div#batch-list, where the ground changes to div.care-block",
+     "stop": 0,
+     "crop": "768-07-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#dashboard-checks > div.check-row:nth-of-type(1)",
+     "text": "Check the brine Garden kimchi · Today",
+     "msg": "its last line sits 0px above the lower edge of div.care-block, where the ground changes to div.tip-panel",
+     "stop": 0,
+     "crop": "768-08-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "overlap-text",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "lies over the text \"4\" (strong#batch-total)",
+     "stop": 0,
+     "crop": "768-09-overlap-text.jpg",
+     "fix": "move the box off the text (or the text off the box)"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row",
+     "text": "",
+     "msg": "the hero has no button (the nav's does not count)",
+     "stop": 0,
+     "crop": "768-10-cta.jpg",
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.tip-panel",
+     "text": "Keep an eye on the temperature",
+     "msg": "the last section before the footer ends with no button",
+     "stop": 0,
+     "crop": "768-11-cta.jpg",
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.summary-label > h2",
+     "text": "Good things are growing.",
+     "msg": "an h2 at 23px, as large as the h1 (20px) or larger (and 1 more like it: \"A little care today\")",
+     "stop": 0,
+     "crop": "768-12-heading-scale.jpg",
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "strong#batch-total",
+     "text": "4",
+     "msg": "the figure \"4\" is set at 45px, larger than the h1 (20px)",
+     "fix": "set figures below the h1: a stat reads as data, not as the headline",
+     "stop": 0,
+     "crop": "768-13-heading-scale.jpg"
+    },
+    {
+     "check": "off-grid",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > details.photo-credits > summary",
+     "text": "Photographs via Wikimedia Commons",
+     "stop": 0,
+     "msg": "left edge at 120.5px, 10.5px off the page margin at 110px (11 elements, like div.tip-panel)",
+     "crop": "768-14-off-grid.jpg",
+     "fix": "move it onto the page margin, or the column edge its section uses"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its first line sits 14px under the top edge of section.summary.hero, where the ground changes",
+     "stop": 0,
+     "crop": "768-15-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its last line sits 14px above the lower edge of section.summary.hero, where the ground changes to div.section-head",
+     "stop": 0,
+     "crop": "768-16-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "its first line sits 16px under the top edge of div.tip-panel, where the ground changes",
+     "stop": 0,
+     "crop": "768-17-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "card-layout",
+     "sev": "WARN",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "4 cards with 1 placement of their UI (vary them: rise, corner, a low stack, right)",
+     "fix": "vary the cards of a group: at least three placements, and the ground in its own light on each",
+     "stop": 0,
+     "crop": "768-18-card-layout.jpg"
+    },
+    {
+     "check": "off-grid",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "the section's heading starts at 164px, 54px off the page margin (110px), and no other section starts there",
+     "stop": 0,
+     "crop": "768-19-off-grid.jpg",
+     "fix": "move it onto the page margin, or the column edge its section uses"
+    },
+    {
+     "check": "centre-axis",
+     "sev": "WARN",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "centred text 8px right of the middle of its column (220px against 212px)",
+     "stop": 0,
+     "crop": "768-20-centre-axis.jpg",
+     "fix": "centre the block on its container (margin-inline: auto), or set it on the left grid"
+    },
+    {
+     "check": "hero-screen",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the hero ends at 1012px on a 1024px screen, 12px above the fold: it ends at the fold, 1px either way (SR-1)",
+     "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+     "rule": "SR-1 T1",
+     "crop": "768-rhythm-01-hero-screen.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the section starts at 105px, 105px below the screen grid (0 x 1024px): sections start on whole screens (SR-2)",
+     "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+     "rule": "SR-2 T-grid",
+     "crop": "768-rhythm-02-section-height.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "a <div> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+     "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+     "rule": "SR-4 T-dom",
+     "crop": "768-rhythm-03-one-section.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "4batches in your kitchen1 ready to enjoy",
+     "msg": "a band: a box 93% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (SR-4)",
+     "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+     "rule": "SR-4 T-dom",
+     "crop": "768-rhythm-04-one-section.jpg"
+    },
+    {
+     "check": "one-heading",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.summary-label > h2",
+     "text": "Good thingsare growing.",
+     "msg": "the hero holds an h2 (2): its heading is the h1, and an h2 opens the next section (SR-5)",
+     "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+     "rule": "SR-5 T1",
+     "crop": "768-rhythm-05-one-heading.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.app-frame > div.work-area > header.topbar",
+     "text": "Saturday, 7 NovemberYour fermentation st",
+     "msg": "the nav's content runs 110px from the left and 34px from the right (read from its outermost blocks: no .wrap): 110 and 34px are not one margin (one container, equal margins, 2px either way) (SR-6)",
+     "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+     "rule": "SR-6 T1-margins",
+     "crop": "768-rhythm-06-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the content of section 1 runs 110px from the left and 34px from the right (read from its outermost blocks: no .wrap): 110 and 34px are not one margin (one container, equal margins, 2px either way) (SR-6)",
+     "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+     "rule": "SR-6 T1-margins",
+     "crop": "768-rhythm-07-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "a.skip-link",
+     "text": "Skip to batches",
+     "msg": "a <a> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.app-frame",
+     "text": "FermentStation My batches4 Checks Profil",
+     "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure",
+     "crop": "768-rhythm-08-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the section needs exactly one in-flow child .wrap (it has 3 in-flow children, 0 .wrap) (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure",
+     "crop": "768-rhythm-09-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.summary-label > h2",
+     "text": "Good thingsare growing.",
+     "msg": "the h2 starts 201px right of the container's left: every h1 and h2 starts on it, 2px either way (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "768-rhythm-10-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "1 text block starts on a left line at x 183, 73px from the container's left: text starts on the container's left, or on one split line (x 380, 434, 488) (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "768-rhythm-11-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "2 text blocks start on a left line at x 164, 54px from the container's left: text starts on the container's left, or on one split line (x 380, 434, 488) (also \"A temperature reading helps you \") (and 2 more like it: x 152, x 125) (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "768-rhythm-12-container-edges.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "with every answer and tab open, the section starts at 105px, 105px below the screen grid (0 x 1024px): sections start on whole screens (SR-2)",
+     "fix": "size each section for its content with every answer and tab open, so the tops below stay on whole screens",
+     "rule": "SR-2 T-grid-expanded",
+     "crop": "768-rhythm-13-section-height.jpg"
+    }
+   ],
+   "glAsked": 0
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "screens": 1,
+   "held": 0,
+   "errors": [],
+   "findings": [
+    {
+     "check": "hero-fill",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "Good thingsare growing.",
+     "msg": "the next section shows on the first screen: it starts at 221px on a 844px screen (the hero ends at 204px)",
+     "stop": 0,
+     "crop": "390-01-hero-fill.jpg",
+     "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row > label.search-box",
+     "text": "Search batches",
+     "msg": "its last line sits 0px above the lower edge of div.search-row, where the ground changes to section.summary.hero",
+     "stop": 0,
+     "crop": "390-02-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.section-head > h1",
+     "text": "Your batches 4",
+     "msg": "its last line sits 10px above the lower edge of div.section-head, where the ground changes to div.filters",
+     "stop": 0,
+     "crop": "390-03-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its first line sits 0px under the top edge of div.filters, where the ground changes",
+     "stop": 0,
+     "crop": "390-04-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its button sits 0px above the lower edge of div.filters, where the ground changes to div#batch-list",
+     "stop": 0,
+     "crop": "390-05-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batch-list > button.batch-card.card:nth-of-type(1)",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "its first line sits 0px under the top edge of div#batch-list, where the ground changes",
+     "stop": 0,
+     "crop": "390-06-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "overlap-text",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "lies over the text \"4\" (strong#batch-total)",
+     "stop": 0,
+     "crop": "390-07-overlap-text.jpg",
+     "fix": "move the box off the text (or the text off the box)"
+    },
+    {
+     "check": "no-visual",
+     "sev": "FAIL",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi",
+     "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+     "stop": 0,
+     "crop": "390-08-no-visual.jpg",
+     "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row",
+     "text": "",
+     "msg": "the hero has no button (the nav's does not count)",
+     "stop": 0,
+     "crop": "390-09-cta.jpg",
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.tip-panel",
+     "text": "Keep an eye on the temperature",
+     "msg": "the last section before the footer ends with no button",
+     "stop": null,
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "strong#batch-total",
+     "text": "4",
+     "msg": "the figure \"4\" is set at 45px, larger than the h1 (20px)",
+     "fix": "set figures below the h1: a stat reads as data, not as the headline",
+     "stop": 0,
+     "crop": "390-10-heading-scale.jpg"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#summary-stats > div.stat-row:nth-of-type(1) > div.stat-label > span.food-icon",
+     "text": "🌱",
+     "msg": "its first line sits 13px under the top edge of section.summary.hero, where the ground changes",
+     "stop": 0,
+     "crop": "390-11-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "its last line sits 12px above the lower edge of section.summary.hero, where the ground changes to div.section-head",
+     "stop": 0,
+     "crop": "390-12-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "tap-size",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "a 68x42px tap target (and 3 more like it on this screen): under the 44px a phone needs",
+     "stop": 0,
+     "crop": "390-13-tap-size.jpg",
+     "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box"
+    },
+    {
+     "check": "card-layout",
+     "sev": "WARN",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "4 cards with 1 placement of their UI (vary them: rise, corner, a low stack, right)",
+     "fix": "vary the cards of a group: at least three placements, and the ground in its own light on each",
+     "stop": 0,
+     "crop": "390-14-card-layout.jpg"
+    },
+    {
+     "check": "off-grid",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "the section's heading starts at 130px, 49px off the page margin (81px), and no other section starts there",
+     "stop": null,
+     "fix": "move it onto the page margin, or the column edge its section uses"
+    },
+    {
+     "check": "centre-axis",
+     "sev": "WARN",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "centred text 8px right of the middle of its column (164px against 156px)",
+     "stop": 0,
+     "crop": "390-15-centre-axis.jpg",
+     "fix": "centre the block on its container (margin-inline: auto), or set it on the left grid"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "main#main > div.dashboard > div.search-row / div#batches-view > section.summary.hero",
+     "text": "",
+     "stop": 0,
+     "msg": "30px between these sections, +30% against the median 23px of gaps at a change of ground",
+     "crop": "390-16-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero / div#batches-view > div.section-head",
+     "text": "",
+     "stop": 0,
+     "msg": "30px between these sections, +30% against the median 23px of gaps at a change of ground",
+     "crop": "390-17-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.section-head / div#batches-view > div.filters",
+     "text": "",
+     "stop": 0,
+     "msg": "13px between these sections, -43% against the median 23px",
+     "crop": "390-18-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.filters / div#batch-list",
+     "text": "",
+     "stop": 0,
+     "msg": "16px between these sections, -30% against the median 23px",
+     "crop": "390-19-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "hero-screen",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the hero ends at 832px on a 844px screen, 12px above the fold: it ends at the fold, 1px either way (SR-1)",
+     "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+     "rule": "SR-1 T1",
+     "crop": "390-rhythm-01-hero-screen.jpg"
+    },
+    {
+     "check": "hero-screen",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the hero's content is 564px taller than the hero (scrollHeight 1238, clientHeight 674): it spills out or scrolls inside it (SR-1)",
+     "fix": "fit the hero's content inside the hero's box: shorten the text or the picture, never let it spill",
+     "rule": "SR-1 T3",
+     "crop": "390-rhythm-02-hero-screen.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the section starts at 158px, 158px below the screen grid (0 x 844px): sections start on whole screens (SR-2)",
+     "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+     "rule": "SR-2 T-grid",
+     "crop": "390-rhythm-05-section-height.jpg"
+    },
+    {
+     "check": "one-section",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "a <div> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+     "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+     "rule": "SR-4 T-dom",
+     "crop": "390-rhythm-06-one-section.jpg"
+    },
+    {
+     "check": "one-heading",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.care-block > div.section-head.checks-title > h2",
+     "text": "A little care today",
+     "msg": "the hero holds an h2 (1): its heading is the h1, and an h2 opens the next section (SR-5)",
+     "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+     "rule": "SR-5 T1"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.app-frame > div.work-area > header.topbar",
+     "text": "Saturday, 7 NovemberYour fermentation st",
+     "msg": "the nav's content runs 81px from the left and 12px from the right (read from its outermost blocks: no .wrap): 81 and 12px are not one margin; the margin is 16-24px at 390px (one container, equal margins, 2px either way) (SR-6)",
+     "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+     "rule": "SR-6 T1-margins",
+     "crop": "390-rhythm-07-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "the content of section 1 runs 81px from the left and 26px from the right (read from its outermost blocks: no .wrap): 81 and 26px are not one margin; the margin is 16-24px at 390px (one container, equal margins, 2px either way) (SR-6)",
+     "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+     "rule": "SR-6 T1-margins",
+     "crop": "390-rhythm-08-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "a.skip-link",
+     "text": "Skip to batches",
+     "msg": "a <a> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.app-frame",
+     "text": "FermentStation My batches4 Checks Profil",
+     "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (and 1 more like it: \"Search batches 4batches \") (SR-6)",
+     "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+     "rule": "SR-6 T1-structure",
+     "crop": "390-rhythm-09-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.work-area > header.topbar > div.topbar-actions > button.icon-button.notification",
+     "text": "View batch checks",
+     "msg": "\"View batch checks\" runs 352-378px, outside the container lines of the nav at 81-364px: full width is for background layers and grounds only (SR-6)",
+     "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+     "rule": "SR-6 T2-containment",
+     "crop": "390-rhythm-10-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div.work-area > header.topbar > div.topbar-actions > button.icon-button.notification",
+     "text": "View batch checks",
+     "msg": "a box runs 352-378px, outside the container lines of the nav at 81-364px: full width is for background layers and grounds only (SR-6)",
+     "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+     "rule": "SR-6 T2-containment",
+     "crop": "390-rhythm-11-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "div#summary-stats > div.stat-row:nth-of-type(1) > div.stat-label > span.food-icon",
+     "text": "🌱",
+     "msg": "3 text blocks start on a left line at x 229, 148px from the container's left: text starts on the container's left, or on one split line (x 209, 235, 260) (also \"✨\", \"🧊\") (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "390-rhythm-12-container-edges.jpg"
+    },
+    {
+     "check": "container-edges",
+     "sev": "FAIL",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "1 text block starts on a left line at x 127, 46px from the container's left: text starts on the container's left, or on one split line (x 209, 235, 260) (and 1 more like it: x 96) (SR-6)",
+     "fix": "start the text on the container's left, or on the one split line every split shares",
+     "rule": "SR-6 T3-left-lines",
+     "crop": "390-rhythm-13-container-edges.jpg"
+    },
+    {
+     "check": "split-pair",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "4batches in your kitchen1 ready to enjoy",
+     "msg": "the two columns of the split start 20px apart at the top: a split's columns are top-aligned, 8px either way (SR-8)",
+     "fix": "top-align both columns of the split (align-items: start)",
+     "rule": "SR-8 T-mode",
+     "crop": "390-rhythm-14-split-pair.jpg"
+    },
+    {
+     "check": "split-pair",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "4batches in your kitchen1 ready to enjoy",
+     "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 229, on none of the split lines 209 (k=5), 235 (k=6), 260 (k=7) (SR-8)",
+     "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+     "rule": "SR-8 T-pair",
+     "crop": "390-rhythm-15-split-pair.jpg"
+    },
+    {
+     "check": "split-pair",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "4batches in your kitchen1 ready to enjoy",
+     "msg": "the split does not run edge to edge on the container: its left column starts at 91px, the container's left at 81px; its right column ends at 354px, the container's right at 364px (SR-8)",
+     "fix": "run the split from the container's left line to its right line",
+     "rule": "SR-8 T-edges",
+     "crop": "390-rhythm-16-split-pair.jpg"
+    },
+    {
+     "check": "section-height",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard",
+     "text": "Search batches 4batches in your kitchen1",
+     "msg": "with every answer and tab open, the section starts at 158px, 158px below the screen grid (0 x 844px): sections start on whole screens (SR-2)",
+     "fix": "size each section for its content with every answer and tab open, so the tops below stay on whole screens",
+     "rule": "SR-2 T-grid-expanded",
+     "crop": "390-rhythm-17-section-height.jpg"
+    }
+   ],
+   "glAsked": 0
+  },
+  {
+   "width": 320,
+   "height": 640,
+   "screens": 1,
+   "held": 0,
+   "errors": [],
+   "findings": [
+    {
+     "check": "hero-fill",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero",
+     "text": "Good thingsare growing.",
+     "msg": "the next section shows on the first screen: it starts at 210px on a 640px screen (the hero ends at 193px)",
+     "stop": 0,
+     "crop": "320-01-hero-fill.jpg",
+     "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row > label.search-box",
+     "text": "Search batches",
+     "msg": "its last line sits 0px above the lower edge of div.search-row, where the ground changes to section.summary.hero",
+     "stop": 0,
+     "crop": "320-02-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.section-head > h1",
+     "text": "Your batches 4",
+     "msg": "its last line sits 10px above the lower edge of div.section-head, where the ground changes to div.filters",
+     "stop": 0,
+     "crop": "320-03-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "its first line sits 0px under the top edge of div.filters, where the ground changes",
+     "stop": 0,
+     "crop": "320-04-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "nav",
+     "sev": "FAIL",
+     "sel": "(the first screen)",
+     "text": "",
+     "stop": 0,
+     "msg": "no nav bar across the top of the first screen (a header with the brand, the section links and the main action)",
+     "fix": "make the nav one bar from the content's left edge to its right edge, with every link and action inside it"
+    },
+    {
+     "check": "overlap-text",
+     "sev": "FAIL",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "lies over the text \"4\" (strong#batch-total)",
+     "stop": 0,
+     "crop": "320-05-overlap-text.jpg",
+     "fix": "move the box off the text (or the text off the box)"
+    },
+    {
+     "check": "no-visual",
+     "sev": "FAIL",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi",
+     "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+     "stop": 0,
+     "crop": "320-06-no-visual.jpg",
+     "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits"
+    },
+    {
+     "check": "no-visual",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.care-block",
+     "text": "A little care today",
+     "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+     "stop": null,
+     "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "main#main > div.dashboard > div.search-row",
+     "text": "",
+     "msg": "the hero has no button (the nav's does not count)",
+     "stop": 0,
+     "crop": "320-07-cta.jpg",
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "cta",
+     "sev": "FAIL",
+     "sel": "div#batches-view > div.tip-panel",
+     "text": "Keep an eye on the temperature",
+     "msg": "the last section before the footer ends with no button",
+     "stop": null,
+     "fix": "add the action: a button in the hero, one on every priced item, one in the closing section"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "FAIL",
+     "sel": "strong#batch-total",
+     "text": "4",
+     "msg": "the figure \"4\" is set at 45px, larger than the h1 (20px)",
+     "fix": "set figures below the h1: a stat reads as data, not as the headline",
+     "stop": 0,
+     "crop": "320-08-heading-scale.jpg"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#batches-view > section.summary.hero > div.gauge > svg",
+     "text": "",
+     "msg": "its first line sits 14px under the top edge of section.summary.hero, where the ground changes",
+     "stop": 0,
+     "crop": "320-09-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "flush",
+     "sev": "WARN",
+     "sel": "div#summary-stats > div.stat-row:nth-of-type(3) > div.stat-track > i",
+     "text": "",
+     "msg": "its last line sits 14px above the lower edge of section.summary.hero, where the ground changes to div.section-head",
+     "stop": 0,
+     "crop": "320-10-flush.jpg",
+     "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)"
+    },
+    {
+     "check": "tap-size",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+     "text": "All batches",
+     "msg": "a 103x42px tap target (and 3 more like it on this screen): under the 44px a phone needs",
+     "stop": 0,
+     "crop": "320-11-tap-size.jpg",
+     "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box"
+    },
+    {
+     "check": "card-layout",
+     "sev": "WARN",
+     "sel": "div#batch-list",
+     "text": "Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Finish 9 N",
+     "msg": "4 cards with 1 placement of their UI (vary them: rise, corner, a low stack, right)",
+     "fix": "vary the cards of a group: at least three placements, and the ground in its own light on each",
+     "stop": 0,
+     "crop": "320-12-card-layout.jpg"
+    },
+    {
+     "check": "heading-scale",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "h3 headings in 2 sizes, 12px (\"Garden kimchi\") to 14px (x1.17)",
+     "stop": null,
+     "fix": "size headings by level: the h1 largest, one size per level, each level below the one above"
+    },
+    {
+     "check": "off-grid",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.tip-panel > div > h3",
+     "text": "Keep an eye on the temperature",
+     "msg": "the section's heading starts at 130px, 49px off the page margin (81px), and no other section starts there",
+     "stop": null,
+     "fix": "move it onto the page margin, or the column edge its section uses"
+    },
+    {
+     "check": "centre-axis",
+     "sev": "WARN",
+     "sel": "span#ready-summary",
+     "text": "1 ready to enjoy",
+     "msg": "centred text 8px right of the middle of its box (196px against 188px)",
+     "stop": 0,
+     "crop": "320-13-centre-axis.jpg",
+     "fix": "centre the block on its container (margin-inline: auto), or set it on the left grid"
+    },
+    {
+     "check": "section-gaps",
+     "sev": "WARN",
+     "sel": "div#batches-view > div.section-head / div#batches-view > div.filters",
+     "text": "",
+     "stop": 0,
+     "msg": "13px between these sections, -58% against the median 31px",
+     "crop": "320-14-section-gaps.jpg",
+     "fix": "use one gap between sections (all within 25% of each other)"
+    },
+    {
+     "check": "visual-caption",
+     "sev": "WARN",
+     "sel": "div#summary-stats > div.stat-row:nth-of-type(1) > div.stat-label",
+     "text": "🌱 Active 2/4",
+     "msg": "a muted 12px line of 1 row sits 8px under the drawing (svg): it reads as a caption: \"🌱 Active 2/4\"; no caption or description under any image, render or visual (house rule)",
+     "stop": 0,
+     "crop": "320-15-visual-caption.jpg",
+     "fix": "take the line away: no caption or description under, over or on any image, render or visual; a licence credit goes in one footer line"
+    }
+   ],
+   "glAsked": 0
+  }
+ ],
+ "shaders": 0,
+ "reduced": {
+  "screens": 1,
+  "notRead": 0
+ },
+ "hidden": {
+  "screens": 2
+ },
+ "slow": {
+  "stops": 1,
+  "late": 0
+ },
+ "sweep": {
+  "widths": [
+   1280,
+   1152,
+   896
+  ],
+  "errors": [],
+  "findings": []
+ },
+ "narrow": {
+  "width": 320,
+  "height": 640,
+  "errors": [],
+  "findings": [
+   {
+    "check": "tap-size",
+    "sev": "WARN",
+    "sel": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1)",
+    "text": "All batches",
+    "msg": "a 103x42px tap target (and 3 more like it on this screen): under the 44px a phone needs",
+    "crop": "narrow-320-01-tap-size.jpg",
+    "width": 320,
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box"
+   }
+  ]
+ },
+ "counts": {
+  "FAIL": 152,
+  "WARN": 61
+ },
+ "checks": {
+  "assets": "PASS",
+  "shader-lint": "PASS",
+  "gl-fallback": "PASS",
+  "empty-visual": "PASS",
+  "hero-fill": "FAIL",
+  "flush": "FAIL",
+  "placeholder": "PASS",
+  "sample-label": "PASS",
+  "caption": "PASS",
+  "credit-wall": "PASS",
+  "nav": "FAIL",
+  "nav-covers": "PASS",
+  "spill": "PASS",
+  "off-viewport": "PASS",
+  "fold-card": "PASS",
+  "hover-spill": "PASS",
+  "overlap-text": "FAIL",
+  "collide": "PASS",
+  "tap-size": "WARN",
+  "row-gap": "PASS",
+  "cut-text": "FAIL",
+  "fold-cut": "PASS",
+  "marquee": "PASS",
+  "scroll-linked": "PASS",
+  "scroll-reveal": "PASS",
+  "pinned": "PASS",
+  "loop-pause": "PASS",
+  "reduced-motion": "PASS",
+  "hidden-content": "PASS",
+  "webgl": "PASS",
+  "no-visual": "FAIL",
+  "text-only": "PASS",
+  "card-visual": "PASS",
+  "hidden-visual": "PASS",
+  "card-family": "PASS",
+  "card-layout": "WARN",
+  "nesting": "PASS",
+  "effect-repeat": "PASS",
+  "ui-fit": "PASS",
+  "ui-centre": "PASS",
+  "dark-ground": "PASS",
+  "button-styles": "PASS",
+  "button-shape": "PASS",
+  "same-action": "PASS",
+  "button-picture": "PASS",
+  "cta": "FAIL",
+  "pricing-tiers": "PASS",
+  "copy-headline": "FAIL",
+  "copy-fact": "PASS",
+  "copy-headings": "WARN",
+  "copy-buttons": "WARN",
+  "copy-actions": "WARN",
+  "heading-scale": "FAIL",
+  "stagger": "PASS",
+  "top-stagger": "PASS",
+  "off-grid": "FAIL",
+  "col-edge": "PASS",
+  "right-edge": "PASS",
+  "centre-axis": "WARN",
+  "tilt": "PASS",
+  "contrast": "PASS",
+  "text-contrast": "FAIL",
+  "body-size": "PASS",
+  "busy-ground": "PASS",
+  "section-gaps": "FAIL",
+  "proximity": "PASS",
+  "hole": "PASS",
+  "links": "PASS",
+  "forms": "PASS",
+  "photo-upscale": "PASS",
+  "photo-set": "PASS",
+  "photo-credit": "WARN",
+  "nav-family": "PASS",
+  "nav-labels": "PASS",
+  "link-styles": "PASS",
+  "heading-align": "PASS",
+  "label-centre": "PASS",
+  "fake-button": "PASS",
+  "stranded-action": "PASS",
+  "orphan": "PASS",
+  "unit-break": "PASS",
+  "tab-wrap": "PASS",
+  "effects-fit": "PASS",
+  "fade-cut": "PASS",
+  "photo-weight": "PASS",
+  "copy-length": "PASS",
+  "nav-current": "PASS",
+  "progress-bar": "PASS",
+  "photo-repeat": "PASS",
+  "button-contrast": "WARN",
+  "photo-print": "PASS",
+  "grounds": "PASS",
+  "split-align": "PASS",
+  "fact-agree": "PASS",
+  "fold-action": "PASS",
+  "action-count": "PASS",
+  "one-screen": "WARN",
+  "hover": "PASS",
+  "hover-move": "PASS",
+  "product-shown": "PASS",
+  "same-object": "PASS",
+  "font-load": "PASS",
+  "visual-caption": "WARN",
+  "visual-empty": "PASS",
+  "effect-kind": "PASS",
+  "hero-enter": "PASS",
+  "moment-none": "WARN",
+  "street-number": "PASS",
+  "postcode": "PASS",
+  "coordinates": "PASS",
+  "company-number": "PASS",
+  "phone-number": "PASS",
+  "hero-screen": "FAIL",
+  "section-height": "FAIL",
+  "section-air": "PASS",
+  "one-section": "FAIL",
+  "one-heading": "FAIL",
+  "container-edges": "FAIL",
+  "row-lines": "FAIL",
+  "split-pair": "FAIL",
+  "motion-layer": "FAIL",
+  "count-text": "PASS",
+  "loop-cycle": "PASS",
+  "section-tile": "PASS",
+  "empty-area": "PASS",
+  "a11y-name": "PASS",
+  "img-alt": "PASS",
+  "field-label": "PASS",
+  "heading-order": "PASS",
+  "tabindex": "PASS",
+  "focus-ring": "PASS",
+  "focus-visible": "PASS",
+  "focus-hidden": "PASS",
+  "skip-link": "PASS",
+  "menu-toggle": "PASS",
+  "lang": "PASS",
+  "page-meta": "PASS",
+  "share-meta": "WARN",
+  "action-repeat": "PASS",
+  "map-link": "PASS",
+  "open-now": "PASS",
+  "assumed": "PASS",
+  "run-on": "PASS",
+  "form-fields": "PASS",
+  "form-send": "PASS"
+ }
+}
