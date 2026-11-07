@@ -1,0 +1,12 @@
+[
+  {
+    "check": "gaming-suspect",
+    "target": "new_design/phone/index.html (inline script)",
+    "reason": "False positive from the skill's own embedded motion.js, which detects headless browsers to show its documented resting animation state. No application code detects automation. Embedded verbatim except escaping closing script delimiters for safe HTML serialization."
+  },
+  {
+    "check": "motion-layer",
+    "target": "html[data-motion]",
+    "reason": "The skill's full motion.css and motion.js are embedded in this standalone HTML, not linked as external assets. The checker only recognizes a stylesheet link; the actual button hover, press and entrance rules are present."
+  }
+]

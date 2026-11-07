@@ -1,0 +1,1258 @@
+{
+ "start": "2026-11-07T15:39:33.342Z",
+ "round": 2,
+ "idle": 0,
+ "errors": 0,
+ "status": "fail",
+ "history": [
+  {
+   "at": "2026-11-07T15:53:15.844Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 34,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-07T15:58:27.422Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 28,
+   "round": 2,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": "new_design/phone/index.html",
+  "url": null,
+  "root": null,
+  "kind": "software",
+  "category": "household fermentation tracker",
+  "primary": "Start a batch",
+  "rounds": 3,
+  "start": "2026-11-07T15:39:33.342Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "1091acd57214331e:6ce374cd",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "1091acd57214331e",
+ "page": "new_design/phone/index.html",
+ "found": {
+  "fails": [
+   {
+    "check": "gaming-suspect",
+    "where": "new_design/phone/index.html (inline script)",
+    "msg": "the page's own script reads the user agent near \"headless\" or an automation tool's name",
+    "fix": "delete the user-agent test; a visitor and the checker get the same page",
+    "widths": [],
+    "ids": [
+     "gaming-suspect"
+    ],
+    "wheres": [
+     "new_design/phone/index.html (inline script)"
+    ]
+   },
+   {
+    "check": "hero-fill",
+    "where": "div#batches-view > section.summary.hero \"Good thingsare growing.\"",
+    "msg": "the next section shows on the first screen: it starts at 203px on a 900px screen (the hero ends at 188px)",
+    "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "hero-fill"
+    ],
+    "wheres": [
+     "div#batches-view > section.summary.hero \"Good thingsare growing.\""
+    ]
+   },
+   {
+    "check": "nav",
+    "where": "(the first screen)",
+    "msg": "no nav bar across the top of the first screen (a header with the brand, the section links and the main action)",
+    "fix": "make the nav one bar from the content's left edge to its right edge, with every link and action inside it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "nav"
+    ],
+    "wheres": [
+     "(the first screen)"
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "div.app-frame > div.work-area > nav.bottom-nav > button.add-button.btn",
+    "msg": "runs 53px past the bottom edge of the panel it sits on (div#batch-list > button.batch-card.card:nth-of-type(3))",
+    "fix": "keep the box inside the panel it starts on: shrink it, or grow the panel to hold it",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "div.app-frame > div.work-area > nav.bottom-nav > button.add-button.btn"
+    ]
+   },
+   {
+    "check": "overlap-text",
+    "where": "div#batches-view > section.summary.hero > div.gauge > svg",
+    "msg": "lies over the text \"4\" (strong#batch-total)",
+    "fix": "move the box off the text (or the text off the box)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "overlap-text"
+    ],
+    "wheres": [
+     "div#batches-view > section.summary.hero > div.gauge > svg"
+    ]
+   },
+   {
+    "check": "overlap-text",
+    "where": "div.app-frame > div.work-area > nav.bottom-nav",
+    "msg": "lies over the text \"Day 2\" (div.batch-bottom > strong)",
+    "fix": "move the box off the text (or the text off the box)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "overlap-text"
+    ],
+    "wheres": [
+     "div.app-frame > div.work-area > nav.bottom-nav"
+    ]
+   },
+   {
+    "check": "cta",
+    "where": "main#main > div.dashboard > div.search-row",
+    "msg": "the hero has no button (the nav's does not count)",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "cta"
+    ],
+    "wheres": [
+     "main#main > div.dashboard > div.search-row"
+    ]
+   },
+   {
+    "check": "cta",
+    "where": "div#batches-view > div.tip-panel \"Keep an eye on the temperature\"",
+    "msg": "the last section before the footer ends with no button",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "cta"
+    ],
+    "wheres": [
+     "div#batches-view > div.tip-panel \"Keep an eye on the temperature\""
+    ]
+   },
+   {
+    "check": "copy-headline",
+    "where": "div#batches-view > div.section-head > h1 \"Your batches 4\"",
+    "msg": "\"Your batches 4\" does not name what is sold (household fermentation tracker, household, fermentation, tracker, from flags)",
+    "fix": "put the category noun in the h1 (and who it is for, or where), in 2 to 8 words",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "copy-headline"
+    ],
+    "wheres": [
+     "div#batches-view > div.section-head > h1 \"Your batches 4\""
+    ]
+   },
+   {
+    "check": "heading-scale",
+    "where": "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\"",
+    "msg": "an h2 at 18px, as large as the h1 (18px) or larger",
+    "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "heading-scale"
+    ],
+    "wheres": [
+     "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\""
+    ]
+   },
+   {
+    "check": "heading-scale",
+    "where": "strong#batch-total \"4\"",
+    "msg": "the figure \"4\" is set at 37px, larger than the h1 (18px)",
+    "fix": "set figures below the h1: a stat reads as data, not as the headline",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "heading-scale"
+    ],
+    "wheres": [
+     "strong#batch-total \"4\""
+    ]
+   },
+   {
+    "check": "motion-layer",
+    "where": "html[data-motion]",
+    "msg": "the page marks <html data-motion> but motion.css is not loaded: buttons, links, cards and photos answer nothing on hover",
+    "fix": "link assets/motion/motion.css after cards.css and keep data-motion on <html> (both, or neither)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "motion-layer"
+    ],
+    "wheres": [
+     "html[data-motion]"
+    ]
+   },
+   {
+    "check": "moment-none",
+    "where": "(the page)",
+    "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+    "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "moment-none"
+    ],
+    "wheres": [
+     "(the page)"
+    ]
+   },
+   {
+    "check": "hero-screen",
+    "where": "main#main > div.dashboard \"Search batches 4batches in your kitchen1\"",
+    "msg": "the hero ends at 1298px on a 900px screen, 398px below the fold: it ends at the fold, 1px either way (SR-1)",
+    "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hero-screen"
+    ],
+    "wheres": [
+     "main#main > div.dashboard \"Search batches 4batches in your kitchen1\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "main#main > div.dashboard \"Search batches 4batches in your kitchen1\"",
+    "msg": "the section starts at 146px, 146px below the screen grid (0 x 900px): sections start on whole screens (SR-2)",
+    "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height"
+    ],
+    "wheres": [
+     "main#main > div.dashboard \"Search batches 4batches in your kitchen1\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "main#main > div.dashboard \"Search batches 4batches in your kitchen1\"",
+    "msg": "a <div> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+    "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "main#main > div.dashboard \"Search batches 4batches in your kitchen1\""
+    ]
+   },
+   {
+    "check": "one-heading",
+    "where": "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\"",
+    "msg": "the hero holds an h2 (1): its heading is the h1, and an h2 opens the next section (SR-5)",
+    "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-heading"
+    ],
+    "wheres": [
+     "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "main#main > div.dashboard \"Search batches 4batches in your kitchen1\"",
+    "msg": "the content of section 1 runs 547px from the left and 547px from the right (read from its outermost blocks: no .wrap): the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (SR-6)",
+    "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "main#main > div.dashboard \"Search batches 4batches in your kitchen1\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "a.skip-link \"Skip to batches\"",
+    "msg": "a <a> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "a.skip-link \"Skip to batches\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div.app-frame \"FermentStation My batches4 Checks Profil\"",
+    "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div.app-frame \"FermentStation My batches4 Checks Profil\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div#summary-stats > div.stat-row:nth-of-type(1) > div.stat-label > span.food-icon \"🌱\"",
+    "msg": "3 text blocks start on a left line at x 713, 166px from the container's left: text starts on the container's left, or on one split line (x 701, 732, 763) (also \"✨\", \"🧊\") (SR-6)",
+    "fix": "start the text on the container's left, or on the one split line every split shares",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div#summary-stats > div.stat-row:nth-of-type(1) > div.stat-label > span.food-icon \"🌱\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "span#ready-summary \"1 ready to enjoy\"",
+    "msg": "1 text block starts on a left line at x 602, 55px from the container's left: text starts on the container's left, or on one split line (x 701, 732, 763) (SR-6)",
+    "fix": "start the text on the container's left, or on the one split line every split shares",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "span#ready-summary \"1 ready to enjoy\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "section.summary.hero > div.gauge > div.gauge-copy > span \"batches in your kitchen\"",
+    "msg": "1 text block starts on a left line at x 572, 25px from the container's left: text starts on the container's left, or on one split line (x 701, 732, 763) (and 1 more like it: x 560) (SR-6)",
+    "fix": "start the text on the container's left, or on the one split line every split shares",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "section.summary.hero > div.gauge > div.gauge-copy > span \"batches in your kitchen\""
+    ]
+   },
+   {
+    "check": "split-pair",
+    "where": "div#batches-view > section.summary.hero \"4batches in your kitchen1 ready to enjoy\"",
+    "msg": "the two columns of the split start 16px apart at the top: a split's columns are top-aligned, 8px either way (SR-8)",
+    "fix": "top-align both columns of the split (align-items: start)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "split-pair"
+    ],
+    "wheres": [
+     "div#batches-view > section.summary.hero \"4batches in your kitchen1 ready to enjoy\""
+    ]
+   },
+   {
+    "check": "flush",
+    "where": "button#sort",
+    "msg": "its button sits 0px above the lower edge of div.search-row, where the ground changes to section.summary.hero",
+    "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "flush"
+    ],
+    "wheres": [
+     "button#sort"
+    ]
+   },
+   {
+    "check": "flush",
+    "where": "div#batches-view > div.section-head > h1 \"Your batches 4\"",
+    "msg": "its last line sits 9px above the lower edge of div.section-head, where the ground changes to div.filters",
+    "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "flush"
+    ],
+    "wheres": [
+     "div#batches-view > div.section-head > h1 \"Your batches 4\""
+    ]
+   },
+   {
+    "check": "flush",
+    "where": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1) \"All batches\"",
+    "msg": "its first line sits 0px under the top edge of div.filters, where the ground changes",
+    "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "flush"
+    ],
+    "wheres": [
+     "div#batches-view > div.filters > button.filter.btn:nth-of-type(1) \"All batches\""
+    ]
+   },
+   {
+    "check": "flush",
+    "where": "div#batch-list > button.batch-card.card:nth-of-type(1) \"Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Fi\"",
+    "msg": "its first line sits 0px under the top edge of div#batch-list, where the ground changes",
+    "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "flush"
+    ],
+    "wheres": [
+     "div#batch-list > button.batch-card.card:nth-of-type(1) \"Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Fi\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "div#batch-list \"Garden kimchi\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "div#batch-list \"Garden kimchi\""
+    ]
+   },
+   {
+    "check": "container",
+    "where": "page",
+    "msg": "no .wrap",
+    "fix": "put the content in one .wrap",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "container"
+    ],
+    "wheres": [
+     "page"
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "flush",
+    "where": "div#batches-view > div.section-head > h1 \"Your batches 4\"",
+    "msg": "div.section-head and div.filters run together: 9px between their content, on one ground",
+    "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "flush",
+    "where": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1) \"All batches\"",
+    "msg": "div.filters and div#batch-list run together: 11px between their content, on one ground",
+    "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "card-layout",
+    "where": "div#batch-list \"Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Fi\"",
+    "msg": "4 cards with 1 placement of their UI (vary them: rise, corner, a low stack, right)",
+    "fix": "vary the cards of a group: at least three placements, and the ground in its own light on each",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-headings",
+    "where": "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\"",
+    "msg": "\"A little care today\" names no product, part, place or section (the one brand line a page may have)",
+    "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-actions",
+    "where": "(the page)",
+    "msg": "the main action \"Start a batch\" does not read word for word the same in the nav or hero and the closing section",
+    "fix": "few actions, one wording: at most 2 in the hero, the main action word for word in nav, hero and close",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "centre-axis",
+    "where": "span#ready-summary \"1 ready to enjoy\"",
+    "msg": "centred text 9px right of the middle of its column (636px against 628px)",
+    "fix": "centre the block on its container (margin-inline: auto), or set it on the left grid",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "main#main > div.dashboard > div.search-row / div#batches-view > section.summary.hero",
+    "msg": "30px between these sections, +46% against the median 21px of gaps at a change of ground",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "div#batches-view > section.summary.hero / div#batches-view > div.section-head",
+    "msg": "32px between these sections, +56% against the median 21px of gaps at a change of ground",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "div#batches-view > div.section-head / div#batches-view > div.filters",
+    "msg": "9px between these sections, -56% against the median 21px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "div#batches-view > div.filters / div#batch-list",
+    "msg": "11px between these sections, -46% against the median 21px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "photo-credit",
+    "where": "(the page text)",
+    "msg": "1 library source (wikimedia): the page credits wikimedia; confirm each shows the client's own product, place or people",
+    "fix": "confirm the library photograph shows the client's own product, place or people; otherwise replace it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "one-screen",
+    "where": "div#batch-list \"Garden kimchi\"",
+    "msg": "1 section is shorter than the screen, so the next one's heading or picture shows with it: \"Garden kimchi\" is 511px of the 900px under the nav, and \"A little care today\" shows below it",
+    "fix": "give each section the screen (min-height: 100svh less the nav, its content centred), or join two short ones into one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "share-meta",
+    "where": "head",
+    "msg": "the head lacks og:title, og:description, og:image, twitter:card, an icon: a shared link shows no picture or title of its own",
+    "fix": "copy the head block of starter.html: og tags, twitter:card, the icon and theme-color (references/system.md, Head)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "flush",
+    "where": "div#batches-view > section.summary.hero > div.gauge > svg",
+    "msg": "its first line sits 15px under the top edge of section.summary.hero, where the ground changes",
+    "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "div.app-frame > div.work-area > header.topbar > button.avatar.mobile-avatar",
+    "msg": "a 39x39px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "div.work-area > header.topbar > div.topbar-actions > button.icon-button.notification",
+    "msg": "a 39x39px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "input#search",
+    "msg": "a 259x42px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "button#sort",
+    "msg": "a 31x42px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "button#see-all \"See all\"",
+    "msg": "a 31x40px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1) \"All batches\"",
+    "msg": "a 85x40px tap target (and 3 more like it on this screen): under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "off-grid",
+    "where": "div#batches-view > div.tip-panel > div > h3 \"Keep an eye on the temperature\"",
+    "msg": "the section's heading starts at 69px, 51px off the page margin (18px), and no other section starts there",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 68,
+   "layout": 15
+  }
+ },
+ "open": [
+  {
+   "check": "hero-fill",
+   "where": "div#batches-view > section.summary.hero \"Good thingsare growing.\"",
+   "msg": "the next section shows on the first screen: it starts at 203px on a 900px screen (the hero ends at 188px)",
+   "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "hero-fill"
+   ],
+   "wheres": [
+    "div#batches-view > section.summary.hero \"Good thingsare growing.\""
+   ]
+  },
+  {
+   "check": "nav",
+   "where": "(the first screen)",
+   "msg": "no nav bar across the top of the first screen (a header with the brand, the section links and the main action)",
+   "fix": "make the nav one bar from the content's left edge to its right edge, with every link and action inside it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "nav"
+   ],
+   "wheres": [
+    "(the first screen)"
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "div.app-frame > div.work-area > nav.bottom-nav > button.add-button.btn",
+   "msg": "runs 53px past the bottom edge of the panel it sits on (div#batch-list > button.batch-card.card:nth-of-type(3))",
+   "fix": "keep the box inside the panel it starts on: shrink it, or grow the panel to hold it",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "div.app-frame > div.work-area > nav.bottom-nav > button.add-button.btn"
+   ]
+  },
+  {
+   "check": "overlap-text",
+   "where": "div#batches-view > section.summary.hero > div.gauge > svg",
+   "msg": "lies over the text \"4\" (strong#batch-total)",
+   "fix": "move the box off the text (or the text off the box)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "overlap-text"
+   ],
+   "wheres": [
+    "div#batches-view > section.summary.hero > div.gauge > svg"
+   ]
+  },
+  {
+   "check": "overlap-text",
+   "where": "div.app-frame > div.work-area > nav.bottom-nav",
+   "msg": "lies over the text \"Day 2\" (div.batch-bottom > strong)",
+   "fix": "move the box off the text (or the text off the box)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "overlap-text"
+   ],
+   "wheres": [
+    "div.app-frame > div.work-area > nav.bottom-nav"
+   ]
+  },
+  {
+   "check": "cta",
+   "where": "main#main > div.dashboard > div.search-row",
+   "msg": "the hero has no button (the nav's does not count)",
+   "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "cta"
+   ],
+   "wheres": [
+    "main#main > div.dashboard > div.search-row"
+   ]
+  },
+  {
+   "check": "cta",
+   "where": "div#batches-view > div.tip-panel \"Keep an eye on the temperature\"",
+   "msg": "the last section before the footer ends with no button",
+   "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "cta"
+   ],
+   "wheres": [
+    "div#batches-view > div.tip-panel \"Keep an eye on the temperature\""
+   ]
+  },
+  {
+   "check": "copy-headline",
+   "where": "div#batches-view > div.section-head > h1 \"Your batches 4\"",
+   "msg": "\"Your batches 4\" does not name what is sold (household fermentation tracker, household, fermentation, tracker, from flags)",
+   "fix": "put the category noun in the h1 (and who it is for, or where), in 2 to 8 words",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "copy-headline"
+   ],
+   "wheres": [
+    "div#batches-view > div.section-head > h1 \"Your batches 4\""
+   ]
+  },
+  {
+   "check": "heading-scale",
+   "where": "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\"",
+   "msg": "an h2 at 18px, as large as the h1 (18px) or larger",
+   "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "heading-scale"
+   ],
+   "wheres": [
+    "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\""
+   ]
+  },
+  {
+   "check": "heading-scale",
+   "where": "strong#batch-total \"4\"",
+   "msg": "the figure \"4\" is set at 37px, larger than the h1 (18px)",
+   "fix": "set figures below the h1: a stat reads as data, not as the headline",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "heading-scale"
+   ],
+   "wheres": [
+    "strong#batch-total \"4\""
+   ]
+  },
+  {
+   "check": "moment-none",
+   "where": "(the page)",
+   "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+   "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "moment-none"
+   ],
+   "wheres": [
+    "(the page)"
+   ]
+  },
+  {
+   "check": "hero-screen",
+   "where": "main#main > div.dashboard \"Search batches 4batches in your kitchen1\"",
+   "msg": "the hero ends at 1298px on a 900px screen, 398px below the fold: it ends at the fold, 1px either way (SR-1)",
+   "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hero-screen"
+   ],
+   "wheres": [
+    "main#main > div.dashboard \"Search batches 4batches in your kitchen1\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "main#main > div.dashboard \"Search batches 4batches in your kitchen1\"",
+   "msg": "the section starts at 146px, 146px below the screen grid (0 x 900px): sections start on whole screens (SR-2)",
+   "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height"
+   ],
+   "wheres": [
+    "main#main > div.dashboard \"Search batches 4batches in your kitchen1\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "main#main > div.dashboard \"Search batches 4batches in your kitchen1\"",
+   "msg": "a <div> sits directly in <main>: every part of <main> is a <section> (SR-4)",
+   "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "main#main > div.dashboard \"Search batches 4batches in your kitchen1\""
+   ]
+  },
+  {
+   "check": "one-heading",
+   "where": "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\"",
+   "msg": "the hero holds an h2 (1): its heading is the h1, and an h2 opens the next section (SR-5)",
+   "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-heading"
+   ],
+   "wheres": [
+    "div#batches-view > div.care-block > div.section-head.checks-title > h2 \"A little care today\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "main#main > div.dashboard \"Search batches 4batches in your kitchen1\"",
+   "msg": "the content of section 1 runs 547px from the left and 547px from the right (read from its outermost blocks: no .wrap): the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (SR-6)",
+   "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "main#main > div.dashboard \"Search batches 4batches in your kitchen1\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "a.skip-link \"Skip to batches\"",
+   "msg": "a <a> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "a.skip-link \"Skip to batches\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div.app-frame \"FermentStation My batches4 Checks Profil\"",
+   "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div.app-frame \"FermentStation My batches4 Checks Profil\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div#summary-stats > div.stat-row:nth-of-type(1) > div.stat-label > span.food-icon \"🌱\"",
+   "msg": "3 text blocks start on a left line at x 713, 166px from the container's left: text starts on the container's left, or on one split line (x 701, 732, 763) (also \"✨\", \"🧊\") (SR-6)",
+   "fix": "start the text on the container's left, or on the one split line every split shares",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div#summary-stats > div.stat-row:nth-of-type(1) > div.stat-label > span.food-icon \"🌱\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "span#ready-summary \"1 ready to enjoy\"",
+   "msg": "1 text block starts on a left line at x 602, 55px from the container's left: text starts on the container's left, or on one split line (x 701, 732, 763) (SR-6)",
+   "fix": "start the text on the container's left, or on the one split line every split shares",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "span#ready-summary \"1 ready to enjoy\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "section.summary.hero > div.gauge > div.gauge-copy > span \"batches in your kitchen\"",
+   "msg": "1 text block starts on a left line at x 572, 25px from the container's left: text starts on the container's left, or on one split line (x 701, 732, 763) (and 1 more like it: x 560) (SR-6)",
+   "fix": "start the text on the container's left, or on the one split line every split shares",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "section.summary.hero > div.gauge > div.gauge-copy > span \"batches in your kitchen\""
+   ]
+  },
+  {
+   "check": "split-pair",
+   "where": "div#batches-view > section.summary.hero \"4batches in your kitchen1 ready to enjoy\"",
+   "msg": "the two columns of the split start 16px apart at the top: a split's columns are top-aligned, 8px either way (SR-8)",
+   "fix": "top-align both columns of the split (align-items: start)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "split-pair"
+   ],
+   "wheres": [
+    "div#batches-view > section.summary.hero \"4batches in your kitchen1 ready to enjoy\""
+   ]
+  },
+  {
+   "check": "flush",
+   "where": "button#sort",
+   "msg": "its button sits 0px above the lower edge of div.search-row, where the ground changes to section.summary.hero",
+   "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "flush"
+   ],
+   "wheres": [
+    "button#sort"
+   ]
+  },
+  {
+   "check": "flush",
+   "where": "div#batches-view > div.section-head > h1 \"Your batches 4\"",
+   "msg": "its last line sits 9px above the lower edge of div.section-head, where the ground changes to div.filters",
+   "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "flush"
+   ],
+   "wheres": [
+    "div#batches-view > div.section-head > h1 \"Your batches 4\""
+   ]
+  },
+  {
+   "check": "flush",
+   "where": "div#batches-view > div.filters > button.filter.btn:nth-of-type(1) \"All batches\"",
+   "msg": "its first line sits 0px under the top edge of div.filters, where the ground changes",
+   "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "flush"
+   ],
+   "wheres": [
+    "div#batches-view > div.filters > button.filter.btn:nth-of-type(1) \"All batches\""
+   ]
+  },
+  {
+   "check": "flush",
+   "where": "div#batch-list > button.batch-card.card:nth-of-type(1) \"Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Fi\"",
+   "msg": "its first line sits 0px under the top edge of div#batch-list, where the ground changes",
+   "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "flush"
+   ],
+   "wheres": [
+    "div#batch-list > button.batch-card.card:nth-of-type(1) \"Garden kimchi 21 °C 🥬 1 kg Day 5 / 7 Fi\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "div#batch-list \"Garden kimchi\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "div#batch-list \"Garden kimchi\""
+   ]
+  },
+  {
+   "check": "container",
+   "where": "page",
+   "msg": "no .wrap",
+   "fix": "put the content in one .wrap",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "container"
+   ],
+   "wheres": [
+    "page"
+   ]
+  }
+ ],
+ "waived": [
+  {
+   "check": "gaming-suspect",
+   "where": "new_design/phone/index.html (inline script)",
+   "msg": "the page's own script reads the user agent near \"headless\" or an automation tool's name",
+   "fix": "delete the user-agent test; a visitor and the checker get the same page",
+   "widths": [],
+   "ids": [
+    "gaming-suspect"
+   ],
+   "wheres": [
+    "new_design/phone/index.html (inline script)"
+   ],
+   "reason": "False positive from the skill's own embedded motion.js, which detects headless browsers to show its documented resting animation state. No application code detects automation. Embedded verbatim except escaping closing script delimiters for safe HTML serialization."
+  },
+  {
+   "check": "motion-layer",
+   "where": "html[data-motion]",
+   "msg": "the page marks <html data-motion> but motion.css is not loaded: buttons, links, cards and photos answer nothing on hover",
+   "fix": "link assets/motion/motion.css after cards.css and keep data-motion on <html> (both, or neither)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "motion-layer"
+   ],
+   "wheres": [
+    "html[data-motion]"
+   ],
+   "reason": "The skill's full motion.css and motion.js are embedded in this standalone HTML, not linked as external assets. The checker only recognizes a stylesheet link; the actual button hover, press and entrance rules are present."
+  }
+ ],
+ "warnCount": 21,
+ "at": "2026-11-07T15:58:27.425Z"
+}

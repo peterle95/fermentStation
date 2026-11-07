@@ -1,0 +1,11 @@
+{
+ "page": "new_design/phone/index.html",
+ "url": null,
+ "root": null,
+ "kind": "software",
+ "category": "household fermentation tracker",
+ "primary": "Start a batch",
+ "rounds": 3,
+ "start": "2026-11-07T15:39:33.342Z",
+ "by": "gate.mjs --start"
+}
