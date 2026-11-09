@@ -3699,6 +3699,13 @@ button:disabled {
   font-weight: 100 900;
   font-display: swap;
 }
+@font-face {
+  font-family: "Sofia Sans Extra Condensed";
+  src: url("/new-design/SofiaSansExtraCondensed.ttf") format("truetype");
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: swap;
+}
 :root {
   --bg: #f3f3e9;
   --surface: #fff;
@@ -4229,3 +4236,15 @@ body { background: #dce6f7; padding: 24px; }
   .new-design *, .new-design *::before, .new-design *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .design-batch-card:hover, .design-batch-card:hover img { transform: none; }
 }
+
+/* Unique-inspired display headings; functional and user-authored text stays in Outfit. */
+.new-design.app-shell :is(.design-topbar-copy > div, .design-view-heading h1, .screen-head h1, .design-section-head h1, .design-section-head h2) {
+  font-family: "Sofia Sans Extra Condensed", Outfit, Arial, sans-serif;
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: normal;
+  line-height: 1.1;
+}
+.new-design.app-shell .design-topbar-copy > div { font-size: 32px; }
+.new-design.app-shell .design-section-head :is(h1, h2) { font-size: 28px; }
+.new-design.app-shell .design-section-head h1 span { font-family: Outfit, Arial, sans-serif; }

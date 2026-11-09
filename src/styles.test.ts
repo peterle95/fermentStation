@@ -27,6 +27,27 @@ describe("mobile safe-area layout", () => {
 });
 
 describe("reference-led responsive shell", () => {
+  it("limits the Unique-inspired display face to static prominent headings after responsive overrides", () => {
+    expect(styles).toMatch(/@font-face \{\s*font-family: "Sofia Sans Extra Condensed";\s*src: url\("\/new-design\/SofiaSansExtraCondensed\.ttf"\) format\("truetype"\);\s*font-weight: 1 1000;\s*font-style: normal;\s*font-display: swap;/);
+    const display = styles.slice(styles.indexOf("/* Unique-inspired display headings;"));
+    expect(styles.indexOf(display)).toBeGreaterThan(styles.lastIndexOf("@media"));
+    expect(display).toContain(".new-design.app-shell :is(.design-topbar-copy > div, .design-view-heading h1, .screen-head h1, .design-section-head h1, .design-section-head h2) {");
+    expect(display).toContain('font-family: "Sofia Sans Extra Condensed", Outfit, Arial, sans-serif;');
+    expect(display).toContain("font-weight: 500;");
+    expect(display).toContain("letter-spacing: normal;");
+    expect(display).toContain("line-height: 1.1;");
+    expect(display).toContain(".new-design.app-shell .design-section-head :is(h1, h2) { font-size: 28px; }");
+    expect(display).not.toMatch(/text-transform|transform:|station-dialog|profile-editor-title-input|design-batch-copy/);
+  });
+
+  it("retains Outfit for functional text, user-authored titles, dialog typography and heading counts", () => {
+    expect(styles).toContain("font: 400 15px/1.4 Outfit, Arial, sans-serif;");
+    expect(styles).toContain(".new-design.app-shell * { font-family: Outfit, Arial, sans-serif; }");
+    expect(styles).toContain(".new-design.app-shell .content-shell * { font-family: inherit; }");
+    expect(styles).toMatch(/\.new-design \.station-dialog \{[^}]*font: 400 15px\/1\.4 Outfit, Arial, sans-serif;/);
+    expect(styles).toContain(".new-design.app-shell .design-section-head h1 span { font-family: Outfit, Arial, sans-serif; }");
+  });
+
   it("keeps phone toasts above navigation without moving desktop toasts", () => {
     const mobile = styles.slice(styles.indexOf("@media (max-width: 900px) {"));
     expect(styles).toMatch(/\.design-toast \{[^}]*bottom: 26px;/);
@@ -97,12 +118,20 @@ describe("reference-led responsive shell", () => {
 
   it("bundles the reference font, photographs and licenses for offline installs", () => {
     expect(styles).toContain('src: url("/new-design/Outfit.ttf")');
+    const displayFont = readFileSync(new URL("../public/new-design/SofiaSansExtraCondensed.ttf", import.meta.url));
+    expect(displayFont.readUInt32BE(0)).toBe(0x00010000);
+    const displayLicense = readFileSync(new URL("../public/new-design/SofiaSansExtraCondensed-OFL.txt", import.meta.url), "utf8");
+    expect(displayLicense).toContain("Copyright 2019 The Sofia Sans Project Authors");
+    expect(displayLicense).toContain("SIL OPEN FONT LICENSE Version 1.1");
+    expect(displayLicense).toContain("DISCLAIMER");
     const config = readFileSync(new URL("../vite.config.ts", import.meta.url), "utf8");
     expect(config).toContain('"new-design/*"');
     const license = readFileSync(new URL("../public/new-design/OFL.txt", import.meta.url), "utf8");
     expect(license).toContain("SIL OPEN FONT LICENSE Version 1.1");
     expect(license).toContain("DISCLAIMER");
     const credits = readFileSync(new URL("../public/new-design/README.md", import.meta.url), "utf8");
+    expect(credits).toContain("Unique-inspired Sofia Sans Extra Condensed");
+    expect(credits).toContain("SofiaSansExtraCondensed-OFL.txt");
     for (const asset of ["kimchi", "kombucha", "sourdough", "kraut"]) {
       expect(readFileSync(new URL(`../public/new-design/${asset}.webp`, import.meta.url)).length).toBeGreaterThan(0);
       expect(credits).toContain(`${asset}.webp`);
