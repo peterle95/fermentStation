@@ -25,3 +25,87 @@ describe("mobile safe-area layout", () => {
     );
   });
 });
+
+describe("reference-led responsive shell", () => {
+  it("keeps phone toasts above navigation without moving desktop toasts", () => {
+    const mobile = styles.slice(styles.indexOf("@media (max-width: 900px) {"));
+    expect(styles).toMatch(/\.design-toast \{[^}]*bottom: 26px;/);
+    expect(mobile).toMatch(/\.design-toast \{[^}]*bottom: calc\(105px \+ var\(--safe-bottom\)\);/);
+  });
+
+  it("keeps a promoted logger out of inline layout without a hidden modal ancestor", () => {
+    expect(styles).toContain(".new-design .activity-logger:has(.station-dialog) { display: contents; }");
+    expect(styles).toMatch(/\.new-design \.batch-workspace \.timeline-entry time \{[^}]*grid-column: 3;[^}]*grid-row: 1;/);
+  });
+
+  it("uses readable unselected Settings labels on the mint segment background", () => {
+    expect(styles).toMatch(/\.new-design \.setting-segment button \{[^}]*color: #58654f;/);
+  });
+
+  it("keeps compact native dialogs in the top layer with internal viewport-bounded overflow", () => {
+    expect(styles).toMatch(/\.new-design \.station-dialog \{[^}]*width: min\(420px, calc\(100% - 32px\)\);[^}]*max-height: calc\(100svh - 40px\);[^}]*overflow: auto;/);
+    expect(styles).toContain(".station-dialog::backdrop { background: #122e244d; backdrop-filter: blur(4px); }");
+    expect(styles).toContain(".station-dialog:not([open]) { display: none; }");
+    expect(styles).not.toContain(".design-dialog-overlay");
+    expect(styles).toContain(".new-design button.design-snapshot");
+    const app = readFileSync(new URL("./App.tsx", import.meta.url), "utf8");
+    expect(app).not.toContain("scrollIntoView");
+    expect(app).not.toContain('dialog.setAttribute("open"');
+    expect(app).toContain("if (!dialog.open) dialog.showModal();");
+  });
+
+  it("keeps the observation logger static inline and reuses the reference modal form tokens", () => {
+    expect(styles).toMatch(/\.new-design \.inline-logger \{[^}]*position: static;[^}]*width: auto;[^}]*margin: 0;[^}]*padding: 0;/);
+    expect(styles).toContain(".observation-fields, .observation-actions { display: contents; }");
+    const app = readFileSync(new URL("./App.tsx", import.meta.url), "utf8");
+    expect(app.match(/id="batch-activity-form"/g)).toHaveLength(1);
+    expect(app).not.toContain('key={editing?.id ?? "new"}');
+    expect(app).toContain('else dialog.open = true;');
+  });
+
+  it("replaces the phone Settings shortcut with one station-information button", () => {
+    const mobile = styles.slice(styles.indexOf("@media (max-width: 900px) {"));
+    expect(styles).toContain(".new-design .navigation .design-mobile-info { display: none; }");
+    expect(mobile).toContain(".new-design .navigation :is(.nav-batches, .nav-settings) { display: none; }");
+    expect(mobile).toContain(".new-design .navigation .design-mobile-info { display: grid; order: 4; }");
+    expect(mobile).toContain(".new-design .brand, .new-design .design-sidebar-bottom { display: none; }");
+  });
+
+  it("only locks the main scroller while its workspace is visible", () => {
+    expect(styles).toContain(".new-design .main-content:has(> .today-screen:not([hidden])) { padding: 0; overflow: hidden; }");
+    expect(styles).not.toContain(".main-content:has(.design-workspace)");
+    expect(styles).toContain(".new-design [hidden] { display: none !important; }");
+  });
+
+  it("lets component and editor button colors override the inherited default", () => {
+    expect(styles).toContain(":where(.new-design) button { color: inherit; }");
+    expect(styles).not.toContain(".new-design button { cursor: pointer; color: inherit; }");
+  });
+
+  it("keeps the profile editor sidebar in its desktop grid column above 900px", () => {
+    const desktop = styles.slice(styles.indexOf("@media (min-width: 901px) {"), styles.indexOf("@media (min-width: 901px) and (max-width: 1250px) {"));
+    expect(desktop).toContain(".new-design.profile-editor-shell .sidebar { display: flex; }");
+    expect(desktop).toContain(".new-design.profile-editor-shell .navigation { display: grid; }");
+    expect(styles).toMatch(/@media \(max-width: 900px\) \{[\s\S]*?\.new-design\.profile-editor-shell \.navigation \{ display: none; \}/);
+  });
+
+  it("hides the whole phone list rather than leaving its controls focusable behind detail", () => {
+    expect(styles).toContain(".design-selected .design-topbar, .design-selected .design-dashboard { display: none; }");
+    expect(styles).toContain(".new-design.has-open-batch .navigation { display: none; }");
+    expect(styles).toMatch(/grid-template-columns: minmax\(0, 1fr\) 337px/);
+  });
+
+  it("bundles the reference font, photographs and licenses for offline installs", () => {
+    expect(styles).toContain('src: url("/new-design/Outfit.ttf")');
+    const config = readFileSync(new URL("../vite.config.ts", import.meta.url), "utf8");
+    expect(config).toContain('"new-design/*"');
+    const license = readFileSync(new URL("../public/new-design/OFL.txt", import.meta.url), "utf8");
+    expect(license).toContain("SIL OPEN FONT LICENSE Version 1.1");
+    expect(license).toContain("DISCLAIMER");
+    const credits = readFileSync(new URL("../public/new-design/README.md", import.meta.url), "utf8");
+    for (const asset of ["kimchi", "kombucha", "sourdough", "kraut"]) {
+      expect(readFileSync(new URL(`../public/new-design/${asset}.webp`, import.meta.url)).length).toBeGreaterThan(0);
+      expect(credits).toContain(`${asset}.webp`);
+    }
+  });
+});

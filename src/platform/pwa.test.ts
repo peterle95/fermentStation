@@ -12,8 +12,8 @@ describe("PWA install metadata", () => {
   });
 
   it("matches the app theme and launch background", () => {
-    expect(pwaManifest.theme_color).toBe("#9d4934");
-    expect(pwaManifest.background_color).toBe("#f6f3ef");
+    expect(pwaManifest.theme_color).toBe("#f3f3e9");
+    expect(pwaManifest.background_color).toBe("#f3f3e9");
   });
 
   it("provides installable and maskable icons", () => {
