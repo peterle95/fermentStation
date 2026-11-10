@@ -8,7 +8,7 @@ import {
   deleteTimelineEntry,
 } from "../domain/batches";
 import { createProfileState } from "../domain/profiles";
-import { createArchive, importArchive, resolveArchiveCollisions } from "./archive";
+import { createArchive, importArchive, refreshArchiveCollisions, resolveArchiveCollisions } from "./archive";
 
 const emptyProfiles = { profiles: [] };
 const emptyBatches = createBatchState();
@@ -136,5 +136,28 @@ describe("FermentStation archive boundary", () => {
     const resolved = resolveArchiveCollisions(imported, "archive");
     expect(resolved.batchState.batches).toHaveLength(1);
     expect(resolved.batchState.batches[0].timeline[0]).toMatchObject({ id: "photo-1" });
+  });
+
+  it.each(["local", "archive"] as const)("refreshes collisions across active and trashed records before keeping %s versions", async (strategy) => {
+    const source = statesWithPhoto();
+    const second = { ...structuredClone(source.batchState.batches[0]), id: "batch-2", name: "Archive second" };
+    const archive = await createArchive(source.profileState, createBatchState([...source.batchState.batches, second]));
+    const imported = await importArchive(archive, source.profileState, source.batchState);
+    expect(imported.collisions.some(({ id }) => id === second.id)).toBe(false);
+    const current = deleteBatch(createBatchState([...source.batchState.batches, { ...second, name: "Local second" }]), second.id, Date.now());
+    const before = structuredClone(current);
+    const refreshed = refreshArchiveCollisions(imported, source.profileState, current);
+    expect(refreshed.collisions.find(({ id }) => id === second.id)).toMatchObject({
+      local: { name: "Local second" }, imported: { name: "Archive second" },
+    });
+    expect(imported.batchState).toBe(source.batchState);
+    const resolved = resolveArchiveCollisions(refreshed, strategy);
+    const all = [...resolved.batchState.batches, ...resolved.batchState.trash];
+    expect(all.filter(({ id }) => id === second.id)).toHaveLength(1);
+    expect(all.find(({ id }) => id === second.id)?.name).toBe(strategy === "local" ? "Local second" : "Archive second");
+    expect(resolved.batchState.trash).toHaveLength(strategy === "local" ? 1 : 0);
+    expect(current).toEqual(before);
+    const roundTrip = await importArchive(await createArchive(resolved.profileState, resolved.batchState), emptyProfiles, emptyBatches);
+    expect(roundTrip.batchState).toEqual(resolved.batchState);
   });
 });

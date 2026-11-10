@@ -63,6 +63,7 @@ import { loadWebState, saveWebState } from "./platform/web-store";
 import {
   createArchive,
   importArchive,
+  refreshArchiveCollisions,
   resolveArchiveCollisions,
   type ArchiveImport,
 } from "./platform/archive";
@@ -640,8 +641,13 @@ export function App() {
         {webStorageError && <section role="alert" className="storage-warning">
           <strong>Changes may not be saved on this device.</strong>{" "}
           Export a backup from Settings before closing the app.
+          {shell.destination !== "settings" && <button onClick={() => navigate("settings")} type="button">Open backup settings</button>}
           {webStorage.current === "indexeddb" && <button type="button" onClick={() => setWebRetry((value) => value + 1)}>Retry saving</button>}
           {webStorage.current === "failed" && <button type="button" onClick={retryWebLoad}>Retry loading</button>}
+        </section>}
+        {shell.destination !== "settings" && ["problem", "conflict", "migration"].includes(storageStatus.state) && <section className="storage-warning" role="alert">
+          <strong>{storageStatus.state === "migration" ? "Choose which storage data to keep." : "Shared storage needs attention."}</strong>
+          <p>{storageStatus.message}</p><button onClick={() => navigate("settings")} type="button">Review data storage</button>
         </section>}
         {showIosGuide && (
           <section className="ios-install-guide" aria-labelledby="ios-install-title">
@@ -703,7 +709,7 @@ export function App() {
               <div className="screen-head">
                 <div>
                   <h1>Settings</h1>
-                  <p className="screen-intro">Household preferences for how FermentStation talks to you. No data leaves this device.</p>
+                  <p className="screen-intro">Preferences, backups, and recovery for your local journal. Shared folders and file transfers stay under your control.</p>
                 </div>
               </div>
             <SettingsView
@@ -723,7 +729,11 @@ export function App() {
                  saveProfiles(profiles);
                  saveBatches(importedBatches);
                }}
-                onRestoreBatch={(id) => saveBatches(restoreBatch(batchState, id, Date.now()))}
+                 onRestoreBatch={(id) => {
+                   const next = restoreBatch(stateRef.current.batchState, id, Date.now());
+                   saveBatches(next);
+                   return next.batches.some((batch) => batch.id === id);
+                 }}
                 storageStatus={storageStatus}
                 onChooseStorage={chooseSharedLocation}
                 onReloadStorage={reloadSharedLocation}
@@ -749,7 +759,8 @@ export function App() {
         {dialog.kind === "inputs" && <div className="station-dialog-body"><p>{profileInputsText(dialog.batch.profileSnapshot)}</p><h3>Profile guidance</h3><p><RichProfileText value={dialog.batch.profileSnapshot.guidance.join(" ") || "No guidance defined yet."} /></p></div>}
         {dialog.kind === "info" && <div className="station-dialog-body"><p>A local fermentation journal for tracking household fermentation batches.</p><h3>Try it out</h3><p>Filter and search batches, open batch details, complete a check, or add an observation. Start a batch from any fermentation profile.</p><h3>Your data</h3><p>Data is saved on this device. Manage backups, shared folders, and credits in <button className="station-text-action" onClick={() => navigate("settings")} type="button">Settings</button>.</p></div>}
       </StationDialog>}
-      <div aria-atomic="true" className="design-toast" hidden={!announcement} role="status">{announcement?.message}</div>
+      <div aria-atomic="true" aria-live="polite" className="sr-only" role={announcement ? "status" : undefined}>{announcement?.message}</div>
+      <div aria-hidden="true" className="design-toast" hidden={!announcement}>{announcement?.message}</div>
     </div>
   );
 }
@@ -757,6 +768,10 @@ export function App() {
 function formatToday() {
   return new Intl.DateTimeFormat("en-GB", { weekday: "long", month: "long", day: "numeric" })
     .format(new Date(`${localDate()}T12:00:00`)).replace(/^(\w+) /, "$1, ");
+}
+
+function validFormulaTerm(term: string) {
+  return /^[A-Za-z][A-Za-z0-9_]*$/.test(term);
 }
 
 interface SettingsViewProps {
@@ -767,24 +782,71 @@ interface SettingsViewProps {
   onFormulaTermsChange(formulaTerms: string[]): void;
   onPreferencesChange(preferences: ShellPreferences, requestNotificationPermission?: boolean): void;
   onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
-  onRestoreBatch(id: string): void;
+  onRestoreBatch(id: string): boolean;
   storageStatus: SharedStorageStatus;
-  onChooseStorage(): void;
-  onReloadStorage(): void;
-  onResolveStorage(choice: "shared" | "device"): void;
+  onChooseStorage(): Promise<void>;
+  onReloadStorage(): Promise<void>;
+  onResolveStorage(choice: "shared" | "device"): Promise<void>;
 }
 
 function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport, onRestoreBatch, storageStatus, onChooseStorage, onReloadStorage, onResolveStorage }: SettingsViewProps) {
   const [message, setMessage] = useState("");
+  const [exchangeError, setExchangeError] = useState("");
+  const [storageError, setStorageError] = useState("");
+  const [operation, setOperation] = useState<{ area: "storage" | "exchange"; label: string } | null>(null);
+  const operationInProgress = useRef(false);
   const [pendingImport, setPendingImport] = useState<ArchiveImport | null>(null);
+  const currentImport = pendingImport && refreshArchiveCollisions(pendingImport, profileState, batchState);
+  const importInput = useRef<HTMLInputElement>(null);
+  const collisionHeading = useRef<HTMLHeadingElement>(null);
   const [showDeletedBatches, setShowDeletedBatches] = useState(false);
+  const [restoreMessage, setRestoreMessage] = useState("");
   const [terms, setTerms] = useState(formulaTerms);
   const [newTerm, setNewTerm] = useState("");
   const [termError, setTermError] = useState("");
+  const [termErrorSource, setTermErrorSource] = useState<"new" | "terms">("new");
+  const [termMessage, setTermMessage] = useState("");
+  const dataChoicePending = !!operation || !!pendingImport;
+  const storageLabels: Record<SharedStorageStatus["state"], string> = {
+    unavailable: "Device storage", unconfigured: "No shared folder", ready: "Folder connected",
+    migration: "Choose a data source", problem: "Storage needs attention", conflict: "Conflicting files preserved",
+  };
+  useEffect(() => {
+    if (pendingImport) collisionHeading.current?.focus();
+  }, [pendingImport]);
+
+  function finishImport(strategy: "local" | "archive" | "cancel") {
+    if (!currentImport) return;
+    if (strategy !== "cancel") {
+      const resolved = resolveArchiveCollisions(currentImport, strategy);
+      onImport(resolved.profileState, resolved.batchState);
+    }
+    setPendingImport(null);
+    setMessage(strategy === "cancel" ? "Import canceled. Existing data unchanged." : `Archive imported with ${strategy === "local" ? "local records kept" : "archive records used"} for collisions.`);
+    requestAnimationFrame(() => importInput.current?.focus({ preventScroll: true }));
+  }
+
+  async function runOperation(area: "storage" | "exchange", label: string, work: () => Promise<void>) {
+    if (operationInProgress.current) return;
+    operationInProgress.current = true;
+    setOperation({ area, label });
+    if (area === "exchange") { setMessage(""); setExchangeError(""); }
+    else setStorageError("");
+    try {
+      await work();
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      if (area === "exchange") setExchangeError(`Transfer failed: ${detail}. Your existing data has not been changed. Try again.`);
+      else setStorageError(`Storage action failed: ${detail}. Choose a folder or reload to try again.`);
+    } finally {
+      operationInProgress.current = false;
+      setOperation(null);
+    }
+  }
 
   function formulaTermError(next: string[]) {
     if (next.length === 0) return "At least one formula term is required.";
-    if (next.some((term) => !/^[A-Za-z][A-Za-z0-9_]*$/.test(term))) {
+    if (next.some((term) => !validFormulaTerm(term))) {
       return "Formula terms must start with a letter and use only letters, numbers, or underscores.";
     }
     if (new Set(next).size !== next.length) return "Formula terms must be unique.";
@@ -792,6 +854,8 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
   }
 
   function addFormulaTerm() {
+    setTermMessage("");
+    setTermErrorSource("new");
     const next = [...terms, newTerm.trim()];
     const error = formulaTermError(next);
     if (error) return setTermError(error);
@@ -801,11 +865,13 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
   }
 
   function saveFormulaTerms() {
+    setTermMessage("");
+    setTermErrorSource("terms");
     const error = formulaTermError(terms);
     if (error) return setTermError(error);
     onFormulaTermsChange(terms);
     setTermError("");
-    setMessage("Formula terms saved on this device.");
+    setTermMessage("Formula terms saved on this device.");
   }
 
   async function downloadArchive() {
@@ -852,164 +918,174 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
   }
 
   async function importBytes(bytes: Uint8Array) {
-    try {
-      const imported = await importArchive(bytes, profileState, batchState);
-      setPendingImport(imported.collisions.length > 0 ? imported : null);
-      if (imported.collisions.length > 0) {
-        setMessage("Import paused. Resolve the listed identifier collisions before changing local data.");
-      } else {
-        onImport(imported.profileState, imported.batchState);
-        setMessage("Archive imported.");
-      }
-    } catch (error) {
-      setPendingImport(null);
-      setMessage(`Import rejected: ${(error as Error).message}`);
+    const imported = await importArchive(bytes, profileState, batchState);
+    setPendingImport(imported.collisions.length > 0 ? imported : null);
+    if (imported.collisions.length > 0) {
+      setMessage("Import paused. Resolve the listed identifier collisions before changing local data.");
+    } else {
+      onImport(imported.profileState, imported.batchState);
+      setMessage("Archive imported.");
     }
   }
 
   async function uploadArchive(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+    const input = event.currentTarget;
+    const file = input.files?.[0];
     if (!file) return;
-    await importBytes(new Uint8Array(await file.arrayBuffer()));
-    event.target.value = "";
+    await runOperation("exchange", "Reading and checking archive…", async () => {
+      await importBytes(new Uint8Array(await file.arrayBuffer()));
+    });
+    input.value = "";
   }
 
   async function pickArchive() {
-    try {
-      const bytes = await pickNativeArchive();
-      if (bytes) await importBytes(bytes);
-    } catch (error) {
-      setMessage(`Import rejected: ${(error as Error).message}`);
-    }
+    const bytes = await pickNativeArchive();
+    if (bytes) await importBytes(bytes);
   }
 
   return (
     <section className="settings" aria-label="Local backup and transfer">
-      <section className="settings-card settings-exchange" aria-labelledby="data-storage-heading">
-        <h3 id="data-storage-heading">Data storage</h3>
-        <p>Shared folder: {storageStatus.location ?? "Not selected"}</p>
-        <p>Status: {storageStatus.message}</p>
-        {storageStatus.state !== "unavailable" && (
-          <button className="primary-action" onClick={onChooseStorage} type="button">Choose folder</button>
-        )}
-        {storageStatus.location && (
-          <button onClick={onReloadStorage} type="button">Reload from shared folder</button>
-        )}
-        {storageStatus.state === "migration" && (
-          <div className="form-actions">
-            <button onClick={() => onResolveStorage("shared")} type="button">Use shared folder data</button>
-            <button onClick={() => onResolveStorage("device")} type="button">Use this device's data</button>
-          </div>
-        )}
-        {storageStatus.conflicts.length > 0 && (
-          <div className="notice" role="alert">
-            <b>Synchronization conflict detected. Your files have been preserved.</b>
-            {storageStatus.conflicts.map((path) => <span key={path}>{path}</span>)}
-          </div>
-        )}
-      </section>
-      <section className="settings-card" aria-label="Household preferences">
+      <section className="settings-card settings-preferences" aria-labelledby="preferences-heading">
+        <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="settings" /></span><h2 id="preferences-heading">Household preferences</h2></div>
         <div className="setting-row">
           <div className="setting-body"><b>Units</b><p>Readouts for temperature and volume.</p></div>
-          <div className="setting-segment" aria-label="Units">
+          <div className="setting-segment" aria-label="Units" role="group">
             <button aria-pressed={preferences.units === "metric"} onClick={() => onPreferencesChange({ ...preferences, units: "metric" })} type="button">°C / L</button>
             <button aria-pressed={preferences.units === "imperial"} onClick={() => onPreferencesChange({ ...preferences, units: "imperial" })} type="button">°F / qt</button>
           </div>
         </div>
         <div className="setting-row">
-          <div className="setting-body"><b>Notifications</b><p>Choose alerts for due checks, ready batches, both, or neither.</p></div>
-          <div className="setting-segment notification-segment" aria-label="Notifications" role="group">
-            {([["all", "All"], ["checks", "Checks"], ["ready", "Ready"], ["off", "Off"]] as const).map(([mode, label]) => (
-              <button aria-pressed={preferences.notificationMode === mode} key={mode} onClick={() => onPreferencesChange({ ...preferences, notificationMode: mode }, true)} type="button">{label}</button>
-            ))}
-          </div>
-        </div>
-        <div className="setting-row">
           <div className="setting-body"><b>Suggestions</b><p>Show computed suggested values on timeline entries.</p></div>
-          <div className="setting-segment" aria-label="Suggestions">
+          <div className="setting-segment" aria-label="Suggestions" role="group">
             <button aria-pressed={preferences.suggestions} onClick={() => onPreferencesChange({ ...preferences, suggestions: true })} type="button">On</button>
             <button aria-pressed={!preferences.suggestions} onClick={() => onPreferencesChange({ ...preferences, suggestions: false })} type="button">Off</button>
           </div>
         </div>
-        <div className="setting-row">
-          <div className="setting-body"><b>Export</b><p>Draft a plain-text journal of every batch timeline.</p></div>
-          <button className="setting-export" onClick={downloadJournal} type="button">Export journal</button>
+        <p>Preferences save automatically. Formula terms are saved separately below.</p>
+      </section>
+      <section className="settings-card settings-notifications" aria-labelledby="notifications-heading">
+        <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="bell" /></span><h2 id="notifications-heading">Notifications</h2></div>
+        <p>Choose alerts for due checks, ready batches, both, or neither.</p>
+        <div className="setting-segment notification-segment" aria-label="Notifications" role="group">
+          {([["all", "All"], ["checks", "Checks"], ["ready", "Ready"], ["off", "Off"]] as const).map(([mode, label]) => (
+            <button aria-pressed={preferences.notificationMode === mode} key={mode} onClick={() => onPreferencesChange({ ...preferences, notificationMode: mode }, true)} type="button">{label}</button>
+          ))}
         </div>
+        <p>Scheduled alerts require the Android app and notification permission. Each batch can also be muted in its details.</p>
+      </section>
+      <section className="settings-card settings-storage" aria-labelledby="data-storage-heading">
+        <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="jar" /></span><h2 id="data-storage-heading">Data storage</h2></div>
+        <div aria-atomic="true" className="settings-storage-status" role={storageStatus.state === "problem" || storageStatus.state === "conflict" ? "alert" : "status"}>
+          <strong className="settings-state-label">{storageLabels[storageStatus.state]}</strong>
+          <p>{storageStatus.message}</p>
+        </div>
+        <p className="settings-location">Shared folder: {storageStatus.location ?? "Not selected"}</p>
+        <div className="form-actions">
+          {storageStatus.state !== "unavailable" && <button className="primary-action" disabled={dataChoicePending} onClick={() => void runOperation("storage", "Opening folder selection…", onChooseStorage)} type="button">Choose folder</button>}
+          {storageStatus.location && <button disabled={dataChoicePending} onClick={() => void runOperation("storage", "Reloading shared folder…", onReloadStorage)} type="button">Reload from shared folder</button>}
+        </div>
+        {storageStatus.state === "migration" && <div className="settings-recovery">
+          <h3>Choose which data to keep</h3>
+          <p>Both this device and the folder contain data. Export a ZIP backup before choosing; these copies will not be merged.</p>
+          <p>Use shared folder data replaces this device's current records and preferences. Use this device's data replaces the folder's records; its previous files are backed up in that folder.</p>
+          <div className="form-actions">
+            <button disabled={dataChoicePending} onClick={() => void runOperation("storage", "Using shared folder data…", () => onResolveStorage("shared"))} type="button">Use shared folder data</button>
+            <button disabled={dataChoicePending} onClick={() => void runOperation("storage", "Using this device's data…", () => onResolveStorage("device"))} type="button">Use this device's data</button>
+          </div>
+        </div>}
+        {storageStatus.conflicts.length > 0 && <div className="settings-recovery">
+          <h3>Preserved conflict files</h3>
+          <p>Review these files in your shared folder before removing any copy. Reload after resolving them outside the app.</p>
+          <ul>{storageStatus.conflicts.map((path) => <li key={path}>{path}</li>)}</ul>
+        </div>}
+        <div aria-atomic="true" className="settings-live" role="status">{operation?.area === "storage" && <p className="notice">{operation.label}</p>}</div>
+        <div aria-atomic="true" aria-live="assertive" className="settings-live" role={storageError ? "alert" : undefined}>{storageError && <p>{storageError}</p>}</div>
+        {dataChoicePending && <p>Finish the current transfer or import choice before changing storage.</p>}
+      </section>
+      <section className="settings-card settings-exchange" aria-labelledby="exchange-heading">
+        <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="book" /></span><h2 id="exchange-heading">Data exchange</h2></div>
+        <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
+        <p>Archives contain profiles, batches (including trash), and photos, up to 200 MB zipped (250 MB expanded). They do not include app settings such as destination, units, notifications, suggestions, or formula terms.</p>
+        <div className="form-actions">
+          <button className="primary-action" disabled={!!operation} onClick={() => void runOperation("exchange", "Preparing ZIP archive…", downloadArchive)} type="button">Export ZIP archive</button>
+          {isNativeTransferAvailable() && <button disabled={dataChoicePending} onClick={() => void runOperation("exchange", "Choosing and checking archive…", pickArchive)} type="button">Choose ZIP from device</button>}
+        </div>
+        <label>Import ZIP archive <input accept=".zip,application/zip" disabled={dataChoicePending} onChange={uploadArchive} ref={importInput} type="file" /></label>
+        <div aria-atomic="true" className="settings-live" role="status">{(operation?.area === "exchange" ? operation.label : message) && <p className="notice">{operation?.area === "exchange" ? operation.label : message}</p>}</div>
+        <div aria-atomic="true" aria-live="assertive" className="settings-live" role={exchangeError ? "alert" : undefined}>{exchangeError && <p>{exchangeError}</p>}</div>
+        {currentImport && <section className="settings-recovery" aria-labelledby="import-collisions-heading">
+          <h3 id="import-collisions-heading" ref={collisionHeading} tabIndex={-1}>Identifier collisions</h3>
+          <p>{currentImport.collisions.length > 0 ? "These identifiers already exist on this device." : "No matching identifiers remain on this device."} Keep local versions to retain your records, or use archive versions to replace the matching records. Other records from the archive will be added with either choice.</p>
+          <ul aria-live="polite" aria-relevant="additions removals">{currentImport.collisions.map((collision) => <li key={`${collision.kind}-${collision.id}`}>{collision.kind}: {collision.id}</li>)}</ul>
+          <div className="form-actions">
+            <button disabled={!!operation} onClick={() => finishImport("local")} type="button">Keep local versions</button>
+            <button disabled={!!operation} onClick={() => finishImport("archive")} type="button">Use archive versions</button>
+            <button disabled={!!operation} onClick={() => finishImport("cancel")} type="button">Cancel import</button>
+          </div>
+        </section>}
         <div className="setting-row">
-          <div className="setting-body"><b>Recently deleted batches</b><p>Batches remain recoverable for seven days.</p></div>
+          <div className="setting-body"><h3>Journal export</h3><p>A readable plain-text copy of every active batch timeline, not a restorable backup.</p></div>
+          <button className="setting-export" disabled={!!operation} onClick={() => void runOperation("exchange", "Preparing journal…", downloadJournal)} type="button">Export journal</button>
+        </div>
+      </section>
+      <section className="settings-card settings-trash" aria-labelledby="trash-heading">
+        <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="clock" /></span><h2 id="trash-heading">Recently deleted batches</h2></div>
+        <p>Batches remain recoverable for seven days, then are permanently deleted. Restore timeline entries from their batch's timeline. Deleted profiles cannot be restored.</p>
           <button
+            aria-controls="deleted-batches-panel"
             aria-expanded={showDeletedBatches}
             aria-label={showDeletedBatches ? "Close recently deleted batches" : "Open recently deleted batches"}
-            className="setting-trash-button"
+            className="settings-trash-toggle"
             onClick={() => setShowDeletedBatches(!showDeletedBatches)}
             type="button"
           >
-            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" /></svg>
+            <span>{showDeletedBatches ? "Close recently deleted batches" : "Open recently deleted batches"}</span><span className="settings-count">{batchState.trash.length}</span>
           </button>
-        </div>
-        {showDeletedBatches && (
-          <div className="deleted-batches-panel" aria-label="Recently deleted batches">
+          <div className="deleted-batches-panel" hidden={!showDeletedBatches} id="deleted-batches-panel">
             {batchState.trash.length === 0 ? <p>No recently deleted batches.</p> : batchState.trash.map((batch) => (
               <div className="trash-item" key={batch.id}>
                 <span>{batch.name}</span>
-                <button aria-label={`Restore ${batch.name}`} onClick={() => onRestoreBatch(batch.id)} type="button">Restore</button>
+                <button aria-label={`Restore ${batch.name}`} disabled={dataChoicePending} onClick={() => {
+                  const restored = onRestoreBatch(batch.id);
+                  setRestoreMessage(restored ? `Batch restored · ${batch.name}` : `The seven-day recovery period for ${batch.name} has ended. This batch can no longer be restored.`);
+                  document.querySelector<HTMLButtonElement>(".settings-trash-toggle")?.focus({ preventScroll: true });
+                }} type="button">Restore</button>
               </div>
             ))}
           </div>
-        )}
-        <div className="setting-row">
-          <div className="setting-body"><b>About</b><p>FermentStation v1 concept · not production software.</p></div>
-          <span className="settings-version">v1.0-concept</span>
-        </div>
+        <div aria-atomic="true" className="settings-live" role="status">{restoreMessage && <p className="notice">{restoreMessage}</p>}</div>
+        {dataChoicePending && <p>Finish the current transfer or import choice before restoring a batch.</p>}
       </section>
       <section className="settings-card formula-term-settings" aria-labelledby="formula-terms-heading">
-        <h3 id="formula-terms-heading">Formula dropdown terms</h3>
+        <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="plus" /></span><h2 id="formula-terms-heading">Formula dropdown terms</h2></div>
         <p>These names are stored in the shared folder when configured and are not included in archives.</p>
+        <p id="formula-term-help">Start with a letter; use letters, numbers, or underscores. Keep at least one unique term.</p>
         {terms.map((term, index) => (
           <div className="formula-term" key={index}>
-            <label>Formula term {index + 1}<input onChange={(event) => setTerms(terms.map((value, termIndex) => termIndex === index ? event.target.value : value))} value={term} /></label>
-            <button aria-label={`Remove formula term ${index + 1}: ${term}`} disabled={terms.length === 1} onClick={() => setTerms(terms.filter((_, termIndex) => termIndex !== index))} type="button">Remove</button>
+            <label>Formula term {index + 1}<input aria-describedby={termError ? "formula-term-help formula-term-error" : "formula-term-help"} aria-invalid={termError && termErrorSource === "terms" && (!validFormulaTerm(term) || terms.indexOf(term) !== terms.lastIndexOf(term)) ? true : undefined} onChange={(event) => { setTerms(terms.map((value, termIndex) => termIndex === index ? event.target.value : value)); setTermMessage(""); setTermError(""); }} value={term} /></label>
+            <button aria-label={`Remove formula term ${index + 1}: ${term}`} disabled={terms.length === 1} onClick={() => { setTerms(terms.filter((_, termIndex) => termIndex !== index)); setTermMessage(""); }} type="button">Remove</button>
           </div>
         ))}
         <div className="formula-term">
-          <label>New formula term<input onChange={(event) => setNewTerm(event.target.value)} value={newTerm} /></label>
+          <label>New formula term<input aria-describedby={termError ? "formula-term-help formula-term-error" : "formula-term-help"} aria-invalid={termError && termErrorSource === "new" ? true : undefined} onChange={(event) => { setNewTerm(event.target.value); setTermError(""); }} value={newTerm} /></label>
           <button onClick={addFormulaTerm} type="button">Add term</button>
         </div>
-        {termError && <p className="notice" role="alert">{termError}</p>}
+        <div aria-atomic="true" aria-live="assertive" className="settings-live" id="formula-term-error" role={termError ? "alert" : undefined}>{termError && <p>{termError}</p>}</div>
         <button className="primary-action" onClick={saveFormulaTerms} type="button">Save formula terms</button>
+        <div aria-atomic="true" className="settings-live" role="status">{termMessage && <p className="notice">{termMessage}</p>}</div>
       </section>
-      <section className="settings-card settings-exchange">
-        <h3>Data exchange</h3>
-        <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
-        <p>Archives contain profiles, batches (including trash), and photos, up to 200 MB zipped (250 MB expanded). They do not include app settings such as destination, units, notifications, suggestions, or formula terms.</p>
-        <button className="primary-action" onClick={downloadArchive} type="button">Export ZIP archive</button>
-        {isNativeTransferAvailable() && <button onClick={pickArchive} type="button">Choose ZIP from device</button>}
-        <label>Import ZIP archive <input accept=".zip,application/zip" onChange={uploadArchive} type="file" /></label>
+      <section className="settings-card settings-about" aria-labelledby="about-heading">
+        <div className="settings-card-heading"><StationLogo /><h2 id="about-heading">About FermentStation</h2></div>
+        <p>A local journal for household fermentation batches, observations, and recurring checks.</p>
+        <p>FermentStation v1 concept · not production software.</p><span className="settings-version">v1.0-concept</span>
       </section>
-      <section className="settings-card" aria-labelledby="credits-heading"><h3 id="credits-heading">Credits and licenses</h3><p>Unique by Rajesh Rajput. Original, unmodified web fonts are bundled for offline use, with the user's confirmed rights. <a href={`${import.meta.env.BASE_URL}fonts/unique/License.pdf`}>Unique end-user license</a>. System sans is the font-load and unsupported-character fallback.</p><p>Legacy bundled font: Outfit © 2021 The Outfit Project Authors. <a href={`${import.meta.env.BASE_URL}new-design/OFL.txt`}>SIL Open Font License 1.1</a>. Not used by the current interface.</p><PhotoCredits /></section>
-      {message && <p className="notice" role="status">{message}</p>}
-      {pendingImport && (
-        <section className="trash" aria-label="Import collisions">
-          <h3>Identifier collisions</h3>
-          {pendingImport.collisions.map((collision) => (
-            <p key={`${collision.kind}-${collision.id}`}>{collision.kind}: {collision.id}</p>
-          ))}
-          <div className="form-actions">
-            <button onClick={() => {
-              const resolved = resolveArchiveCollisions(pendingImport, "local");
-              onImport(resolved.profileState, resolved.batchState);
-              setPendingImport(null);
-              setMessage("Archive imported with local records kept for collisions.");
-            }} type="button">Keep local versions</button>
-            <button onClick={() => {
-              const resolved = resolveArchiveCollisions(pendingImport, "archive");
-              onImport(resolved.profileState, resolved.batchState);
-              setPendingImport(null);
-              setMessage("Archive imported with archive records used for collisions.");
-            }} type="button">Use archive versions</button>
-          </div>
-        </section>
-      )}
+      <section className="settings-card settings-credits" aria-labelledby="credits-heading">
+        <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="leaf" /></span><h2 id="credits-heading">Credits and licenses</h2></div>
+        <p>Unique by Rajesh Rajput. Original, unmodified web fonts are bundled for offline use, with the user's confirmed rights. <a href={`${import.meta.env.BASE_URL}fonts/unique/License.pdf`}>Unique end-user license</a>. System sans is the font-load and unsupported-character fallback.</p>
+        <p>Legacy bundled font: Outfit © 2021 The Outfit Project Authors. <a href={`${import.meta.env.BASE_URL}new-design/OFL.txt`}>SIL Open Font License 1.1</a>. Not used by the current interface.</p>
+        <p>Legacy bundled font: Sofia Sans Extra Condensed © 2019 The Sofia Sans Project Authors. <a href={`${import.meta.env.BASE_URL}new-design/SofiaSansExtraCondensed-OFL.txt`}>Sofia Sans Open Font License</a>. Not used by the current interface.</p>
+        <PhotoCredits />
+      </section>
     </section>
   );
 }

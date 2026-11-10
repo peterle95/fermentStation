@@ -136,6 +136,20 @@ export async function importArchive(
   };
 }
 
+export function refreshArchiveCollisions(
+  imported: ArchiveImport,
+  localProfiles: ProfileState,
+  localBatches: BatchState,
+): ArchiveImport {
+  if (!imported.pendingProfileState || !imported.pendingBatchState) return imported;
+  return {
+    ...imported,
+    profileState: localProfiles,
+    batchState: localBatches,
+    collisions: findCollisions(localProfiles, localBatches, imported.pendingProfileState, imported.pendingBatchState),
+  };
+}
+
 export function resolveArchiveCollisions(
   imported: ArchiveImport,
   strategy: "local" | "archive",
