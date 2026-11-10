@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { App as CapacitorApp } from "@capacitor/app";
 import { isTauri } from "@tauri-apps/api/core";
 import type { PluginListenerHandle } from "@capacitor/core";
@@ -52,7 +52,6 @@ import {
 } from "./domain/profiles";
 import {
   createShellState,
-  destinations,
   selectDestination,
   type Destination,
   type ShellPreferences,
@@ -80,8 +79,8 @@ import {
 } from "./platform/shared-data-store";
 
 const labels: Record<Destination, string> = {
-  today: "Today",
-  batches: "Batches",
+  today: "My batches",
+  batches: "My batches",
   calendar: "Calendar",
   profiles: "Profiles",
   settings: "Settings",
@@ -109,7 +108,7 @@ function NavIcon({ destination }: { destination: Destination }) {
   return <DesignIcon name="user" />;
 }
 
-function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus" | "bell" | "user" | "sparkles" | "temp" | "clock" | "back" | "check" | "book" | "drop" }) {
+function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus" | "bell" | "user" | "sparkles" | "temp" | "clock" | "back" | "check" | "book" | "drop" | "settings" }) {
   const paths = {
     leaf: "M19 3C9 3 3 7 5 14c2 6 12 6 14-11ZM4 21 15 9m-6 6 6 1",
     jar: "M7 7c0 3-2 3-2 6v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6c0-3-2-3-2-6M5 12h14M5 16h14",
@@ -125,29 +124,58 @@ function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus
     check: "m5 12 4 4L19 6",
     book: "M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Zm0 0v15",
     drop: "M12 2S4 11 4 15a8 8 0 0 0 16 0c0-4-8-13-8-13Z",
+    settings: "m9 3-1 3-3 1-2 5 2 5 3 1 1 3h6l1-3 3-1 2-5-2-5-3-1-1-3ZM16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
   };
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{name === "jar" && <rect x="6" y="3" width="12" height="4" rx="1.5" />}<path d={paths[name]} />{name === "temp" && <circle cx="12" cy="18" r="1" />}</svg>;
 }
 
+function StationLogo() {
+  return <span className="brand-mark" aria-hidden="true"><img alt="" src={`${import.meta.env.BASE_URL}new-design/new_app_logo/FermentStation_Logo_Asset_Pack/transparent/logo-transparent-96.png`} /></span>;
+}
+
+type FieldErrors = Record<string, string>;
+
+function fieldErrorProps(errors: FieldErrors, id: string) {
+  return { id, "aria-invalid": errors[id] ? true as const : undefined, "aria-describedby": errors[id] ? `${id}-error` : undefined };
+}
+
+function FieldError({ errors, id }: { errors: FieldErrors; id: string }) {
+  return errors[id] ? <span className="field-error" id={`${id}-error`}>{errors[id]}</span> : null;
+}
+
+function captureFieldError(event: React.FormEvent<HTMLElement>, report: (id: string, message: string) => void) {
+  const field = event.target;
+  if ((field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) && field.id) report(field.id, field.validationMessage);
+}
+
 function profileVisual(profile: FermentationProfile) {
   const name = profile.name.toLowerCase();
-  if (name.includes("kimchi")) return { photo: "kimchi", color: "#fbd4f3", emoji: "🥬" };
-  if (name.includes("kombucha")) return { photo: "kombucha", color: "#dbe6fb", emoji: "🍵" };
-  if (name.includes("sourdough")) return { photo: "sourdough", color: "#f7eab9", emoji: "🌾" };
-  if (name.includes("sauerkraut")) return { photo: "kraut", color: "#e0ecd0", emoji: "🥬" };
-  return { photo: null, color: "#e4eee2", emoji: "🫙" };
+  if (name.includes("kimchi")) return { photo: "kimchi", color: "var(--colour-action-alt)" };
+  if (name.includes("kombucha")) return { photo: "kombucha", color: "var(--colour-accent)" };
+  if (name.includes("sourdough")) return { photo: "sourdough", color: "var(--colour-surface)" };
+  if (name.includes("sauerkraut")) return { photo: "kraut", color: "var(--colour-action)" };
+  return { photo: null, color: "var(--colour-action-alt)" };
 }
 
 function BatchPhoto({ batch, detail = false }: { batch: Batch; detail?: boolean }) {
   const visual = profileVisual(batch.profileSnapshot);
   const photo = batch.timeline.filter((entry) => entry.kind === "photo").at(-1);
-  return <div className={detail ? "design-detail-photo" : "design-batch-photo"} style={{ background: visual.color }}>
-    {photo ? <img alt={`Batch photograph: ${photo.caption || photo.name}`} src={photo.dataUrl} /> : visual.photo
-      ? <img alt={`${batch.profileSnapshot.name} stand-in photograph`} data-source="stand-in" src={`${import.meta.env.BASE_URL}new-design/${visual.photo}.webp`} />
+  const source = photo?.dataUrl ?? (visual.photo ? `${import.meta.env.BASE_URL}new-design/${visual.photo}.webp` : null);
+  return <div className={`${detail ? "design-detail-photo" : "design-batch-photo"}${photo ? " user-photo" : ""}`} style={detail ? { background: visual.color } : undefined}>
+    {source ? <BatchImage key={source} source={source} userPhoto={!!photo} description={photo ? `Batch photograph: ${photo.caption || photo.name}` : `${batch.profileSnapshot.name} stand-in photograph`} />
       : <DesignIcon name="jar" />}
     {detail && <span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span>}
     <span className="design-photo-label">{batch.status === "to-fridge" ? "In the fridge" : batch.status === "ready" && !detail ? batch.finishDate === localDate() ? "Ready today" : "Ready to enjoy" : batch.finishDate ? `Finish ${shortDate(batch.finishDate)}` : "No finish date"}</span>
   </div>;
+}
+
+function BatchImage({ source, description, userPhoto }: { source: string; description: string; userPhoto: boolean }) {
+  const [state, setState] = useState<"loading" | "loaded" | "failed">("loading");
+  return <>
+    {state !== "loaded" && <span className="batch-photo-fallback" role={state === "failed" ? "img" : undefined} aria-label={state === "failed" ? userPhoto ? "Batch photograph unavailable; original retained" : "Stand-in photograph unavailable" : undefined}><DesignIcon name="jar" /></span>}
+    {state !== "failed" && <img alt={description} data-source={userPhoto ? "user" : "stand-in"} onLoad={() => setState("loaded")} onError={() => setState("failed")} src={source} />}
+    {!userPhoto && <span className="batch-image-credit">Stand-in</span>}
+  </>;
 }
 
 function batchDay(batch: Batch) {
@@ -156,11 +184,6 @@ function batchDay(batch: Batch) {
 
 function shortDate(date: string) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(`${date}T12:00:00`));
-}
-
-function inputEmoji(name: string) {
-  const term = name.toLowerCase();
-  return term.includes("carrot") ? "🥕" : term.includes("chilli") || term.includes("chili") ? "🌶️" : term.includes("salt") ? "🧂" : term.includes("water") ? "💧" : term.includes("flour") ? "🌾" : term.includes("sugar") ? "🍬" : term.includes("tea") ? "🍵" : term.includes("ginger") ? "🫚" : term.includes("cabbage") ? "🥬" : "🫙";
 }
 
 function BatchMeta({ batch, units, guidance = false }: { batch: Batch; units: ShellPreferences["units"]; guidance?: boolean }) {
@@ -175,8 +198,8 @@ function BatchMeta({ batch, units, guidance = false }: { batch: Batch; units: Sh
   const salt = saltFormula && parseSimpleFormula(saltFormula.formula);
   return <div className="design-batch-meta">
     <span><DesignIcon name="temp" />{temperature ? `${displayTemperature(temperature.value, units)} °${units === "imperial" ? "F" : "C"}` : "No reading"}</span>
-    {amount && <span><span aria-hidden="true">{profileVisual(batch.profileSnapshot).emoji}</span>{amount}</span>}
-    {guidance && salt?.percentage && salt.operator === "*" && <span title="Profile formula percentage"><span aria-hidden="true">🧂</span>{salt.operand}%</span>}
+    {amount && <span><DesignIcon name="jar" />{amount}</span>}
+    {guidance && salt?.percentage && salt.operator === "*" && <span title="Profile formula percentage">Salt {salt.operand}%</span>}
   </div>;
 }
 
@@ -242,6 +265,7 @@ function StartBatchForm({ profiles, initialProfile, onCreate, onCancel }: { prof
     : [...profiles, initialProfile] : profiles;
   const [profileId, setProfileId] = useState(initialProfile?.id ?? profiles[0]?.id ?? "");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const profile = available.find(({ id }) => id === profileId);
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -257,15 +281,18 @@ function StartBatchForm({ profiles, initialProfile, onCreate, onCancel }: { prof
       });
       onCreate(batch);
     } catch (error) {
-      setError((error as Error).message);
+      const message = (error as Error).message;
+      setError(message);
+      const index = profile.inputs.findIndex((input) => message === `${input.name} cannot be negative`);
+      setFieldErrors({ [index < 0 ? "start-profile" : `start-input-${index}`]: message });
     }
   }
-  return <form onSubmit={save}>
+  return <form onInput={() => { setError(""); setFieldErrors({}); }} onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))} onSubmit={save}>
     <p className="station-dialog-body">Choose a fermentation profile for your next batch.</p>
-    <label className="station-field">Batch name<input autoComplete="off" maxLength={60} name="name" placeholder="e.g. My weekend kimchi" title="Optional; uses the profile name if blank" /></label>
-    <label className="station-field">Fermentation profile<select name="profileId" onChange={(event) => { setProfileId(event.target.value); setError(""); }} required value={profileId}>{available.map((profile) => <option key={profile.id} value={profile.id}>{profile.name} · {profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "duration not set"}</option>)}</select></label>
-    <label className="station-field">Start date<input defaultValue={localDate()} max={localDate()} name="startDate" required type="date" /></label>
-    {profile && profile.inputs.length > 0 ? <details className="station-options"><summary><span>Batch input options</span> · name is optional</summary><div key={profile.id}>{profile.inputs.map((input) => <label className="station-field" key={input.name}>{input.name} ({input.unit})<input defaultValue={input.defaultValue} min="0" name={`input.${input.name}`} step="any" type="number" /></label>)}<p>Blank inputs use profile defaults. Changes are saved on this device.</p></div></details> : <p className="station-helper">Saved on this device · name is optional.</p>}
+    <label className="station-field">Batch name<input {...fieldErrorProps(fieldErrors, "start-name")} aria-label="Batch name" autoComplete="off" maxLength={60} name="name" placeholder="e.g. My weekend kimchi" title="Optional; uses the profile name if blank" /><FieldError errors={fieldErrors} id="start-name" /></label>
+    <label className="station-field">Fermentation profile<select {...fieldErrorProps(fieldErrors, "start-profile")} aria-label="Fermentation profile" name="profileId" onChange={(event) => { setProfileId(event.target.value); setError(""); setFieldErrors({}); }} required value={profileId}>{available.map((profile) => <option key={profile.id} value={profile.id}>{profile.name} · {profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "duration not set"}</option>)}</select><FieldError errors={fieldErrors} id="start-profile" /></label>
+    <label className="station-field">Start date<input {...fieldErrorProps(fieldErrors, "start-date")} aria-label="Start date" defaultValue={localDate()} max={localDate()} name="startDate" required type="date" /><FieldError errors={fieldErrors} id="start-date" /></label>
+    {profile && profile.inputs.length > 0 ? <details className="station-options"><summary><span>Batch input options</span> · name is optional</summary><div key={profile.id}>{profile.inputs.map((input, index) => <label className="station-field" key={input.name}>{input.name} ({input.unit})<input {...fieldErrorProps(fieldErrors, `start-input-${index}`)} aria-label={`${input.name} (${input.unit})`} defaultValue={input.defaultValue} min="0" name={`input.${input.name}`} step="any" type="number" /><FieldError errors={fieldErrors} id={`start-input-${index}`} /></label>)}<p>Blank inputs use profile defaults. Changes are saved on this device.</p></div></details> : <p className="station-helper">Saved on this device · name is optional.</p>}
     {error && <p role="alert">{error}</p>}
     <div className="station-dialog-actions"><button className="station-secondary" onClick={onCancel} type="button">Cancel</button><button className="station-primary" disabled={!profile} type="submit">Start a batch</button></div>
   </form>;
@@ -321,6 +348,8 @@ export function App() {
   const [openBatchId, setOpenBatchId] = useState<string | null>(null);
   const [showPhoneDetail, setShowPhoneDetail] = useState(false);
   const [showChecks, setShowChecks] = useState(false);
+  const [detailOrigin, setDetailOrigin] = useState<"calendar" | "checks" | null>(null);
+  const batchReturnFocus = useRef<HTMLElement | null>(null);
   const [dialog, setDialog] = useState<StationDialogState | null>(null);
   const dialogTrigger = useRef<HTMLElement | null>(null);
   const [batchListVersion, setBatchListVersion] = useState(0);
@@ -448,6 +477,7 @@ export function App() {
     persistShared(sharedDataStore.saveShell(next));
     setShowPhoneDetail(false);
     setShowChecks(false);
+    setDetailOrigin(null);
     setEditingProfileId(null);
     setDialog(null);
   }
@@ -487,7 +517,18 @@ export function App() {
   }
 
   function openBatch(id: string | null) {
-    if (id) setOpenBatchId(id);
+    if (id) {
+      batchReturnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      setDetailOrigin(shell.destination === "calendar" ? "calendar" : showChecks ? "checks" : null);
+      setOpenBatchId(id);
+    } else {
+      if (detailOrigin === "calendar") navigate("calendar");
+      if (detailOrigin === "checks") setShowChecks(true);
+      requestAnimationFrame(() => {
+        const heading = document.querySelector<HTMLElement>(detailOrigin === "calendar" ? ".calendar-screen h1" : detailOrigin === "checks" ? ".design-checks-view h1" : "#batch-overview-heading");
+        (batchReturnFocus.current?.isConnected ? batchReturnFocus.current : heading)?.focus({ preventScroll: true });
+      });
+    }
     setShowPhoneDetail(id !== null);
   }
 
@@ -560,36 +601,42 @@ export function App() {
       <a className="design-skip-link" href="#main-content">Skip to content</a>
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark" aria-hidden="true"><DesignIcon name="leaf" /></span>
+          <StationLogo />
           <div><strong>FermentStation</strong></div>
         </div>
         <nav aria-label="Primary navigation" className="navigation">
-          {destinations.map((destination) => (
+          {(["today", "checks", "calendar", "profiles"] as const).map((destination) => (
             <button
-              aria-label={destination === "calendar" ? "Checks" : labels[destination]}
-              aria-current={(destination === "calendar" ? showChecks : !showChecks && (shell.destination === destination || destination === "today" && shell.destination === "batches")) ? "page" : undefined}
+              aria-label={destination === "checks" ? "Checks" : labels[destination]}
+              aria-current={(destination === "checks" ? showChecks : !showChecks && (shell.destination === destination || destination === "today" && shell.destination === "batches")) ? "page" : undefined}
               className={`nav-${destination}`}
               key={destination}
-              onClick={() => destination === "calendar" ? openChecks() : navigate(destination)}
+              onClick={() => destination === "checks" ? openChecks() : navigate(destination)}
               type="button"
             >
-              <span className="nav-mark" aria-hidden="true"><NavIcon destination={destination} /></span>
-              {destination === "settings" ? (
-                <span>More</span>
-               ) : <span className="nav-word">{destination === "today" ? "My batches" : destination === "calendar" ? "Checks" : labels[destination]}</span>}
+              <span className="nav-mark" aria-hidden="true">{destination === "checks" ? <DesignIcon name="check" /> : <NavIcon destination={destination} />}</span>
+              <span className="nav-word">{destination === "checks" ? "Checks" : labels[destination]}</span>
               {destination === "today" && <span className="design-nav-count">{batchState.batches.length}</span>}
             </button>
           ))}
-          {(shell.destination === "calendar" || shell.destination === "settings") && <button aria-label="Start a batch" className="batch-fab primary-action design-global-start" disabled={profileState.profiles.length === 0} onClick={() => showDialog({ kind: "start" })} type="button"><span className="nav-mark"><DesignIcon name="plus" /></span><span>Start a batch</span></button>}
-          <button aria-label="Open station information" className="design-mobile-info" onClick={() => showDialog({ kind: "info" })} type="button"><span className="nav-mark"><DesignIcon name="user" /></span></button>
         </nav>
         <div className="design-sidebar-bottom">
-          <div className="design-side-note"><DesignIcon name="sparkles" /><h2>A little care.<br />A living kitchen.</h2><p>Keep your cultures close, and your batch notes closer.</p></div>
+          <div className="design-side-note"><DesignIcon name="jar" /><h2>Your local journal</h2><p>Batch notes, readings, and the next check.</p></div>
           <button aria-label="Open station information" className="design-account" onClick={() => showDialog({ kind: "info" })} type="button"><span className="design-avatar"><DesignIcon name="user" /></span><span>My kitchen<small>Home fermenter</small></span><span aria-hidden="true">›</span></button>
         </div>
       </aside>
 
       <div className="content-shell">
+        <header className="design-topbar">
+          <button aria-label="Open station information" className="icon-button station-identity" onClick={() => showDialog({ kind: "info" })} type="button"><StationLogo /></button>
+          <div className="design-topbar-copy"><p>{formatToday()}</p><div>Your fermentation station</div></div>
+          <button aria-label="Open calendar" className="design-date-chip" onClick={() => navigate("calendar")} type="button"><NavIcon destination="calendar" /><span>{shortDate(localDate())}</span></button>
+          <div className="design-topbar-actions">
+            <button aria-label="View batch checks" className="icon-button" onClick={openChecks} type="button"><DesignIcon name="bell" /></button>
+            <button aria-label="Settings" aria-current={shell.destination === "settings" ? "page" : undefined} className="icon-button" onClick={() => navigate("settings")} type="button"><DesignIcon name="settings" /></button>
+            <button aria-label="Start a batch" className="batch-fab primary-action" onClick={() => showDialog({ kind: "start" })} type="button"><DesignIcon name="plus" /><span>Start a batch</span></button>
+          </div>
+        </header>
         {webStorageError && <section role="alert" className="storage-warning">
           <strong>Changes may not be saved on this device.</strong>{" "}
           Export a backup from Settings before closing the app.
@@ -621,7 +668,7 @@ export function App() {
                 mode={shell.destination === "today" ? "today" : "batches"}
                 pane={showChecks ? "checks" : shell.destination === "profiles" ? "profiles" : "batches"}
                 showPhoneDetail={showPhoneDetail}
-                onChecks={openChecks}
+                backLabel={detailOrigin === "calendar" ? "Calendar" : showChecks ? "Checks" : "batches"}
                 onObservationAdded={() => setAnnouncement({ message: "Observation added" })}
                 profilePane={shell.destination === "profiles" && <section className="profiles-screen" aria-label="Fermentation profiles">
                   {!editingProfileId && <div className="design-view-heading"><h1>Fermentation profiles</h1><p>The methods, inputs, and guidance behind your batches.</p></div>}
@@ -641,27 +688,24 @@ export function App() {
                 units={shell.units}
               />
             </section>
-          {shell.destination === "calendar" ? (
-            <section className="calendar-screen" aria-label="Fermentation calendar">
+          <section className="calendar-screen" aria-label="Fermentation calendar" hidden={shell.destination !== "calendar"}>
               <div className="screen-head">
                 <div>
                   <p className="eyebrow">Check-ins &amp; ready days</p>
-                  <h1>Calendar</h1>
-                  <p className="screen-intro">Amber marks a profile check, green a ready day, blue a shift to the fridge.</p>
+                  <h1 tabIndex={-1}>Calendar</h1>
+                  <p className="screen-intro">Checks, ready days, and moves to the fridge. Select a scheduled day to open its batch.</p>
                 </div>
               </div>
               <CalendarView batches={batchState.batches} onOpen={(id) => { navigate("batches"); openBatch(id); }} />
-            </section>
-          ) : shell.destination === "settings" ? (
+          </section>
+          {shell.destination === "settings" ? (
             <section className="settings-screen" aria-label="Settings">
               <div className="screen-head">
                 <div>
-                  <p className="eyebrow">Reached from the overflow menu</p>
                   <h1>Settings</h1>
                   <p className="screen-intro">Household preferences for how FermentStation talks to you. No data leaves this device.</p>
                 </div>
               </div>
-              <button className="primary-action" onClick={() => navigate("calendar")} type="button">Calendar</button>
             <SettingsView
               batchState={batchState}
               formulaTerms={shell.formulaTerms}
@@ -690,15 +734,16 @@ export function App() {
         </main>
       </div>
       {dialog && <StationDialog mode={dialog.kind} title={dialog.kind === "start" ? "Start a batch" : dialog.kind === "profile" ? dialog.profile.name : dialog.kind === "dates" ? "Batch dates" : dialog.kind === "inputs" ? "Profile inputs" : "Your fermentation station"} returnFocus={dialogTrigger.current} onClose={() => setDialog(null)}>
-        {dialog.kind === "start" && <StartBatchForm profiles={profileState.profiles} initialProfile={dialog.profile} onCancel={() => setDialog(null)} onCreate={(batch) => {
+        {dialog.kind === "start" && (profileState.profiles.length === 0 && !dialog.profile ? <div className="station-dialog-body"><p>Create or restore a fermentation profile before starting a batch.</p><div className="station-dialog-actions"><button className="station-primary" onClick={() => navigate("profiles")} type="button">Open Profiles</button></div></div> : <StartBatchForm profiles={profileState.profiles} initialProfile={dialog.profile} onCancel={() => setDialog(null)} onCreate={(batch) => {
           const current = stateRef.current.batchState;
           saveBatches({ ...current, batches: [...current.batches, batch] });
           navigate("batches");
           setBatchListVersion((version) => version + 1);
           openBatch(batch.id);
+          setDetailOrigin(null);
           setAnnouncement({ message: `Batch started · ${batch.name}` });
           requestAnimationFrame(() => document.querySelector<HTMLElement>(".design-detail")?.focus({ preventScroll: true }));
-        }} />}
+        }} />)}
         {dialog.kind === "profile" && <ProfileOverview profile={dialog.profile} onStart={() => showDialog({ kind: "start", profile: dialog.profile })} />}
         {dialog.kind === "dates" && <div className="station-dialog-body"><dl><dt>Start date</dt><dd>{shortDate(dialog.batch.startDate)}</dd><dt>Finish date</dt><dd>{dialog.batch.finishDate ? shortDate(dialog.batch.finishDate) : "Not set"}</dd><dt>Batch status</dt><dd>{statusLabel(dialog.batch.status)}</dd></dl><p>A batch becomes ready on its finish date. Moving it to the fridge slows fermentation.</p></div>}
         {dialog.kind === "inputs" && <div className="station-dialog-body"><p>{profileInputsText(dialog.batch.profileSnapshot)}</p><h3>Profile guidance</h3><p><RichProfileText value={dialog.batch.profileSnapshot.guidance.join(" ") || "No guidance defined yet."} /></p></div>}
@@ -941,7 +986,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         {isNativeTransferAvailable() && <button onClick={pickArchive} type="button">Choose ZIP from device</button>}
         <label>Import ZIP archive <input accept=".zip,application/zip" onChange={uploadArchive} type="file" /></label>
       </section>
-      <section className="settings-card" aria-labelledby="credits-heading"><h3 id="credits-heading">Credits and licenses</h3><p>Outfit © 2021 The Outfit Project Authors. <a href={`${import.meta.env.BASE_URL}new-design/OFL.txt`}>SIL Open Font License 1.1</a>.</p><PhotoCredits /></section>
+      <section className="settings-card" aria-labelledby="credits-heading"><h3 id="credits-heading">Credits and licenses</h3><p>Unique by Rajesh Rajput. Original, unmodified web fonts are bundled for offline use, with the user's confirmed rights. <a href={`${import.meta.env.BASE_URL}fonts/unique/License.pdf`}>Unique end-user license</a>. System sans is the font-load and unsupported-character fallback.</p><p>Legacy bundled font: Outfit © 2021 The Outfit Project Authors. <a href={`${import.meta.env.BASE_URL}new-design/OFL.txt`}>SIL Open Font License 1.1</a>. Not used by the current interface.</p><PhotoCredits /></section>
       {message && <p className="notice" role="status">{message}</p>}
       {pendingImport && (
         <section className="trash" aria-label="Import collisions">
@@ -1148,7 +1193,7 @@ interface BatchViewProps {
   pane: "batches" | "checks" | "profiles";
   profilePane: ReactNode;
   showPhoneDetail: boolean;
-  onChecks(): void;
+  backLabel: string;
   profiles: FermentationProfile[];
   units: ShellPreferences["units"];
   onChange(batch: Batch): void;
@@ -1163,7 +1208,7 @@ interface BatchViewProps {
 
 type BatchListFilter = BatchFilter | "attention";
 
-function BatchView({ visible: workspaceVisible, batches, mode, pane, profilePane, showPhoneDetail, onChecks, onObservationAdded, profiles, units, onDialog, batchListVersion, onChange, onUpdate, onComplete, onDelete, onNavigate, onOpen, onSelect, openBatchId }: BatchViewProps) {
+function BatchView({ visible: workspaceVisible, batches, mode, pane, profilePane, showPhoneDetail, backLabel, onObservationAdded, profiles, units, onDialog, batchListVersion, onChange, onUpdate, onComplete, onDelete, onNavigate, onOpen, onSelect, openBatchId }: BatchViewProps) {
   const [filter, setFilter] = useState<BatchListFilter>("all");
   const [query, setQuery] = useState("");
   const [sorted, setSorted] = useState(false);
@@ -1175,7 +1220,7 @@ function BatchView({ visible: workspaceVisible, batches, mode, pane, profilePane
   useEffect(() => {
     if (!openBatchId || !showPhoneDetail) return;
     if (detailRef.current) detailRef.current.scrollTop = 0;
-    if (!window.matchMedia?.("(min-width: 901px)").matches) detailRef.current?.focus({ preventScroll: true });
+    if (!window.matchMedia?.("(min-width: 1024px)").matches) detailRef.current?.focus({ preventScroll: true });
   }, [openBatchId, showPhoneDetail]);
   const filtered = filter === "attention"
     ? batches.filter((batch) => batch.status === "active" && dueBatchChecks(batch, localDate()).length > 0)
@@ -1205,31 +1250,13 @@ function BatchView({ visible: workspaceVisible, batches, mode, pane, profilePane
 
   function closeBatch() {
     onOpen(null);
-    requestAnimationFrame(() => overviewHeadingRef.current?.focus({ preventScroll: true }));
   }
 
   return (
     <section className={`batches design-workspace${openBatch && showPhoneDetail ? " design-selected" : ""}`} aria-label="Fermentation workspace">
-      <header className="design-topbar">
-        <button aria-label="Open station information" className="design-avatar design-mobile-avatar" onClick={() => onDialog({ kind: "info" })} type="button"><DesignIcon name="leaf" /></button>
-        <div className="design-topbar-copy"><p>{formatToday()}</p><div>Your fermentation station</div></div>
-        <button aria-label="Calendar" className="design-date-chip" onClick={() => onNavigate("calendar")} type="button"><NavIcon destination="calendar" /><span>Today, {shortDate(localDate())}</span><svg aria-hidden="true" className="design-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m9 5 7 7-7 7" /></svg></button>
-        <div className="design-topbar-actions"><button aria-label="View batch checks" className="icon-button" onClick={onChecks} type="button"><DesignIcon name="bell" /></button>
-        <button
-          aria-label="Start a batch"
-          className="batch-fab primary-action"
-          disabled={profiles.length === 0}
-          onClick={() => onDialog({ kind: "start" })}
-          type="button"
-        >
-          <DesignIcon name="plus" /><span>Start a batch</span>
-        </button>
-        </div>
-      </header>
-
       <div className="design-dashboard" key={pane}>
       {pane === "profiles" ? profilePane : pane === "checks" ? <section aria-label="Batch checks" className="design-checks-view">
-        <div className="design-view-heading"><h1>Your batch checks</h1><p>A small check-in for the cultures in your kitchen.</p></div>
+        <div className="design-view-heading"><h1 tabIndex={-1}>Your batch checks</h1><p>A small check-in for the cultures in your kitchen.</p></div>
         <div className="design-all-checks">{batches.filter(({ status }) => status === "active").flatMap((batch) => batch.checks.map((check) => {
           const completed = check.lastCompletedDate === today;
           return <article className={`queue-card${completed ? " done" : ""}`} key={`${batch.id}-${check.id}`}>
@@ -1241,21 +1268,22 @@ function BatchView({ visible: workspaceVisible, batches, mode, pane, profilePane
         {!batches.some((batch) => batch.status === "active" && batch.checks.length > 0) && <p className="design-empty-checks">No checks scheduled for your active batches.</p>}
         <PhotoCredits />
       </section> : <>
+        <div className="design-section-head"><div><p className="eyebrow">Your local journal</p><h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>My batches <span>{batches.length}</span></h1></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
         <div className="design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /><button aria-label="Sort batches by finish date" aria-pressed={sorted} onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div>
-        <section className="design-summary" aria-label="Kitchen summary">
-          <div className="design-gauge"><svg aria-hidden="true" viewBox="0 0 154 126"><path className="design-gauge-track" d="M17 111a62 62 0 1 1 120 0" /><path className="design-gauge-value" d="M17 111a62 62 0 1 1 120 0" pathLength="100" strokeDasharray={`${batches.length ? 76 : 0} 100`} /></svg><div><strong>{batches.length}</strong><span>batches</span><small><DesignIcon name="sparkles" />{readyBatches.length} ready to enjoy</small></div></div>
-          <div className="design-summary-label"><h2>Good things<br />are growing.</h2><p>A little check-in keeps your batches on track.</p></div>
-          <div className="design-summary-stats">{batchStatuses.map((status, index) => {
+        <section className="design-summary" aria-label="Kitchen summary" hidden={mode !== "today"}>
+          <div className="design-gauge"><strong>{batches.length}</strong><span>Total batches</span><small>{dueChecks.length} checks due</small></div>
+          <div className="design-summary-label"><h2>Kitchen summary</h2><p>{readyBatches.length} ready to enjoy</p></div>
+          <div className="design-summary-stats">{batchStatuses.map((status) => {
             const count = batches.filter((batch) => batch.status === status).length;
-            return <div className="design-stat-row" key={status}><div><span aria-hidden="true">{["🌱", "✨", "🧊"][index]}</span>{statusLabel(status)}<span className="design-stat-number">{count}<span>/{batches.length}</span></span></div><div className="design-stat-track"><i style={{ width: `${batches.length ? count / batches.length * 100 : 0}%` }} /></div></div>;
+            return <div className="design-stat-row" key={status}><div>{statusLabel(status)}<span className="design-stat-number">{count}<span>/{batches.length}</span></span></div><div className="design-stat-track"><i style={{ width: `${batches.length ? count / batches.length * 100 : 0}%` }} /></div></div>;
           })}</div>
         </section>
-        <div className="design-section-head"><h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>Your batches <span>{visible.length}</span></h1><button className="design-quiet" onClick={() => { setFilter("all"); setQuery(""); if (mode === "today") onNavigate("batches"); }} type="button">See all</button></div>
+        <div className="design-section-head"><h2>{mode === "today" ? "Batch overview" : "All batches"}</h2><span>{visible.length} shown</span></div>
         <div className="filter-row" role="group" aria-label="Filter batches by status">
-          {(["all", ...batchStatuses] as BatchFilter[]).map((status) => <button aria-pressed={filter === status} key={status} onClick={() => setFilter(status)} type="button">{status === "all" ? "All" : statusLabel(status)}{status === "all" && <span> batches</span>}</button>)}
+          {(["all", ...batchStatuses] as BatchFilter[]).map((status) => <button aria-pressed={filter === status} key={status} onClick={() => setFilter(status)} type="button">{status === "all" ? "All" : statusLabel(status)}</button>)}
         </div>
 
-      {profiles.length === 0 && <p className="notice">Restore or create a profile before starting a batch.</p>}
+      {profiles.length === 0 && <p className="notice">Restore or create a profile before starting a batch. <button className="station-text-action" onClick={() => onNavigate("profiles")} type="button">Open Profiles</button></p>}
 
       {visible.length === 0 ? (
         <section className="empty-state">
@@ -1330,7 +1358,7 @@ function BatchView({ visible: workspaceVisible, batches, mode, pane, profilePane
       </>}
       </div>
       <aside aria-label="Selected batch" className="design-detail" ref={detailRef} tabIndex={-1}>
-        {openBatch ? <><div className="design-detail-top"><button aria-label={`Back to ${mode}`} className="icon-button design-back" onClick={closeBatch} type="button"><DesignIcon name="back" /></button><h2>Batch details</h2><button aria-label="View batch dates" className="icon-button" onClick={() => onDialog({ kind: "dates", batch: openBatch })} type="button"><NavIcon destination="calendar" /></button></div><BatchCard batch={openBatch} key={openBatch.id} visible={workspaceVisible} onChange={onChange} onUpdate={onUpdate} onComplete={onComplete} onObservationAdded={onObservationAdded} onDialog={onDialog} onDelete={onDelete} units={units} /></> : <div className="design-detail-empty"><DesignIcon name="jar" /><h2>Your batch details</h2><p>Choose a batch to see its progress and record an observation.</p></div>}
+        {openBatch ? <><div className="design-detail-top"><button aria-label={`Back to ${backLabel}`} className="icon-button design-back" onClick={closeBatch} type="button"><DesignIcon name="back" /></button><h2>Batch details</h2><button aria-label="View batch dates" className="icon-button" onClick={() => onDialog({ kind: "dates", batch: openBatch })} type="button"><NavIcon destination="calendar" /></button></div><BatchCard batch={openBatch} key={openBatch.id} visible={workspaceVisible} onChange={onChange} onUpdate={onUpdate} onComplete={onComplete} onObservationAdded={onObservationAdded} onDialog={onDialog} onDelete={onDelete} units={units} /></> : <div className="design-detail-empty"><DesignIcon name="jar" /><h2>Your batch details</h2><p>Choose a batch to see its progress and record an observation.</p></div>}
       </aside>
     </section>
   );
@@ -1344,8 +1372,8 @@ function CompactBatchCard({ batch, selected, units, onOpen }: { batch: Batch; se
   const isAttention = batch.status === "active" && dueBatchChecks(batch, localDate()).length > 0;
   const statusText = isAttention ? "Active · attention" : statusLabel(batch.status);
   return (
-    <button aria-label={`Open ${batch.name}`} aria-pressed={selected} className={`design-batch-card${selected ? " selected" : ""}`} onClick={() => onOpen(batch.id)} type="button">
-      <div className="design-batch-copy"><h3>{batch.name}</h3><BatchMeta batch={batch} units={units} /><div className="design-batch-bottom"><strong>{batch.status === "to-fridge" ? "Chilled" : `Day ${day}`}</strong>{batch.status !== "to-fridge" && batch.finishDate && <span>/ {Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))}</span>}</div><span className="sr-only">{statusText}. {latestPh && `pH ${latestPh.value}.`} Next: {next}</span></div>
+    <button aria-label={`Open ${batch.name}`} aria-pressed={selected} className={`design-batch-card${selected ? " selected" : ""}`} style={{ "--batch-colour": profileVisual(batch.profileSnapshot).color } as CSSProperties} onClick={() => onOpen(batch.id)} type="button">
+      <div className="design-batch-copy"><span className={`status status-${batch.status}`}>{statusText}</span><h3>{batch.name}</h3><p className="design-batch-profile">{batch.profileSnapshot.name}</p><BatchMeta batch={batch} units={units} /><div className="design-batch-bottom"><strong>{batch.status === "to-fridge" ? "Chilled" : `Day ${day}`}</strong>{batch.status !== "to-fridge" && batch.finishDate && <span>/ {Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))} days</span>}</div><p className="design-batch-next">{nextCheck ? `${nextCheck.name} · ${shortDate(nextCheck.nextDueDate)}` : batch.finishDate ? `Finish · ${shortDate(batch.finishDate)}` : "No finish date"}</p><span className="sr-only">{latestPh && `pH ${latestPh.value}.`} Next: {next}</span></div>
       <BatchPhoto batch={batch} />
     </button>
   );
@@ -1382,6 +1410,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
   const formRef = useRef<HTMLFormElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
+  const observationTrigger = useRef<HTMLButtonElement>(null);
   const mounted = useRef(false);
   const modal = useRef(false);
   const revision = useRef(0);
@@ -1685,11 +1714,12 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
   return (
     <article className="batch-workspace">
       <div className="design-detail-card">
-        <div className="design-detail-heading"><span className="design-check-symbol"><DesignIcon name="jar" /></span><div><h3>{batch.name}</h3><p>{batch.profileSnapshot.name} batch</p></div><button aria-label="Add observation" className="icon-button" onClick={showLogger} type="button"><DesignIcon name="plus" /></button></div>
+        <div className="design-detail-heading"><span className="design-check-symbol"><DesignIcon name="jar" /></span><div><h3>{batch.name}</h3><p>{batch.profileSnapshot.name} batch</p></div><button aria-label="Add observation" className="primary-action design-record-observation" onClick={showLogger} ref={observationTrigger} type="button"><DesignIcon name="plus" /><span>Add observation</span></button></div>
         <div className="design-detail-metrics"><BatchMeta batch={batch} units={units} guidance /><strong>{day}<small> / {batch.finishDate ? Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000)) : "—"} days</small></strong></div>
         <BatchPhoto batch={batch} detail />
+        {batch.status === "active" && nextCheck && <section className="design-detail-next" aria-label="Next batch check"><div><p>{dueCheck ? "Check due" : "Next check"}</p><strong>{dueCheck?.name ?? nextCheck.name}</strong><p>{dueCheck?.overdue ? "Overdue · " : "Due · "}{shortDate((dueCheck ?? nextCheck).nextDueDate)}</p></div>{dueCheck && <button aria-label={`Complete check: ${dueCheck.name} for this batch`} className="primary-action" onClick={(event) => { if (document.activeElement === event.currentTarget && dueBatchChecks(batch, localDate()).length === 1) observationTrigger.current?.focus({ preventScroll: true }); onComplete(batch.id, dueCheck.id); }} type="button"><DesignIcon name="check" /><span>Complete check</span></button>}</section>}
       </div>
-      <section className="design-input-summary"><div className="design-section-head"><h3>Profile inputs</h3><button className="design-quiet" onClick={() => onDialog({ kind: "inputs", batch })} type="button">See all</button></div><div className="design-ingredients">{batch.profileSnapshot.inputs.map((input) => <span key={input.name}><span aria-hidden="true">{inputEmoji(input.name)}</span>{input.name}</span>)}{batch.profileSnapshot.inputs.length === 0 && <p>No profile inputs.</p>}</div></section>
+      <section className="design-input-summary"><div className="design-section-head"><h3>Profile inputs</h3><button className="design-quiet" onClick={() => onDialog({ kind: "inputs", batch })} type="button">See all</button></div><div className="design-ingredients">{batch.profileSnapshot.inputs.map((input) => <span key={input.name}>{input.name}</span>)}{batch.profileSnapshot.inputs.length === 0 && <p>No profile inputs.</p>}</div></section>
       <div className="workbench">
         <div className="wb-rail">
       <section className="batch-management" hidden={!managementOpen} id="batch-management" aria-label="Batch management tools">
@@ -2022,6 +2052,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   const [editing, setEditing] = useState<FermentationProfile | null>(null);
   const [calculations, setCalculations] = useState<FormulaRow[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [checkRows, setCheckRows] = useState<ProfileCheckRow[]>([]);
   const [guidanceRows, setGuidanceRows] = useState<string[]>([]);
   const [message, setMessage] = useState("");
@@ -2040,6 +2071,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
 
   function edit(profile: FermentationProfile) {
     setErrors([]);
+    setFieldErrors({});
     setMessage("");
     setEditing(profile);
     setCalculations(formulaRows(profile));
@@ -2053,6 +2085,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   function closeEditor() {
     setEditing(null);
     setErrors([]);
+    setFieldErrors({});
     setCheckRows([]);
     setGuidanceRows([]);
     setFocusCheckId(null);
@@ -2162,6 +2195,27 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
     const nextErrors = validateProfile(profile);
     if (!profile.name || nextErrors.length > 0) {
       setErrors(nextErrors);
+      const adjacent: FieldErrors = {};
+      const mark = (ids: string[], messages: string[]) => { if (messages.length) for (const id of ids) adjacent[id] = messages.join(" "); };
+      if (!profile.name) adjacent["profile-name"] = "Profile name is required.";
+      mark(["profile-duration"], nextErrors.filter((message) => message.startsWith("Expected duration")));
+      mark(["profile-temperature-min", "profile-temperature-max"], nextErrors.filter((message) => message.startsWith("Temperature range")));
+      mark(["profile-ph-min", "profile-ph-max"], nextErrors.filter((message) => message.includes("pH zone")));
+      for (const check of checkRows) {
+        if (!check.name.trim() || checkRows.filter((row) => row.name.trim().toLowerCase() === check.name.trim().toLowerCase()).length > 1) {
+          mark([`profile-check-${check.id}-name`], nextErrors.filter((message) => message === "Check names must be present and unique."));
+        }
+        mark([`profile-check-${check.id}-interval`], nextErrors.filter((message) => message === `${check.name || "Check"} interval must be a positive whole number.`));
+      }
+      for (const row of calculations) {
+        if (row.kind !== "structured") continue;
+        mark([`profile-formula-${row.id}-source`], nextErrors.filter((message) => message.startsWith(`Input name ${row.source} `) || message === `${row.result}: Unknown input ${row.source}`));
+        mark([`profile-formula-${row.id}-operand`], nextErrors.filter((message) => message.startsWith(`${row.result}: `) && !message.includes("Unknown input")));
+        if (!row.result || profile.calculations.filter(({ name }) => name === row.result).length > 1) {
+          mark([`profile-formula-${row.id}-result`], nextErrors.filter((message) => message === "Calculation names must be present and unique."));
+        }
+      }
+      setFieldErrors(adjacent);
       return;
     }
 
@@ -2177,15 +2231,15 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
         const duration = editing.expectedDurationDays ? `${editing.expectedDurationDays} days` : "—";
         const phRange = phRangeFor(editing);
         return (
-          <div className="profile-editor-page">
+          <div className="profile-editor-page" onInput={() => { setErrors([]); setFieldErrors({}); }} onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))}>
             <header className="profile-mobile-bar">
-              <span className="brand-mark" aria-hidden="true">F</span>
+              <StationLogo />
               <strong>FermentStation</strong>
               <button aria-label="Close profile editor menu" className="icon-button" onClick={closeEditor} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
             </header>
             <nav className="profile-editor-crumbs" aria-label="Breadcrumb"><button onClick={closeEditor} type="button">Profiles</button></nav>
             <header className="profile-editor-head">
-              <div><p className="profile-editor-eyebrow">Fermentation profile</p><h1><input aria-label="Name" autoFocus className="profile-editor-title-input" defaultValue={editing.name} form="profile-editor-form" name="name" placeholder="Profile name" required /></h1></div>
+              <div><p className="profile-editor-eyebrow">Fermentation profile</p><h1><input {...fieldErrorProps(fieldErrors, "profile-name")} aria-label="Name" autoFocus className="profile-editor-title-input" defaultValue={editing.name} form="profile-editor-form" name="name" placeholder="Profile name" required /><FieldError errors={fieldErrors} id="profile-name" /></h1></div>
               <span className="profile-editor-status"><i />Editable profile</span>
             </header>
 
@@ -2201,11 +2255,11 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
                         {guidanceRows.map((step, index) => <label className="profile-editor-guidance-row" key={index}><span>Guidance step {index + 1}</span><textarea aria-label={`Guidance step ${index + 1}`} onChange={(event) => updateGuidanceStep(index, event.target.value)} value={step} /><button className="profile-editor-text-button" onClick={() => removeGuidanceStep(index)} type="button">Remove step</button></label>)}
                       </div>
                     </div>
-                     <label className="profile-editor-field"><span>Temperature minimum</span><span className="profile-editor-suffix"><input aria-label="Temperature minimum" defaultValue={editing.temperatureMinC ?? ""} min="0" max="100" name="temperatureMinC" step="any" type="number" /><i>°C</i></span></label>
-                      <label className="profile-editor-field"><span>Temperature maximum</span><span className="profile-editor-suffix"><input aria-label="Temperature maximum" defaultValue={editing.temperatureMaxC ?? ""} min="0" max="100" name="temperatureMaxC" step="any" type="number" /><i>°C</i></span></label>
-                      <label className="profile-editor-field"><span>pH minimum</span><span className="profile-editor-suffix"><input aria-label="pH minimum" defaultValue={phRange.min} min="0" max="14" name="phMin" step="any" type="number" /><i>pH</i></span></label>
-                      <label className="profile-editor-field"><span>pH maximum</span><span className="profile-editor-suffix"><input aria-label="pH maximum" defaultValue={phRange.max} min="0" max="14" name="phMax" step="any" type="number" /><i>pH</i></span></label>
-                      <label className="profile-editor-field"><span>Expected duration</span><span className="profile-editor-suffix"><input defaultValue={editing.expectedDurationDays ?? ""} min="1" name="expectedDurationDays" type="number" /><i>days</i></span></label>
+                     <label className="profile-editor-field"><span>Temperature minimum</span><span className="profile-editor-suffix"><input {...fieldErrorProps(fieldErrors, "profile-temperature-min")} aria-label="Temperature minimum" defaultValue={editing.temperatureMinC ?? ""} min="0" max="100" name="temperatureMinC" step="any" type="number" /><i>°C</i></span><FieldError errors={fieldErrors} id="profile-temperature-min" /></label>
+                      <label className="profile-editor-field"><span>Temperature maximum</span><span className="profile-editor-suffix"><input {...fieldErrorProps(fieldErrors, "profile-temperature-max")} aria-label="Temperature maximum" defaultValue={editing.temperatureMaxC ?? ""} min="0" max="100" name="temperatureMaxC" step="any" type="number" /><i>°C</i></span><FieldError errors={fieldErrors} id="profile-temperature-max" /></label>
+                      <label className="profile-editor-field"><span>pH minimum</span><span className="profile-editor-suffix"><input {...fieldErrorProps(fieldErrors, "profile-ph-min")} aria-label="pH minimum" defaultValue={phRange.min} min="0" max="14" name="phMin" step="any" type="number" /><i>pH</i></span><FieldError errors={fieldErrors} id="profile-ph-min" /></label>
+                      <label className="profile-editor-field"><span>pH maximum</span><span className="profile-editor-suffix"><input {...fieldErrorProps(fieldErrors, "profile-ph-max")} aria-label="pH maximum" defaultValue={phRange.max} min="0" max="14" name="phMax" step="any" type="number" /><i>pH</i></span><FieldError errors={fieldErrors} id="profile-ph-max" /></label>
+                      <label className="profile-editor-field"><span>Expected duration</span><span className="profile-editor-suffix"><input {...fieldErrorProps(fieldErrors, "profile-duration")} aria-label="Expected duration" defaultValue={editing.expectedDurationDays ?? ""} min="1" name="expectedDurationDays" type="number" /><i>days</i></span><FieldError errors={fieldErrors} id="profile-duration" /></label>
                    </div>
                 </section>
 
@@ -2215,8 +2269,8 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
                     {checkRows.length === 0 && <p className="profile-editor-check-empty">No recurring checks yet. Add one when this profile needs a repeating rhythm.</p>}
                     {checkRows.map((check, index) => (
                       <div className="profile-editor-check-row" key={check.id}>
-                        <label><span>Check</span><input aria-label={`Check name ${index + 1}`} onChange={(event) => updateCheck(check.id, { name: event.target.value })} placeholder="e.g. Taste and smell" ref={(input) => { checkInputsRef.current[check.id] = input; }} value={check.name} /></label>
-                        <label><span>Every</span><input aria-label={`Check interval ${index + 1}`} min="1" onChange={(event) => updateCheck(check.id, { intervalDays: Number(event.target.value) })} type="number" value={check.intervalDays || ""} /></label>
+                        <label><span>Check</span><input {...fieldErrorProps(fieldErrors, `profile-check-${check.id}-name`)} aria-label={`Check name ${index + 1}`} onChange={(event) => updateCheck(check.id, { name: event.target.value })} placeholder="e.g. Taste and smell" ref={(input) => { checkInputsRef.current[check.id] = input; }} value={check.name} /><FieldError errors={fieldErrors} id={`profile-check-${check.id}-name`} /></label>
+                        <label><span>Every</span><input {...fieldErrorProps(fieldErrors, `profile-check-${check.id}-interval`)} aria-label={`Check interval ${index + 1}`} min="1" onChange={(event) => updateCheck(check.id, { intervalDays: Number(event.target.value) })} type="number" value={check.intervalDays || ""} /><FieldError errors={fieldErrors} id={`profile-check-${check.id}-interval`} /></label>
                         <span className="profile-editor-check-unit">days</span>
                         <button aria-label={`Remove ${check.name || "check"}`} className="profile-editor-icon-button" onClick={() => removeCheck(index)} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5" /></svg></button>
                       </div>
@@ -2231,12 +2285,12 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
                       <div className="legacy-formula" key={row.id}><p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p><p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p><button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button></div>
                     ) : (
                       <div className="profile-editor-formula-row" key={row.id}>
-                        <label>Source term row {index + 1}<select onChange={(event) => { const source = event.target.value; const matchingSource = calculations.find((candidate): candidate is StructuredFormulaRow => candidate.kind === "structured" && candidate.source === source); updateFormula(row.id, { source, sourceUnit: matchingSource?.sourceUnit ?? currentInputs().find(({ name }) => name === source)?.unit ?? row.sourceUnit, sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false }); }} value={row.source}>{availableSourceTerms(formulaTerms, calculations, currentInputs()).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select></label>
+                        <label>Source term row {index + 1}<select {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-source`)} aria-label={`Source term row ${index + 1}`} onChange={(event) => { const source = event.target.value; const matchingSource = calculations.find((candidate): candidate is StructuredFormulaRow => candidate.kind === "structured" && candidate.source === source); updateFormula(row.id, { source, sourceUnit: matchingSource?.sourceUnit ?? currentInputs().find(({ name }) => name === source)?.unit ?? row.sourceUnit, sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false }); }} value={row.source}>{availableSourceTerms(formulaTerms, calculations, currentInputs()).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-source`} /></label>
                         <label>Source unit row {index + 1}<select onChange={(event) => updateSourceUnit(row.source, event.target.value as MetricUnit)} value={row.sourceUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
                         <label>Operator row {index + 1}<select onChange={(event) => updateFormula(row.id, { operator: event.target.value as StructuredFormulaRow["operator"] })} value={row.operator}><option value="+">+</option><option value="-">-</option><option value="*">×</option><option value="/">/</option></select></label>
-                        <label>Operand row {index + 1}<input min="0" onChange={(event) => updateFormula(row.id, { operand: event.target.value })} required step="any" type="number" value={row.operand} /></label>
+                        <label>Operand row {index + 1}<input {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-operand`)} aria-label={`Operand row ${index + 1}`} min="0" onChange={(event) => updateFormula(row.id, { operand: event.target.value })} required step="any" type="number" value={row.operand} /><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-operand`} /></label>
                         <label>Operand type row {index + 1}<select onChange={(event) => updateFormula(row.id, { operandType: event.target.value as StructuredFormulaRow["operandType"] })} value={row.operandType}><option value="number">Number</option><option value="percentage">Percentage</option></select></label>
-                        <label>Result term row {index + 1}<select onChange={(event) => updateFormula(row.id, { result: event.target.value })} value={row.result}>{availableResultTerms(formulaTerms, editing, calculations).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select></label>
+                        <label>Result term row {index + 1}<select {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-result`)} aria-label={`Result term row ${index + 1}`} onChange={(event) => updateFormula(row.id, { result: event.target.value })} value={row.result}>{availableResultTerms(formulaTerms, editing, calculations).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-result`} /></label>
                         <label>Result unit row {index + 1}<select onChange={(event) => updateFormula(row.id, { resultUnit: event.target.value as MetricUnit })} value={row.resultUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
                         <button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button>
                       </div>
@@ -2259,12 +2313,13 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
       })()}
 
       {!editing && <div className="profile-list">
+        {profiles.length === 0 && <section className="empty-state"><h2>No fermentation profiles yet</h2><p>Open Manage profiles to add a reusable method for your next batch.</p></section>}
         {profiles.map((profile) => {
           const presentation = presentationFor(profile);
           return (
             <article className="profile-card" key={profile.id}>
               <button aria-label={`View ${profile.name} guidance`} className="profile-card-main" onClick={() => onView(profile)} type="button">
-                  <span className="design-profile-visual">{profileVisual(profile).photo ? <img alt={`${profile.name} stand-in photograph`} src={`${import.meta.env.BASE_URL}new-design/${profileVisual(profile).photo}.webp`} /> : <DesignIcon name="jar" />}</span>
+                  <span className="design-profile-visual" style={{ background: profileVisual(profile).color }}>{profileVisual(profile).photo ? <img alt={`${profile.name} stand-in photograph`} src={`${import.meta.env.BASE_URL}new-design/${profileVisual(profile).photo}.webp`} /> : <DesignIcon name="jar" />}</span>
                  <div className="design-profile-copy"><h3>{profile.name}</h3><span>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "Duration not set"} · {presentation.params[0][0]}</span><span className="sr-only">{presentation.description}</span></div>
                   <svg aria-hidden="true" className="design-profile-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m9 5 7 7-7 7" /></svg>
               </button>

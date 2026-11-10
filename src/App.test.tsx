@@ -99,6 +99,101 @@ describe("batch workflow", () => {
     await yieldToRunner();
   });
 
+  it("offers four truthful destinations, direct Settings and a separate start action", () => {
+    render(<App />);
+    const navigation = within(screen.getByRole("navigation", { name: "Primary navigation" }));
+    expect(navigation.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual(["My batches", "Checks", "Calendar", "Profiles"]);
+    expect(navigation.getByRole("button", { name: "My batches" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.click(navigation.getByRole("button", { name: "Calendar" }));
+    expect(screen.getByRole("heading", { name: "Calendar" })).toBeTruthy();
+    expect(navigation.getByRole("button", { name: "Calendar" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    expect(screen.getByRole("region", { name: "Settings" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    expect(screen.getByRole("dialog", { name: "Start a batch" })).toBeTruthy();
+  });
+
+  it("keeps Start a batch available without profiles and links its guidance to Profiles", () => {
+    localStorage.setItem("fermentstation.profiles", JSON.stringify({ profiles: [] }));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    const dialog = within(screen.getByRole("dialog", { name: "Start a batch" }));
+    expect(dialog.getByText("Create or restore a fermentation profile before starting a batch.")).toBeTruthy();
+    fireEvent.click(dialog.getByRole("button", { name: "Open Profiles" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.getByRole("heading", { name: "No fermentation profiles yet" })).toBeTruthy();
+  });
+
+  it("switches Overview and All batches without losing search, sort, filters or selection", () => {
+    const today = localDateForTest();
+    const profile = createProfileState().profiles[0];
+    const first = createBatch(profile, { id: "first", name: "First jar", startDate: today, today });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([first])));
+    render(<App />);
+    const views = within(screen.getByRole("group", { name: "My batches view" }));
+    expect(views.getByRole("button", { name: "Overview" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "First" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sort batches by finish date" }));
+    fireEvent.click(within(screen.getByRole("group", { name: "Filter batches by status" })).getByRole("button", { name: "Active" }));
+    fireEvent.click(views.getByRole("button", { name: "All batches" }));
+    expect(views.getByRole("button", { name: "All batches" }).getAttribute("aria-pressed")).toBe("true");
+    expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("First");
+    expect(screen.getByRole("button", { name: "Sort batches by finish date" }).getAttribute("aria-pressed")).toBe("true");
+    expect(within(screen.getByRole("group", { name: "Filter batches by status" })).getByRole("button", { name: "Active" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("button", { name: "Open First jar" }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("keeps a failed user photo truthful and recoverable without replacing the saved original", () => {
+    const batch = createBatch(createProfileState().profiles[0], { id: "jar", name: "Photo jar", startDate: localDateForTest() });
+    batch.timeline.push({ id: "photo", kind: "photo", date: localDateForTest(), name: "my-jar.jpg", mimeType: "image/jpeg", caption: "My jar", dataUrl: "data:image/jpeg;base64,cGhvdG8=" });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    const card = within(screen.getByRole("button", { name: "Open Photo jar" }));
+    const photo = card.getByRole("img", { name: "Batch photograph: My jar" });
+    fireEvent.error(photo);
+    expect(card.getByRole("img", { name: "Batch photograph unavailable; original retained" })).toBeTruthy();
+    expect(card.queryByRole("img", { name: /stand-in/ })).toBeNull();
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline[0].dataUrl).toBe("data:image/jpeg;base64,cGhvdG8=");
+  });
+
+  it("returns from a calendar batch to its original month and from a check to Checks", () => {
+    const today = localDateForTest();
+    const profile = { ...createProfileState().profiles[0], checks: [{ name: "Taste", intervalDays: 2 }] };
+    const batch = { ...createBatch(profile, { id: "jar", name: "Return jar", startDate: today, today }), finishDate: addDaysForTest(today, 40) };
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next month" }));
+    const month = screen.getByRole("grid").getAttribute("aria-label");
+    fireEvent.click(screen.getByRole("button", { name: `Open Return jar for ${batch.finishDate}` }));
+    fireEvent.click(screen.getByRole("button", { name: "Back to Calendar" }));
+    expect(screen.getByRole("grid").getAttribute("aria-label")).toBe(month);
+    fireEvent.click(screen.getByRole("button", { name: "Checks" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Return jar for Taste" }));
+    fireEvent.click(screen.getByRole("button", { name: "Back to Checks" }));
+    expect(screen.getByRole("heading", { name: "Your batch checks" })).toBeTruthy();
+  });
+
+  it("restores focus to the originating view when a day-picker choice no longer exists", async () => {
+    const today = localDateForTest();
+    const finishDate = addDaysForTest(today, 2);
+    const profile = createProfileState().profiles[0];
+    const batches = ["First", "Second"].map((name) => ({ ...createBatch(profile, { id: name, name, startDate: today, today }), finishDate }));
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState(batches)));
+    render(<App />);
+    for (const calendar of [true, false]) {
+      fireEvent.click(screen.getByRole("button", { name: calendar ? "Calendar" : "My batches" }));
+      if (!calendar) openMoreBatchActions();
+      fireEvent.click(screen.getByRole("button", { name: `Choose a batch for ${finishDate}` }));
+      const choice = within(screen.getByRole("dialog")).getByRole("button", { name: "Open First" });
+      choice.focus();
+      fireEvent.click(choice);
+      fireEvent.click(screen.getByRole("button", { name: calendar ? "Back to Calendar" : "Back to batches" }));
+      await act(async () => { await new Promise(requestAnimationFrame); });
+      expect(document.activeElement).toBe(screen.getByRole("heading", { name: calendar ? "Calendar" : "My batches 2" }));
+    }
+  });
+
   it("keeps advanced management out of the default accessibility tree and opens all tools explicitly", () => {
     const today = localDateForTest();
     const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Tea", unit: "l" as const, defaultValue: 2 }], calculations: [{ name: "Sugar", unit: "g" as const, formula: "Tea * 5" }], checks: [{ name: "Taste", intervalDays: 2 }] };
@@ -167,7 +262,7 @@ describe("batch workflow", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
     expect(disclosure.hidden).toBe(true);
     expect(within(detail).queryByRole("button", { name: "Log activity" })).toBeNull();
-    for (const route of ["Checks", "Profiles", "Today", "Batches"]) {
+    for (const route of ["Checks", "Profiles", "My batches"]) {
       fireEvent.click(screen.getByRole("button", { name: route }));
       for (const width of [344, 884]) {
         Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
@@ -310,7 +405,7 @@ describe("batch workflow", () => {
       expect(screen.queryByRole("dialog")).toBeNull();
       expect(dialog.open).toBe(true); // nonmodal inline, not a fake modal
       expect(document.activeElement).toBe(trigger);
-      for (const route of dismiss === "Cancel" ? ["Checks", "Profiles", "Today", "Batches"] : []) {
+      for (const route of dismiss === "Cancel" ? ["Checks", "Profiles", "My batches"] : []) {
         fireEvent.click(screen.getByRole("button", { name: route }));
         for (const width of [344, 884]) {
           Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
@@ -526,7 +621,7 @@ describe("batch workflow", () => {
     expect(screen.getByLabelText("Activity date")).toBe(date);
     expect(date.value).toBe(draftDate);
     const form = file.closest("form");
-    for (const route of ["Checks", "Profiles", "Today", "Batches"]) {
+    for (const route of ["Checks", "Profiles", "My batches"]) {
       fireEvent.click(screen.getByRole("button", { name: route }));
       for (const width of [344, 884]) {
         Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
@@ -556,7 +651,7 @@ describe("batch workflow", () => {
     render(<App />);
     const header = document.querySelector(".design-topbar");
     const detail = screen.getByRole("complementary", { name: "Selected batch" });
-    for (const route of ["Batches", "Checks", "Profiles"]) {
+    for (const route of ["My batches", "Checks", "Profiles"]) {
       fireEvent.click(screen.getByRole("button", { name: route }));
       const destination = localStorage.getItem("fermentstation.shell");
       const stored = localStorage.getItem("fermentstation.batches");
@@ -682,7 +777,7 @@ describe("batch workflow", () => {
     const before = localStorage.getItem("fermentstation.batches");
     for (const value of ["", addDaysForTest(localDateForTest(), 1)]) {
       fireEvent.change(date, { target: { value } });
-      expect(date.checkValidity()).toBe(false);
+      act(() => { expect(date.checkValidity()).toBe(false); });
       fireEvent.click(newBatchSubmit());
       expect(screen.getByRole("dialog")).toBe(dialog);
       expect(localStorage.getItem("fermentstation.batches")).toBe(before);
@@ -791,14 +886,14 @@ describe("batch workflow", () => {
     expect(screen.getByRole("status").textContent).toBe(`Check completed · next due ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(`${addDaysForTest(today, 2)}T12:00:00`))}`);
     fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
     expect(screen.getByRole("heading", { name: "Calendar" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "My batches" }));
     expect(screen.queryByRole("button", { name: "Complete Taste for Active jar" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "View batch checks" }));
     expect(screen.getByRole("heading", { name: "Your batch checks" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Completed Taste for Active jar" })).toBeTruthy();
   });
 
-  it("keeps the selected detail and exact logger nodes across workspace routes and postures", () => {
+  it.each(["Checks", "Profiles", "My batches", "Calendar", "Settings"])("keeps the selected detail and exact logger nodes across %s and responsive postures", (route) => {
     const batch = createBatch(createProfileState().profiles[0], { id: "jar", name: "Selected jar", startDate: localDateForTest() });
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
     render(<App />);
@@ -807,28 +902,65 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Note" }));
     const draft = screen.getByLabelText("Activity context") as HTMLTextAreaElement;
     const form = draft.closest("form");
+    const dialog = form!.closest("dialog");
+    const date = form!.querySelector('[name="date"]');
+    const file = form!.querySelector('[name="photo"]');
+    const ancestors: Element[] = [];
+    for (let parent = draft.parentElement; parent; parent = parent.parentElement) ancestors.push(parent);
     const header = document.querySelector(".design-topbar");
     const detail = screen.getByRole("complementary", { name: "Selected batch" });
     fireEvent.change(draft, { target: { value: "Keep the same draft" } });
     detail.scrollTop = 420;
-    for (const route of ["Checks", "Profiles", "Today", "Batches"]) {
-      fireEvent.click(screen.getByRole("button", { name: route }));
-      expect(document.querySelector(".design-topbar")).toBe(header);
+    fireEvent.click(screen.getByRole("button", { name: route }));
+    expect(document.querySelector(".design-topbar")).toBe(header);
+    expect(document.querySelector("#batch-activity-form")).toBe(form);
+    expect(document.querySelector("[aria-label='Activity context']")).toBe(draft);
+    expect(draft.value).toBe("Keep the same draft");
+    expect(detail.scrollTop).toBe(420);
+    expect(document.querySelector(".app-shell")?.classList.contains("has-open-batch")).toBe(false);
+    for (const width of [320, 390, 640, 768, 884, 900, 901, 1024, 1440]) {
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
+      fireEvent(window, new Event("resize"));
       expect(document.querySelector("#batch-activity-form")).toBe(form);
-      expect(document.querySelector("[aria-label='Activity context']")).toBe(draft);
-      expect(draft.value).toBe("Keep the same draft");
-      expect(detail.scrollTop).toBe(420);
-      expect(document.querySelector(".app-shell")?.classList.contains("has-open-batch")).toBe(false);
-      for (const width of [344, 884, 1440]) {
-        Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
-        fireEvent(window, new Event("resize"));
-        expect(document.querySelector("#batch-activity-form")).toBe(form);
-      }
+      expect(form!.closest("dialog")).toBe(dialog);
+      expect(form!.querySelector('[name="date"]')).toBe(date);
+      expect(form!.querySelector('[name="photo"]')).toBe(file);
+      const currentAncestors: Element[] = [];
+      for (let parent = draft.parentElement; parent; parent = parent.parentElement) currentAncestors.push(parent);
+      expect(currentAncestors).toEqual(ancestors);
     }
+    fireEvent.click(screen.getByRole("button", { name: "My batches" }));
     fireEvent.click(screen.getByRole("button", { name: "Open Selected jar" }));
     expect(screen.getByLabelText("Activity context")).toBe(draft);
     fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toContainEqual(expect.objectContaining({ kind: "note", text: "Keep the same draft" }));
+  });
+
+  it("completes the next due check directly from detail without opening tools or requiring an observation", () => {
+    const today = localDateForTest();
+    const profile = { ...createProfileState().profiles[0], checks: [{ id: "taste", name: "Taste", intervalDays: 2 }] };
+    const batch = createBatch(profile, { id: "jar", name: "Daily jar", startDate: addDaysForTest(today, -4), today });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Open Daily jar" }));
+    const detail = within(screen.getByRole("complementary", { name: "Selected batch" }));
+    expect(detail.getByRole("button", { name: "More batch tools" }).getAttribute("aria-expanded")).toBe("false");
+    const next = within(detail.getByRole("region", { name: "Next batch check" }));
+    expect(next.getByText("Taste")).toBeTruthy();
+    const complete = next.getByRole("button", { name: "Complete check: Taste for this batch" });
+    const observation = detail.getByRole("button", { name: "Add observation" });
+    const focus = vi.spyOn(observation, "focus");
+    complete.focus();
+    fireEvent.click(complete);
+    expect(document.activeElement).toBe(observation);
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    focus.mockRestore();
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(detail.getByRole("button", { name: "More batch tools" }).getAttribute("aria-expanded")).toBe("false");
+    expect(next.queryByRole("button", { name: "Complete check: Taste for this batch" })).toBeNull();
+    const stored = JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0];
+    expect(stored.checks[0]).toMatchObject({ lastCompletedDate: today, nextDueDate: addDaysForTest(today, 2) });
+    expect(stored.timeline).toEqual([expect.objectContaining({ kind: "check", checkName: "Taste", date: today })]);
   });
 
   it("reflects edited cadence and pauses and resumes checks with batch status", () => {
@@ -849,7 +981,7 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Checks" }));
     expect(screen.queryByRole("button", { name: "Complete Taste for House jar" })).toBeNull();
     expect(screen.getByText("No checks scheduled for your active batches.")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "My batches" }));
     fireEvent.click(screen.getByRole("button", { name: "Open House jar" }));
     fireEvent.change(screen.getByLabelText("Activity status"), { target: { value: "active" } });
     fireEvent.click(screen.getByRole("button", { name: "Log activity" }));
@@ -861,7 +993,7 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     expect(screen.queryByRole("region", { name: "Fermentation workspace" })).toBeNull();
     expect(screen.queryByRole("complementary", { name: "Selected batch" })).toBeNull();
-    fireEvent.click(within(screen.getByRole("region", { name: "Settings" })).getByRole("button", { name: "Calendar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
     expect(screen.getByRole("heading", { name: "Calendar" })).toBeTruthy();
   });
 
@@ -897,6 +1029,19 @@ describe("batch workflow", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
+  it("explains an empty profile list and keeps profile creation available", () => {
+    localStorage.setItem("fermentstation.profiles", JSON.stringify({ profiles: [] }));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    expect(screen.getByRole("heading", { name: "No fermentation profiles yet" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /^View .* guidance$/ })).toBeNull();
+    fireEvent.click(profileManagementButton("Add profile"));
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "House method" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    expect(screen.queryByRole("heading", { name: "No fermentation profiles yet" })).toBeNull();
+    expect(screen.getByRole("button", { name: "View House method guidance" })).toBeTruthy();
+  });
+
   it("supports an empty profile check list and stable check editing", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
@@ -911,6 +1056,79 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("Check interval 1"), { target: { value: "2" } });
     fireEvent.click(screen.getByRole("button", { name: "Remove Taste" }));
     expect(screen.getByText(/No recurring checks yet/)).toBeTruthy();
+  });
+
+  it("links rejected profile temperature ranges to both adjacent fields without writes", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
+    const before = localStorage.getItem("fermentstation.profiles");
+    const min = screen.getByLabelText("Temperature minimum");
+    const max = screen.getByLabelText("Temperature maximum");
+    fireEvent.change(min, { target: { value: "25" } });
+    fireEvent.change(max, { target: { value: "20" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    for (const field of [min, max]) {
+      expect(field.getAttribute("aria-invalid")).toBe("true");
+      const message = document.getElementById(field.getAttribute("aria-describedby")!);
+      expect(message?.textContent).toContain("minimum no greater than the maximum");
+      expect(field.closest("label")!.contains(message)).toBe(true);
+    }
+    expect(localStorage.getItem("fermentstation.profiles")).toBe(before);
+  });
+
+  it("links native Start validation to its field without changing validation or writes", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    const date = screen.getByLabelText("Start date");
+    fireEvent.change(date, { target: { value: "" } });
+    const before = localStorage.getItem("fermentstation.batches");
+    fireEvent.click(newBatchSubmit());
+    expect(date.getAttribute("aria-invalid")).toBe("true");
+    const message = document.getElementById(date.getAttribute("aria-describedby")!);
+    expect(message?.textContent?.length).toBeGreaterThan(0);
+    expect(date.closest("label")!.contains(message)).toBe(true);
+    expect(localStorage.getItem("fermentstation.batches")).toBe(before);
+  });
+
+  it.each(["name", "duration", "checks", "interval", "formula", "ph"])("links profile %s errors to affected fields without writes", (kind) => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
+    const before = localStorage.getItem("fermentstation.profiles");
+    let fields: HTMLElement[];
+    if (kind === "name" || kind === "duration") {
+      fields = [screen.getByLabelText(kind === "name" ? "Name" : "Expected duration")];
+      fireEvent.change(fields[0], { target: { value: kind === "name" ? "   " : "0" } });
+    } else if (kind === "checks" || kind === "interval") {
+      fireEvent.click(screen.getByRole("button", { name: "Add check" }));
+      fireEvent.change(screen.getByLabelText("Check name 1"), { target: { value: "Taste" } });
+      if (kind === "checks") {
+        fireEvent.click(screen.getByRole("button", { name: "Add check" }));
+        fireEvent.change(screen.getByLabelText("Check name 2"), { target: { value: "Taste" } });
+        fields = [screen.getByLabelText("Check name 1"), screen.getByLabelText("Check name 2")];
+      } else {
+        fields = [screen.getByLabelText("Check interval 1")];
+        fireEvent.change(fields[0], { target: { value: "0" } });
+      }
+    } else if (kind === "formula") {
+      fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
+      fireEvent.change(screen.getByLabelText("Operator row 1"), { target: { value: "/" } });
+      fields = [screen.getByLabelText("Operand row 1")];
+      fireEvent.change(fields[0], { target: { value: "0" } });
+    } else {
+      fields = [screen.getByLabelText("pH minimum"), screen.getByLabelText("pH maximum")];
+      fireEvent.change(fields[0], { target: { value: "10" } });
+      fireEvent.change(fields[1], { target: { value: "2" } });
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    for (const field of fields) {
+      expect(field.getAttribute("aria-invalid")).toBe("true");
+      const message = document.getElementById(field.getAttribute("aria-describedby")!);
+      expect(message?.textContent?.length).toBeGreaterThan(0);
+      expect(field.parentElement!.contains(message) || field.closest("label")?.contains(message)).toBe(true);
+    }
+    expect(localStorage.getItem("fermentstation.profiles")).toBe(before);
   });
 
   it("connects editable temperature and guidance to the profile card", () => {
@@ -979,7 +1197,7 @@ describe("batch workflow", () => {
     const editor = within(document.querySelector(".profile-editor-page")!);
     fireEvent.change(editor.getByLabelText("Name"), { target: { value: "Renamed profile" } });
     fireEvent.click(editor.getByRole("button", { name: "Save profile" }));
-    fireEvent.click(navigation.getByRole("button", { name: "Today" }));
+    fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     let dashboard = within(document.querySelector(".design-dashboard")!);
     fireEvent.click(dashboard.getByRole("button", { name: "Open Kitchen kombucha" }));
 
@@ -992,7 +1210,7 @@ describe("batch workflow", () => {
     fireEvent.click(logger.getByRole("button", { name: "Log activity" }));
     expect(detail.getByText("Ready", { selector: ".status" })).toBeTruthy();
 
-    fireEvent.click(navigation.getByRole("button", { name: "Batches" }));
+    fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     dashboard = within(document.querySelector(".design-dashboard")!);
     const filters = within(dashboard.getByRole("group", { name: "Filter batches by status" }));
     fireEvent.click(filters.getByRole("button", { name: "Active" }));
@@ -1040,11 +1258,11 @@ describe("batch workflow", () => {
     fireEvent.click(detail.getByRole("button", { name: "Delete batch" }));
     expect(document.querySelector(".app-shell")?.classList.contains("has-open-batch")).toBe(false);
     expect(screen.queryByText("Recently deleted batches")).toBeNull();
-    fireEvent.click(navigation.getByRole("button", { name: "Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     const settings = within(screen.getByRole("region", { name: "Settings" }));
     fireEvent.click(settings.getByRole("button", { name: "Open recently deleted batches" }));
     fireEvent.click(settings.getByRole("button", { name: "Restore Kombucha F1" }));
-    fireEvent.click(navigation.getByRole("button", { name: "Today" }));
+    fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     const dashboard = within(document.querySelector(".design-dashboard")!);
     fireEvent.click(dashboard.getByRole("button", { name: "Open Kombucha F1" }));
     expect(detail.getByText("Tasted pleasantly tart")).toBeTruthy();
@@ -1086,7 +1304,7 @@ describe("batch workflow", () => {
     expect(screen.queryByLabelText(/^Inputs/)).toBeNull();
     fireEvent.click(editor.getByRole("button", { name: "Cancel" }));
 
-    fireEvent.click(navigation.getByRole("button", { name: "Today" }));
+    fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     fireEvent.click(topbar.getByRole("button", { name: "Start a batch" }));
     const startDialog = within(screen.getByRole("dialog", { name: "Start a batch" }));
     fireEvent.click(startDialog.getByText("Batch input options"));
@@ -1198,7 +1416,7 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("Check name 1"), { target: { value: "Taste" } });
     fireEvent.change(screen.getByLabelText("Check interval 1"), { target: { value: "2" } });
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
-    fireEvent.click(navigation.getByRole("button", { name: "Today" }));
+    fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     fireEvent.click(topbar.getByRole("button", { name: "Start a batch" }));
     const today = localDateForTest();
     const startDate = addDaysForTest(today, -8);
@@ -1211,7 +1429,7 @@ describe("batch workflow", () => {
     expect(screen.getByText(new RegExp(`Overdue ${addDaysForTest(startDate, 2)}`))).toBeTruthy();
     const detail = within(screen.getByRole("complementary", { name: "Selected batch" }));
     fireEvent.click(detail.getByRole("button", { name: /Back to batches/i }));
-    fireEvent.click(navigation.getByRole("button", { name: "Today" }));
+    fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     expect(screen.getByRole("heading", { name: /Action queue/i })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Open Kombucha F1 for Taste" }));
     openBatchTools();
@@ -1226,7 +1444,7 @@ describe("batch workflow", () => {
     expect(screen.getByText(new RegExp(`Next ${adjustedDateValue}|Overdue ${adjustedDateValue}`))).toBeTruthy();
     const expectedNextDate = addDaysForTest(today, 3);
 
-    fireEvent.click(topbar.getByRole("button", { name: "Calendar" }));
+    fireEvent.click(topbar.getByRole("button", { name: "Open calendar" }));
     const calendar = within(screen.getByRole("region", { name: "Fermentation calendar" }));
     expect(calendar.getByText("Finish date")).toBeTruthy();
     expect(calendar.getByText("Taste")).toBeTruthy();
@@ -1234,7 +1452,7 @@ describe("batch workflow", () => {
     fireEvent.click(calendar.getByRole("button", { name: `Open Kombucha F1 for ${expectedNextDate}` }));
     expect(detail.getByRole("heading", { name: "Kombucha F1" })).toBeTruthy();
 
-    fireEvent.click(topbar.getByRole("button", { name: "Calendar" }));
+    fireEvent.click(topbar.getByRole("button", { name: "Open calendar" }));
     fireEvent.click(within(screen.getByRole("region", { name: "Fermentation calendar" })).getByRole("button", { name: "Open Kombucha F1: Taste" }));
     expect(detail.getByRole("heading", { name: "Kombucha F1" })).toBeTruthy();
   });
@@ -1259,7 +1477,7 @@ describe("batch workflow", () => {
     openBatchTools();
     fireEvent.change(screen.getByLabelText("Finish date"), { target: { value: finishDate } });
     fireEvent.click(detail.getByRole("button", { name: /Back to batches/i }));
-    fireEvent.click(navigation.getByRole("button", { name: "Today" }));
+    fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     openMoreBatchActions();
     const upcoming = within(screen.getByRole("region", { name: /Upcoming/ }));
 
@@ -1280,7 +1498,7 @@ describe("batch workflow", () => {
     fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Open Second jar" }));
     expect(detail.getByRole("heading", { name: "Second jar" })).toBeTruthy();
 
-    fireEvent.click(topbar.getByRole("button", { name: "Calendar" }));
+    fireEvent.click(topbar.getByRole("button", { name: "Open calendar" }));
     fireEvent.click(within(screen.getByRole("region", { name: "Fermentation calendar" })).getByRole("button", { name: `Choose a batch for ${finishDate}` }));
     const calendarChooser = screen.getByRole("dialog", { name: `Choose a batch for ${finishDate}` });
     expect(calendarChooser.textContent).toContain("First jar");
@@ -1318,7 +1536,7 @@ describe("batch workflow", () => {
     fireEvent.change(screen.getByLabelText("pH minimum"), { target: { value: "3.2" } });
     fireEvent.change(screen.getByLabelText("pH maximum"), { target: { value: "3.6" } });
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
-    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "My batches" }));
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
     fireEvent.click(newBatchSubmit());
 
@@ -1358,7 +1576,7 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     fireEvent.click(screen.getByRole("button", { name: "°F / qt" }));
-    fireEvent.click(screen.getByRole("button", { name: "Today" }));
+    fireEvent.click(screen.getByRole("button", { name: "My batches" }));
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
     fireEvent.click(newBatchSubmit());
 
@@ -1576,7 +1794,7 @@ describe("batch workflow", () => {
 
   it("preserves destination and unsaved draft across Fold6 postures", () => {
     render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Batches" }));
+    fireEvent.click(screen.getByRole("button", { name: "My batches" }));
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
     fireEvent.click(newBatchSubmit());
     openBatchTools();
@@ -1587,16 +1805,16 @@ describe("batch workflow", () => {
 
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 344 });
     fireEvent(window, new Event("resize"));
-    expect(screen.getByRole("button", { name: "Batches" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "My batches" }).getAttribute("aria-current")).toBe("page");
     expect((screen.getByLabelText("Activity context") as HTMLInputElement).value)
       .toBe("Unsaved cover-screen observation");
 
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 884 });
     fireEvent(window, new Event("resize"));
-    expect(screen.getByRole("button", { name: "Batches" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("button", { name: "My batches" }).getAttribute("aria-current")).toBe("page");
     expect((screen.getByLabelText("Activity context") as HTMLInputElement).value)
       .toBe("Unsaved cover-screen observation");
-    expect(screen.getByText("More")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Settings" })).toBeTruthy();
   });
 
   it("searches profile names and sorts finish dates without retargeting a selected draft", () => {
@@ -1647,7 +1865,11 @@ describe("batch workflow", () => {
   it("starts a batch from other destinations through the same creation form", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
-    fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    const start = screen.getByRole("button", { name: "Start a batch" });
+    expect(start.closest("nav")).toBeNull();
+    expect(screen.getByRole("banner").contains(start)).toBe(true);
+    expect(screen.queryByText("Reached from the overflow menu")).toBeNull();
+    fireEvent.click(start);
     expect(screen.getAllByRole("dialog")).toHaveLength(1);
     expect(newBatchSubmit()).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
@@ -1670,6 +1892,9 @@ describe("batch workflow", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(profileManagementButton("Edit Kombucha F1"));
+    const mobileLogo = document.querySelector<HTMLImageElement>(".profile-mobile-bar .brand-mark img")!;
+    expect(mobileLogo.getAttribute("src")).toBe(document.querySelector(".brand .brand-mark img")!.getAttribute("src"));
+    expect(mobileLogo.getAttribute("src")).toContain("logo-transparent-96.png");
     fireEvent.click(screen.getByRole("button", { name: "Close profile editor menu" }));
     expect(screen.getByRole("heading", { name: "Fermentation profiles" })).toBeTruthy();
   });
