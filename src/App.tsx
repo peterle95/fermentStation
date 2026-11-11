@@ -1596,6 +1596,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
   const [loggerKind, setLoggerKind] = useState<LoggerKind>("status");
   const [checkDrafts, setCheckDrafts] = useState<Record<string, string>>({});
   const [checkError, setCheckError] = useState("");
+  const [checkErrorField, setCheckErrorField] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<CapturedPhoto | null>(null);
   const [photoError, setPhotoError] = useState("");
   const [addingCheck, setAddingCheck] = useState(false);
@@ -1604,6 +1605,10 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
   const [loggerModal, setLoggerModal] = useState(false);
   const [observationMode, setObservationMode] = useState(false);
   const [managementOpen, setManagementOpen] = useState(false);
+  const [toolErrors, setToolErrors] = useState<FieldErrors>({});
+  const [toolFeedback, setToolFeedback] = useState("");
+  const managementRef = useRef<HTMLElement>(null);
+  const addCheckRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -1869,6 +1874,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
 
   function saveInputs(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!event.currentTarget.reportValidity()) return;
     const data = new FormData(event.currentTarget);
     let next = batch;
     for (const input of batch.profileSnapshot.inputs) {
@@ -1877,6 +1883,21 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
     }
     onChange(next);
     managementDrafts.current.delete("inputs");
+    setToolFeedback("Batch inputs saved. Non-overridden suggestions recalculated; overrides and their saved suggestions kept.");
+  }
+
+  function discardToolChanges(event: React.MouseEvent<HTMLButtonElement>) {
+    if (managementDrafts.current.size && !window.confirm("Discard unsaved tool changes? Saved batch values and observations will stay intact.")) return;
+    managementRef.current?.querySelectorAll("form").forEach((form) => form.reset());
+    managementDrafts.current.clear();
+    setCheckDrafts({});
+    setNewCheckName("");
+    setNewCheckInterval("7");
+    setAddingCheck(false);
+    setCheckError("");
+    setToolErrors({});
+    setToolFeedback("Unsaved tool changes discarded. Saved values kept.");
+    event.currentTarget.focus({ preventScroll: true });
   }
 
   function editEntry(entry: TimelineEntry) {
@@ -1902,6 +1923,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
 
   function saveNewCheck(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!event.currentTarget.reportValidity()) return;
     try {
       onChange(addBatchCheck(batch, newCheckName, Number(newCheckInterval), localDate()));
       setNewCheckName("");
@@ -1909,9 +1931,21 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
       setAddingCheck(false);
       managementDrafts.current.delete("new-check");
       setCheckError("");
+      setToolFeedback("Recurring check added to this batch only.");
+      focusAddCheck();
     } catch (error) {
+      setCheckErrorField("new");
       setCheckError((error as Error).message);
     }
+  }
+
+  function focusAddCheck() {
+    const target = addCheckRef.current?.disabled ? managementRef.current?.querySelector<HTMLElement>("#batch-check-editor") : addCheckRef.current;
+    target?.focus({ preventScroll: true });
+  }
+
+  function checkErrorProps(field: string) {
+    return { "aria-invalid": checkError && checkErrorField === field ? true as const : undefined, "aria-describedby": checkError && checkErrorField === field ? "batch-check-error" : undefined };
   }
 
   function saveCheckName(checkId: string, currentName: string) {
@@ -1920,7 +1954,9 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
       setCheckDrafts(({ [checkId]: _removed, ...rest }) => rest);
       managementDrafts.current.delete(`check:${checkId}`);
       setCheckError("");
+      setToolFeedback("Check name saved. Its schedule is unchanged.");
     } catch (error) {
+      setCheckErrorField(`name:${checkId}`);
       setCheckError((error as Error).message);
     }
   }
@@ -1981,7 +2017,14 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
       <section className="design-input-summary"><div className="design-section-head"><h3>Profile inputs</h3><button className="design-quiet" onClick={() => onDialog({ kind: "inputs", batch })} type="button">See all</button></div><div className="design-ingredients">{batch.profileSnapshot.inputs.map((input) => <span key={input.name}>{input.name}</span>)}{batch.profileSnapshot.inputs.length === 0 && <p>No profile inputs.</p>}</div></section>
       <div className="workbench">
         <div className="wb-rail">
-      <section className="batch-management" hidden={!managementOpen} id="batch-management" aria-label="Batch management tools">
+      <section className="batch-management" hidden={!managementOpen} id="batch-management" aria-label="Batch management tools" ref={managementRef} onInvalid={(event) => captureFieldError(event, (id, message) => setToolErrors((previous) => ({ ...previous, [id]: message })))} onInput={(event) => { const id = (event.target as HTMLInputElement).id; setToolErrors((previous) => ({ ...previous, [id]: "" })); setToolFeedback(""); }}>
+      <header className="batch-tools-heading"><div><p className="eyebrow">This batch only</p><h3>Batch tools</h3><p>Adjust this preparation without changing its profile.</p></div><button className="design-quiet" onClick={discardToolChanges} type="button">Discard tool changes</button></header>
+      <div className="batch-tools-shortcuts" role="group" aria-label="Batch tool shortcuts">
+        <button onClick={() => revealManagementSection("batch-date-editor")} type="button">Edit batch dates</button>
+        <button onClick={() => revealManagementSection("batch-input-editor")} type="button">Edit batch inputs and calculations</button>
+        <button onClick={() => revealManagementSection("batch-check-editor")} type="button">Edit recurring checks</button>
+      </div>
+      <p className="batch-tool-feedback" role="status">{toolFeedback}</p>
       <div className="batch-workspace-head">
         <div className="batch-head-actions">
           <button aria-label="Take photo" className="batch-head-camera" onClick={takePhoto} type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M4 7h3l1.2-2h7.6L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" /><circle cx="12" cy="13" r="3.5" /></svg></button>
@@ -1989,18 +2032,14 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
             aria-label={`Notifications for ${batch.name}`}
             aria-pressed={!batch.notificationsMuted}
             className="batch-head-notifications"
-            onClick={() => onChange({ ...batch, notificationsMuted: !batch.notificationsMuted })}
+            onClick={() => { onChange({ ...batch, notificationsMuted: !batch.notificationsMuted }); setToolFeedback(batch.notificationsMuted ? "Batch notifications enabled, subject to device notification settings." : "Batch notifications muted."); }}
             title={batch.notificationsMuted ? "Enable notifications for this batch" : "Mute notifications for this batch"}
             type="button"
           >
             <svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />{batch.notificationsMuted && <path d="M4 4l16 16" />}</svg>
+            <span>Notifications {batch.notificationsMuted ? "muted" : "on"}</span>
           </button>
-          <button className="primary-action" onClick={showLogger} type="button">Record observation</button>
           <button onClick={revealLogger} type="button">Open advanced logger</button>
-          <button onClick={() => revealManagementSection("batch-date-editor")} type="button">Edit batch dates</button>
-          <button onClick={() => revealManagementSection("batch-input-editor")} type="button">Edit batch inputs and calculations</button>
-          <button onClick={() => revealManagementSection("batch-check-editor")} type="button">Edit recurring checks</button>
-          <button onClick={() => onDelete(batch.id)} type="button">Delete batch</button>
         </div>
       </div>
 
@@ -2050,40 +2089,44 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
           </section>
 
         <section className="batch-components-shell" aria-label="Batch configuration components">
-          <div className="batch-components-progress" aria-hidden="true"><span /><span /><span /><span /></div>
           <div className="batch-components-grid">
             <article className="batch-component-card" aria-labelledby="finish-heading" id="batch-date-editor">
-              <header className="batch-component-header"><h2 id="finish-heading">Batch details</h2><span className="batch-component-step">01</span></header>
-              <label className="component-field"><span>Finish date</span><input onChange={(event) => onChange(setFinishDate(batch, event.target.value, localDate()))} type="date" value={batch.finishDate ?? ""} /></label>
+              <header className="batch-component-header"><h4 id="finish-heading">Batch dates</h4><span className="batch-component-step" aria-hidden="true">01</span></header>
+              <p className="component-empty">Started <time dateTime={batch.startDate}>{shortDate(batch.startDate)}</time> · {statusLabel(batch.status)}</p>
+              <label className="component-field"><span>Finish date</span><input {...fieldErrorProps(toolErrors, "batch-finish-date")} onChange={(event) => { if (event.target.reportValidity()) { onChange(setFinishDate(batch, event.target.value, localDate())); setToolFeedback("Finish date saved. Batch status and check scheduling updated."); } }} required type="date" value={batch.finishDate ?? ""} /><FieldError errors={toolErrors} id="batch-finish-date" /></label>
+              <p className="component-empty">Saves immediately. A future finish date returns this batch to active; on its finish date it becomes ready.</p>
             </article>
 
             <article className="batch-component-card" aria-labelledby="inputs-heading" id="batch-input-editor">
-              <header className="batch-component-header"><h2 id="inputs-heading">Profile inputs</h2><span className="batch-component-step">02</span></header>
+              <header className="batch-component-header"><h4 id="inputs-heading">Profile inputs</h4><span className="batch-component-step" aria-hidden="true">02</span></header>
               {batch.profileSnapshot.inputs.length > 0 ? <form className="component-inputs" onChange={() => managementDrafts.current.add("inputs")} onSubmit={saveInputs}>
                 <div className="component-input-fields">
-                  {batch.profileSnapshot.inputs.map((input) => (
-                    <label className="component-field" key={input.name}><span>{input.name} ({input.unit})</span><input defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" /></label>
+                  {batch.profileSnapshot.inputs.map((input, index) => (
+                    <label className="component-field" key={input.name}><span>{input.name} ({input.unit})</span><input {...fieldErrorProps(toolErrors, `batch-input-${index}`)} defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" /><FieldError errors={toolErrors} id={`batch-input-${index}`} /></label>
                   ))}
                 </div>
                 <button className="component-button component-button-primary" type="submit">Update inputs</button>
+                <p className="component-empty">Blank values remain unset. Suggestions use this batch’s saved profile snapshot.</p>
               </form> : <p className="component-empty">No profile inputs.</p>}
             </article>
 
             <article className="batch-component-card" aria-labelledby="calculations-heading">
-              <header className="batch-component-header"><h2 id="calculations-heading">Profile calculations</h2><span className="batch-component-step">03</span></header>
-              {batch.profileSnapshot.calculations.length > 0 ? batch.profileSnapshot.calculations.map((calculation) => {
+              <header className="batch-component-header"><h4 id="calculations-heading">Profile calculations</h4><span className="batch-component-step" aria-hidden="true">03</span></header>
+              {batch.profileSnapshot.calculations.length > 0 ? batch.profileSnapshot.calculations.map((calculation, index) => {
                 const value = batch.calculationValues[calculation.name];
                 return (
                   <div className="component-calculation" key={calculation.name}>
                     <span className="component-pair-label">{calculation.name}:</span>
                     <div className="component-calculation-value"><strong>{formatCalculationValue(value?.override ?? value?.suggested)} {calculation.unit}</strong><span>{value?.override !== undefined ? " (overridden)" : " suggested"}</span></div>
                     <span className="sr-only">{formatCalculationValue(value?.override ?? value?.suggested)} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
+                    <p className="component-empty">{value?.override !== undefined ? "Suggestion saved before override" : "Suggested"}: {formatCalculationValue(value?.suggested)} {calculation.unit}{value?.suggested == null ? value?.override !== undefined ? " · No suggestion was available before this override." : " · Add the required inputs to calculate." : ""}</p>
                     <form className="component-override" onChange={() => managementDrafts.current.add(`calculation:${calculation.name}`)} onSubmit={(event) => {
                       event.preventDefault();
+                      if (!event.currentTarget.reportValidity()) return;
                       const raw = String(new FormData(event.currentTarget).get("override") ?? "");
-                      if (raw !== "") { onChange(overrideBatchCalculation(batch, calculation.name, Number(raw))); managementDrafts.current.delete(`calculation:${calculation.name}`); }
+                      if (raw !== "") { onChange(overrideBatchCalculation(batch, calculation.name, Number(raw))); managementDrafts.current.delete(`calculation:${calculation.name}`); event.currentTarget.reset(); setToolFeedback(`${calculation.name} override saved for this batch.`); }
                     }}>
-                      <label className="component-field"><span>Override</span><input aria-label={`Override ${calculation.name}`} min="0" name="override" step="any" type="number" /></label>
+                      <label className="component-field"><span>Override</span><input {...fieldErrorProps(toolErrors, `batch-override-${index}`)} aria-label={`Override ${calculation.name}`} min="0" name="override" required step="any" type="number" /><FieldError errors={toolErrors} id={`batch-override-${index}`} /></label>
                       <button className="component-button" type="submit">Override</button>
                     </form>
                   </div>
@@ -2091,32 +2134,34 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
               }) : <p className="component-empty">No calculations.</p>}
             </article>
 
-            <article className="batch-component-card" aria-label={`${batch.name} checks`} id="batch-check-editor">
-              <header className="batch-component-header"><h2>Recurring checks</h2><button className="component-button component-button-quiet" disabled={batch.status !== "active"} onClick={() => { setAddingCheck(true); setCheckError(""); }} type="button">Add check</button></header>
-              {checkError && <p className="notice" role="alert">{checkError}</p>}
+            <article className="batch-component-card" aria-label={`${batch.name} checks`} id="batch-check-editor" tabIndex={-1}>
+              <header className="batch-component-header"><h4>Recurring checks</h4><button className="component-button component-button-quiet" disabled={batch.status !== "active"} onClick={() => { setAddingCheck(true); setCheckError(""); }} ref={addCheckRef} type="button">Add check</button></header>
+              <p className="component-check-state">{batch.status === "active" ? "Intervals save immediately. New checks count from today and belong only to this batch." : "Checks paused. Adding checks and changing intervals are unavailable until this batch is active. Names and removal remain available."}</p>
+              {checkError && <p className="notice" id="batch-check-error" role="alert">{checkError}</p>}
               {batch.checks.length === 0 && !addingCheck && <p className="component-empty">No recurring checks yet.</p>}
               {batch.checks.map((check) => {
                 const due = dueBatchChecks(batch, localDate()).find(({ id }) => id === check.id);
                 return (
                   <div className="component-check" key={check.id}>
-                    <label className="component-field"><span>Check name</span><input aria-label={`Check name ${check.id}`} onChange={(event) => { managementDrafts.current.add(`check:${check.id}`); setCheckDrafts({ ...checkDrafts, [check.id]: event.target.value }); }} value={checkDrafts[check.id] ?? check.name} /></label>
+                    <label className="component-field"><span>Check name</span><input {...checkErrorProps(`name:${check.id}`)} aria-label={`Check name: ${check.name}`} onChange={(event) => { managementDrafts.current.add(`check:${check.id}`); setCheckDrafts({ ...checkDrafts, [check.id]: event.target.value }); setCheckError(""); }} value={checkDrafts[check.id] ?? check.name} /></label>
                     <div className="component-check-meta">
                       <label className="component-field"><span>Next</span><input aria-label={`${check.name} next date`} readOnly type="date" value={check.nextDueDate} /></label>
-                      <label className="component-field"><span>Every</span><input aria-label={`${check.name} interval days`} disabled={batch.status !== "active"} min="1" onChange={(event) => { try { onChange(adjustBatchCheck(batch, check.id, Number(event.target.value), localDate())); setCheckError(""); } catch (error) { setCheckError((error as Error).message); } }} type="number" value={check.intervalDays} /></label>
+                      <label className="component-field"><span>Every (days)</span><input {...checkErrorProps(`interval:${check.id}`)} aria-label={`${check.name} interval days`} disabled={batch.status !== "active"} min="1" onChange={(event) => { try { onChange(adjustBatchCheck(batch, check.id, Number(event.target.value), localDate())); setCheckError(""); setToolFeedback("Check interval saved. Next date recalculated."); } catch (error) { setCheckErrorField(`interval:${check.id}`); setCheckError((error as Error).message); } }} step="1" type="number" value={check.intervalDays} /></label>
                     </div>
                     <p className="component-check-status">{batch.status === "active" ? `${due?.overdue ? "Overdue" : due ? "Due" : "Next"} ${check.nextDueDate}` : "Paused"}</p>
-                    <div className="component-check-actions"><button className="component-button" onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button><button className="component-remove" aria-label={`Remove ${check.name}`} onClick={() => { if (managementDrafts.current.has(`check:${check.id}`) && !window.confirm("Discard the unsaved name and remove this check?")) return; managementDrafts.current.delete(`check:${check.id}`); onChange(removeBatchCheck(batch, check.id)); }} type="button">Remove</button></div>
+                    <div className="component-check-actions"><button className="component-button" onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button><button className="component-remove" aria-label={`Remove ${check.name}`} onClick={() => { if (managementDrafts.current.has(`check:${check.id}`) && !window.confirm("Discard the unsaved name and remove this check?")) return; managementDrafts.current.delete(`check:${check.id}`); setCheckDrafts(({ [check.id]: _removed, ...rest }) => rest); onChange(removeBatchCheck(batch, check.id)); setCheckError(""); setToolFeedback(`${check.name} removed. Existing completion history kept.`); managementRef.current?.querySelector<HTMLElement>("#batch-check-editor")?.focus({ preventScroll: true }); }} type="button">Remove</button></div>
                   </div>
                 );
               })}
               {addingCheck && <form className="component-check component-new-check" onChange={() => managementDrafts.current.add("new-check")} onSubmit={saveNewCheck}>
-                <label className="component-field"><span>Check name</span><input autoFocus onChange={(event) => setNewCheckName(event.target.value)} placeholder="e.g. Taste and smell" required value={newCheckName} /></label>
-                <label className="component-field"><span>Every</span><input min="1" onChange={(event) => setNewCheckInterval(event.target.value)} required type="number" value={newCheckInterval} /></label>
-                <div className="component-check-actions"><button className="component-button" type="submit">Add recurring check</button><button className="component-remove" onClick={() => { if (!managementDrafts.current.has("new-check") || window.confirm("Discard this unsaved recurring check?")) { managementDrafts.current.delete("new-check"); setAddingCheck(false); } }} type="button">Cancel</button></div>
+                <label className="component-field"><span>Check name</span><input {...fieldErrorProps(toolErrors, "batch-new-check-name")} aria-describedby={checkError && checkErrorField === "new" ? "batch-check-error" : toolErrors["batch-new-check-name"] ? "batch-new-check-name-error" : undefined} aria-invalid={checkError && checkErrorField === "new" || toolErrors["batch-new-check-name"] ? true : undefined} autoFocus onChange={(event) => { setNewCheckName(event.target.value); setCheckError(""); }} placeholder="e.g. Taste and smell" required value={newCheckName} /><FieldError errors={toolErrors} id="batch-new-check-name" /></label>
+                <label className="component-field"><span>Every (days)</span><input {...fieldErrorProps(toolErrors, "batch-new-check-interval")} disabled={batch.status !== "active"} min="1" onChange={(event) => setNewCheckInterval(event.target.value)} required step="1" type="number" value={newCheckInterval} /><FieldError errors={toolErrors} id="batch-new-check-interval" /></label>
+                <div className="component-check-actions"><button className="component-button" disabled={batch.status !== "active"} type="submit">Add recurring check</button><button className="component-remove" onClick={() => { if (!managementDrafts.current.has("new-check") || window.confirm("Discard this unsaved recurring check?")) { managementDrafts.current.delete("new-check"); setAddingCheck(false); setNewCheckName(""); setNewCheckInterval("7"); setCheckError(""); focusAddCheck(); } }} type="button">Cancel</button></div>
               </form>}
             </article>
           </div>
         </section>
+        <section className="batch-tools-danger" aria-label="Batch deletion"><div><h4>Delete this batch</h4><p>Move it to Recently deleted in Settings. You can restore it for seven days.</p></div><button onClick={() => { if (window.confirm(`Move ${batch.name} to Recently deleted? It can be restored for seven days.`)) onDelete(batch.id); }} type="button">Delete batch</button></section>
       </section>
 
           <section className="wb-panel batch-guidance" aria-labelledby="guidance-heading">

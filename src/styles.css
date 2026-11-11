@@ -435,10 +435,27 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .detail-photo-credits { order: 7; }
 .detail-photo-credits .design-photo-credits { margin: 0; }
 .design-detail-footer svg { width: 20px; height: 20px; }
-.batch-management { order: 5; display: grid; gap: var(--space-6); padding: var(--card-padding); border-radius: var(--radius-card); background: var(--colour-background); color: var(--colour-text); }
-.batch-head-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.batch-head-actions > button:not(.batch-head-camera, .batch-head-notifications) { width: 100%; }
+.batch-management { order: 5; display: grid; gap: var(--space-6); min-width: 0; container-type: inline-size; color: var(--colour-text-inverse); }
+.batch-tools-heading { order: -4; display: flex; flex-wrap: wrap; align-items: start; gap: var(--space-4); padding-top: var(--space-6); border-top: 1px solid currentColor; }
+.batch-tools-heading > div { flex: 1 1 220px; min-width: 0; }
+.batch-tools-heading h3 { margin-block: var(--space-2); }
+.batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p { font-size: var(--type-small); }
+.batch-tools-shortcuts { order: -3; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.batch-tools-shortcuts button { flex: 1 1 160px; background: var(--colour-action); color: var(--colour-text); font-size: var(--type-small); }
+.batch-tool-feedback { order: -2; overflow-wrap: anywhere; }
+.batch-tool-feedback:empty { display: none; }
+.batch-workspace-head { order: -1; }
+.batch-head-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.batch-head-actions button { font-size: var(--type-small); }
+.batch-head-camera { flex: 0 0 52px; width: 52px; padding: var(--space-3); background: var(--colour-background); color: var(--colour-text); }
+.batch-head-notifications { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); background: var(--colour-background); color: var(--colour-text); }
+.batch-head-notifications svg { flex-shrink: 0; }
 .batch-head-notifications[aria-pressed="true"] { background: var(--colour-action); }
+.batch-management > .next-action { color: var(--colour-text); }
+.batch-management > .wb-panel { padding: var(--card-padding); border-radius: var(--radius-card); background: var(--colour-background); color: var(--colour-text); }
+.batch-tools-danger { order: 3; display: grid; gap: var(--space-4); padding: var(--card-padding); border: 1px solid currentColor; border-radius: var(--radius-card); }
+.batch-tools-danger h4 { margin-bottom: var(--space-2); }
+.batch-tools-danger button { justify-self: start; background: var(--colour-background); color: var(--colour-text); }
 .next-action { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--space-3); padding: var(--card-padding); border-radius: var(--radius-card); background: var(--colour-surface); }
 .next-action p { font-size: var(--type-small); margin-top: var(--space-2); }
 .next-action .next-action-kick { margin-top: 0; }
@@ -471,17 +488,17 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
   --component-accent: var(--colour-action);
   color: var(--component-fg);
 }
-.batch-components-progress { display: flex; gap: var(--space-2); margin-bottom: var(--space-6); }
-.batch-components-progress span { width: 24px; height: 4px; border-radius: var(--radius-control); background: var(--colour-action-alt); }
-.batch-components-grid { display: grid; gap: var(--space-6); }
-.batch-component-card { min-width: 0; border: 1px solid var(--component-border); border-radius: var(--radius-card); padding: var(--card-padding); }
+.batch-components-grid { display: grid; align-items: start; gap: var(--space-6); }
+.batch-component-card { min-width: 0; display: grid; gap: var(--space-4); border-radius: 10% 10% var(--radius-card) var(--radius-card) / 12px 12px var(--radius-card) var(--radius-card); padding: var(--card-padding); background: var(--colour-background); overflow-wrap: anywhere; }
+.batch-component-card:first-child { background: var(--colour-accent); }
+.batch-component-card:nth-child(3) { background: var(--colour-surface); }
 .batch-component-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-4); }
-.batch-component-header h2 { font-size: var(--type-body); letter-spacing: 0; }
-.batch-component-step { display: grid; place-items: center; width: 32px; height: 32px; background: var(--component-warm); border-radius: var(--radius-control); font-size: var(--type-small); }
+.batch-component-header h4 { flex: 1; font-size: var(--type-body); letter-spacing: 0; }
+.batch-component-step { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; border: 1px solid currentColor; border-radius: 50%; font-size: var(--type-small); }
 .component-field, .component-inputs, .component-input-fields, .component-calculation, .component-check { display: grid; gap: var(--space-3); }
 .component-field { font-size: var(--type-small); }
 .component-calculation + .component-calculation { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--component-border); }
-.component-calculation-value { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
+.component-calculation-value { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-control); background: var(--colour-surface-inverse); color: var(--colour-text-inverse); }
 .component-calculation-value > span, .component-pair-label, .component-empty, .component-check-status { font-size: var(--type-small); }
 .component-override { display: grid; gap: var(--space-3); }
 .component-check { padding-block: var(--space-4); border-top: 1px solid var(--component-border); }
@@ -489,6 +506,14 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .component-check-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .component-check-actions button { flex: 1; padding-inline: var(--space-3); font-size: var(--type-small); }
 .component-button { color: var(--component-fg); }
+.component-button-primary, .component-check-actions .component-button { background: var(--colour-action); }
+.component-check-state { font-size: var(--type-small); padding: var(--space-3) var(--space-4); border-radius: var(--radius-small); background: var(--colour-action-alt); }
+.component-check-status { justify-self: start; padding: var(--space-2) var(--space-4); border: 1px solid currentColor; border-radius: var(--radius-control); }
+@container (min-width: 680px) {
+  .batch-components-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .component-check-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .meas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* One permanent observation dialog: static inline or native top-layer modal. */
 .activity-logger { order: 1; border-radius: var(--radius-card); padding: var(--card-padding); background: var(--colour-background); color: var(--colour-text); }

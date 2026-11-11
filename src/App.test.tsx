@@ -1949,6 +1949,31 @@ describe("batch workflow", () => {
     expect(detail.getByRole("heading", { name: "First jar" })).toBeTruthy();
   });
 
+  it("validates batch inputs inline and protects drafts until an explicit discard", () => {
+    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Water", unit: "l" as const, defaultValue: 2 }], calculations: [{ name: "Sugar", unit: "g" as const, formula: "Water * 5" }] };
+    const batch = createBatch(profile, { id: "jar", startDate: localDateForTest() });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    const tools = within(openBatchTools());
+    const input = tools.getByLabelText("Water (l)") as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "-1" } });
+    fireEvent.click(tools.getByRole("button", { name: "Update inputs" }));
+    expect(input.getAttribute("aria-invalid")).toBe("true");
+    expect(document.getElementById(input.getAttribute("aria-describedby")!)?.textContent).toBeTruthy();
+    expect(tools.getByText(/10000 g suggested/)).toBeTruthy();
+    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(tools.getByRole("button", { name: "Discard tool changes" }));
+    expect(input.value).toBe("-1");
+    vi.mocked(window.confirm).mockReturnValue(true);
+    fireEvent.click(tools.getByRole("button", { name: "Discard tool changes" }));
+    expect(input.value).toBe("2");
+    expect(input.hasAttribute("aria-invalid")).toBe(false);
+    const unload = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(unload);
+    expect(unload.defaultPrevented).toBe(false);
+    expect(document.activeElement).toBe(tools.getByRole("button", { name: "Discard tool changes" }));
+  });
+
   it("adds, renames, and removes a batch-local check", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
@@ -1970,6 +1995,97 @@ describe("batch workflow", () => {
     expect(screen.getByDisplayValue("Gas release")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Remove Gas release" }));
     expect(screen.getByText("No recurring checks yet.")).toBeTruthy();
+  });
+
+  it("keeps unset inputs, overrides, snapshots and observations intact across tool saves and discard", () => {
+    const today = localDateForTest();
+    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Flour", unit: "g" as const }], calculations: [{ name: "Water", unit: "g" as const, formula: "Flour * 0.5" }] };
+    const batch = createBatch(profile, { id: "jar", startDate: today, inputValues: { Flour: 100 } });
+    batch.timeline.push({ id: "note", kind: "note", date: today, text: "Saved preparation" });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    const tools = within(openBatchTools());
+    const input = tools.getByLabelText("Flour (g)") as HTMLInputElement;
+    const override = tools.getByLabelText("Override Water");
+    fireEvent.change(input, { target: { value: "" } });
+    fireEvent.click(tools.getByRole("button", { name: "Update inputs" }));
+    expect(tools.getByText(/Add the required inputs to calculate/)).toBeTruthy();
+    fireEvent.change(override, { target: { value: "60" } });
+    fireEvent.submit(override.closest("form")!);
+    fireEvent.change(input, { target: { value: "200" } });
+    fireEvent.click(tools.getByRole("button", { name: "Discard tool changes" }));
+    expect(input.value).toBe("");
+    const stored = JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0];
+    expect(stored.inputValues).toEqual({});
+    expect(stored.calculationValues.Water).toEqual({ suggested: null, override: 60 });
+    expect(stored.profileSnapshot).toEqual(batch.profileSnapshot);
+    expect(stored.timeline).toEqual(batch.timeline);
+    fireEvent.change(input, { target: { value: "200" } });
+    fireEvent.click(tools.getByRole("button", { name: "Update inputs" }));
+    expect(tools.getByText(/No suggestion was available before this override/)).toBeTruthy();
+    expect(tools.queryByText(/Add the required inputs to calculate/)).toBeNull();
+    expect(tools.getByRole("status").textContent).toContain("Non-overridden suggestions recalculated");
+  });
+
+  it("explains paused controls, scopes check errors and keeps draft creation recoverable", () => {
+    const today = localDateForTest();
+    const profile = { ...createProfileState().profiles[0], checks: [{ name: "Taste", intervalDays: 2 }, { name: "Burp", intervalDays: 3 }] };
+    const batch = createBatch(profile, { id: "jar", startDate: today });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    const tools = within(openBatchTools());
+    const name = tools.getByDisplayValue("Burp");
+    fireEvent.change(name, { target: { value: " taste " } });
+    fireEvent.click(within(name.closest(".component-check")!).getByRole("button", { name: "Save name" }));
+    expect(name.getAttribute("aria-invalid")).toBe("true");
+    expect(tools.getByRole("alert").id).toBe(name.getAttribute("aria-describedby"));
+    expect(tools.getByDisplayValue("Taste").hasAttribute("aria-invalid")).toBe(false);
+    fireEvent.click(tools.getByRole("button", { name: "Discard tool changes" }));
+    fireEvent.click(tools.getByRole("button", { name: "Add check" }));
+    const newCheck = within(document.querySelector(".component-new-check")!);
+    fireEvent.change(newCheck.getByLabelText("Check name"), { target: { value: "Unsaved check" } });
+    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(tools.getByRole("button", { name: "Cancel" }));
+    expect(newCheck.getByLabelText("Check name")).toHaveProperty("value", "Unsaved check");
+    vi.mocked(window.confirm).mockReturnValue(true);
+    fireEvent.click(tools.getByRole("button", { name: "Cancel" }));
+    expect(document.activeElement).toBe(tools.getByRole("button", { name: "Add check" }));
+    fireEvent.click(tools.getByRole("button", { name: "Add check" }));
+    expect(within(document.querySelector(".component-new-check")!).getByLabelText("Check name")).toHaveProperty("value", "");
+    fireEvent.change(tools.getByLabelText("Finish date"), { target: { value: today } });
+    fireEvent.click(tools.getByRole("button", { name: "Cancel" }));
+    expect(document.activeElement).toBe(tools.getByRole("article", { name: "Kombucha F1 checks" }));
+    expect(tools.getByRole("button", { name: "Add check" })).toHaveProperty("disabled", true);
+    expect(tools.getByLabelText("Taste interval days")).toHaveProperty("disabled", true);
+    expect(tools.getByText(/Checks paused\. Adding checks/)).toBeTruthy();
+    fireEvent.click(tools.getByRole("button", { name: "Remove Burp" }));
+    expect(document.activeElement).toBe(tools.getByRole("article", { name: "Kombucha F1 checks" }));
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].checks).toHaveLength(1);
+  });
+
+  it("shows notification state and confirms recoverable batch deletion", () => {
+    const batch = createBatch(createProfileState().profiles[0], { id: "jar", startDate: localDateForTest() });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    const tools = within(openBatchTools());
+    const notifications = tools.getByRole("button", { name: "Notifications for Kombucha F1" });
+    fireEvent.click(notifications);
+    expect(notifications.getAttribute("aria-pressed")).toBe("false");
+    expect(notifications.textContent).toContain("muted");
+    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(tools.getByRole("button", { name: "Delete batch" }));
+    expect(window.confirm).toHaveBeenLastCalledWith(expect.stringContaining("restored for seven days"));
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches).toHaveLength(1);
+    vi.mocked(window.confirm).mockReturnValue(true);
+    fireEvent.click(tools.getByRole("button", { name: "Delete batch" }));
+    const stored = JSON.parse(localStorage.getItem("fermentstation.batches")!);
+    expect(stored.batches).toHaveLength(0);
+    const savedBatch = JSON.parse(JSON.stringify({ ...batch, notificationsMuted: true }));
+    expect(stored.trash[0]).toMatchObject(savedBatch);
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open recently deleted batches" }));
+    fireEvent.click(screen.getByRole("button", { name: /Restore Kombucha F1/ }));
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0]).toEqual(savedBatch);
   });
 
   it("records editable pH readings with warnings and profile zones", () => {
