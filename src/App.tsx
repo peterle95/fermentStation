@@ -109,7 +109,7 @@ function NavIcon({ destination }: { destination: Destination }) {
   return <DesignIcon name="user" />;
 }
 
-function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus" | "bell" | "user" | "sparkles" | "temp" | "clock" | "back" | "check" | "book" | "drop" | "settings" }) {
+function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus" | "bell" | "user" | "sparkles" | "temp" | "clock" | "back" | "check" | "book" | "drop" | "settings" | "close" }) {
   const paths = {
     leaf: "M19 3C9 3 3 7 5 14c2 6 12 6 14-11ZM4 21 15 9m-6 6 6 1",
     jar: "M7 7c0 3-2 3-2 6v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6c0-3-2-3-2-6M5 12h14M5 16h14",
@@ -123,6 +123,7 @@ function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus
     clock: "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 7v5l3 2",
     back: "m14 5-7 7 7 7",
     check: "m5 12 4 4L19 6",
+    close: "m6 6 12 12M6 18 18 6",
     book: "M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Zm0 0v15",
     drop: "M12 2S4 11 4 15a8 8 0 0 0 16 0c0-4-8-13-8-13Z",
     settings: "m9 3-1 3-3 1-2 5 2 5 3 1 1 3h6l1-3 3-1 2-5-2-5-3-1-1-3ZM16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
@@ -384,6 +385,7 @@ export function App() {
   const [showChecks, setShowChecks] = useState(false);
   const [detailOrigin, setDetailOrigin] = useState<"calendar" | "checks" | null>(null);
   const batchReturnFocus = useRef<HTMLElement | null>(null);
+  const calendarReturnScroll = useRef(0);
   const [dialog, setDialog] = useState<StationDialogState | null>(null);
   const profileDraft = useUnsavedChanges("Discard unsaved profile changes? Your saved profile and existing batches will not change.");
   const startDraft = useUnsavedChanges("Discard this unsaved batch? Its name, date and inputs will be lost.");
@@ -568,6 +570,7 @@ export function App() {
     if (id && id !== openBatchId && beforeBatchReplace.current?.() === false) return;
     if (id) {
       batchReturnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      if (origin === "calendar") calendarReturnScroll.current = document.getElementById("main-content")?.scrollTop ?? 0;
       if (origin === "calendar" && !navigate("batches")) return;
       setDetailOrigin(origin);
       setOpenBatchId(id);
@@ -577,6 +580,8 @@ export function App() {
       requestAnimationFrame(() => {
         const heading = document.querySelector<HTMLElement>(detailOrigin === "calendar" ? ".calendar-screen h1" : detailOrigin === "checks" ? ".design-checks-view h1" : "#batch-overview-heading");
         (batchReturnFocus.current?.isConnected ? batchReturnFocus.current : heading)?.focus({ preventScroll: true });
+        const main = document.getElementById("main-content");
+        if (detailOrigin === "calendar" && main) main.scrollTop = calendarReturnScroll.current;
       });
     }
     setShowPhoneDetail(id !== null);
@@ -756,9 +761,9 @@ export function App() {
           <section className="calendar-screen" aria-label="Fermentation calendar" hidden={shell.destination !== "calendar"}>
               <div className="screen-head">
                 <div>
-                  <p className="eyebrow">Check-ins &amp; ready days</p>
+                  <p className="eyebrow">Your batch schedule</p>
                   <h1 tabIndex={-1}>Calendar</h1>
-                  <p className="screen-intro">Checks, ready days, and moves to the fridge. Select a scheduled day to open its batch.</p>
+                  <p className="screen-intro">Check dates and finish dates. Choose a scheduled day to open its batch.</p>
                 </div>
               </div>
               <CalendarView batches={batchState.batches} onOpen={(id) => openBatch(id, "calendar")} />
@@ -1168,42 +1173,53 @@ interface BatchPickerProps {
 
 function BatchPicker({ date, events, onClose, onOpen }: BatchPickerProps) {
   const batchIds = [...new Set(events.map(({ batchId }) => batchId))];
-
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const returnFocus = useRef(document.activeElement instanceof HTMLElement ? document.activeElement : null);
   useEffect(() => {
-    const dismiss = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+    const dialog = dialogRef.current;
+    if (!dialog || batchIds.length < 2) return;
+    if (!dialog.open) dialog.showModal();
+    dialog.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+    const trigger = returnFocus.current;
+    return () => {
+      if (dialog.open) dialog.close();
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
     };
-    window.addEventListener("keydown", dismiss);
-    return () => window.removeEventListener("keydown", dismiss);
-  }, [onClose]);
+  }, [batchIds.length]);
 
   if (batchIds.length < 2) return null;
 
   return (
-    <div className="upcoming-batch-picker-overlay" onClick={onClose}>
-      <div aria-label={`Choose a batch for ${date}`} aria-modal="true" className="upcoming-batch-picker" id={`upcoming-batch-picker-${date}`} onClick={(event) => event.stopPropagation()} role="dialog">
+    <dialog aria-label={`Choose a batch for ${date}`} className="station-dialog upcoming-batch-picker" id={`upcoming-batch-picker-${date}`} onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }} ref={dialogRef}>
         <div className="upcoming-batch-picker-heading">
-          <strong>Choose a batch</strong>
-          <button onClick={onClose} type="button">Close</button>
+          <div><p className="eyebrow">{shortDate(date)}</p><h2>Choose a batch</h2></div>
+          <button aria-label="Close" className="icon-button" onClick={onClose} type="button"><DesignIcon name="close" /></button>
         </div>
         {batchIds.map((batchId) => {
           const batchEvents = events.filter((event) => event.batchId === batchId);
           const batchName = batchEvents[0].batchName;
           return (
-            <button aria-label={`Open ${batchName}`} className="upcoming-batch-choice" key={batchId} onClick={() => { onClose(); onOpen(batchId); }} type="button">
+            <button aria-label={`Open ${batchName}`} className="upcoming-batch-choice" key={batchId} onClick={() => {
+              // Release native modal inertness before handing the day trigger to openBatch.
+              dialogRef.current?.close();
+              returnFocus.current?.focus({ preventScroll: true });
+              onClose();
+              onOpen(batchId);
+            }} type="button">
               <strong>{batchName}</strong>
               <span>{batchEvents.map((event) => event.label).join(" · ")}</span>
             </button>
           );
         })}
-      </div>
-    </div>
+    </dialog>
   );
 }
 
 function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string): void }) {
   const [viewDate, setViewDate] = useState(() => new Date(`${localDate()}T12:00:00`));
   const [openDate, setOpenDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [focusDate, setFocusDate] = useState(localDate);
   const events = calendarEvents(batches);
   const today = localDate();
   const year = viewDate.getFullYear();
@@ -1223,51 +1239,72 @@ function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string
   const overdue = events.filter(({ date, kind }) => kind === "check" && date < today).slice(0, 5);
 
   function shiftMonth(offset: number) {
-    setViewDate(new Date(year, month + offset, 1));
+    const date = new Date(year, month + offset, 1);
+    setViewDate(date);
+    setFocusDate(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-01`);
   }
 
   return (
     <div className="calendar-layout">
       <div className="calendar-panel">
         <div className="calendar-head">
-          <h2>{monthLabel}</h2>
+          <h2 aria-live="polite" aria-atomic="true">{monthLabel}</h2>
           <div className="calendar-nav">
+            <button className="calendar-today" onClick={() => { setViewDate(new Date(`${today}T12:00:00`)); setFocusDate(today); }} type="button">Today</button>
             <button aria-label="Previous month" onClick={() => shiftMonth(-1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button>
             <button aria-label="Next month" onClick={() => shiftMonth(1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg></button>
           </div>
         </div>
-        <div aria-hidden="true" className="calendar-weekdays">
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => <span key={day}>{day}</span>)}
-        </div>
-        <div className="calendar-grid" role="grid" aria-label={monthLabel}>
-          {cells.map((cell, index) => {
-            if (!cell.date) return <div aria-hidden="true" className="calendar-day other" key={`leading-${index}`} />;
+        <div className="calendar-grid" role="grid" aria-label={monthLabel} onKeyDown={(event) => {
+          const cell = (event.target as HTMLElement).closest<HTMLElement>("[data-date]");
+          if (!cell) return;
+          const day = Number(cell.dataset.date!.slice(-2));
+          const weekday = (leadingDays + day - 1) % 7;
+          const offset = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7, Home: -weekday, End: 6 - weekday }[event.key];
+          if (offset === undefined) return;
+          event.preventDefault();
+          const nextDay = Math.max(1, Math.min(daysInMonth, day + offset));
+          const nextDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(nextDay).padStart(2, "0")}`;
+          setFocusDate(nextDate);
+          const nextCell = event.currentTarget.querySelector<HTMLElement>(`[data-date="${nextDate}"]`);
+          (nextCell?.querySelector("button") ?? nextCell)?.focus({ preventScroll: true });
+        }}>
+          <div className="calendar-weekdays" role="row">
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => <span role="columnheader" key={day}>{day}</span>)}
+          </div>
+          {Array.from({ length: Math.ceil(cells.length / 7) }, (_, week) => <div className="calendar-week" role="row" key={week}>{cells.slice(week * 7, week * 7 + 7).map((cell, index) => {
+            if (!cell.date) return <div aria-label="Outside this month" className="calendar-day other" role="gridcell" key={`leading-${index}`} />;
             const dateValue = cell.date;
             const batchIds = [...new Set(cell.events.map(({ batchId }) => batchId))];
             const canChooseBatch = batchIds.length > 1;
             const contents = <>
               <span className="calendar-day-number">{Number(cell.date.slice(-2))}</span>
-              {cell.events.map((event) => (
-                <span className={`calendar-event event-${event.kind}`} key={`${event.batchId}-${event.kind}-${event.label}`} title={`${event.batchName}: ${event.label}`}>
-                  {event.label}
-                </span>
-              ))}
+              {cell.events.length > 0 && <span aria-hidden="true" className="calendar-markers">{(["check", "finish"] as const).filter((kind) => cell.events.some((event) => event.kind === kind)).map((kind) => <i className={`event-${kind}`} key={kind} />)}</span>}
+              {cell.events.length > 0 && <span className="sr-only" id={`calendar-events-${dateValue}`}>{cell.events.map((event) => `${event.batchName}: ${event.label}`).join(". ")}</span>}
             </>;
             return (
               <div
                 aria-label={cell.events.length ? undefined : cell.date}
-                className={`calendar-day${dateValue === today ? " today" : ""}${cell.events.length ? " has-events" : ""}`}
+                aria-current={dateValue === today ? "date" : undefined}
+                aria-selected={dateValue === selectedDate}
+                className={`calendar-day${dateValue === today ? " today" : ""}${cell.events.length ? " has-events" : ""}${dateValue === selectedDate ? " selected" : ""}`}
+                data-date={dateValue}
                 key={dateValue}
+                onFocus={() => setFocusDate(dateValue)}
                 role="gridcell"
+                tabIndex={cell.events.length || focusDate !== dateValue ? -1 : 0}
               >
                 {cell.events.length ? (
                   <button
                     aria-controls={canChooseBatch ? `upcoming-batch-picker-${dateValue}` : undefined}
+                    aria-current={dateValue === today ? "date" : undefined}
+                    aria-describedby={`calendar-events-${dateValue}`}
                     aria-expanded={canChooseBatch ? openDate === dateValue : undefined}
                     aria-haspopup={canChooseBatch ? "dialog" : undefined}
                     aria-label={canChooseBatch ? `Choose a batch for ${dateValue}` : `Open ${cell.events[0].batchName} for ${dateValue}`}
                     className="calendar-day-button"
-                    onClick={() => canChooseBatch ? setOpenDate((current) => current === dateValue ? null : dateValue) : onOpen(batchIds[0])}
+                    onClick={() => { setSelectedDate(dateValue); if (canChooseBatch) setOpenDate(dateValue); else onOpen(batchIds[0]); }}
+                    tabIndex={focusDate === dateValue ? 0 : -1}
                     type="button"
                   >
                     {contents}
@@ -1275,41 +1312,41 @@ function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string
                 ) : contents}
               </div>
             );
-          })}
+          })}</div>)}
         </div>
         <div className="calendar-legend">
-          <span className="legend-check"><i />Profile check</span>
-          <span className="legend-ready"><i />Ready</span>
-          <span className="legend-fridge"><i />To fridge</span>
+          <span className="legend-check"><i />Check date</span>
+          <span className="legend-ready"><i />Finish date</span>
         </div>
+        <p className="calendar-helper">Checks pause when a batch is ready or in the fridge. Finish dates stay visible.</p>
       </div>
       <div className="calendar-lists">
         <div>
-          <div className="calendar-section-label"><h2>Upcoming checks</h2></div>
+          <div className="calendar-section-label"><h2>Upcoming dates</h2><span className="design-badge">Next {upcoming.length}</span></div>
           <div className="upcoming-list">
             {upcoming.length === 0 ? <p className="calendar-empty">No finish dates or checks scheduled.</p> : upcoming.map((event) => {
             const date = new Date(`${event.date}T12:00:00`);
             const isFinish = event.kind === "finish";
             return (
-              <button aria-label={`Open ${event.batchName}: ${event.label}`} className="upcoming-item" key={`${event.batchId}-${event.kind}-${event.date}`} onClick={() => onOpen(event.batchId)} type="button">
-                <div className="upcoming-date"><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span></div>
-                <div className="upcoming-body"><time className="calendar-event-date" dateTime={event.date}>{event.date}</time><b>{event.batchName} {isFinish ? "finish date" : event.label}</b><p>{isFinish ? "Ready to bottle or move on." : "Profile check · due"}</p></div>
-                <span className={`calendar-status ${isFinish ? "ready" : "attention"}`}><span className="status-dot" />{isFinish ? "ready" : "check"}</span>
+              <button aria-label={`Open ${event.batchName}: ${event.label}`} className="upcoming-item" key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
+                <time className="upcoming-date" dateTime={event.date}><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { month: "short" }).format(date)}</span></time>
+                <div className="upcoming-body"><b>{event.batchName}</b><p>{isFinish ? "Finish date" : event.label}</p></div>
+                <span className={`calendar-status ${isFinish ? "ready" : "attention"}`}>{isFinish ? "Finish" : "Check"}</span>
               </button>
             );
             })}
           </div>
         </div>
         <div>
-          <div className="calendar-section-label"><h2>Overdue</h2></div>
+          <div className="calendar-section-label"><h2>Overdue</h2><span className="design-badge">{overdue.length} shown</span></div>
           <div className="upcoming-list">
             {overdue.length === 0 ? <p className="calendar-empty">No overdue checks.</p> : overdue.map((event) => {
               const date = new Date(`${event.date}T12:00:00`);
               return (
                 <button aria-label={`Open ${event.batchName}: ${event.label}`} className="upcoming-item overdue-item" key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
-                  <div className="upcoming-date"><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span></div>
-                  <div className="upcoming-body"><time className="calendar-event-date" dateTime={event.date}>{event.date}</time><b>{event.batchName} {event.label}</b><p>Profile check · overdue</p></div>
-                  <span className="calendar-status attention"><span className="status-dot" />overdue</span>
+                  <time className="upcoming-date" dateTime={event.date}><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { month: "short" }).format(date)}</span></time>
+                  <div className="upcoming-body"><b>{event.batchName}</b><p>{event.label} · overdue</p></div>
+                  <span aria-hidden="true" className="calendar-overdue-mark">!</span>
                 </button>
               );
             })}
@@ -1349,6 +1386,35 @@ interface BatchViewProps {
 
 type BatchListFilter = BatchFilter | "attention";
 
+function compareScheduledChecks(left: { batch: Batch; check: Batch["checks"][number] }, right: { batch: Batch; check: Batch["checks"][number] }) {
+  return left.check.nextDueDate.localeCompare(right.check.nextDueDate) || left.batch.name.localeCompare(right.batch.name) || left.check.name.localeCompare(right.check.name);
+}
+
+function ChecksView({ batches, onOpen, onComplete }: { batches: Batch[]; onOpen(id: string): void; onComplete(batchId: string, checkId: string): void }) {
+  const today = localDate();
+  const checks = batches.filter(({ status }) => status === "active").flatMap((batch) => batch.checks.map((check) => ({ batch, check })))
+    .sort((left, right) => Number(left.check.lastCompletedDate === today) - Number(right.check.lastCompletedDate === today) || compareScheduledChecks(left, right));
+  const due = checks.filter(({ check }) => check.nextDueDate <= today);
+  const paused = batches.filter(({ status, checks }) => status !== "active" && checks.length > 0);
+  return <section aria-label="Batch checks" className="design-checks-view">
+    <div className="design-view-heading"><p className="eyebrow">Care for your cultures</p><h1 tabIndex={-1}>Your batch checks</h1><p>Complete a check here, or open its batch for notes and readings.</p></div>
+    <div className="checks-summary"><div><strong>{due.length}</strong><span>Due or overdue</span></div><div><strong>{paused.length}</strong><span>Paused batches</span></div></div>
+    <div className="design-section-head"><h2>Scheduled checks</h2><span className="design-badge">{checks.length} checks</span></div>
+    <div className="design-all-checks">{checks.map(({ batch, check }) => {
+      const completed = check.lastCompletedDate === today;
+      const overdue = !completed && check.nextDueDate < today;
+      return <article className={`queue-card${completed ? " done" : overdue ? " overdue" : ""}`} key={`${batch.id}-${check.id}`}>
+        <span className={`queue-icon${overdue ? " overdue" : ""}`} aria-hidden="true">{overdue ? "!" : <DesignIcon name={check.name.toLowerCase().includes("brine") ? "drop" : "leaf"} />}</span>
+        <button aria-label={`Open ${batch.name} for ${check.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{check.name}</strong><span>{batch.name} · {check.nextDueDate === today ? "Today" : `${overdue ? "Overdue" : "Due"} ${shortDate(check.nextDueDate)}`}</span>{completed && <span>Completed today</span>}</button>
+        <button aria-label={`${completed ? "Completed" : "Complete"} ${check.name} for ${batch.name}`} className="design-check-complete" disabled={completed} onClick={(event) => { if (document.activeElement === event.currentTarget) (event.currentTarget.previousElementSibling as HTMLButtonElement)?.focus({ preventScroll: true }); onComplete(batch.id, check.id); }} type="button"><DesignIcon name="check" /></button>
+      </article>;
+    })}</div>
+    {checks.length === 0 && <p className="design-empty-checks">No checks scheduled for your active batches.</p>}
+    {checks.length > 0 && due.length === 0 && <p className="checks-caught-up">All caught up. You can still complete an upcoming check early.</p>}
+    {paused.length > 0 && <section className="checks-paused" aria-labelledby="paused-checks-heading"><h2 id="paused-checks-heading">Paused checks</h2><p>Checks resume when a batch becomes active again.</p><div className="design-all-checks">{paused.map((batch) => <button aria-label={`Open paused batch ${batch.name}`} className="checks-paused-row" onClick={() => onOpen(batch.id)} key={batch.id} type="button"><span><strong>{batch.name}</strong><span>{batch.checks.map(({ name }) => name).join(" · ")}</span></span><span className="design-badge">{statusLabel(batch.status)} · paused</span></button>)}</div></section>}
+  </section>;
+}
+
 function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mode, pane, profilePane, showPhoneDetail, backLabel, onObservationAdded, profiles, units, onDialog, batchListVersion, onChange, onUpdate, onComplete, onDelete, onNavigate, onOpen, onSelect, openBatchId }: BatchViewProps) {
   const [filter, setFilter] = useState<BatchListFilter>("all");
   const [query, setQuery] = useState("");
@@ -1376,8 +1442,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
     if (!openBatchId) onSelect(batches[0].id);
   }, [batches, onSelect, openBatchId]);
   const dueChecks = prioritizeToday(batches, localDate()).flatMap((batch) => dueBatchChecks(batch, localDate()).map((check) => ({ batch, check })))
-    .sort((left, right) => left.check.nextDueDate.localeCompare(right.check.nextDueDate) ||
-      left.batch.name.localeCompare(right.batch.name) || left.check.name.localeCompare(right.check.name));
+    .sort(compareScheduledChecks);
   const readyBatches = batches.filter(({ status }) => status === "ready");
   const today = localDate();
   const upcoming = calendarEvents(batches).filter(({ date }) => date >= today);
@@ -1390,25 +1455,15 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
   const selectedUpcomingEvents = upcomingDays.find(({ date }) => date === openUpcomingDate)?.events ?? [];
 
   function closeBatch() {
+    // Release the responsive focus-within pane before restoring its hidden origin.
+    if (detailRef.current?.contains(document.activeElement) && document.activeElement instanceof HTMLElement) document.activeElement.blur();
     onOpen(null);
   }
 
   return (
     <section className={`batches design-workspace${pane === "profiles" ? " profile-workspace" : ""}${openBatch && showPhoneDetail ? " design-selected" : ""}`} aria-label="Fermentation workspace">
       <div className="design-dashboard" key={pane}>
-      {pane === "profiles" ? profilePane : pane === "checks" ? <section aria-label="Batch checks" className="design-checks-view">
-        <div className="design-view-heading"><h1 tabIndex={-1}>Your batch checks</h1><p>A small check-in for the cultures in your kitchen.</p></div>
-        <div className="design-all-checks">{batches.filter(({ status }) => status === "active").flatMap((batch) => batch.checks.map((check) => {
-          const completed = check.lastCompletedDate === today;
-          return <article className={`queue-card${completed ? " done" : ""}`} key={`${batch.id}-${check.id}`}>
-            <span className="queue-icon" aria-hidden="true"><DesignIcon name={check.name.toLowerCase().includes("brine") ? "drop" : "leaf"} /></span>
-            <button aria-label={`Open ${batch.name} for ${check.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{check.name}</strong><span>{batch.name} · {check.nextDueDate === today ? "Today" : `${completed || check.nextDueDate > today ? "Due" : "Overdue"} ${shortDate(check.nextDueDate)}`}</span></button>
-            <button aria-label={`${completed ? "Completed" : "Complete"} ${check.name} for ${batch.name}`} className="design-check-complete" disabled={completed} onClick={() => onComplete(batch.id, check.id)} type="button"><DesignIcon name="check" /></button>
-          </article>;
-        }))}</div>
-        {!batches.some((batch) => batch.status === "active" && batch.checks.length > 0) && <p className="design-empty-checks">No checks scheduled for your active batches.</p>}
-        <PhotoCredits />
-      </section> : <>
+      {pane === "profiles" ? profilePane : pane === "checks" ? <ChecksView batches={batches} onOpen={onOpen} onComplete={onComplete} /> : <>
         <div className="design-section-head"><div><p className="eyebrow">Your local journal</p><h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>My batches <span>{batches.length}</span></h1></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
         <div className="design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /><button aria-label="Sort batches by finish date" aria-pressed={sorted} onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div>
         <section className="design-summary" aria-label="Kitchen summary" hidden={mode !== "today"}>

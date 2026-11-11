@@ -5,7 +5,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { setImmediate as yieldToRunner } from "node:timers/promises";
 import { App } from "./App";
 import { createProfileState } from "./domain/profiles";
-import { createBatch, createBatchState } from "./domain/batches";
+import { completeBatchCheck, createBatch, createBatchState } from "./domain/batches";
 import { createShellState } from "./domain/shell";
 import { iosGuideDismissedKey } from "./platform/ios-install-guide";
 import * as camera from "./platform/camera";
@@ -346,7 +346,7 @@ describe("batch workflow", () => {
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline[0].dataUrl).toBe("data:image/jpeg;base64,cGhvdG8=");
   });
 
-  it("returns from a calendar batch to its original month and from a check to Checks", () => {
+  it("returns from a calendar batch to its original month and from a check to Checks", async () => {
     const today = localDateForTest();
     const profile = { ...createProfileState().profiles[0], checks: [{ name: "Taste", intervalDays: 2 }] };
     const batch = { ...createBatch(profile, { id: "jar", name: "Return jar", startDate: today, today }), finishDate: addDaysForTest(today, 40) };
@@ -359,12 +359,18 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Back to Calendar" }));
     expect(screen.getByRole("grid").getAttribute("aria-label")).toBe(month);
     fireEvent.click(screen.getByRole("button", { name: "Checks" }));
-    fireEvent.click(screen.getByRole("button", { name: "Open Return jar for Taste" }));
-    fireEvent.click(screen.getByRole("button", { name: "Back to Checks" }));
+    const trigger = screen.getByRole("button", { name: "Open Return jar for Taste" });
+    trigger.focus();
+    fireEvent.click(trigger);
+    const back = screen.getByRole("button", { name: "Back to Checks" });
+    back.focus();
+    fireEvent.click(back);
+    await act(async () => { await new Promise(requestAnimationFrame); });
     expect(screen.getByRole("heading", { name: "Your batch checks" })).toBeTruthy();
+    expect(document.activeElement).toBe(trigger);
   });
 
-  it("restores focus to the originating view when a day-picker choice no longer exists", async () => {
+  it("restores focus to the originating day after opening a day-picker choice", async () => {
     const today = localDateForTest();
     const finishDate = addDaysForTest(today, 2);
     const profile = createProfileState().profiles[0];
@@ -374,13 +380,15 @@ describe("batch workflow", () => {
     for (const calendar of [true, false]) {
       fireEvent.click(screen.getByRole("button", { name: calendar ? "Calendar" : "My batches" }));
       if (!calendar) openMoreBatchActions();
-      fireEvent.click(screen.getByRole("button", { name: `Choose a batch for ${finishDate}` }));
+      const trigger = screen.getByRole("button", { name: `Choose a batch for ${finishDate}` });
+      trigger.focus();
+      fireEvent.click(trigger);
       const choice = within(screen.getByRole("dialog")).getByRole("button", { name: "Open First" });
       choice.focus();
       fireEvent.click(choice);
       fireEvent.click(screen.getByRole("button", { name: calendar ? "Back to Calendar" : "Back to batches" }));
       await act(async () => { await new Promise(requestAnimationFrame); });
-      expect(document.activeElement).toBe(screen.getByRole("heading", { name: calendar ? "Calendar" : "My batches 2" }));
+      expect(document.activeElement).toBe(trigger);
     }
   });
 
@@ -1083,6 +1091,113 @@ describe("batch workflow", () => {
     expect(screen.getByRole("button", { name: "Completed Taste for Active jar" })).toBeTruthy();
   });
 
+  it("prioritizes overdue checks and explains upcoming, completed and both paused statuses without changing records", () => {
+    const today = localDateForTest();
+    const profile = { ...createProfileState().profiles[0], expectedDurationDays: 90, checks: [{ name: "Taste", intervalDays: 2 }] };
+    const future = createBatch(profile, { id: "future", name: "Future jar", startDate: today, today });
+    const overdue = createBatch(profile, { id: "overdue", name: "Overdue jar", startDate: addDaysForTest(today, -5), today });
+    const due = createBatch(profile, { id: "due", name: "Due jar", startDate: addDaysForTest(today, -2), today });
+    const uncompleted = createBatch(profile, { id: "done", name: "Done jar", startDate: today, today });
+    const done = completeBatchCheck(uncompleted, uncompleted.checks[0].id, today, "completion");
+    const ready = { ...createBatch(profile, { id: "ready", name: "Ready jar", startDate: today, today }), status: "ready" as const };
+    const fridge = { ...createBatch(profile, { id: "fridge", name: "Fridge jar", startDate: today, today }), status: "to-fridge" as const };
+    const state = createBatchState([future, done, due, overdue, ready, fridge]);
+    localStorage.setItem("fermentstation.batches", JSON.stringify(state));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Checks" }));
+    const checks = within(screen.getByRole("region", { name: "Batch checks" }));
+    expect(checks.getAllByRole("button", { name: /^Open .+ for Taste$/ }).map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Open Overdue jar for Taste", "Open Due jar for Taste", "Open Future jar for Taste", "Open Done jar for Taste",
+    ]);
+    expect(checks.getByText(/Overdue jar · Overdue/)).toBeTruthy();
+    expect(checks.getByText("Due jar · Today")).toBeTruthy();
+    expect(checks.getByText("Completed today")).toBeTruthy();
+    expect(checks.getByRole("button", { name: "Open paused batch Ready jar" }).textContent).toContain("Ready · paused");
+    expect(checks.getByRole("button", { name: "Open paused batch Fridge jar" }).textContent).toContain("To fridge · paused");
+    expect(checks.queryByRole("button", { name: "Complete Taste for Ready jar" })).toBeNull();
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!)).toEqual(state);
+    const complete = checks.getByRole("button", { name: "Complete Taste for Overdue jar" });
+    complete.focus();
+    fireEvent.click(complete);
+    expect(document.activeElement).toBe(checks.getByRole("button", { name: "Open Overdue jar for Taste" }));
+    const stored = JSON.parse(localStorage.getItem("fermentstation.batches")!);
+    const updated = stored.batches.find(({ id }: { id: string }) => id === "overdue");
+    expect(updated.checks[0]).toMatchObject({ lastCompletedDate: today, nextDueDate: addDaysForTest(today, 2) });
+    expect(updated.timeline).toEqual([expect.objectContaining({ kind: "check", checkName: "Taste", date: today })]);
+    expect(stored.batches.filter(({ id }: { id: string }) => id !== "overdue")).toEqual(state.batches.filter(({ id }) => id !== "overdue"));
+  });
+
+  it("supports keyboard calendar days, native picker cancellation and selected-day context on return", async () => {
+    const today = localDateForTest();
+    const profile = { ...createProfileState().profiles[0], expectedDurationDays: 90, checks: [{ name: "Batch-local taste", intervalDays: 1 }] };
+    const active = createBatch(profile, { id: "care", name: "Care jar", startDate: addDaysForTest(today, -1), today });
+    const finishing = { ...createBatch(profile, { id: "finish", name: "Finish jar", startDate: today, today }), finishDate: today };
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([active, finishing])));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    const calendar = within(screen.getByRole("region", { name: "Fermentation calendar" }));
+    expect(calendar.getByText("Check date")).toBeTruthy();
+    expect(calendar.getByText("Finish date", { selector: ".calendar-legend span" })).toBeTruthy();
+    expect(calendar.queryByText("To fridge", { exact: true })).toBeNull();
+    expect(calendar.getByRole("heading", { name: "Upcoming dates" })).toBeTruthy();
+    const grid = screen.getByRole("grid");
+    const month = grid.getAttribute("aria-label");
+    const trigger = calendar.getByRole("button", { name: `Choose a batch for ${today}` });
+    expect(document.getElementById(trigger.getAttribute("aria-describedby")!)?.textContent).toContain("Care jar: Batch-local taste");
+    expect(document.getElementById(trigger.getAttribute("aria-describedby")!)?.textContent).toContain("Finish jar: Finish date");
+    expect(grid.querySelectorAll('[tabindex="0"]')).toHaveLength(1);
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "Home" });
+    const weekday = (new Date(`${today}T12:00:00`).getDay() + 6) % 7;
+    expect(document.activeElement?.closest("[data-date]")?.getAttribute("data-date")).toBe(`${today.slice(0, 8)}${String(Math.max(1, Number(today.slice(-2)) - weekday)).padStart(2, "0")}`);
+    fireEvent.keyDown(document.activeElement!, { key: "End" });
+    expect(grid.querySelectorAll('[tabindex="0"]')).toHaveLength(1);
+    trigger.focus();
+    fireEvent.click(trigger);
+    const picker = screen.getByRole("dialog", { name: `Choose a batch for ${today}` }) as HTMLDialogElement;
+    expect(picker.open).toBe(true);
+    expect(document.activeElement).toBe(within(picker).getByRole("button", { name: "Close" }));
+    expect(within(picker).getByRole("button", { name: "Open Care jar" }).textContent).toContain("Batch-local taste");
+    fireEvent(picker, new Event("cancel", { cancelable: true }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+    fireEvent.click(trigger);
+    const main = document.getElementById("main-content")!;
+    main.scrollTop = 240;
+    const restoreFocus = vi.spyOn(trigger, "focus");
+    nativeClose.mockClear();
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Open Care jar" }));
+    // jsdom has no modal inertness: also verify the close-before-focus ordering.
+    expect(nativeClose.mock.invocationCallOrder[0]).toBeLessThan(restoreFocus.mock.invocationCallOrder[0]);
+    restoreFocus.mockRestore();
+    fireEvent.click(screen.getByRole("button", { name: "Back to Calendar" }));
+    await act(async () => { await new Promise(requestAnimationFrame); });
+    expect(screen.getByRole("grid").getAttribute("aria-label")).toBe(month);
+    expect(trigger.closest('[role="gridcell"]')?.getAttribute("aria-selected")).toBe("true");
+    expect(document.activeElement).toBe(trigger);
+    expect(main.scrollTop).toBe(240);
+    fireEvent.click(calendar.getByRole("button", { name: "Previous month" }));
+    expect(screen.getByRole("grid").getAttribute("aria-label")).not.toBe(month);
+    expect(screen.getByRole("grid").querySelectorAll('[tabindex="0"]')).toHaveLength(1);
+    fireEvent.click(calendar.getByRole("button", { name: "Today" }));
+    expect(screen.getByRole("grid").getAttribute("aria-label")).toBe(month);
+    expect(trigger.tabIndex).toBe(0);
+  });
+
+  it("explains empty check and calendar schedules without offering nonexistent actions", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Checks" }));
+    const checks = within(screen.getByRole("region", { name: "Batch checks" }));
+    expect(checks.getByText("No checks scheduled for your active batches.")).toBeTruthy();
+    expect(checks.queryByRole("heading", { name: "Paused checks" })).toBeNull();
+    expect(checks.queryByRole("button")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    expect(screen.getByText("No finish dates or checks scheduled.")).toBeTruthy();
+    expect(screen.getByText("No overdue checks.")).toBeTruthy();
+    expect(within(screen.getByRole("grid")).queryByRole("button")).toBeNull();
+    expect(screen.getByRole("grid").querySelectorAll('[tabindex="0"]')).toHaveLength(1);
+  });
+
   it.each(["Checks", "Profiles", "My batches", "Calendar", "Settings"])("keeps the selected detail and exact logger nodes across %s and responsive postures", (route) => {
     const batch = createBatch(createProfileState().profiles[0], { id: "jar", name: "Selected jar", startDate: localDateForTest() });
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
@@ -1774,9 +1889,9 @@ describe("batch workflow", () => {
 
     fireEvent.click(topbar.getByRole("button", { name: "Open calendar" }));
     const calendar = within(screen.getByRole("region", { name: "Fermentation calendar" }));
-    expect(calendar.getByText("Finish date")).toBeTruthy();
+    expect(calendar.getByText("Finish date", { selector: ".calendar-legend span" })).toBeTruthy();
     expect(calendar.getByText("Taste")).toBeTruthy();
-    expect(calendar.getByText(expectedNextDate)).toBeTruthy();
+    expect(calendar.getByRole("button", { name: "Open Kombucha F1: Taste" }).querySelector("time")?.getAttribute("datetime")).toBe(expectedNextDate);
     fireEvent.click(calendar.getByRole("button", { name: `Open Kombucha F1 for ${expectedNextDate}` }));
     expect(detail.getByRole("heading", { name: "Kombucha F1" })).toBeTruthy();
 
@@ -1815,11 +1930,11 @@ describe("batch workflow", () => {
     expect(chooser.textContent).toContain("Second jar");
     expect(within(chooser).getByRole("button", { name: "Close" })).toBeTruthy();
 
-    fireEvent.click(chooser.parentElement!);
+    fireEvent.click(chooser);
     expect(screen.queryByRole("dialog")).toBeNull();
 
     fireEvent.click(upcoming.getByRole("button", { name: `Choose a batch for ${finishDate}` }));
-    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent(screen.getByRole("dialog"), new Event("cancel", { cancelable: true }));
     expect(screen.queryByRole("dialog")).toBeNull();
 
     fireEvent.click(upcoming.getByRole("button", { name: `Choose a batch for ${finishDate}` }));
