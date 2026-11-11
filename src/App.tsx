@@ -149,6 +149,20 @@ function captureFieldError(event: React.FormEvent<HTMLElement>, report: (id: str
   if ((field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) && field.id) report(field.id, field.validationMessage);
 }
 
+function useUnsavedChanges(message: string) {
+  const dirty = useRef(false);
+  useEffect(() => {
+    const warn = (event: BeforeUnloadEvent) => {
+      if (!dirty.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, []);
+  return { dirty, confirmDiscard: () => !dirty.current || window.confirm(message) };
+}
+
 function profileVisual(profile: FermentationProfile) {
   const name = profile.name.toLowerCase();
   if (name.includes("kimchi")) return { photo: "kimchi", color: "var(--colour-action-alt)" };
@@ -252,20 +266,33 @@ function profileInputsText(profile: FermentationProfile) {
 
 function ProfileOverview({ profile, onStart }: { profile: FermentationProfile; onStart(): void }) {
   const salt = parseSimpleFormula(profile.calculations.find(({ name }) => name.toLowerCase() === "salt")?.formula ?? "");
-  return <div className="station-dialog-body">
-    <p><RichProfileText value={profile.guidance.join(" ") || "No guidance defined yet."} /></p>
+  return <div className="station-dialog-body profile-overview">
+    <div className="profile-overview-intro"><div><p className="eyebrow">Reusable fermentation profile</p><ProfileGuidance profile={profile} /></div><ProfilePhoto profile={profile} /></div>
     <dl><dt>Expected fermentation duration</dt><dd>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "Not set"}</dd><dt>Profile temperature range</dt><dd>{profile.temperatureMinC !== undefined && profile.temperatureMaxC !== undefined ? `${profile.temperatureMinC}–${profile.temperatureMaxC} °C` : "Not set"}</dd>{salt?.percentage && salt.operator === "*" && <><dt>Salt guidance</dt><dd>{salt.operand}%</dd></>}</dl>
+    {profile.phZones.length > 0 && <section><h3>pH conditions</h3><ul>{profile.phZones.map((zone, index) => <li key={index}>{zone.label}: {zone.min}–{zone.max}</li>)}</ul></section>}
     <h3>Profile inputs</h3><p>{profileInputsText(profile)}</p>
+    <h3>Profile calculations</h3>{profile.calculations.length ? <ul>{profile.calculations.map((calculation) => <li key={calculation.name}>{calculation.name} = {calculation.formula} ({calculation.unit})</li>)}</ul> : <p>No calculations defined.</p>}
     <h3>Profile checks</h3><p>{profile.checks.map(({ name, intervalDays }) => `${name} · every ${intervalDays} ${intervalDays === 1 ? "day" : "days"}`).join(" · ") || "No recurring checks."}</p>
+    <p className="station-helper">Starting a batch copies this profile. Later edits or deletion will not change that batch.</p>
     <div className="station-dialog-actions"><button className="station-primary" onClick={onStart} type="button">Start a batch</button></div>
   </div>;
 }
 
-function StartBatchForm({ profiles, initialProfile, onCreate, onCancel }: { profiles: FermentationProfile[]; initialProfile?: FermentationProfile; onCreate(batch: Batch): void; onCancel(): void }) {
-  const available = initialProfile ? profiles.some(({ id }) => id === initialProfile.id)
+function ProfilePhoto({ profile }: { profile: FermentationProfile }) {
+  const visual = profileVisual(profile);
+  return <div className="design-profile-visual">{visual.photo ? <BatchImage key={visual.photo} source={`${import.meta.env.BASE_URL}new-design/${visual.photo}.webp`} description={`${profile.name} stand-in photograph`} userPhoto={false} retryable /> : <DesignIcon name="jar" />}</div>;
+}
+
+function ProfileGuidance({ profile }: { profile: FermentationProfile }) {
+  return profile.guidance.length ? <ol className="profile-guidance-steps">{profile.guidance.map((step, index) => <li key={index}><RichProfileText value={step} /></li>)}</ol> : <p>No guidance defined yet.</p>;
+}
+
+function StartBatchForm({ profiles, initialProfile, onCreate, onCancel, onDirty, onProfiles }: { profiles: FermentationProfile[]; initialProfile?: FermentationProfile; onCreate(batch: Batch): void; onCancel(): void; onDirty(): void; onProfiles(): void }) {
+  const [available] = useState(() => initialProfile ? profiles.some(({ id }) => id === initialProfile.id)
     ? profiles.map((profile) => profile.id === initialProfile.id ? initialProfile : profile)
-    : [...profiles, initialProfile] : profiles;
+    : [...profiles, initialProfile] : profiles);
   const [profileId, setProfileId] = useState(initialProfile?.id ?? profiles[0]?.id ?? "");
+  const inputDrafts = useRef<Record<string, Record<string, string>>>({});
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const profile = available.find(({ id }) => id === profileId);
@@ -289,12 +316,16 @@ function StartBatchForm({ profiles, initialProfile, onCreate, onCancel }: { prof
       setFieldErrors({ [index < 0 ? "start-profile" : `start-input-${index}`]: message });
     }
   }
-  return <form onInput={() => { setError(""); setFieldErrors({}); }} onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))} onSubmit={save}>
-    <p className="station-dialog-body">Choose a fermentation profile for your next batch.</p>
+  if (!available.length) return <div className="station-dialog-body"><p>Create or restore a fermentation profile before starting a batch.</p><div className="station-dialog-actions"><button className="station-primary" onClick={onProfiles} type="button">Open Profiles</button></div></div>;
+  return <form onChange={onDirty} onInput={() => { setError(""); setFieldErrors({}); }} onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))} onSubmit={save}>
+    <p className="station-helper">Choose a reusable method. This batch will keep its own copy.</p>
+    <fieldset className="start-batch-basics"><legend>Your batch</legend>
     <label className="station-field">Batch name<input {...fieldErrorProps(fieldErrors, "start-name")} aria-label="Batch name" autoComplete="off" maxLength={60} name="name" placeholder="e.g. My weekend kimchi" title="Optional; uses the profile name if blank" /><FieldError errors={fieldErrors} id="start-name" /></label>
     <label className="station-field">Fermentation profile<select {...fieldErrorProps(fieldErrors, "start-profile")} aria-label="Fermentation profile" name="profileId" onChange={(event) => { setProfileId(event.target.value); setError(""); setFieldErrors({}); }} required value={profileId}>{available.map((profile) => <option key={profile.id} value={profile.id}>{profile.name} · {profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "duration not set"}</option>)}</select><FieldError errors={fieldErrors} id="start-profile" /></label>
     <label className="station-field">Start date<input {...fieldErrorProps(fieldErrors, "start-date")} aria-label="Start date" defaultValue={localDate()} max={localDate()} name="startDate" required type="date" /><FieldError errors={fieldErrors} id="start-date" /></label>
-    {profile && profile.inputs.length > 0 ? <details className="station-options"><summary><span>Batch input options</span> · name is optional</summary><div key={profile.id}>{profile.inputs.map((input, index) => <label className="station-field" key={input.name}>{input.name} ({input.unit})<input {...fieldErrorProps(fieldErrors, `start-input-${index}`)} aria-label={`${input.name} (${input.unit})`} defaultValue={input.defaultValue} min="0" name={`input.${input.name}`} step="any" type="number" /><FieldError errors={fieldErrors} id={`start-input-${index}`} /></label>)}<p>Blank inputs use profile defaults. Changes are saved on this device.</p></div></details> : <p className="station-helper">Saved on this device · name is optional.</p>}
+    </fieldset>
+    {profile && <section className="start-profile-summary" aria-label="Selected profile guidance"><h3>{profile.name}</h3><p>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days expected fermentation` : "Expected duration not set"}{profile.temperatureMinC !== undefined && profile.temperatureMaxC !== undefined ? ` · ${profile.temperatureMinC}–${profile.temperatureMaxC} °C` : ""}</p><details><summary>Profile guidance and checks</summary><ProfileGuidance profile={profile} /><p>{profile.checks.map((check) => `${check.name} · ${formatCheckInterval(check.intervalDays)}`).join(" · ") || "No recurring checks."}</p></details></section>}
+    {profile && profile.inputs.length > 0 ? <details className="station-options"><summary><span>Batch input options</span> · name is optional</summary><div key={profile.id}>{profile.inputs.map((input, index) => <label className="station-field" key={input.name}>{input.name} ({input.unit})<input {...fieldErrorProps(fieldErrors, `start-input-${index}`)} aria-label={`${input.name} (${input.unit})`} defaultValue={inputDrafts.current[profile.id]?.[input.name] ?? input.defaultValue} onChange={(event) => { inputDrafts.current[profile.id] = { ...inputDrafts.current[profile.id], [input.name]: event.target.value }; }} min="0" name={`input.${input.name}`} step="any" type="number" /><FieldError errors={fieldErrors} id={`start-input-${index}`} /></label>)}<p>Blank inputs use profile defaults. Changes are saved on this device when you start the batch.</p></div></details> : <p className="station-helper">Saved on this device · name is optional.</p>}
     {error && <p role="alert">{error}</p>}
     <div className="station-dialog-actions"><button className="station-secondary" onClick={onCancel} type="button">Cancel</button><button className="station-primary" disabled={!profile} type="submit">Start a batch</button></div>
   </form>;
@@ -354,9 +385,18 @@ export function App() {
   const [detailOrigin, setDetailOrigin] = useState<"calendar" | "checks" | null>(null);
   const batchReturnFocus = useRef<HTMLElement | null>(null);
   const [dialog, setDialog] = useState<StationDialogState | null>(null);
+  const profileDraft = useUnsavedChanges("Discard unsaved profile changes? Your saved profile and existing batches will not change.");
+  const startDraft = useUnsavedChanges("Discard this unsaved batch? Its name, date and inputs will be lost.");
   const dialogTrigger = useRef<HTMLElement | null>(null);
   const [batchListVersion, setBatchListVersion] = useState(0);
+  function closeDialog() {
+    if (!startDraft.confirmDiscard()) return;
+    startDraft.dirty.current = false;
+    setDialog(null);
+  }
   function showDialog(next: StationDialogState) {
+    if (!startDraft.confirmDiscard()) return;
+    startDraft.dirty.current = false;
     if (!dialog) dialogTrigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     setDialog(next);
   }
@@ -474,6 +514,10 @@ export function App() {
   }
 
   function navigate(destination: Destination) {
+    if (destination === "profiles" && shell.destination === "profiles" && editingProfileId) return true;
+    if (!profileDraft.confirmDiscard() || !startDraft.confirmDiscard()) return false;
+    profileDraft.dirty.current = false;
+    startDraft.dirty.current = false;
     const next = selectDestination(shell, destination);
     if (webStorage.current === "fallback") browserShellStore.save(next);
     setShell(next);
@@ -483,6 +527,7 @@ export function App() {
     setDetailOrigin(null);
     setEditingProfileId(null);
     setDialog(null);
+    return true;
   }
 
   function updatePreferences(preferences: ShellPreferences, requestNotificationPermission = false) {
@@ -523,7 +568,7 @@ export function App() {
     if (id && id !== openBatchId && beforeBatchReplace.current?.() === false) return;
     if (id) {
       batchReturnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      if (origin === "calendar") navigate("batches");
+      if (origin === "calendar" && !navigate("batches")) return;
       setDetailOrigin(origin);
       setOpenBatchId(id);
     } else {
@@ -538,7 +583,7 @@ export function App() {
   }
 
   function openChecks() {
-    navigate("batches");
+    if (!navigate("batches")) return;
     setShowChecks(true);
   }
 
@@ -566,17 +611,22 @@ export function App() {
   }
 
   function applySharedSnapshot(snapshot: SharedSnapshot) {
+    // Keep the editor mounted, but accept newer collections before a draft saves.
+    const nextShell = profileDraft.dirty.current || startDraft.dirty.current
+      ? { ...snapshot.shell, destination: stateRef.current.shell.destination }
+      : snapshot.shell;
     const batches = updateBatchDates(discardExpiredBatches(snapshot.batchState, Date.now()));
     if (beforeBatchReplace.current?.(batches.batches) === false) {
       setStorageStatus({ ...sharedDataStore.getStatus(), state: "problem", message: "Shared data was not loaded because it would discard unsaved batch work. Finish your draft, then reload the shared folder in Settings." });
       return;
     }
     if (webStorage.current === "fallback") {
-      browserShellStore.save(snapshot.shell);
+      browserShellStore.save(nextShell);
       browserProfileStore.save(snapshot.profileState);
       browserBatchStore.save(batches);
     }
-    setShell(snapshot.shell);
+    stateRef.current = { shell: nextShell, profileState: snapshot.profileState, batchState: batches };
+    setShell(nextShell);
     setProfileState(snapshot.profileState);
     setBatchState(batches);
   }
@@ -687,7 +737,7 @@ export function App() {
                 onObservationAdded={() => setAnnouncement({ message: "Observation added" })}
                 profilePane={shell.destination === "profiles" && <section className="profiles-screen" aria-label="Fermentation profiles">
                   {!editingProfileId && <div className="design-view-heading"><h1>Fermentation profiles</h1><p>The methods, inputs, and guidance behind your batches.</p></div>}
-                  <Profiles formulaTerms={shell.formulaTerms} profiles={profileState.profiles} onDelete={(id) => saveProfiles(deleteProfile(profileState, id))} onSave={handleProfile} onEditingChange={setEditingProfileId} onView={(profile) => showDialog({ kind: "profile", profile })} />
+                  <Profiles draft={profileDraft} formulaTerms={shell.formulaTerms} profiles={profileState.profiles} onDelete={(id) => saveProfiles(deleteProfile(profileState, id))} onSave={handleProfile} onEditingChange={setEditingProfileId} onView={(profile) => showDialog({ kind: "profile", profile })} />
                 </section>}
                 onDialog={showDialog}
                 batchListVersion={batchListVersion}
@@ -752,9 +802,11 @@ export function App() {
           ) : null}
         </main>
       </div>
-      {dialog && <StationDialog mode={dialog.kind} title={dialog.kind === "start" ? "Start a batch" : dialog.kind === "profile" ? dialog.profile.name : dialog.kind === "dates" ? "Batch dates" : dialog.kind === "inputs" ? "Profile inputs" : "Your fermentation station"} returnFocus={dialogTrigger.current} onClose={() => setDialog(null)}>
-        {dialog.kind === "start" && (profileState.profiles.length === 0 && !dialog.profile ? <div className="station-dialog-body"><p>Create or restore a fermentation profile before starting a batch.</p><div className="station-dialog-actions"><button className="station-primary" onClick={() => navigate("profiles")} type="button">Open Profiles</button></div></div> : <StartBatchForm profiles={profileState.profiles} initialProfile={dialog.profile} onCancel={() => setDialog(null)} onCreate={(batch) => {
-          if (beforeBatchReplace.current?.() === false) return;
+      {dialog && <StationDialog mode={dialog.kind} title={dialog.kind === "start" ? "Start a batch" : dialog.kind === "profile" ? dialog.profile.name : dialog.kind === "dates" ? "Batch dates" : dialog.kind === "inputs" ? "Profile inputs" : "Your fermentation station"} returnFocus={dialogTrigger.current} onClose={closeDialog}>
+        {dialog.kind === "start" && <StartBatchForm profiles={profileState.profiles} initialProfile={dialog.profile} onProfiles={() => navigate("profiles")} onDirty={() => { startDraft.dirty.current = true; }} onCancel={closeDialog} onCreate={(batch) => {
+          if (beforeBatchReplace.current?.() === false || !profileDraft.confirmDiscard()) return;
+          profileDraft.dirty.current = false;
+          startDraft.dirty.current = false;
           const current = stateRef.current.batchState;
           saveBatches({ ...current, batches: [...current.batches, batch] });
           navigate("batches");
@@ -763,7 +815,7 @@ export function App() {
           setDetailOrigin(null);
           setAnnouncement({ message: `Batch started · ${batch.name}` });
           requestAnimationFrame(() => document.querySelector<HTMLElement>(".design-detail")?.focus({ preventScroll: true }));
-        }} />)}
+        }} />}
         {dialog.kind === "profile" && <ProfileOverview profile={dialog.profile} onStart={() => showDialog({ kind: "start", profile: dialog.profile })} />}
         {dialog.kind === "dates" && <div className="station-dialog-body"><dl><dt>Start date</dt><dd>{shortDate(dialog.batch.startDate)}</dd><dt>Finish date</dt><dd>{dialog.batch.finishDate ? shortDate(dialog.batch.finishDate) : "Not set"}</dd><dt>Batch status</dt><dd>{statusLabel(dialog.batch.status)}</dd></dl><p>A batch becomes ready on its finish date. Moving it to the fridge slows fermentation.</p></div>}
         {dialog.kind === "inputs" && <div className="station-dialog-body"><p>{profileInputsText(dialog.batch.profileSnapshot)}</p><h3>Profile guidance</h3><p><RichProfileText value={dialog.batch.profileSnapshot.guidance.join(" ") || "No guidance defined yet."} /></p></div>}
@@ -1342,7 +1394,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
   }
 
   return (
-    <section className={`batches design-workspace${openBatch && showPhoneDetail ? " design-selected" : ""}`} aria-label="Fermentation workspace">
+    <section className={`batches design-workspace${pane === "profiles" ? " profile-workspace" : ""}${openBatch && showPhoneDetail ? " design-selected" : ""}`} aria-label="Fermentation workspace">
       <div className="design-dashboard" key={pane}>
       {pane === "profiles" ? profilePane : pane === "checks" ? <section aria-label="Batch checks" className="design-checks-view">
         <div className="design-view-heading"><h1 tabIndex={-1}>Your batch checks</h1><p>A small check-in for the cultures in your kitchen.</p></div>
@@ -2085,6 +2137,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
 }
 
 interface ProfilesProps {
+  draft: ReturnType<typeof useUnsavedChanges>;
   formulaTerms: string[];
   profiles: FermentationProfile[];
   onDelete(id: string): void;
@@ -2203,7 +2256,7 @@ function formulaRows(profile: FermentationProfile): FormulaRow[] {
   });
 }
 
-function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, onView }: ProfilesProps) {
+function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingChange, onView }: ProfilesProps) {
   const [editing, setEditing] = useState<FermentationProfile | null>(null);
   const [calculations, setCalculations] = useState<FormulaRow[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
@@ -2212,7 +2265,16 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   const [guidanceRows, setGuidanceRows] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const checkInputsRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const addProfileRef = useRef<HTMLButtonElement>(null);
+  const editButtons = useRef<Record<string, HTMLButtonElement | null>>({});
+  const returnProfileId = useRef<string | null>(null);
   const [focusCheckId, setFocusCheckId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (editing || !returnProfileId.current) return;
+    (editButtons.current[returnProfileId.current] ?? addProfileRef.current)?.focus({ preventScroll: true });
+    returnProfileId.current = null;
+  }, [editing]);
 
   useEffect(() => {
     if (!focusCheckId) return;
@@ -2225,6 +2287,8 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   }
 
   function edit(profile: FermentationProfile) {
+    draft.dirty.current = false;
+    returnProfileId.current = profile.id;
     setErrors([]);
     setFieldErrors({});
     setMessage("");
@@ -2238,6 +2302,8 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   }
 
   function closeEditor() {
+    if (!draft.confirmDiscard()) return;
+    draft.dirty.current = false;
     setEditing(null);
     setErrors([]);
     setFieldErrors({});
@@ -2252,16 +2318,19 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   }
 
   function addCheck() {
+    draft.dirty.current = true;
     const id = createClientId();
     setCheckRows([...checkRows, { id, name: "", intervalDays: 7 }]);
     setFocusCheckId(id);
   }
 
   function removeCheck(index: number) {
+    draft.dirty.current = true;
     setCheckRows(checkRows.filter((_, checkIndex) => checkIndex !== index));
   }
 
   function addGuidanceStep() {
+    draft.dirty.current = true;
     setGuidanceRows([...guidanceRows, ""]);
   }
 
@@ -2270,10 +2339,12 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   }
 
   function removeGuidanceStep(index: number) {
+    draft.dirty.current = true;
     setGuidanceRows(guidanceRows.filter((_, stepIndex) => stepIndex !== index));
   }
 
   function addFormula() {
+    draft.dirty.current = true;
     const terms = availableResultTerms(formulaTerms, editing, calculations);
     const source = terms.includes("totalWeight") ? "totalWeight" : terms[0];
     const matchingSource = calculations.find((row): row is StructuredFormulaRow => row.kind === "structured" && row.source === source);
@@ -2299,6 +2370,11 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
     }]);
   }
 
+  function removeFormula(id: string) {
+    draft.dirty.current = true;
+    setCalculations(calculations.filter((row) => row.id !== id));
+  }
+
   function updateFormula(id: string, update: Partial<StructuredFormulaRow>) {
     setCalculations(calculations.map((row) => row.id === id && row.kind === "structured" ? { ...row, ...update } : row));
   }
@@ -2312,6 +2388,9 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    if (!editing) return;
+    const originalPh = phRangeFor(editing);
+    const phUnchanged = String(data.get("phMin") ?? "") === String(originalPh.min) && String(data.get("phMax") ?? "") === String(originalPh.max);
     const inputs = editing?.inputs.map((input) => ({ ...input })) ?? [];
     const structuredRows = calculations.filter((row): row is StructuredFormulaRow => row.kind === "structured");
     const resultNames = new Set(calculations.map((row) => row.kind === "structured" ? row.result : row.calculation.name));
@@ -2334,7 +2413,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
       temperatureMaxC: String(data.get("temperatureMaxC") ?? "").trim() === ""
         ? undefined
         : Number(data.get("temperatureMaxC")),
-      phZones: parsePhRange(data.get("phMin"), data.get("phMax")),
+      phZones: phUnchanged ? editing.phZones : [...editing.phZones.filter(({ label }) => label !== "optimal"), ...parsePhRange(data.get("phMin"), data.get("phMax"))],
       expectedDurationDays: data.get("expectedDurationDays")
         ? Number(data.get("expectedDurationDays"))
         : undefined,
@@ -2348,6 +2427,9 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
     };
 
     const nextErrors = validateProfile(profile);
+    if ((String(data.get("phMin") ?? "").trim() === "") !== (String(data.get("phMax") ?? "").trim() === "")) {
+      nextErrors.push("The optimal pH zone must include both minimum and maximum values.");
+    }
     if (!profile.name || nextErrors.length > 0) {
       setErrors(nextErrors);
       const adjacent: FieldErrors = {};
@@ -2375,6 +2457,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
     }
 
     onSave(profile);
+    draft.dirty.current = false;
     setMessage(`${profile.name} profile saved.`);
     closeEditor();
   }
@@ -2382,26 +2465,24 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
   return (
     <section className="profiles">
       {editing && (() => {
-        const presentation = presentationFor(editing);
-        const duration = editing.expectedDurationDays ? `${editing.expectedDurationDays} days` : "—";
         const phRange = phRangeFor(editing);
         return (
-          <div className="profile-editor-page" onInput={() => { setErrors([]); setFieldErrors({}); }} onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))}>
+          <div className="profile-editor-page" onChange={() => { draft.dirty.current = true; }} onInput={() => { setErrors([]); setFieldErrors({}); }} onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))}>
             <header className="profile-mobile-bar">
               <StationLogo />
               <strong>FermentStation</strong>
-              <button aria-label="Close profile editor menu" className="icon-button" onClick={closeEditor} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 7h16M4 12h16M4 17h16" /></svg></button>
+              <button aria-label="Back to profiles" className="icon-button" onClick={closeEditor} type="button"><DesignIcon name="back" /></button>
             </header>
             <nav className="profile-editor-crumbs" aria-label="Breadcrumb"><button onClick={closeEditor} type="button">Profiles</button></nav>
             <header className="profile-editor-head">
-              <div><p className="profile-editor-eyebrow">Fermentation profile</p><h1><input {...fieldErrorProps(fieldErrors, "profile-name")} aria-label="Name" autoFocus className="profile-editor-title-input" defaultValue={editing.name} form="profile-editor-form" name="name" placeholder="Profile name" required /><FieldError errors={fieldErrors} id="profile-name" /></h1></div>
+              <div><label className="profile-editor-eyebrow" htmlFor="profile-name">Name</label><h1><input {...fieldErrorProps(fieldErrors, "profile-name")} autoFocus className="profile-editor-title-input" defaultValue={editing.name} form="profile-editor-form" name="name" placeholder="Profile name" required /><FieldError errors={fieldErrors} id="profile-name" /></h1></div>
               <span className="profile-editor-status"><i />Editable profile</span>
             </header>
 
             <div className="profile-editor-grid">
               <form className="profile-editor-form" id="profile-editor-form" key={editing.id} onSubmit={save}>
                 <section className="profile-editor-section">
-                  <div className="profile-editor-section-head profile-editor-basics-head"><div><p className="profile-editor-kicker">01 / The profile</p><h2>Give it a clear name</h2><p className="profile-editor-intro">A profile is a reusable practice. Keep its guidance grounded in what you will actually observe.</p></div></div>
+                  <div className="profile-editor-section-head profile-editor-basics-head"><div><p className="profile-editor-kicker">01 / The method</p><h2>Guidance and conditions</h2><p className="profile-editor-intro">Set the steps and conditions used to start new batches.</p></div></div>
                   <div className="profile-editor-fields">
                     <div className="profile-editor-guidance">
                       <div className="profile-editor-guidance-head"><span>Guidance (optional)</span><button className="profile-editor-text-button" onClick={addGuidanceStep} type="button">Add step</button></div>
@@ -2415,11 +2496,12 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
                       <label className="profile-editor-field"><span>pH minimum</span><span className="profile-editor-suffix"><input {...fieldErrorProps(fieldErrors, "profile-ph-min")} aria-label="pH minimum" defaultValue={phRange.min} min="0" max="14" name="phMin" step="any" type="number" /><i>pH</i></span><FieldError errors={fieldErrors} id="profile-ph-min" /></label>
                       <label className="profile-editor-field"><span>pH maximum</span><span className="profile-editor-suffix"><input {...fieldErrorProps(fieldErrors, "profile-ph-max")} aria-label="pH maximum" defaultValue={phRange.max} min="0" max="14" name="phMax" step="any" type="number" /><i>pH</i></span><FieldError errors={fieldErrors} id="profile-ph-max" /></label>
                       <label className="profile-editor-field"><span>Expected duration</span><span className="profile-editor-suffix"><input {...fieldErrorProps(fieldErrors, "profile-duration")} aria-label="Expected duration" defaultValue={editing.expectedDurationDays ?? ""} min="1" name="expectedDurationDays" type="number" /><i>days</i></span><FieldError errors={fieldErrors} id="profile-duration" /></label>
+                      <p className="profile-editor-field wide">The pH range edits the optimal zone. Other saved pH zones are kept.</p>
                    </div>
                 </section>
 
                 <section className="profile-editor-section">
-                  <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">02 / Recurring checks</p><h2>What should be noticed?</h2><p className="profile-editor-intro">A small number of checks is easier to sustain. These appear in the daily queue when due.</p></div><button className="profile-editor-text-button" onClick={addCheck} type="button">Add check</button></div>
+                  <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">02 / Recurring checks</p><h2>Checks for each batch</h2><p className="profile-editor-intro">Copied to new batches and scheduled from their start date.</p></div><button className="profile-editor-text-button" onClick={addCheck} type="button">Add check</button></div>
                   <div className="profile-editor-checks">
                     {checkRows.length === 0 && <p className="profile-editor-check-empty">No recurring checks yet. Add one when this profile needs a repeating rhythm.</p>}
                     {checkRows.map((check, index) => (
@@ -2437,7 +2519,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
                   <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">03 / Calculations</p><h2>Formulas</h2></div></div>
                   <fieldset className="profile-editor-formula"><legend className="sr-only">Formulas</legend>
                     {calculations.map((row, index) => row.kind === "legacy" ? (
-                      <div className="legacy-formula" key={row.id}><p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p><p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p><button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button></div>
+                      <div className="legacy-formula" key={row.id}><p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p><p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p><button onClick={() => removeFormula(row.id)} type="button">Remove calculation {index + 1}</button></div>
                     ) : (
                       <div className="profile-editor-formula-row" key={row.id}>
                         <label>Source term row {index + 1}<select {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-source`)} aria-label={`Source term row ${index + 1}`} onChange={(event) => { const source = event.target.value; const matchingSource = calculations.find((candidate): candidate is StructuredFormulaRow => candidate.kind === "structured" && candidate.source === source); updateFormula(row.id, { source, sourceUnit: matchingSource?.sourceUnit ?? currentInputs().find(({ name }) => name === source)?.unit ?? row.sourceUnit, sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false }); }} value={row.source}>{availableSourceTerms(formulaTerms, calculations, currentInputs()).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-source`} /></label>
@@ -2447,7 +2529,7 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
                         <label>Operand type row {index + 1}<select onChange={(event) => updateFormula(row.id, { operandType: event.target.value as StructuredFormulaRow["operandType"] })} value={row.operandType}><option value="number">Number</option><option value="percentage">Percentage</option></select></label>
                         <label>Result term row {index + 1}<select {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-result`)} aria-label={`Result term row ${index + 1}`} onChange={(event) => updateFormula(row.id, { result: event.target.value })} value={row.result}>{availableResultTerms(formulaTerms, editing, calculations).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-result`} /></label>
                         <label>Result unit row {index + 1}<select onChange={(event) => updateFormula(row.id, { resultUnit: event.target.value as MetricUnit })} value={row.resultUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
-                        <button onClick={() => setCalculations(calculations.filter(({ id }) => id !== row.id))} type="button">Remove calculation {index + 1}</button>
+                        <button onClick={() => removeFormula(row.id)} type="button">Remove calculation {index + 1}</button>
                       </div>
                     ))}
                     <button className="profile-editor-add-formula" onClick={addFormula} type="button">Add formula</button>
@@ -2455,39 +2537,37 @@ function Profiles({ formulaTerms, profiles, onDelete, onSave, onEditingChange, o
                 </section>
 
                 {errors.length > 0 && <div className="notice" role="alert">{errors.join(" ")}</div>}
-                <div className="profile-editor-actions"><button aria-label="Cancel" className="profile-editor-text-button" onClick={closeEditor} type="button">Cancel changes</button><div><button className="profile-editor-button" onClick={() => setMessage("Preview reflects the current profile settings.")} type="button">Preview</button><button className="profile-editor-button primary" type="submit">Save profile <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 12h14M13 6l6 6-6 6" /></svg></button></div></div>
+                <div className="profile-editor-actions"><button aria-label="Cancel" className="profile-editor-text-button" onClick={closeEditor} type="button">Cancel changes</button><button className="profile-editor-button primary" type="submit">Save profile <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 12h14M13 6l6 6-6 6" /></svg></button></div>
               </form>
 
                <aside className="profile-editor-aside" aria-label="Profile context">
-                 <article className="profile-editor-card"><p className="profile-editor-eyebrow">At a glance</p><h3>{editing.name || "Profile name"}</h3><p>{presentation.description}</p><div className="profile-editor-meta"><div><span>Temperature</span><strong>{presentation.params[0][0]}</strong></div><div><span>Expected duration</span><strong>{duration}</strong></div><div><span>Check cadence</span><strong>{presentation.params[3][0]}</strong></div></div></article>
-                 <article className="profile-editor-card profile-editor-note"><h3>Practical note</h3><p>Keep the profile focused on observations that make the next check easier to act on.</p></article>
+                 <article className="profile-editor-card"><h2>Profile inputs</h2><p>{profileInputsText(editing)}</p><p>Formula sources add inputs. Existing inputs and defaults are kept; choose actual quantities when starting a batch.</p></article>
+                 <article className="profile-editor-card profile-editor-note"><h2>Existing batches stay intact</h2><p>Saving or deleting a profile never changes the snapshots, checks or observations in batches you already started.</p></article>
                </aside>
             </div>
           </div>
         );
       })()}
 
+      {!editing && <div className="profile-toolbar"><p>{profiles.length} reusable {profiles.length === 1 ? "method" : "methods"}</p><button className="profile-add" ref={addProfileRef} onClick={() => edit({ id: createClientId(), name: "", guidance: [], inputs: [], calculations: [], checks: [], phZones: [] })} type="button"><DesignIcon name="plus" />Add profile</button></div>}
       {!editing && <div className="profile-list">
-        {profiles.length === 0 && <section className="empty-state"><h2>No fermentation profiles yet</h2><p>Open Manage profiles to add a reusable method for your next batch.</p></section>}
+        {profiles.length === 0 && <section className="empty-state"><DesignIcon name="jar" /><h2>No fermentation profiles yet</h2><p>Add a reusable method, then start a batch from its guidance.</p></section>}
         {profiles.map((profile) => {
           const presentation = presentationFor(profile);
           return (
-            <article className="profile-card" key={profile.id}>
+            <article className="profile-card" key={profile.id} style={{ "--profile-colour": profileVisual(profile).color } as CSSProperties}>
               <button aria-label={`View ${profile.name} guidance`} className="profile-card-main" onClick={() => onView(profile)} type="button">
-                  <span className="design-profile-visual" style={{ background: profileVisual(profile).color }}>{profileVisual(profile).photo ? <img alt={`${profile.name} stand-in photograph`} src={`${import.meta.env.BASE_URL}new-design/${profileVisual(profile).photo}.webp`} /> : <DesignIcon name="jar" />}</span>
-                 <div className="design-profile-copy"><h3>{profile.name}</h3><span>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "Duration not set"} · {presentation.params[0][0]}</span><span className="sr-only">{presentation.description}</span></div>
-                  <svg aria-hidden="true" className="design-profile-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m9 5 7 7-7 7" /></svg>
+                <span className="design-profile-copy"><h2>{profile.name}</h2><span className="profile-facts"><span>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "Duration not set"}</span><span>{profile.temperatureMinC === undefined ? "Temperature not set" : presentation.params[0][0]}</span></span><span className="profile-card-guidance"><RichProfileText value={presentation.description} /></span></span>
+                <span className="profile-card-link">View guidance <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="m7 17 10-10M7 7h10v10" /></svg></span>
               </button>
+              <ProfilePhoto profile={profile} />
+              <div className="profile-card-actions"><button aria-label={`Edit ${profile.name}`} ref={(button) => { editButtons.current[profile.id] = button; }} onClick={() => edit(profile)} type="button">Edit profile</button><button aria-label={`Delete ${profile.name}`} onClick={() => { if (window.confirm(`Delete ${profile.name}? This cannot be undone. Existing batches keep their profile snapshot.`)) { onDelete(profile.id); setMessage(`${profile.name} profile deleted. Existing batches are unchanged.`); addProfileRef.current?.focus(); } }} type="button">Delete</button></div>
             </article>
           );
         })}
       </div>}
 
       {!editing && <PhotoCredits />}
-      {!editing && <details className="design-profile-management"><summary>Manage profiles</summary>
-        <button className="profile-add" onClick={() => edit({ id: createClientId(), name: "", guidance: [], inputs: [], calculations: [], checks: [], phZones: [] })} type="button">Add profile</button>
-        {profiles.map((profile) => <div className="design-profile-management-row" key={profile.id}><span>{profile.name}</span><button aria-label={`Edit ${profile.name}`} onClick={() => edit(profile)} type="button">Edit</button><button aria-label={`Delete ${profile.name}`} onClick={() => onDelete(profile.id)} type="button">Delete</button></div>)}
-      </details>}
 
       {message && <div className="profile-editor-toast" role="status">{message}</div>}
 

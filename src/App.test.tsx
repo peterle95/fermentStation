@@ -64,10 +64,7 @@ function addDaysForTest(date: string, days: number) {
 }
 
 function profileManagementButton(name: string) {
-  const disclosure = screen.getByText("Manage profiles").closest("details")!;
-  if (!disclosure.open) fireEvent.click(within(disclosure).getByText("Manage profiles"));
-  expect(disclosure.open).toBe(true);
-  return within(disclosure).getByRole("button", { name });
+  return screen.getByRole("button", { name });
 }
 
 function newBatchSubmit() {
@@ -1190,13 +1187,132 @@ describe("batch workflow", () => {
     expect(screen.getByRole("heading", { name: "Calendar" })).toBeTruthy();
   });
 
-  it("keeps every stored profile and exposes CRUD outside the compact guidance grid", () => {
+  it("protects profile edits from cancel, navigation and browser unload until explicitly discarded", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
+    const name = screen.getByLabelText("Name");
+    fireEvent.change(name, { target: { value: "Unsaved culture" } });
+    name.focus();
+    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByLabelText("Name")).toBe(name);
+    fireEvent.click(screen.getByRole("button", { name: "Checks" }));
+    expect(screen.getByLabelText("Name")).toBe(name);
+    expect(document.activeElement).toBe(name);
+    const unload = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(unload);
+    expect(unload.defaultPrevented).toBe(true);
+    vi.mocked(window.confirm).mockReturnValue(true);
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    expect(screen.getByRole("heading", { name: "Calendar" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
+    expect((screen.getByLabelText("Name") as HTMLInputElement).value).toBe("Kombucha F1");
+  });
+
+  it("protects start-batch work on close, Escape and navigation and clears the guard after saving", () => {
+    render(<App />);
+    const trigger = screen.getByRole("button", { name: "Start a batch" });
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole("dialog", { name: "Start a batch" });
+    const name = within(dialog).getByLabelText("Batch name");
+    fireEvent.change(name, { target: { value: "Weekend jar" } });
+    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    fireEvent(dialog, new Event("cancel", { bubbles: false, cancelable: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Calendar" }));
+    expect(screen.getByRole("dialog", { name: "Start a batch" })).toBe(dialog);
+    expect((name as HTMLInputElement).value).toBe("Weekend jar");
+    const unload = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(unload);
+    expect(unload.defaultPrevented).toBe(true);
+    vi.mocked(window.confirm).mockClear();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Start a batch" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(within(screen.getByRole("complementary", { name: "Selected batch" })).getByRole("heading", { name: "Weekend jar" })).toBeTruthy();
+    expect(window.confirm).not.toHaveBeenCalled();
+    const cleanUnload = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(cleanUnload);
+    expect(cleanUnload.defaultPrevented).toBe(false);
+  });
+
+  it("retains start inputs when switching profiles and discards them only after confirmation", () => {
+    const state = createProfileState();
+    state.profiles[0].inputs = [{ name: "water", unit: "l", defaultValue: 2 }];
+    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    fireEvent.click(screen.getByText("Batch input options"));
+    fireEvent.change(screen.getByLabelText("water (l)"), { target: { value: "3.5" } });
+    fireEvent.change(screen.getByLabelText("Fermentation profile"), { target: { value: state.profiles[1].id } });
+    fireEvent.change(screen.getByLabelText("Fermentation profile"), { target: { value: state.profiles[0].id } });
+    expect((screen.getByLabelText("water (l)") as HTMLInputElement).value).toBe("3.5");
+    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
+    expect((screen.getByLabelText("water (l)") as HTMLInputElement).value).toBe("3.5");
+    vi.mocked(window.confirm).mockReturnValue(true);
+    fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    fireEvent.click(screen.getByText("Batch input options"));
+    expect((screen.getByLabelText("water (l)") as HTMLInputElement).value).toBe("2");
+  });
+
+  it("keeps a batch's method, checks and observations after editing and deleting its source profile", () => {
+    const state = createProfileState();
+    state.profiles[0] = { ...state.profiles[0], checks: [{ name: "Taste", intervalDays: 2 }], guidance: ["Original method."], inputs: [{ name: "water", unit: "l", defaultValue: 2 }], expectedDurationDays: 7 };
+    const batch = createBatch(state.profiles[0], { id: "snapshot", name: "Snapshot jar", startDate: localDateForTest() });
+    batch.timeline.push({ id: "note", kind: "note", date: localDateForTest(), text: "Original observation" });
+    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
+    fireEvent.change(screen.getByLabelText("Guidance step 1"), { target: { value: "Changed method." } });
+    fireEvent.change(screen.getByLabelText("Check interval 1"), { target: { value: "5" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(profileManagementButton("Delete Kombucha F1"));
+    expect(screen.getByRole("button", { name: "View Kombucha F1 guidance" })).toBeTruthy();
+    vi.mocked(window.confirm).mockReturnValue(true);
+    fireEvent.click(profileManagementButton("Delete Kombucha F1"));
+    fireEvent.click(screen.getByRole("button", { name: "My batches" }));
+    const detail = within(screen.getByRole("complementary", { name: "Selected batch" }));
+    expect(detail.getByText("Original observation")).toBeTruthy();
+    fireEvent.click(detail.getByRole("button", { name: "See fermentation profile" }));
+    const overview = within(screen.getByRole("dialog", { name: "Kombucha F1" }));
+    expect(overview.getByText("Original method.")).toBeTruthy();
+    expect(overview.getByText("Taste · every 2 days")).toBeTruthy();
+    expect(overview.getByText("water 2 L")).toBeTruthy();
+  });
+
+  it("labels profile stand-ins and offers a recoverable jar fallback without inventing profile facts", () => {
+    const state = createProfileState();
+    state.profiles = [state.profiles[0], { ...state.profiles[0], id: "custom", name: "House culture" }];
+    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    const card = screen.getByRole("button", { name: "View Kombucha F1 guidance" }).closest("article")!;
+    expect(within(card).getByText("Stand-in")).toBeTruthy();
+    expect(within(card).getByText("Duration not set")).toBeTruthy();
+    expect(within(card).getByText("Temperature not set")).toBeTruthy();
+    fireEvent.error(within(card).getByAltText("Kombucha F1 stand-in photograph"));
+    expect(within(card).getByRole("img", { name: "Stand-in photograph unavailable" })).toBeTruthy();
+    fireEvent.click(within(card).getByRole("button", { name: "Retry photograph" }));
+    expect(within(card).getByAltText("Kombucha F1 stand-in photograph")).toBeTruthy();
+    const custom = screen.getByRole("button", { name: "View House culture guidance" }).closest("article")!;
+    expect(within(custom).queryByRole("img")).toBeNull();
+    expect(custom.textContent).not.toMatch(/Day \d|Finish |Ready|°C/);
+  });
+
+  it("keeps every stored profile with directly reachable create, edit and delete actions", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     expect(screen.getByRole("heading", { name: "Fermentation profiles" })).toBeTruthy();
     expect(screen.getAllByRole("button", { name: /^View .* guidance$/ })).toHaveLength(createProfileState().profiles.length);
-    expect(screen.getByText("Manage profiles").closest("details")?.open).toBe(false);
-    expect(screen.getByRole("button", { name: "Edit Kombucha F1" }).closest("details")).toBe(screen.getByText("Manage profiles").closest("details"));
+    expect(screen.getByRole("button", { name: "Add profile" }).closest("details")).toBeNull();
+    expect(screen.getByRole("button", { name: "Edit Kombucha F1" }).closest("article")).toBeTruthy();
     fireEvent.click(profileManagementButton("Add profile"));
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "House culture" } });
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
@@ -1220,6 +1336,25 @@ describe("batch workflow", () => {
     expect(within(dialog).getByRole("heading", { name: "Profile checks" })).toBeTruthy();
     fireEvent.click(within(dialog).getByRole("button", { name: "Close dialog" }));
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it.each(["name", "optimal range"])("preserves unrelated conditions, inputs and formulas when editing a profile's %s", (field) => {
+    const state = createProfileState();
+    state.profiles[0] = { ...state.profiles[0], inputs: [{ name: "water", unit: "g", defaultValue: 500 }], calculations: [{ name: "tea", unit: "g", formula: "water / (20 + 2)" }], phZones: [{ label: "danger", min: 0, max: 2 }, { label: "optimal", min: 3, max: 4.2 }, { label: "safe", min: 5, max: 7 }] };
+    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "House tea" } });
+    if (field === "optimal range") fireEvent.change(screen.getByLabelText("pH maximum"), { target: { value: "4.5" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
+    fireEvent.click(screen.getByRole("button", { name: "View House tea guidance" }));
+    const overview = within(screen.getByRole("dialog", { name: "House tea" }));
+    expect(overview.getByText("danger: 0–2")).toBeTruthy();
+    expect(overview.getByText(field === "optimal range" ? "optimal: 3–4.5" : "optimal: 3–4.2")).toBeTruthy();
+    expect(overview.getByText("safe: 5–7")).toBeTruthy();
+    expect(overview.getByText("water 500 g")).toBeTruthy();
+    expect(overview.getByText("tea = water / (20 + 2) (g)")).toBeTruthy();
   });
 
   it("explains an empty profile list and keeps profile creation available", () => {
@@ -1284,7 +1419,7 @@ describe("batch workflow", () => {
     expect(localStorage.getItem("fermentstation.batches")).toBe(before);
   });
 
-  it.each(["name", "duration", "checks", "interval", "formula", "ph"])("links profile %s errors to affected fields without writes", (kind) => {
+  it.each(["name", "duration", "checks", "interval", "formula", "ph", "ph-incomplete"])("links profile %s errors to affected fields without writes", (kind) => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(profileManagementButton("Edit Kombucha F1"));
@@ -1311,8 +1446,8 @@ describe("batch workflow", () => {
       fireEvent.change(fields[0], { target: { value: "0" } });
     } else {
       fields = [screen.getByLabelText("pH minimum"), screen.getByLabelText("pH maximum")];
-      fireEvent.change(fields[0], { target: { value: "10" } });
-      fireEvent.change(fields[1], { target: { value: "2" } });
+      fireEvent.change(fields[0], { target: { value: kind === "ph-incomplete" ? "" : "10" } });
+      fireEvent.change(fields[1], { target: { value: kind === "ph-incomplete" ? "4.2" : "2" } });
     }
     fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
     for (const field of fields) {
@@ -2081,14 +2216,15 @@ describe("batch workflow", () => {
       .toBeTruthy();
   });
 
-  it("returns from the profile editor with its mobile menu button", () => {
+  it("returns from the profile editor with its labelled back button and restores focus", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(profileManagementButton("Edit Kombucha F1"));
     const mobileLogo = document.querySelector<HTMLImageElement>(".profile-mobile-bar .brand-mark img")!;
     expect(mobileLogo.getAttribute("src")).toBe(document.querySelector(".brand .brand-mark img")!.getAttribute("src"));
     expect(mobileLogo.getAttribute("src")).toContain("logo-transparent-96.png");
-    fireEvent.click(screen.getByRole("button", { name: "Close profile editor menu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Back to profiles" }));
     expect(screen.getByRole("heading", { name: "Fermentation profiles" })).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Edit Kombucha F1" }));
   });
 });

@@ -53,8 +53,12 @@ describe("Swipe-derived design contract", () => {
     expect(rule("input, select, textarea")).toContain("min-height: var(--input-height)");
     expect(rule("input, select, textarea")).toContain("font-size: var(--type-body)");
     expect(rule("textarea")).toContain("border-radius: var(--radius-small)");
-    for (const selector of [".profile-card-main", ".profile-editor-section", ".batch-component-card", ".settings-card, .trash", ".station-dialog"]) {
+    for (const selector of [".batch-component-card", ".settings-card, .trash", ".station-dialog"]) {
       expect(rule(selector)).toContain("var(--radius-card)");
+      expect(rule(selector)).toContain("var(--card-padding)");
+    }
+    for (const selector of [".profile-card", ".profile-editor-section"]) {
+      expect(rule(selector)).toContain("border-radius: 2rem 2rem 2.5rem 2.5rem / 2.5rem 2.5rem 2rem 2rem");
       expect(rule(selector)).toContain("var(--card-padding)");
     }
   });

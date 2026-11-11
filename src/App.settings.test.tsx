@@ -61,6 +61,32 @@ function upload(bytes: Uint8Array) {
 }
 
 describe("Settings and data feedback", () => {
+  it.each(["profile", "start"])("keeps a %s draft while accepting newer shared records before saving", async (kind) => {
+    const remoteProfile = { ...profile, id: "remote-profile", name: "Remote culture" };
+    const remoteBatch = createBatch(remoteProfile, { id: "remote-batch", name: "Remote jar", startDate: today });
+    status = { state: "ready", location: "Kitchen/shared", message: "Ready", conflicts: [] };
+    vi.spyOn(sharedDataStore, "reload").mockResolvedValue({ status, snapshot: { shell: createShellState(), profileState: { profiles: [remoteProfile] }, batchState: createBatchState([batch, remoteBatch]) } });
+    render(<App />);
+    await act(async () => {});
+    if (kind === "profile") {
+      fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+      fireEvent.click(screen.getByRole("button", { name: "Edit Kombucha F1" }));
+    } else fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    const name = screen.getByLabelText(kind === "profile" ? "Name" : "Batch name") as HTMLInputElement;
+    fireEvent.change(name, { target: { value: "Local draft" } });
+    await act(async () => fireEvent.focus(window));
+    expect(screen.getByLabelText(kind === "profile" ? "Name" : "Batch name")).toBe(name);
+    expect(name.value).toBe("Local draft");
+    fireEvent.click(kind === "profile" ? screen.getByRole("button", { name: "Save profile" }) : within(screen.getByRole("dialog")).getByRole("button", { name: "Start a batch" }));
+    if (kind === "start") {
+      fireEvent.click(screen.getByRole("button", { name: "My batches" }));
+      expect(screen.getByRole("button", { name: "Open Remote jar" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Open Local draft" })).toBeTruthy();
+      fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    }
+    expect(screen.getByRole("button", { name: "View Remote culture guidance" })).toBeTruthy();
+  });
+
   it.each(["check", "entry"])("protects an edited %s removed from a retained shared batch", async (kind) => {
     const tracked = createBatch({ ...profile, checks: [{ name: "Taste", intervalDays: 2 }] }, { id: batch.id, startDate: today });
     tracked.timeline.push({ id: "note", kind: "note", date: today, text: "Original note" });
