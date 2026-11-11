@@ -184,7 +184,7 @@ describe("responsive workflow safeguards", () => {
     const inline = rule(".inline-logger");
     for (const declaration of ["position: static", "width: auto", "margin: 0", "padding: 0", "overflow: visible"]) expect(inline).toContain(declaration);
     expect(rule(".observation-fields, .observation-actions")).toContain("display: contents");
-    expect(rule(".timeline-entry time")).toContain("grid-column: 3; grid-row: 1");
+    expect(rule(".timeline-entry time")).toContain("grid-column: 2; grid-row: 2");
     expect(app.match(/id="batch-activity-form"/g)).toHaveLength(1);
     expect(app).not.toContain('key={editing?.id ?? "new"}');
     expect(app).toContain("else dialog.open = true;");

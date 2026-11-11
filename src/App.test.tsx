@@ -91,9 +91,10 @@ function openMoreBatchActions() {
 }
 
 describe("batch workflow", () => {
-  beforeEach(() => { localStorage.clear(); nativeShowModal.mockClear(); nativeClose.mockClear(); });
+  beforeEach(() => { localStorage.clear(); nativeShowModal.mockClear(); nativeClose.mockClear(); vi.spyOn(window, "confirm").mockReturnValue(true); });
   afterEach(async () => {
     cleanup();
+    vi.mocked(window.confirm).mockRestore();
     // Let worker IPC drain between synchronous DOM workflows instead of
     // starving Vitest's reporting RPC for the duration of the whole file.
     await yieldToRunner();
@@ -111,6 +112,198 @@ describe("batch workflow", () => {
     expect(screen.getByRole("region", { name: "Settings" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
     expect(screen.getByRole("dialog", { name: "Start a batch" })).toBeTruthy();
+  });
+
+  it("shows real dated readings without opening tools and explains paused checks", () => {
+    const today = localDateForTest();
+    const batch = createBatch(createProfileState().profiles[0], { id: "jar", name: "Measured jar", startDate: today });
+    batch.status = "to-fridge";
+    batch.timeline.push({ id: "ph", kind: "ph", date: today, value: 3.7 }, { id: "temp", kind: "temperature", date: today, value: 19 });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    const detail = within(screen.getByRole("complementary", { name: "Selected batch" }));
+    const readings = detail.getByLabelText("Latest observed readings");
+    expect(readings.textContent).toContain("3.7");
+    expect(readings.textContent).toContain("19 °C");
+    expect(readings.querySelectorAll(`time[datetime="${today}"]`)).toHaveLength(2);
+    expect(detail.getByText("Recurring checks paused while this batch is not active.")).toBeTruthy();
+    expect(detail.queryByRole("button", { name: "Log activity" })).toBeNull();
+  });
+
+  it("keeps draft nodes, focus and files when replacement or explicit discard is declined", () => {
+    const today = localDateForTest();
+    const profile = createProfileState().profiles[0];
+    const first = createBatch(profile, { id: "first", name: "First jar", startDate: today });
+    first.timeline.push({ id: "note", kind: "note", date: today, text: "Saved note" });
+    const second = createBatch(profile, { id: "second", name: "Second jar", startDate: today });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([first, second])));
+    render(<App />);
+    openBatchTools();
+    fireEvent.click(screen.getByRole("button", { name: "Photo" }));
+    const file = screen.getByLabelText("Photo") as HTMLInputElement;
+    const selected = new File(["photo"], "unsaved.jpg", { type: "image/jpeg" });
+    fireEvent.change(file, { target: { files: [selected] } });
+    const context = screen.getByLabelText("Activity context") as HTMLTextAreaElement;
+    fireEvent.change(context, { target: { value: "Keep this draft" } });
+    context.focus();
+    vi.mocked(window.confirm).mockReturnValue(false);
+    for (const action of ["Open Second jar", `Edit note from ${today}`, "Delete batch", "Discard draft"]) {
+      fireEvent.click(screen.getByRole("button", { name: action }));
+      expect(screen.getByLabelText("Activity context")).toBe(context);
+      expect(context.value).toBe("Keep this draft");
+      expect(file.files?.[0]).toBe(selected);
+      expect(document.activeElement).toBe(context);
+    }
+    const unload = new Event("beforeunload", { cancelable: true });
+    fireEvent(window, unload);
+    expect(unload.defaultPrevented).toBe(true);
+    expect(window.confirm).toHaveBeenCalledTimes(4);
+    vi.mocked(window.confirm).mockReturnValue(true);
+    fireEvent.click(screen.getByRole("button", { name: "Discard draft" }));
+    expect(context.value).toBe("");
+    fireEvent.click(screen.getByRole("button", { name: "Open Second jar" }));
+    expect(within(screen.getByRole("complementary", { name: "Selected batch" })).getByRole("heading", { name: "Second jar" })).toBeTruthy();
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toHaveLength(1);
+  });
+
+  it("protects unsaved batch input edits but does not warn after those inputs are saved", () => {
+    const today = localDateForTest();
+    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Tea", unit: "l" as const, defaultValue: 2 }] };
+    const batches = ["First", "Second"].map((name) => createBatch(profile, { id: name, name, startDate: today }));
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState(batches)));
+    render(<App />);
+    openBatchTools();
+    fireEvent.change(screen.getByLabelText("Tea (l)"), { target: { value: "3" } });
+    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(screen.getByRole("button", { name: "Open Second" }));
+    expect((screen.getByLabelText("Tea (l)") as HTMLInputElement).value).toBe("3");
+    expect(window.confirm).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: "Update inputs" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Second" }));
+    expect(window.confirm).toHaveBeenCalledOnce();
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].inputValues.Tea).toBe(3);
+  });
+
+  it("advances the same basic logger without losing its note, reading or chosen date", () => {
+    const today = localDateForTest();
+    const past = addDaysForTest(today, -1);
+    const batch = createBatch(createProfileState().profiles[0], { id: "jar", startDate: today });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Add observation" }));
+    const dialog = screen.getByRole("dialog");
+    const form = dialog.querySelector("form");
+    const textarea = within(dialog).getByLabelText("Observation");
+    fireEvent.change(textarea, { target: { value: "Aroma is changing" } });
+    fireEvent.change(within(dialog).getByLabelText("Temperature reading (°C)"), { target: { value: "20" } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Advanced options" }));
+    expect(within(dialog).getByLabelText("Activity context")).toBe(textarea);
+    expect(dialog.querySelector("form")).toBe(form);
+    fireEvent.change(within(dialog).getByLabelText("Activity date"), { target: { value: past } });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Log activity" }));
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toEqual([
+      expect.objectContaining({ kind: "temperature", value: 20, date: past }),
+      expect.objectContaining({ kind: "note", text: "Aroma is changing", date: past }),
+    ]);
+  });
+
+  it("keeps an asynchronous camera capture through resizing and ignores it after explicit discard", async () => {
+    const batch = createBatch(createProfileState().profiles[0], { id: "jar", startDate: localDateForTest() });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    let resolvePhoto!: (photo: camera.CapturedPhoto) => void;
+    const available = vi.spyOn(camera, "isNativeCameraAvailable").mockReturnValue(true);
+    const capture = vi.spyOn(camera, "captureNativePhoto").mockImplementation(() => new Promise((resolve) => { resolvePhoto = resolve; }));
+    const oldWidth = window.innerWidth;
+    try {
+      render(<App />);
+      openBatchTools();
+      const form = document.querySelector("#batch-activity-form");
+      for (const discard of [false, true]) {
+        fireEvent.click(within(screen.getByRole("region", { name: "Batch management tools" })).getByRole("button", { name: "Take photo" }));
+        for (const width of [1440, 1024, 1023, 600, 390]) {
+          Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
+          fireEvent(window, new Event("resize"));
+          expect(document.querySelector("#batch-activity-form")).toBe(form);
+        }
+        if (discard) fireEvent.click(screen.getByRole("button", { name: "Discard draft" }));
+        await act(async () => resolvePhoto({ name: "camera.jpg", mimeType: "image/jpeg", dataUrl: "data:image/jpeg;base64,cGhvdG8=" }));
+        if (discard) expect(screen.queryByText("Photo captured. Add a caption or save the activity.")).toBeNull();
+        else {
+          expect(screen.getByText("Photo captured. Add a caption or save the activity.")).toBeTruthy();
+          fireEvent.click(screen.getByRole("button", { name: "Discard draft" }));
+        }
+      }
+      capture.mockRejectedValueOnce(new Error("Permission denied"));
+      fireEvent.click(within(screen.getByRole("region", { name: "Batch management tools" })).getByRole("button", { name: "Take photo" }));
+      await act(async () => {});
+      expect(within(form as HTMLElement).getByRole("alert").textContent).toContain("Camera unavailable: Permission denied");
+      expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toEqual([]);
+    } finally {
+      available.mockRestore();
+      capture.mockRestore();
+      Object.defineProperty(window, "innerWidth", { configurable: true, value: oldWidth });
+    }
+  });
+
+  it("reports failed file reads inside the logger while retaining the selected file and caption", async () => {
+    const batch = createBatch(createProfileState().profiles[0], { id: "jar", startDate: localDateForTest() });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    let reader!: FileReader;
+    const read = vi.spyOn(FileReader.prototype, "readAsDataURL").mockImplementation(function (this: FileReader) { reader = this; });
+    try {
+      render(<App />);
+      openBatchTools();
+      fireEvent.click(screen.getByRole("button", { name: "Photo" }));
+      const file = screen.getByLabelText("Photo") as HTMLInputElement;
+      const selected = new File(["bytes"], "unreadable.jpg", { type: "image/jpeg" });
+      fireEvent.change(file, { target: { files: [selected] } });
+      const caption = screen.getByLabelText("Caption") as HTMLInputElement;
+      fireEvent.change(caption, { target: { value: "Keep my caption" } });
+      fireEvent.submit(file.closest("form")!);
+      await act(async () => reader.dispatchEvent(new Event("error")));
+      expect(within(file.closest("form")!).getByRole("alert").textContent).toContain("Could not read this photograph");
+      expect(file.files?.[0]).toBe(selected);
+      expect(caption.value).toBe("Keep my caption");
+      expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toEqual([]);
+    } finally { read.mockRestore(); }
+  });
+
+  it("does not save a pending photograph or context after an explicit discard", async () => {
+    const batch = createBatch(createProfileState().profiles[0], { id: "jar", startDate: localDateForTest() });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    let reader!: FileReader;
+    const read = vi.spyOn(FileReader.prototype, "readAsDataURL").mockImplementation(function (this: FileReader) { reader = this; });
+    try {
+      render(<App />);
+      openBatchTools();
+      fireEvent.click(screen.getByRole("button", { name: "Photo" }));
+      const file = screen.getByLabelText("Photo") as HTMLInputElement;
+      fireEvent.change(file, { target: { files: [new File(["bytes"], "abandoned.jpg", { type: "image/jpeg" })] } });
+      fireEvent.change(screen.getByLabelText("Activity context"), { target: { value: "Also abandoned" } });
+      fireEvent.submit(file.closest("form")!);
+      fireEvent.click(screen.getByRole("button", { name: "Discard draft" }));
+      await act(async () => {
+        Object.defineProperty(reader, "result", { value: "data:image/jpeg;base64,cGhvdG8=" });
+        reader.dispatchEvent(new Event("load"));
+      });
+      expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toEqual([]);
+    } finally { read.mockRestore(); }
+  });
+
+  it("retries detail and timeline photographs without replacing original bytes with stand-ins", () => {
+    const today = localDateForTest();
+    const batch = createBatch(createProfileState().profiles[0], { id: "jar", startDate: today });
+    batch.timeline.push({ id: "photo", kind: "photo", date: today, name: "jar.jpg", caption: "My jar", mimeType: "image/jpeg", dataUrl: "data:image/jpeg;base64,cGhvdG8=" });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
+    render(<App />);
+    const detail = within(screen.getByRole("complementary", { name: "Selected batch" }));
+    for (const image of detail.getAllByRole("img")) fireEvent.error(image);
+    const retries = detail.getAllByRole("button", { name: "Retry photograph" });
+    expect(retries).toHaveLength(2);
+    for (const retry of retries) fireEvent.click(retry);
+    expect(detail.getAllByRole("img").map((image) => image.getAttribute("src"))).toEqual([batch.timeline[0].kind === "photo" ? batch.timeline[0].dataUrl : "", "data:image/jpeg;base64,cGhvdG8="]);
+    expect(detail.queryByRole("img", { name: /stand-in/ })).toBeNull();
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toEqual(batch.timeline);
   });
 
   it("keeps Start a batch available without profiles and links its guidance to Profiles", () => {

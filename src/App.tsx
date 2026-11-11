@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { App as CapacitorApp } from "@capacitor/app";
 import { isTauri } from "@tauri-apps/api/core";
 import type { PluginListenerHandle } from "@capacitor/core";
@@ -163,19 +163,20 @@ function BatchPhoto({ batch, detail = false }: { batch: Batch; detail?: boolean 
   const photo = batch.timeline.filter((entry) => entry.kind === "photo").at(-1);
   const source = photo?.dataUrl ?? (visual.photo ? `${import.meta.env.BASE_URL}new-design/${visual.photo}.webp` : null);
   return <div className={`${detail ? "design-detail-photo" : "design-batch-photo"}${photo ? " user-photo" : ""}`} style={detail ? { background: visual.color } : undefined}>
-    {source ? <BatchImage key={source} source={source} userPhoto={!!photo} description={photo ? `Batch photograph: ${photo.caption || photo.name}` : `${batch.profileSnapshot.name} stand-in photograph`} />
+    {source ? <BatchImage key={source} source={source} userPhoto={!!photo} retryable={detail} description={photo ? `Batch photograph: ${photo.caption || photo.name}` : `${batch.profileSnapshot.name} stand-in photograph`} />
       : <DesignIcon name="jar" />}
     {detail && <span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span>}
     <span className="design-photo-label">{batch.status === "to-fridge" ? "In the fridge" : batch.status === "ready" && !detail ? batch.finishDate === localDate() ? "Ready today" : "Ready to enjoy" : batch.finishDate ? `Finish ${shortDate(batch.finishDate)}` : "No finish date"}</span>
   </div>;
 }
 
-function BatchImage({ source, description, userPhoto }: { source: string; description: string; userPhoto: boolean }) {
+function BatchImage({ source, description, userPhoto, retryable = false }: { source: string; description: string; userPhoto: boolean; retryable?: boolean }) {
   const [state, setState] = useState<"loading" | "loaded" | "failed">("loading");
   return <>
     {state !== "loaded" && <span className="batch-photo-fallback" role={state === "failed" ? "img" : undefined} aria-label={state === "failed" ? userPhoto ? "Batch photograph unavailable; original retained" : "Stand-in photograph unavailable" : undefined}><DesignIcon name="jar" /></span>}
     {state !== "failed" && <img alt={description} data-source={userPhoto ? "user" : "stand-in"} onLoad={() => setState("loaded")} onError={() => setState("failed")} src={source} />}
     {!userPhoto && <span className="batch-image-credit">Stand-in</span>}
+    {state === "failed" && retryable && <button className="batch-photo-retry" onClick={() => setState("loading")} type="button">Retry photograph</button>}
   </>;
 }
 
@@ -347,6 +348,7 @@ export function App() {
     ),
   );
   const [openBatchId, setOpenBatchId] = useState<string | null>(null);
+  const beforeBatchReplace = useRef<((nextBatches?: Batch[]) => boolean) | null>(null);
   const [showPhoneDetail, setShowPhoneDetail] = useState(false);
   const [showChecks, setShowChecks] = useState(false);
   const [detailOrigin, setDetailOrigin] = useState<"calendar" | "checks" | null>(null);
@@ -517,10 +519,12 @@ export function App() {
     persistShared(sharedDataStore.saveBatches(current));
   }
 
-  function openBatch(id: string | null) {
+  function openBatch(id: string | null, origin: "calendar" | "checks" | null = shell.destination === "calendar" ? "calendar" : showChecks ? "checks" : null) {
+    if (id && id !== openBatchId && beforeBatchReplace.current?.() === false) return;
     if (id) {
       batchReturnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      setDetailOrigin(shell.destination === "calendar" ? "calendar" : showChecks ? "checks" : null);
+      if (origin === "calendar") navigate("batches");
+      setDetailOrigin(origin);
       setOpenBatchId(id);
     } else {
       if (detailOrigin === "calendar") navigate("calendar");
@@ -563,6 +567,10 @@ export function App() {
 
   function applySharedSnapshot(snapshot: SharedSnapshot) {
     const batches = updateBatchDates(discardExpiredBatches(snapshot.batchState, Date.now()));
+    if (beforeBatchReplace.current?.(batches.batches) === false) {
+      setStorageStatus({ ...sharedDataStore.getStatus(), state: "problem", message: "Shared data was not loaded because it would discard unsaved batch work. Finish your draft, then reload the shared folder in Settings." });
+      return;
+    }
     if (webStorage.current === "fallback") {
       browserShellStore.save(snapshot.shell);
       browserProfileStore.save(snapshot.profileState);
@@ -671,6 +679,7 @@ export function App() {
               <BatchView
                 visible={shell.destination !== "calendar" && shell.destination !== "settings"}
                 batches={batchState.batches}
+                beforeBatchReplace={beforeBatchReplace}
                 mode={shell.destination === "today" ? "today" : "batches"}
                 pane={showChecks ? "checks" : shell.destination === "profiles" ? "profiles" : "batches"}
                 showPhoneDetail={showPhoneDetail}
@@ -689,7 +698,7 @@ export function App() {
                 onChange={saveBatch}
                 onUpdate={updateBatch}
                 onComplete={completeCheck}
-                onDelete={(id) => saveBatches(deleteBatch(batchState, id, Date.now()))}
+                onDelete={(id) => { if (beforeBatchReplace.current?.() !== false) saveBatches(deleteBatch(batchState, id, Date.now())); }}
                 profiles={profileState.profiles}
                 units={shell.units}
               />
@@ -702,7 +711,7 @@ export function App() {
                   <p className="screen-intro">Checks, ready days, and moves to the fridge. Select a scheduled day to open its batch.</p>
                 </div>
               </div>
-              <CalendarView batches={batchState.batches} onOpen={(id) => { navigate("batches"); openBatch(id); }} />
+              <CalendarView batches={batchState.batches} onOpen={(id) => openBatch(id, "calendar")} />
           </section>
           {shell.destination === "settings" ? (
             <section className="settings-screen" aria-label="Settings">
@@ -745,6 +754,7 @@ export function App() {
       </div>
       {dialog && <StationDialog mode={dialog.kind} title={dialog.kind === "start" ? "Start a batch" : dialog.kind === "profile" ? dialog.profile.name : dialog.kind === "dates" ? "Batch dates" : dialog.kind === "inputs" ? "Profile inputs" : "Your fermentation station"} returnFocus={dialogTrigger.current} onClose={() => setDialog(null)}>
         {dialog.kind === "start" && (profileState.profiles.length === 0 && !dialog.profile ? <div className="station-dialog-body"><p>Create or restore a fermentation profile before starting a batch.</p><div className="station-dialog-actions"><button className="station-primary" onClick={() => navigate("profiles")} type="button">Open Profiles</button></div></div> : <StartBatchForm profiles={profileState.profiles} initialProfile={dialog.profile} onCancel={() => setDialog(null)} onCreate={(batch) => {
+          if (beforeBatchReplace.current?.() === false) return;
           const current = stateRef.current.batchState;
           saveBatches({ ...current, batches: [...current.batches, batch] });
           navigate("batches");
@@ -1259,7 +1269,10 @@ function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string
   );
 }
 
+type BatchReplacementGuard = RefObject<((nextBatches?: Batch[]) => boolean) | null>;
+
 interface BatchViewProps {
+  beforeBatchReplace: BatchReplacementGuard;
   visible: boolean;
   onObservationAdded(): void;
   batches: Batch[];
@@ -1284,7 +1297,7 @@ interface BatchViewProps {
 
 type BatchListFilter = BatchFilter | "attention";
 
-function BatchView({ visible: workspaceVisible, batches, mode, pane, profilePane, showPhoneDetail, backLabel, onObservationAdded, profiles, units, onDialog, batchListVersion, onChange, onUpdate, onComplete, onDelete, onNavigate, onOpen, onSelect, openBatchId }: BatchViewProps) {
+function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mode, pane, profilePane, showPhoneDetail, backLabel, onObservationAdded, profiles, units, onDialog, batchListVersion, onChange, onUpdate, onComplete, onDelete, onNavigate, onOpen, onSelect, openBatchId }: BatchViewProps) {
   const [filter, setFilter] = useState<BatchListFilter>("all");
   const [query, setQuery] = useState("");
   const [sorted, setSorted] = useState(false);
@@ -1434,7 +1447,7 @@ function BatchView({ visible: workspaceVisible, batches, mode, pane, profilePane
       </>}
       </div>
       <aside aria-label="Selected batch" className="design-detail" ref={detailRef} tabIndex={-1}>
-        {openBatch ? <><div className="design-detail-top"><button aria-label={`Back to ${backLabel}`} className="icon-button design-back" onClick={closeBatch} type="button"><DesignIcon name="back" /></button><h2>Batch details</h2><button aria-label="View batch dates" className="icon-button" onClick={() => onDialog({ kind: "dates", batch: openBatch })} type="button"><NavIcon destination="calendar" /></button></div><BatchCard batch={openBatch} key={openBatch.id} visible={workspaceVisible} onChange={onChange} onUpdate={onUpdate} onComplete={onComplete} onObservationAdded={onObservationAdded} onDialog={onDialog} onDelete={onDelete} units={units} /></> : <div className="design-detail-empty"><DesignIcon name="jar" /><h2>Your batch details</h2><p>Choose a batch to see its progress and record an observation.</p></div>}
+        {openBatch ? <><div className="design-detail-top"><button aria-label={`Back to ${backLabel}`} className="icon-button design-back" onClick={closeBatch} type="button"><DesignIcon name="back" /></button><h2>Batch details</h2><button aria-label="View batch dates" className="icon-button" onClick={() => onDialog({ kind: "dates", batch: openBatch })} type="button"><NavIcon destination="calendar" /></button></div><BatchCard batch={openBatch} key={openBatch.id} beforeBatchReplace={beforeBatchReplace} visible={workspaceVisible} onChange={onChange} onUpdate={onUpdate} onComplete={onComplete} onObservationAdded={onObservationAdded} onDialog={onDialog} onDelete={onDelete} units={units} /></> : <div className="design-detail-empty"><DesignIcon name="jar" /><h2>Your batch details</h2><p>Choose a batch to see its progress and record an observation.</p></div>}
       </aside>
     </section>
   );
@@ -1456,6 +1469,7 @@ function CompactBatchCard({ batch, selected, units, onOpen }: { batch: Batch; se
 }
 
 interface BatchCardProps {
+  beforeBatchReplace: BatchReplacementGuard;
   visible: boolean;
   onObservationAdded(): void;
   batch: Batch;
@@ -1470,12 +1484,13 @@ interface BatchCardProps {
 type LoggerKind = "note" | "ph" | "temperature" | "status" | "photo";
 type EditableTimelineEntry = Extract<TimelineEntry, { kind: LoggerKind }>;
 
-function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservationAdded, onDialog, onDelete, units }: BatchCardProps) {
+function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onComplete, onObservationAdded, onDialog, onDelete, units }: BatchCardProps) {
   const [editing, setEditing] = useState<EditableTimelineEntry | null>(null);
   const [loggerKind, setLoggerKind] = useState<LoggerKind>("status");
   const [checkDrafts, setCheckDrafts] = useState<Record<string, string>>({});
   const [checkError, setCheckError] = useState("");
   const [capturedPhoto, setCapturedPhoto] = useState<CapturedPhoto | null>(null);
+  const [photoError, setPhotoError] = useState("");
   const [addingCheck, setAddingCheck] = useState(false);
   const [newCheckName, setNewCheckName] = useState("");
   const [newCheckInterval, setNewCheckInterval] = useState("7");
@@ -1491,8 +1506,55 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
   const modal = useRef(false);
   const revision = useRef(0);
   const operation = useRef(0);
+  const abandonedSave = useRef(0);
   const dirty = useRef(false);
+  const managementDrafts = useRef(new Set<string>());
   const basicObservation = loggerModal && observationMode;
+
+  useEffect(() => {
+    beforeBatchReplace.current = (nextBatches) => {
+      const next = nextBatches?.find(({ id }) => id === batch.id);
+      const losesObservation = !next || !!editing && !next.timeline.some(({ id }) => id === editing.id);
+      const lostEditors = [...managementDrafts.current].filter((key) => !next ||
+        key.startsWith("check:") && !next.checks.some(({ id }) => key === `check:${id}`) ||
+        key.startsWith("calculation:") && !next.profileSnapshot.calculations.some(({ name }) => key === `calculation:${name}`) ||
+        key === "inputs" && !batch.profileSnapshot.inputs.every(({ name }) => next.profileSnapshot.inputs.some((input) => input.name === name)));
+      if ((losesObservation && dirty.current || lostEditors.length > 0) && !window.confirm("Discard unsaved batch work? Notes, selected photos and editor changes that have not been saved will be lost.")) return false;
+      if (next) {
+        for (const key of lostEditors) managementDrafts.current.delete(key);
+        if (lostEditors.some((key) => key.startsWith("check:"))) setCheckDrafts((drafts) => Object.fromEntries(Object.entries(drafts).filter(([id]) => !lostEditors.includes(`check:${id}`))));
+        if (losesObservation) { dirty.current = false; discardDraft(); }
+      } else {
+        dirty.current = false;
+        managementDrafts.current.clear();
+        revision.current++;
+        operation.current++;
+      }
+      return true;
+    };
+    const warnOnUnload = (event: BeforeUnloadEvent) => {
+      if (!dirty.current && managementDrafts.current.size === 0) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnOnUnload);
+    return () => { beforeBatchReplace.current = null; window.removeEventListener("beforeunload", warnOnUnload); };
+  }, [beforeBatchReplace, batch, editing]);
+
+  function discardDraft() {
+    if (dirty.current && !window.confirm("Discard this unsaved observation and its selected photo?")) return false;
+    abandonedSave.current++;
+    revision.current++;
+    operation.current++;
+    dirty.current = false;
+    setEditing(null);
+    setObservationMode(false);
+    setCapturedPhoto(null);
+    setPhotoError("");
+    formRef.current?.reset();
+    formRef.current?.querySelector("textarea")?.setCustomValidity("");
+    return true;
+  }
 
   function dismissLogger(restoreFocus = true) {
     modal.current = false;
@@ -1566,6 +1628,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
 
   async function takePhoto() {
     changeKind("photo");
+    setPhotoError("");
     const form = formRef.current;
     const version = revision.current;
     const request = ++operation.current;
@@ -1575,7 +1638,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
       const photo = await captureNativePhoto();
       if (mounted.current && formRef.current === form && revision.current === version && operation.current === request) setCapturedPhoto(photo);
     } catch (error) {
-      if (mounted.current && formRef.current === form && revision.current === version && operation.current === request) setCheckError(`Camera unavailable: ${(error as Error).message}`);
+      if (mounted.current && formRef.current === form && revision.current === version && operation.current === request) setPhotoError(`Camera unavailable: ${(error as Error).message}`);
     }
   }
 
@@ -1607,6 +1670,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
     const originEditing = editing;
     const originUnits = units;
     const originBasic = basicObservation;
+    const abandonedVersion = abandonedSave.current;
     const version = revision.current;
     const request = ++operation.current;
     const kind = originEditing?.kind ?? loggerKind;
@@ -1614,6 +1678,10 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
       id: originEditing?.id ?? createClientId(),
       date: String(data.get("date") ?? ""),
     };
+    const context = String(data.get("text") ?? "").trim();
+    const withContext = (next: Batch) => kind !== "note" && context
+      ? addTimelineEntry(next, { id: createClientId(), date: common.date, kind: "note", text: context })
+      : next;
     const finish = () => {
       if (!mounted.current || formRef.current !== form || revision.current !== version || operation.current !== request) return;
       revision.current++;
@@ -1622,6 +1690,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
       setLoggerKind("status");
       setObservationMode(false);
       setCapturedPhoto(null);
+      setPhotoError("");
       form.reset();
       if (modal.current) dismissLogger();
       if (originBasic) onObservationAdded();
@@ -1656,9 +1725,16 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
       const current = originEditing?.kind === "photo" ? originEditing : undefined;
       if ((!file || file.size === 0) && !capturedPhoto && !current) return;
       if (file && file.size > 0 && !file.type.startsWith("image/")) return;
-      const selected = file && file.size > 0
-        ? { name: file.name, mimeType: file.type, dataUrl: await fileToDataUrl(file) }
-        : capturedPhoto;
+      let selected = capturedPhoto;
+      if (file && file.size > 0) {
+        try {
+          selected = { name: file.name, mimeType: file.type, dataUrl: await fileToDataUrl(file) };
+        } catch {
+          if (mounted.current && formRef.current === form && revision.current === version && operation.current === request) setPhotoError("Could not read this photograph. Select it again or choose another file. Your draft has been kept.");
+          return;
+        }
+      }
+      if (abandonedSave.current !== abandonedVersion) return;
       const photo: TimelineEntry = {
         ...common,
         kind,
@@ -1667,7 +1743,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
         dataUrl: selected?.dataUrl ?? current!.dataUrl,
         caption: String(data.get("caption") ?? "").trim(),
       };
-      onUpdate(originId, (current) => originEditing ? updateTimelineEntry(current, photo) : addTimelineEntry(current, photo));
+      onUpdate(originId, (current) => withContext(originEditing ? updateTimelineEntry(current, photo) : addTimelineEntry(current, photo)));
       finish();
       return;
     } else {
@@ -1676,11 +1752,11 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
     if (!entry.date || ("value" in entry && !Number.isFinite(entry.value)) || ("text" in entry && !entry.text)) return;
     if (kind === "ph") {
       const phEntry = entry as Extract<TimelineEntry, { kind: "ph" }>;
-      onUpdate(originId, (current) => originEditing ? updatePhReading(current, phEntry) : addPhReading(current, phEntry));
+      onUpdate(originId, (current) => withContext(originEditing ? updatePhReading(current, phEntry) : addPhReading(current, phEntry)));
       finish();
       return;
     }
-    onUpdate(originId, (current) => originEditing ? updateTimelineEntry(current, entry, localDate()) : addTimelineEntry(current, entry));
+    onUpdate(originId, (current) => withContext(originEditing ? updateTimelineEntry(current, entry, localDate()) : addTimelineEntry(current, entry)));
     finish();
   }
 
@@ -1693,10 +1769,12 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
       next = setBatchInput(next, input.name, raw === "" ? undefined : Number(raw));
     }
     onChange(next);
+    managementDrafts.current.delete("inputs");
   }
 
   function editEntry(entry: TimelineEntry) {
     if (entry.kind === "check" || entry.kind === "measurement") return;
+    if (!discardDraft()) return;
     changeKind(entry.kind);
     const form = formRef.current!;
     form.reset();
@@ -1712,13 +1790,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
 
   function cancelEntry() {
     if (modal.current) return dismissLogger();
-    revision.current++;
-    dirty.current = false;
-    setEditing(null);
-    setObservationMode(false);
-    setCapturedPhoto(null);
-    formRef.current?.reset();
-    formRef.current?.querySelector("textarea")?.setCustomValidity("");
+    discardDraft();
   }
 
   function saveNewCheck(event: React.FormEvent<HTMLFormElement>) {
@@ -1728,6 +1800,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
       setNewCheckName("");
       setNewCheckInterval("7");
       setAddingCheck(false);
+      managementDrafts.current.delete("new-check");
       setCheckError("");
     } catch (error) {
       setCheckError((error as Error).message);
@@ -1738,6 +1811,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
     try {
       onChange(renameBatchCheck(batch, checkId, checkDrafts[checkId] ?? currentName));
       setCheckDrafts(({ [checkId]: _removed, ...rest }) => rest);
+      managementDrafts.current.delete(`check:${checkId}`);
       setCheckError("");
     } catch (error) {
       setCheckError((error as Error).message);
@@ -1791,9 +1865,11 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
     <article className="batch-workspace">
       <div className="design-detail-card">
         <div className="design-detail-heading"><span className="design-check-symbol"><DesignIcon name="jar" /></span><div><h3>{batch.name}</h3><p>{batch.profileSnapshot.name} batch</p></div><button aria-label="Add observation" className="primary-action design-record-observation" onClick={showLogger} ref={observationTrigger} type="button"><DesignIcon name="plus" /><span>Add observation</span></button></div>
-        <div className="design-detail-metrics"><BatchMeta batch={batch} units={units} guidance /><strong>{day}<small> / {batch.finishDate ? Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000)) : "—"} days</small></strong></div>
+        <div className="design-detail-metrics"><span>Started {shortDate(batch.startDate)}</span><strong>Day {day}<small>{batch.finishDate ? ` / ${Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))}` : ""}</small></strong></div>
         <BatchPhoto batch={batch} detail />
+        <dl className="detail-readings" aria-label="Latest observed readings"><div><dt><DesignIcon name="drop" />pH</dt><dd>{latestPh ? latestPh.value : "Not recorded"}</dd>{latestPh && <time dateTime={latestPh.date}>{shortDate(latestPh.date)}</time>}</div><div><dt><DesignIcon name="temp" />Temperature</dt><dd>{latestTemperature ? `${displayTemperature(latestTemperature.value, units)} ${temperatureUnit}` : "Not recorded"}</dd>{latestTemperature && <time dateTime={latestTemperature.date}>{shortDate(latestTemperature.date)}</time>}</div></dl>
         {batch.status === "active" && nextCheck && <section className="design-detail-next" aria-label="Next batch check"><div><p>{dueCheck ? "Check due" : "Next check"}</p><strong>{dueCheck?.name ?? nextCheck.name}</strong><p>{dueCheck?.overdue ? "Overdue · " : "Due · "}{shortDate((dueCheck ?? nextCheck).nextDueDate)}</p></div>{dueCheck && <button aria-label={`Complete check: ${dueCheck.name} for this batch`} className="primary-action" onClick={(event) => { if (document.activeElement === event.currentTarget && dueBatchChecks(batch, localDate()).length === 1) observationTrigger.current?.focus({ preventScroll: true }); onComplete(batch.id, dueCheck.id); }} type="button"><DesignIcon name="check" /><span>Complete check</span></button>}</section>}
+        {(!nextCheck || batch.status !== "active") && <p className="detail-check-state">{batch.status !== "active" ? "Recurring checks paused while this batch is not active." : "No recurring checks scheduled."}</p>}
       </div>
       <section className="design-input-summary"><div className="design-section-head"><h3>Profile inputs</h3><button className="design-quiet" onClick={() => onDialog({ kind: "inputs", batch })} type="button">See all</button></div><div className="design-ingredients">{batch.profileSnapshot.inputs.map((input) => <span key={input.name}>{input.name}</span>)}{batch.profileSnapshot.inputs.length === 0 && <p>No profile inputs.</p>}</div></section>
       <div className="workbench">
@@ -1876,7 +1952,7 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
 
             <article className="batch-component-card" aria-labelledby="inputs-heading" id="batch-input-editor">
               <header className="batch-component-header"><h2 id="inputs-heading">Profile inputs</h2><span className="batch-component-step">02</span></header>
-              {batch.profileSnapshot.inputs.length > 0 ? <form className="component-inputs" onSubmit={saveInputs}>
+              {batch.profileSnapshot.inputs.length > 0 ? <form className="component-inputs" onChange={() => managementDrafts.current.add("inputs")} onSubmit={saveInputs}>
                 <div className="component-input-fields">
                   {batch.profileSnapshot.inputs.map((input) => (
                     <label className="component-field" key={input.name}><span>{input.name} ({input.unit})</span><input defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" /></label>
@@ -1895,10 +1971,10 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
                     <span className="component-pair-label">{calculation.name}:</span>
                     <div className="component-calculation-value"><strong>{formatCalculationValue(value?.override ?? value?.suggested)} {calculation.unit}</strong><span>{value?.override !== undefined ? " (overridden)" : " suggested"}</span></div>
                     <span className="sr-only">{formatCalculationValue(value?.override ?? value?.suggested)} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
-                    <form className="component-override" onSubmit={(event) => {
+                    <form className="component-override" onChange={() => managementDrafts.current.add(`calculation:${calculation.name}`)} onSubmit={(event) => {
                       event.preventDefault();
                       const raw = String(new FormData(event.currentTarget).get("override") ?? "");
-                      if (raw !== "") onChange(overrideBatchCalculation(batch, calculation.name, Number(raw)));
+                      if (raw !== "") { onChange(overrideBatchCalculation(batch, calculation.name, Number(raw))); managementDrafts.current.delete(`calculation:${calculation.name}`); }
                     }}>
                       <label className="component-field"><span>Override</span><input aria-label={`Override ${calculation.name}`} min="0" name="override" step="any" type="number" /></label>
                       <button className="component-button" type="submit">Override</button>
@@ -1916,20 +1992,20 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
                 const due = dueBatchChecks(batch, localDate()).find(({ id }) => id === check.id);
                 return (
                   <div className="component-check" key={check.id}>
-                    <label className="component-field"><span>Check name</span><input aria-label={`Check name ${check.id}`} onChange={(event) => setCheckDrafts({ ...checkDrafts, [check.id]: event.target.value })} value={checkDrafts[check.id] ?? check.name} /></label>
+                    <label className="component-field"><span>Check name</span><input aria-label={`Check name ${check.id}`} onChange={(event) => { managementDrafts.current.add(`check:${check.id}`); setCheckDrafts({ ...checkDrafts, [check.id]: event.target.value }); }} value={checkDrafts[check.id] ?? check.name} /></label>
                     <div className="component-check-meta">
                       <label className="component-field"><span>Next</span><input aria-label={`${check.name} next date`} readOnly type="date" value={check.nextDueDate} /></label>
                       <label className="component-field"><span>Every</span><input aria-label={`${check.name} interval days`} disabled={batch.status !== "active"} min="1" onChange={(event) => { try { onChange(adjustBatchCheck(batch, check.id, Number(event.target.value), localDate())); setCheckError(""); } catch (error) { setCheckError((error as Error).message); } }} type="number" value={check.intervalDays} /></label>
                     </div>
                     <p className="component-check-status">{batch.status === "active" ? `${due?.overdue ? "Overdue" : due ? "Due" : "Next"} ${check.nextDueDate}` : "Paused"}</p>
-                    <div className="component-check-actions"><button className="component-button" onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button><button className="component-remove" aria-label={`Remove ${check.name}`} onClick={() => onChange(removeBatchCheck(batch, check.id))} type="button">Remove</button></div>
+                    <div className="component-check-actions"><button className="component-button" onClick={() => saveCheckName(check.id, check.name)} type="button">Save name</button><button className="component-remove" aria-label={`Remove ${check.name}`} onClick={() => { if (managementDrafts.current.has(`check:${check.id}`) && !window.confirm("Discard the unsaved name and remove this check?")) return; managementDrafts.current.delete(`check:${check.id}`); onChange(removeBatchCheck(batch, check.id)); }} type="button">Remove</button></div>
                   </div>
                 );
               })}
-              {addingCheck && <form className="component-check component-new-check" onSubmit={saveNewCheck}>
+              {addingCheck && <form className="component-check component-new-check" onChange={() => managementDrafts.current.add("new-check")} onSubmit={saveNewCheck}>
                 <label className="component-field"><span>Check name</span><input autoFocus onChange={(event) => setNewCheckName(event.target.value)} placeholder="e.g. Taste and smell" required value={newCheckName} /></label>
                 <label className="component-field"><span>Every</span><input min="1" onChange={(event) => setNewCheckInterval(event.target.value)} required type="number" value={newCheckInterval} /></label>
-                <div className="component-check-actions"><button className="component-button" type="submit">Add recurring check</button><button className="component-remove" onClick={() => setAddingCheck(false)} type="button">Cancel</button></div>
+                <div className="component-check-actions"><button className="component-button" type="submit">Add recurring check</button><button className="component-remove" onClick={() => { if (!managementDrafts.current.has("new-check") || window.confirm("Discard this unsaved recurring check?")) { managementDrafts.current.delete("new-check"); setAddingCheck(false); } }} type="button">Cancel</button></div>
               </form>}
             </article>
           </div>
@@ -1949,14 +2025,14 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
           <section className="wb-panel activity-logger" aria-labelledby="activity-logger-heading" hidden={!managementOpen && !loggerModal}>
             <h2 hidden={loggerModal} id="activity-logger-heading">Log {loggerKind === "ph" ? "pH reading" : loggerKind === "status" ? "status change" : loggerKind}</h2>
             <dialog aria-labelledby={loggerModal ? "observation-dialog-title" : undefined} className={`observation-logger${loggerModal ? " station-dialog" : " inline-logger"}`} onCancel={(event) => { event.preventDefault(); dismissLogger(); }} onClose={(event) => { if (!event.currentTarget.open && modal.current) dismissLogger(); }} ref={dialogRef} role={loggerModal ? "dialog" : "presentation"}>
-            <div className="station-dialog-heading" hidden={!loggerModal}><h2 id="observation-dialog-title">Add observation</h2><button aria-label="Close dialog" className="station-dialog-close" onClick={() => dismissLogger()} ref={closeRef} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div>
+            <div className="station-dialog-heading" hidden={!loggerModal}><h2 id="observation-dialog-title">{editing ? "Edit observation" : "Add observation"}</h2><button aria-label="Close dialog" className="station-dialog-close" onClick={() => dismissLogger()} ref={closeRef} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div>
             <form className={basicObservation ? "observation-form" : "timeline-form quick-log-form"} id="batch-activity-form" onChange={() => { revision.current++; dirty.current = true; }} onInput={() => { revision.current++; dirty.current = true; formRef.current?.querySelector("textarea")?.setCustomValidity(""); }} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") event.currentTarget.requestSubmit(); }} onSubmit={saveEntry} ref={formRef}>
               <p className="station-dialog-body" hidden={!loggerModal}>{batch.name}</p>
               <label className="sr-only" hidden={basicObservation}>Activity type<select disabled={!!editing || basicObservation} name="kind" onChange={(event) => changeKind(event.target.value as LoggerKind)} tabIndex={-1} value={loggerKind}>
                 <option value="status">Status change</option><option value="ph">pH reading</option><option value="temperature">Temperature</option><option value="note">Note</option><option value="photo">Photo</option>
               </select></label>
               <div className="quick-log-types" aria-label="Activity choices" hidden={basicObservation} role="group">
-                {(["status", "ph", "temperature", "note"] as LoggerKind[]).map((kind) => {
+                {(["status", "ph", "temperature", "note", "photo"] as LoggerKind[]).map((kind) => {
                   const label = kind === "ph" ? "pH reading" : kind === "status" ? "Status change" : kind[0].toUpperCase() + kind.slice(1);
                   return <button aria-pressed={loggerKind === kind} disabled={!!editing} key={kind} onClick={() => changeKind(kind)} type="button">{label}</button>;
                 })}
@@ -1972,7 +2048,9 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
               </div>
               {loggerKind === "photo" && isNativeCameraAvailable() && <button className="quick-log-camera" onClick={takePhoto} type="button">Take photo</button>}
               {capturedPhoto && <p className="notice" role="status">Photo captured. Add a caption or save the activity.</p>}
+              {photoError && <p role="alert">{photoError}</p>}
               <p className="station-helper" hidden={!basicObservation}>Add a note, a reading, or both.</p>
+              <div className="logger-options"><button className="design-quiet" hidden={!basicObservation} onClick={() => { setObservationMode(false); if (formRef.current?.querySelector<HTMLInputElement>('[data-value="temperature"]')?.value) setLoggerKind("temperature"); }} type="button">Advanced options</button><button className="design-quiet" onClick={() => { if (discardDraft()) { if (modal.current) dismissLogger(); else setLoggerKind("status"); } }} type="button">Discard draft</button><span>Closing keeps your draft.</span></div>
               <div className={basicObservation ? "station-dialog-actions" : "quick-log-actions"}><span hidden={loggerModal}>Save with <kbd>Ctrl</kbd> <kbd>↵</kbd></span><div className={basicObservation ? "observation-actions" : undefined}><button className={basicObservation ? "station-secondary" : undefined} hidden={!loggerModal && !editing} onClick={cancelEntry} type="button">Cancel</button><button aria-label={basicObservation ? "Add observation" : editing ? "Save activity" : "Log activity"} className={basicObservation ? "station-primary" : "primary-action"} type="submit">{basicObservation ? "Add observation" : "Save activity"}</button></div></div>
             </form>
             </dialog>
@@ -1985,11 +2063,11 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
               {[...batch.timeline].reverse().map((entry) => (
                 <div className={`timeline-entry timeline-${entry.kind}`} key={entry.id}>
                   <span className="timeline-dot" aria-hidden="true" />
-                  <span className="timeline-content"><strong>{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong><span className="timeline-description">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <img alt={entry.caption || entry.name} src={entry.dataUrl} />}</span></span>
+                  <span className="timeline-content"><strong>{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong><span className="timeline-description">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <span className="timeline-photo user-photo"><BatchImage key={entry.dataUrl} source={entry.dataUrl} description={entry.caption || entry.name} userPhoto retryable /></span>}</span></span>
                   <time dateTime={entry.date}>{shortDate(entry.date)}</time>
                   <div className="timeline-entry-actions" hidden={!managementOpen}>
                     {entry.kind !== "check" && entry.kind !== "measurement" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} onClick={() => editEntry(entry)} type="button">Edit</button>}
-                    <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => onChange(deleteTimelineEntry(batch, entry.id, Date.now()))} type="button">Delete</button>
+                    <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => { if (editing?.id === entry.id && !discardDraft()) return; onChange(deleteTimelineEntry(batch, entry.id, Date.now())); }} type="button">Delete</button>
                   </div>
                 </div>
               ))}
@@ -2000,7 +2078,8 @@ function BatchCard({ batch, visible, onChange, onUpdate, onComplete, onObservati
         </div>
 
       </div>
-      <div className="design-detail-footer"><DesignIcon name="leaf" />A little care, one batch at a time.</div>
+      <div className="design-detail-footer"><DesignIcon name="leaf" />Your observations, kept in one place.</div>
+      <div className="detail-photo-credits"><PhotoCredits /></div>
     </article>
   );
 }

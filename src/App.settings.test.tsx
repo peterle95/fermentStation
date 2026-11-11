@@ -6,6 +6,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { App } from "./App";
 import { createBatch, createBatchState, deleteBatch } from "./domain/batches";
 import { createProfileState } from "./domain/profiles";
+import { createShellState } from "./domain/shell";
 import { createArchive, importArchive } from "./platform/archive";
 import * as transfer from "./platform/native-transfer";
 import { sharedDataStore, type SharedStorageStatus } from "./platform/shared-data-store";
@@ -60,6 +61,57 @@ function upload(bytes: Uint8Array) {
 }
 
 describe("Settings and data feedback", () => {
+  it.each(["check", "entry"])("protects an edited %s removed from a retained shared batch", async (kind) => {
+    const tracked = createBatch({ ...profile, checks: [{ name: "Taste", intervalDays: 2 }] }, { id: batch.id, startDate: today });
+    tracked.timeline.push({ id: "note", kind: "note", date: today, text: "Original note" });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([tracked])));
+    status = { state: "ready", location: "Kitchen/shared", message: "Ready", conflicts: [] };
+    vi.spyOn(sharedDataStore, "reload").mockResolvedValue({ status, snapshot: { shell: createShellState(), profileState: profiles, batchState: createBatchState([{ ...tracked, checks: [], timeline: [] }]) } });
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    render(<App />);
+    await act(async () => {});
+    fireEvent.click(screen.getByRole("button", { name: "More batch tools" }));
+    if (kind === "entry") fireEvent.click(screen.getByRole("button", { name: `Edit note from ${today}` }));
+    else fireEvent.change(screen.getByLabelText(`Check name ${tracked.checks[0].id}`), { target: { value: "Unsaved check name" } });
+    const draft = screen.getByLabelText("Activity context") as HTMLTextAreaElement;
+    fireEvent.change(draft, { target: { value: "Unsaved note" } });
+    await act(async () => fireEvent.focus(window));
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(draft.value).toBe("Unsaved note");
+    expect(screen.getByLabelText(`Check name ${tracked.checks[0].id}`)).toBeTruthy();
+    confirm.mockReturnValue(true);
+    await act(async () => fireEvent.focus(window));
+    expect(screen.queryByLabelText(`Check name ${tracked.checks[0].id}`)).toBeNull();
+    expect(draft.value).toBe(kind === "entry" ? "" : "Unsaved note");
+    expect(screen.queryByRole("button", { name: "Save activity" })).toBeNull();
+  });
+
+  it("protects an observation and file when a shared reload removes the selected batch", async () => {
+    status = { state: "ready", location: "Kitchen/shared", message: "Ready", conflicts: [] };
+    const reload = vi.spyOn(sharedDataStore, "reload").mockResolvedValue({ status, snapshot: { shell: createShellState(), profileState: profiles, batchState: createBatchState() } });
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    render(<App />);
+    await act(async () => {});
+    fireEvent.click(screen.getByRole("button", { name: "More batch tools" }));
+    fireEvent.click(screen.getByRole("button", { name: "Photo" }));
+    const file = screen.getByLabelText("Photo") as HTMLInputElement;
+    const selected = new File(["bytes"], "draft.jpg", { type: "image/jpeg" });
+    fireEvent.change(file, { target: { files: [selected] } });
+    const caption = screen.getByLabelText("Caption") as HTMLInputElement;
+    fireEvent.change(caption, { target: { value: "Unsaved caption" } });
+    await act(async () => fireEvent.focus(window));
+    expect(reload).toHaveBeenCalledOnce();
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Photo")).toBe(file);
+    expect(file.files?.[0]).toBe(selected);
+    expect(caption.value).toBe("Unsaved caption");
+    expect(screen.getByText(/Shared data was not loaded because it would discard/)).toBeTruthy();
+    confirm.mockReturnValue(true);
+    await act(async () => fireEvent.focus(window));
+    expect(screen.getByRole("heading", { name: "Your batch details" })).toBeTruthy();
+    expect(document.querySelector("#batch-activity-form")).toBeNull();
+  });
+
   it("exposes named groups, dark-selection semantics, formula feedback and bundled licenses", async () => {
     const settings = await openSettings();
     for (const name of ["Household preferences", "Notifications", "Data storage", "Data exchange", "Recently deleted batches", "Formula dropdown terms", "About FermentStation", "Credits and licenses"]) {
