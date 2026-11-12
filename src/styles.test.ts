@@ -221,4 +221,16 @@ describe("installed appearance and provenance", () => {
     expect(app).toContain("Not used by the current interface.");
   });
 
+  it("reuses the unchanged real logo for the Android launch rather than the Capacitor placeholder", () => {
+    expect(read("../capacitor.config.ts")).toContain('iconColor: "#1c1c1c"');
+    const colors = read("../android/app/src/main/res/values/colors.xml");
+    for (const value of ["#1c1c1c", "#b6f074", "#ffffff"]) expect(colors).toContain(value);
+    const launch = read("../android/app/src/main/res/values/styles.xml");
+    expect(launch).not.toContain("@drawable/splash");
+    expect(launch).toContain("@drawable/station_launch_background");
+    expect(launch).toContain("@drawable/station_launch_icon");
+    expect(launch).toContain('name="postSplashScreenTheme">@style/AppTheme.NoActionBar');
+    const original = readFileSync(new URL("../public/new-design/new_app_logo/FermentStation_Logo_Asset_Pack/transparent/logo-transparent-432.png", import.meta.url));
+    expect(readFileSync(new URL("../android/app/src/main/res/drawable-nodpi/station_launch_logo.png", import.meta.url))).toEqual(original);
+  });
 });

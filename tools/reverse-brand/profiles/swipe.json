@@ -1,0 +1,50 @@
+{
+  "brand": "Swipe Drinks",
+  "source": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+  "scope": "embedded-artwork",
+  "rasterBoardMediaAlt": "Swipe Drinks simplified drink flow and token screens by Orbix Studio",
+  "colourRoles": {
+    "background": "#ffffff", "surface": "#ffec89", "surface-inverse": "#1c1c1c",
+    "text": "#1c1c1c", "text-muted": "#1c1c1c", "text-inverse": "#ffffff",
+    "action": "#b6f074", "on-action": "#1c1c1c", "action-alt": "#dab8f1", "accent": "#b6e1fa", "border": "#1c1c1c"
+  },
+  "families": [{"name":"Circular Std","share":null,"weights":["Book","Medium","Bold"],"status":"named in raster style board; original font files not copied; usage share unknown"}],
+  "roles": {
+    "display":{"desktop":96,"mobile":48,"weight":500,"lineHeight":1,"tracking":-0.055,"font":"Circular Std, Arial, sans-serif","status":"reconstructed; artwork has no computed type"},
+    "h1":{"desktop":72,"mobile":40,"weight":500,"lineHeight":1.02,"tracking":-0.045,"font":"Circular Std, Arial, sans-serif","status":"reconstructed"},
+    "h2":{"desktop":56,"mobile":34,"weight":500,"lineHeight":1.06,"tracking":-0.04,"font":"Circular Std, Arial, sans-serif","status":"reconstructed"},
+    "h3":{"desktop":32,"mobile":28,"weight":500,"lineHeight":1.12,"tracking":-0.03,"font":"Circular Std, Arial, sans-serif","status":"reconstructed"},
+    "h4":{"desktop":24,"mobile":22,"weight":500,"lineHeight":1.2,"tracking":-0.02,"font":"Circular Std, Arial, sans-serif","status":"reconstructed"},
+    "lead":{"desktop":24,"mobile":20,"weight":400,"lineHeight":1.4,"tracking":-0.02,"font":"Circular Std, Arial, sans-serif","status":"reconstructed"},
+    "body":{"desktop":18,"mobile":18,"weight":400,"lineHeight":1.5,"tracking":0,"font":"Circular Std, Arial, sans-serif","status":"18 PX declared in raster board; mobile size and leading reconstructed"},
+    "small":{"desktop":14,"mobile":14,"weight":400,"lineHeight":1.4,"tracking":0,"font":"Circular Std, Arial, sans-serif","status":"reconstructed"}
+  },
+  "layout":{"container":1280,"columns":12,"gutter":24,"breakpoints":["640px","1024px"],"status":"guide reconstruction, not measured app CSS"},
+  "quotes":[
+    {"text":"Welcome to Juice Buddies!","source":"https://www.orbix.studio/case-studies/swipe-drinks-app","status":"manually transcribed artwork, style board"},
+    {"text":"The coolest app for kids who love sharing delicious drinks with friends.","source":"https://www.orbix.studio/case-studies/swipe-drinks-app","status":"manually transcribed artwork, style board"},
+    {"text":"Explore fruity flavors and refreshing concoctions!","source":"https://www.orbix.studio/case-studies/swipe-drinks-app","status":"manually transcribed artwork, style board"},
+    {"text":"Join us in spreading happiness, one sip at a time!","source":"https://www.orbix.studio/case-studies/swipe-drinks-app","status":"manually transcribed artwork, style board"},
+    {"text":"Download Swipedrinks now and let the juice-sharing adventures begin!","source":"https://www.orbix.studio/case-studies/swipe-drinks-app","status":"manually transcribed artwork, style board"}
+  ],
+  "ctas":["Swipe Now","Scan","Download Swipedrinks"],
+  "reconstruction":{"cardRadius":32,"buttonRadius":999,"buttonHeight":52,"cardPadding":24,"inputHeight":52,"navHeight":76,"easing":"cubic-bezier(0.2, 0.8, 0.2, 1)","status":"all geometry and easing inferred from visual evidence; no original app stylesheet"},
+  "rasterEvidence":[
+    {"name":"yellow","declared":"#ffec89","sample":"#ffec88","cropXY":[90,790]},
+    {"name":"dark","declared":null,"sample":"#1c1c1c","cropXY":[300,800],"note":"Printed hex repeats yellow; rejected as inconsistent with dark fill."},
+    {"name":"lime","declared":"#b6f074","sample":"#b7f075","cropXY":[820,820]},
+    {"name":"lilac","declared":"#dab8f1","sample":"#d9b8f1","cropXY":[100,1120]},
+    {"name":"blue","declared":"#b6e1fa","sample":"#b6e2fa","cropXY":[760,1120]}
+  ],
+  "photography":"Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs.",
+  "assumptions":[
+    "Swipe is represented as raster artwork in an Orbix case study, not a live Swipe website. Orbix homepage plus four key pages and mobile passes are contextual evidence only.",
+    "Circular Std and Book/Medium/Bold are declared visually. Numeric weights 400/500/700 are conventional mappings, not extracted font metadata. Font usage share and local availability are not assumed.",
+    "Four pastel hex values are transcribed from the style board. Ten-by-ten screenshot pixel samples differ slightly due to compression. Black #1c1c1c is sampled because its printed value is inconsistent. White is observed in the artwork; role assignments are inferred.",
+    "The only declared type size is 18 PX. All other role sizes, line heights, tracking, responsive clamps, grid, spacing, radii, button geometry and inputs are guide reconstructions, not measured Swipe CSS.",
+    "No Swipe header or logo bounding box can be measured as a DOM element. Dashed logo frame is a 144 by 40 px reconstructed slot; it is not a copied mark.",
+    "No original Swipe gradients, easing or responsive breakpoints are available. Gradient, easing and breakpoints are reconstructed and labelled as such.",
+    "Voice statistics cover only the five transcribed artwork excerpts and three observed CTA labels, not all app copy. Orbix prose is excluded from Swipe voice claims.",
+    "Manual image mode makes no image-provider calls. The light edition uses gradients; the hero edition uses imported images where supplied and gradients for missing slots. AI status is declared by manual import, not detected from pixels. External image-generation costs are unknown to this CLI."
+  ]
+}

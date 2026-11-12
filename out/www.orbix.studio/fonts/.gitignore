@@ -1,0 +1,8 @@
+# Original font binaries require license review before any public redistribution.
+**/fonts/*.otf
+**/fonts/*.ttf
+**/fonts/*.woff
+**/fonts/*.woff2
+charset/actual-font-coverage.json
+__pycache__/
+*.pyc

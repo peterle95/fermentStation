@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
   plugins: {
     LocalNotifications: {
       smallIcon: "ic_stat_fermentstation",
-      iconColor: "#9D4934",
+      iconColor: "#1c1c1c",
     },
   },
 };

@@ -1,0 +1,50 @@
+{
+  "target": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+  "brand": "Swipe Drinks",
+  "mode": "manual",
+  "timings": {
+    "capture": 179,
+    "analyse": 90,
+    "tokens": 7,
+    "images": 4397,
+    "guide": 70,
+    "slides": 4983,
+    "video": 731935,
+    "verification": 42181
+  },
+  "sizes": [
+    [
+      "brand-guide.html",
+      100810
+    ],
+    [
+      "brand-guide-hero.html",
+      693955
+    ],
+    [
+      "tokens.css",
+      3337
+    ],
+    [
+      "tokens.json",
+      39371
+    ],
+    [
+      "snapshot.json",
+      13925580
+    ],
+    [
+      "analysis.json",
+      53357
+    ]
+  ],
+  "video": {
+    "frames": 2700,
+    "stills": 11,
+    "file": "C:\\Users\\molze\\GitHub\\fermentstation\\out\\www.orbix.studio\\video\\www.orbix.studio-presentation-1920x1080-60fps.mp4",
+    "status": "rendered"
+  },
+  "validation": true,
+  "imageProviderSpend": 0,
+  "llmCost": null
+}

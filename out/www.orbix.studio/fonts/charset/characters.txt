@@ -1,0 +1,29 @@
+Uppercase A–Z
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+Lowercase a–z
+abcdefghijklmnopqrstuvwxyz
+
+Numerals
+0123456789
+
+ASCII punctuation & keyboard symbols
+!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+
+Latin-1 and Western European accents
+¡¢£¤¥¦§¨©ª«¬®¯°±²³´¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
+
+Latin Extended-A
+ĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžſ
+
+Additional accented Latin
+ƒǼǽǾǿȘșȚțȷẀẁẂẃẄẅỲỳ
+
+Diacritic marks
+ˆˇ˘˙˚˛˜˝
+
+Editorial punctuation & ligatures
+–—‘’‚“”„†‡•…‰‹›⁄⁴™−ﬁﬂ
+
+Currency, math and other symbols
+¢£¤¥§©®°±×÷¼½¾€μ

@@ -1,0 +1,90 @@
+{
+  "mode": "manual",
+  "source": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+  "reference": "Text description only; never use source photographs as image inputs.",
+  "cost": 0,
+  "style": "Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs.",
+  "slots": [
+    {
+      "slot": "hero",
+      "aspectRatio": "16:9",
+      "resolution": 2000,
+      "prompt": "Wide still life of a grapefruit soda in an unbranded clear tumbler with lime slices on a lemon-yellow studio sweep; leave the upper left calm and open. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/hero.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    },
+    {
+      "slot": "horizon",
+      "aspectRatio": "16:9",
+      "resolution": 2000,
+      "prompt": "Low horizon of softly lit mint-green and pale-blue studio planes, one tiny chilled pear soda at the far right; generous empty foreground. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/horizon.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    },
+    {
+      "slot": "object",
+      "aspectRatio": "4:5",
+      "resolution": 1400,
+      "prompt": "Single polished chrome sphere beside a translucent ice-blue acrylic cylinder on a lime-green seamless studio surface, orderly reflections. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/object.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    },
+    {
+      "slot": "street",
+      "aspectRatio": "4:5",
+      "resolution": 1400,
+      "prompt": "Candid daylight crop of adult friends holding unbranded citrus sodas outside an outdoor music event; no identifiable venue or signage. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/street.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    },
+    {
+      "slot": "sky",
+      "aspectRatio": "16:9",
+      "resolution": 2000,
+      "prompt": "Clean pale-blue summer sky above a narrow band of chartreuse-green grass, crisp horizon, soft natural light. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/sky.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    },
+    {
+      "slot": "glass",
+      "aspectRatio": "4:5",
+      "resolution": 1400,
+      "prompt": "Orderly row of three clear glass cylinders with condensation and one sliced kiwi on a pastel lilac studio surface, frontal material study. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/glass.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    },
+    {
+      "slot": "grid",
+      "aspectRatio": "16:9",
+      "resolution": 2000,
+      "prompt": "Top-down still life of neatly aligned unbranded glass tumblers and lime halves in a regular twelve-column-inspired arrangement on a pale yellow surface. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/grid.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    },
+    {
+      "slot": "tokens",
+      "aspectRatio": "4:5",
+      "resolution": 1400,
+      "prompt": "Small blank lime-green ceramic discs in a precise staggered stack beside a translucent blue cube on a clean black studio surface. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/tokens.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    },
+    {
+      "slot": "fruit",
+      "aspectRatio": "4:5",
+      "resolution": 1400,
+      "prompt": "Macro close-up of freshly cut pink grapefruit, pear and kiwi with small clear ice cubes on a pale-blue studio sweep, tactile and sharply focused. Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs. New composition and new subjects, photorealistic, no text, letters, logos, brand marks, cards or app screens",
+      "file": "images/fruit.png",
+      "status": "awaiting manual generation",
+      "cost": null
+    }
+  ]
+}

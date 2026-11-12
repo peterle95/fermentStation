@@ -1,0 +1,20 @@
+[
+  {
+    "time": 2,
+    "scene": "01",
+    "path": "out/www.orbix.studio/screenshots/review/manual-images-encoded-scene-01.png",
+    "bytes": 591514
+  },
+  {
+    "time": 30,
+    "scene": "08",
+    "path": "out/www.orbix.studio/screenshots/review/manual-images-encoded-scene-08.png",
+    "bytes": 827191
+  },
+  {
+    "time": 42,
+    "scene": "11",
+    "path": "out/www.orbix.studio/screenshots/review/manual-images-encoded-scene-11.png",
+    "bytes": 544470
+  }
+]

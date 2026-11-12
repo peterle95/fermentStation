@@ -25,6 +25,7 @@ Geometry, spacing and responsive behavior are app adaptations, not measured orig
 
 The user-supplied orange cat-and-jar logo is unchanged artwork. Native launch and install-icon redesign are not part of issue #56. Keep source palette aliases in `--editor-*` and `--component-*` rather than reviving independent themes. User photos retain their original bytes and natural rectangular framing; stand-ins are visibly identified, and loading/broken images retain their space with a neutral jar fallback. A failed user photograph is never silently replaced by a stand-in.
 
+The five install/head icons in `public/` are byte-identical copies from the logo pack's `drop-in-assets/`. Their originals remain untouched. HTML icon URLs use Vite's `%BASE_URL%`; manifest icon paths stay relative to the manifest. Keep these actual PNG files and their precache entries together for both root and `/fermentStation/` installs.
 
 ## Historical font assets
 

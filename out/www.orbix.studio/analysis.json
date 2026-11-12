@@ -1,0 +1,2256 @@
+{
+  "brand": "Swipe Drinks",
+  "source": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+  "scope": "embedded-artwork",
+  "elements": 8962,
+  "removedChrome": 1312,
+  "pages": [
+    {
+      "url": "https://www.orbix.studio/",
+      "elements": 3197
+    },
+    {
+      "url": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+      "elements": 1706
+    },
+    {
+      "url": "https://www.orbix.studio/pricing",
+      "elements": 1819
+    },
+    {
+      "url": "https://www.orbix.studio/about",
+      "elements": 1990
+    },
+    {
+      "url": "https://www.orbix.studio/contact",
+      "elements": 1562
+    }
+  ],
+  "colours": [
+    {
+      "hex": "#ffffff",
+      "oklch": "oklch(100% 0 0)",
+      "text": 3333,
+      "background": 69024519.48529997,
+      "textShare": 17.44,
+      "backgroundShare": 38.52
+    },
+    {
+      "hex": "#f3f4f6",
+      "oklch": "oklch(96.7% 0.0029 264.54)",
+      "text": 136,
+      "background": 40824043.27520001,
+      "textShare": 0.71,
+      "backgroundShare": 22.79
+    },
+    {
+      "hex": "#010101",
+      "oklch": "oklch(6.72% 0 0)",
+      "text": 820,
+      "background": 28693187.712499987,
+      "textShare": 4.29,
+      "backgroundShare": 16.01
+    },
+    {
+      "hex": "#fafafa",
+      "oklch": "oklch(98.51% 0 0)",
+      "text": 0,
+      "background": 13533127.630200002,
+      "textShare": 0,
+      "backgroundShare": 7.55
+    },
+    {
+      "hex": "#f9fafa",
+      "oklch": "oklch(98.43% 0.0011 197.14)",
+      "text": 0,
+      "background": 13513349.361200003,
+      "textShare": 0,
+      "backgroundShare": 7.54
+    },
+    {
+      "hex": "#f1f1f1",
+      "oklch": "oklch(95.81% 0 0)",
+      "text": 0,
+      "background": 1640030.4000000001,
+      "textShare": 0,
+      "backgroundShare": 0.92
+    },
+    {
+      "hex": "#f94c00",
+      "oklch": "oklch(65.67% 0.2188 37.21)",
+      "text": 0,
+      "background": 1309517.2992,
+      "textShare": 0,
+      "backgroundShare": 0.73
+    },
+    {
+      "hex": "#4219a8",
+      "oklch": "oklch(38.49% 0.2027 284.71)",
+      "text": 0,
+      "background": 1308960,
+      "textShare": 0,
+      "backgroundShare": 0.73
+    },
+    {
+      "hex": "#171717",
+      "oklch": "oklch(20.46% 0 0)",
+      "text": 0,
+      "background": 1296000,
+      "textShare": 0,
+      "backgroundShare": 0.72
+    },
+    {
+      "hex": "#f55c1a",
+      "oklch": "oklch(66.87% 0.2002 39.79)",
+      "text": 0,
+      "background": 1296000,
+      "textShare": 0,
+      "backgroundShare": 0.72
+    },
+    {
+      "hex": "#6536d7",
+      "oklch": "oklch(49.47% 0.227 288.48)",
+      "text": 0,
+      "background": 1296000,
+      "textShare": 0,
+      "backgroundShare": 0.72
+    },
+    {
+      "hex": "#15182c",
+      "oklch": "oklch(21.7% 0.0395 276.11)",
+      "text": 0,
+      "background": 1296000,
+      "textShare": 0,
+      "backgroundShare": 0.72
+    },
+    {
+      "hex": "#fff6f4",
+      "oklch": "oklch(97.96% 0.0101 32.52)",
+      "text": 0,
+      "background": 823529.7015000001,
+      "textShare": 0,
+      "backgroundShare": 0.46
+    },
+    {
+      "hex": "#090909",
+      "oklch": "oklch(13.98% 0 0)",
+      "text": 0,
+      "background": 599040,
+      "textShare": 0,
+      "backgroundShare": 0.33
+    },
+    {
+      "hex": "#f8f8f8",
+      "oklch": "oklch(97.91% 0 0)",
+      "text": 0,
+      "background": 480000,
+      "textShare": 0,
+      "backgroundShare": 0.27
+    },
+    {
+      "hex": "#fcdddb",
+      "oklch": "oklch(92.26% 0.0346 22.2)",
+      "text": 0,
+      "background": 340009.65599999996,
+      "textShare": 0,
+      "backgroundShare": 0.19
+    },
+    {
+      "hex": "#ffddfa",
+      "oklch": "oklch(93.42% 0.0531 330.85)",
+      "text": 0,
+      "background": 329951.6066,
+      "textShare": 0,
+      "backgroundShare": 0.18
+    },
+    {
+      "hex": "#e7d7f8",
+      "oklch": "oklch(90.21% 0.0476 307.24)",
+      "text": 0,
+      "background": 329951.6066,
+      "textShare": 0,
+      "backgroundShare": 0.18
+    },
+    {
+      "hex": "#fdfdfd",
+      "oklch": "oklch(99.4% 0 0)",
+      "text": 0,
+      "background": 290920.88310000004,
+      "textShare": 0,
+      "backgroundShare": 0.16
+    },
+    {
+      "hex": "#f0f0f0",
+      "oklch": "oklch(95.51% 0 0)",
+      "text": 0,
+      "background": 235821.6136,
+      "textShare": 0,
+      "backgroundShare": 0.13
+    },
+    {
+      "hex": "#efdcc3",
+      "oklch": "oklch(90.34% 0.0393 74.78)",
+      "text": 0,
+      "background": 198151.1,
+      "textShare": 0,
+      "backgroundShare": 0.11
+    },
+    {
+      "hex": "#fedfdd",
+      "oklch": "oklch(92.86% 0.0345 22.2)",
+      "text": 0,
+      "background": 165003.9992,
+      "textShare": 0,
+      "backgroundShare": 0.09
+    },
+    {
+      "hex": "#ffe1df",
+      "oklch": "oklch(93.38% 0.0333 22.32)",
+      "text": 0,
+      "background": 165003.9992,
+      "textShare": 0,
+      "backgroundShare": 0.09
+    },
+    {
+      "hex": "#020202",
+      "oklch": "oklch(8.47% 0 0)",
+      "text": 0,
+      "background": 40432,
+      "textShare": 0,
+      "backgroundShare": 0.02
+    },
+    {
+      "hex": "#e8e8e8",
+      "oklch": "oklch(93.1% 0 0)",
+      "text": 0,
+      "background": 27226.0394,
+      "textShare": 0,
+      "backgroundShare": 0.02
+    },
+    {
+      "hex": "#ff3333",
+      "oklch": "oklch(64.89% 0.237 26.97)",
+      "text": 0,
+      "background": 20738.6434,
+      "textShare": 0,
+      "backgroundShare": 0.01
+    },
+    {
+      "hex": "#9a2eb7",
+      "oklch": "oklch(52.43% 0.2132 318.04)",
+      "text": 0,
+      "background": 12590.217,
+      "textShare": 0,
+      "backgroundShare": 0.01
+    },
+    {
+      "hex": "#f0ffef",
+      "oklch": "oklch(98.46% 0.0262 143.61)",
+      "text": 0,
+      "background": 11820.2877,
+      "textShare": 0,
+      "backgroundShare": 0.01
+    },
+    {
+      "hex": "#6537d7",
+      "oklch": "oklch(49.59% 0.226 288.36)",
+      "text": 0,
+      "background": 10250.561200000002,
+      "textShare": 0,
+      "backgroundShare": 0.01
+    },
+    {
+      "hex": "#fcebff",
+      "oklch": "oklch(95.93% 0.032 321.14)",
+      "text": 0,
+      "background": 7396.116,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#e6e6e6",
+      "oklch": "oklch(92.49% 0 0)",
+      "text": 0,
+      "background": 7261.3200000000015,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#e2ffe0",
+      "oklch": "oklch(97.09% 0.0508 143.42)",
+      "text": 0,
+      "background": 7120.815,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#ffeee0",
+      "oklch": "oklch(95.89% 0.0262 62.01)",
+      "text": 0,
+      "background": 6796.335000000001,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#ff592a",
+      "oklch": "oklch(68.19% 0.2099 35.84)",
+      "text": 0,
+      "background": 4239.872,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#213fb6",
+      "oklch": "oklch(43.03% 0.1904 266.64)",
+      "text": 0,
+      "background": 3136,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#000000",
+      "oklch": "oklch(0% 0 0)",
+      "text": 10129,
+      "background": 3040,
+      "textShare": 53.01,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#2ec1df",
+      "oklch": "oklch(75% 0.1235 215.48)",
+      "text": 0,
+      "background": 2770.9696,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#025db5",
+      "oklch": "oklch(48.49% 0.1578 254.87)",
+      "text": 0,
+      "background": 2411.3674,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#ececec",
+      "oklch": "oklch(94.31% 0 0)",
+      "text": 0,
+      "background": 2411.3674,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#edf2fc",
+      "oklch": "oklch(96.03% 0.0144 264.5)",
+      "text": 0,
+      "background": 2296.9182,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#f2f1fd",
+      "oklch": "oklch(96.24% 0.016 289.93)",
+      "text": 0,
+      "background": 2235.5080000000003,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#b43b2a",
+      "oklch": "oklch(52.5% 0.1598 30.94)",
+      "text": 0,
+      "background": 2108.6464,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#efefef",
+      "oklch": "oklch(95.21% 0 0)",
+      "text": 0,
+      "background": 2055,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#ecfba9",
+      "oklch": "oklch(95.82% 0.105 116.87)",
+      "text": 0,
+      "background": 1440,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#dbdbdb",
+      "oklch": "oklch(89.14% 0 0)",
+      "text": 0,
+      "background": 440,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#fefefe",
+      "oklch": "oklch(99.7% 0 0)",
+      "text": 12,
+      "background": 144,
+      "textShare": 0.06,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#dfdbdb",
+      "oklch": "oklch(89.46% 0.0044 17.24)",
+      "text": 0,
+      "background": 128.4725,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#1fb6dc",
+      "oklch": "oklch(72.03% 0.1266 220.84)",
+      "text": 0,
+      "background": 128.4725,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#7b90af",
+      "oklch": "oklch(64.81% 0.0525 258.01)",
+      "text": 0,
+      "background": 120,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#408baa",
+      "oklch": "oklch(60.22% 0.0875 228)",
+      "text": 0,
+      "background": 120,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#e7e9ef",
+      "oklch": "oklch(93.42% 0.0084 271.32)",
+      "text": 0,
+      "background": 112.57399999999998,
+      "textShare": 0,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#13ae4c",
+      "oklch": "oklch(65.7% 0.1821 148.73)",
+      "text": 90,
+      "background": 23.3523,
+      "textShare": 0.47,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#0b1d3a",
+      "oklch": "oklch(23.38% 0.0609 259.52)",
+      "text": 184,
+      "background": 0,
+      "textShare": 0.96,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#22541f",
+      "oklch": "oklch(39.81% 0.0991 142.48)",
+      "text": 21,
+      "background": 0,
+      "textShare": 0.11,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#4b5563",
+      "oklch": "oklch(44.61% 0.0263 256.8)",
+      "text": 19,
+      "background": 0,
+      "textShare": 0.1,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#af50f7",
+      "oklch": "oklch(62.89% 0.2403 306.78)",
+      "text": 6,
+      "background": 0,
+      "textShare": 0.03,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#075df7",
+      "oklch": "oklch(54.04% 0.2408 261.85)",
+      "text": 15,
+      "background": 0,
+      "textShare": 0.08,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#222222",
+      "oklch": "oklch(25.2% 0 0)",
+      "text": 1443,
+      "background": 0,
+      "textShare": 7.55,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#424242",
+      "oklch": "oklch(37.91% 0 0)",
+      "text": 2620,
+      "background": 0,
+      "textShare": 13.71,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#111111",
+      "oklch": "oklch(17.76% 0 0)",
+      "text": 242,
+      "background": 0,
+      "textShare": 1.27,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#1a5cf6",
+      "oklch": "oklch(54.02% 0.2387 263.19)",
+      "text": 10,
+      "background": 0,
+      "textShare": 0.05,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#245320",
+      "oklch": "oklch(39.61% 0.0955 142.12)",
+      "text": 9,
+      "background": 0,
+      "textShare": 0.05,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#bb651f",
+      "oklch": "oklch(59.56% 0.1352 54.27)",
+      "text": 9,
+      "background": 0,
+      "textShare": 0.05,
+      "backgroundShare": 0
+    },
+    {
+      "hex": "#9f38b2",
+      "oklch": "oklch(53.75% 0.1993 321.02)",
+      "text": 10,
+      "background": 0,
+      "textShare": 0.05,
+      "backgroundShare": 0
+    }
+  ],
+  "colourRoles": {
+    "background": "#ffffff",
+    "surface": "#ffec89",
+    "surface-inverse": "#1c1c1c",
+    "text": "#1c1c1c",
+    "text-muted": "#1c1c1c",
+    "text-inverse": "#ffffff",
+    "action": "#b6f074",
+    "on-action": "#1c1c1c",
+    "action-alt": "#dab8f1",
+    "accent": "#b6e1fa",
+    "border": "#1c1c1c"
+  },
+  "roles": {
+    "display": {
+      "desktop": 96,
+      "mobile": 48,
+      "weight": 500,
+      "lineHeight": 1,
+      "tracking": -0.055,
+      "font": "Circular Std, Arial, sans-serif",
+      "status": "reconstructed; artwork has no computed type"
+    },
+    "h1": {
+      "desktop": 72,
+      "mobile": 40,
+      "weight": 500,
+      "lineHeight": 1.02,
+      "tracking": -0.045,
+      "font": "Circular Std, Arial, sans-serif",
+      "status": "reconstructed"
+    },
+    "h2": {
+      "desktop": 56,
+      "mobile": 34,
+      "weight": 500,
+      "lineHeight": 1.06,
+      "tracking": -0.04,
+      "font": "Circular Std, Arial, sans-serif",
+      "status": "reconstructed"
+    },
+    "h3": {
+      "desktop": 32,
+      "mobile": 28,
+      "weight": 500,
+      "lineHeight": 1.12,
+      "tracking": -0.03,
+      "font": "Circular Std, Arial, sans-serif",
+      "status": "reconstructed"
+    },
+    "h4": {
+      "desktop": 24,
+      "mobile": 22,
+      "weight": 500,
+      "lineHeight": 1.2,
+      "tracking": -0.02,
+      "font": "Circular Std, Arial, sans-serif",
+      "status": "reconstructed"
+    },
+    "lead": {
+      "desktop": 24,
+      "mobile": 20,
+      "weight": 400,
+      "lineHeight": 1.4,
+      "tracking": -0.02,
+      "font": "Circular Std, Arial, sans-serif",
+      "status": "reconstructed"
+    },
+    "body": {
+      "desktop": 18,
+      "mobile": 18,
+      "weight": 400,
+      "lineHeight": 1.5,
+      "tracking": 0,
+      "font": "Circular Std, Arial, sans-serif",
+      "status": "18 PX declared in raster board; mobile size and leading reconstructed"
+    },
+    "small": {
+      "desktop": 14,
+      "mobile": 14,
+      "weight": 400,
+      "lineHeight": 1.4,
+      "tracking": 0,
+      "font": "Circular Std, Arial, sans-serif",
+      "status": "reconstructed"
+    }
+  },
+  "families": [
+    {
+      "name": "Circular Std",
+      "share": null,
+      "weights": [
+        "Book",
+        "Medium",
+        "Bold"
+      ],
+      "status": "named in raster style board; original font files not copied; usage share unknown"
+    }
+  ],
+  "spacing": {
+    "base": 4,
+    "onGrid": [
+      [
+        4,
+        null
+      ],
+      [
+        8,
+        null
+      ],
+      [
+        12,
+        null
+      ],
+      [
+        16,
+        null
+      ],
+      [
+        24,
+        null
+      ],
+      [
+        32,
+        null
+      ],
+      [
+        48,
+        null
+      ],
+      [
+        64,
+        null
+      ],
+      [
+        96,
+        null
+      ]
+    ],
+    "offGrid": [],
+    "status": "reconstructed; original app spacing unavailable"
+  },
+  "layout": {
+    "container": 1280,
+    "columns": 12,
+    "gutter": 24,
+    "breakpoints": [
+      "640px",
+      "1024px"
+    ],
+    "status": "guide reconstruction, not measured app CSS"
+  },
+  "buttons": [],
+  "cards": [],
+  "input": null,
+  "nav": null,
+  "radii": [],
+  "gradients": [],
+  "easings": [
+    [
+      "ease",
+      8933
+    ],
+    [
+      "cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.16, 1, 0.3, 1)",
+      26
+    ],
+    [
+      "cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.16, 1, 0.3, 1)",
+      2
+    ],
+    [
+      "ease, ease",
+      1
+    ]
+  ],
+  "imagery": {
+    "count": 42,
+    "mediaAreaShare": 41.02,
+    "fullBleedShare": 2.38,
+    "objectFit": [
+      [
+        "cover",
+        42
+      ]
+    ],
+    "formats": [
+      [
+        "svg",
+        23
+      ],
+      [
+        "avif",
+        19
+      ]
+    ],
+    "themes": [
+      "Thin horizontal right arrow icon.",
+      "Gold vertical ribbon badge reading UI.",
+      "Adobe XD logo in pink on a dark background.",
+      "Adobe XD design tool badge for Swipe Drinks event tech app case study by Orbix Studio",
+      "Orange directional triangle pointer graphic.",
+      "Orange directional triangle pointer graphic.",
+      "Swipe Drinks mobile app interface design by Orbix Studio",
+      "Swipe Drinks app onboarding and token purchase screen by Orbix Studio",
+      "Swipe Drinks drink selection and token balance screen by Orbix Studio",
+      "Swipe Drinks token top-up and payment screen by Orbix Studio",
+      "Swipe Drinks parent dashboard and spending control screen by Orbix Studio",
+      "Swipe Drinks simplified drink flow and token screens by Orbix Studio",
+      "Swipe Drinks app design process and workflow overview by Orbix Studio",
+      "Swipe Drinks user research and event flow analysis by Orbix Studio",
+      "Swipe Drinks app flow and navigation structure design by Orbix Studio",
+      "Swipe Drinks token system screen layout design by Orbix Studio",
+      "Swipe Drinks colorful event-themed app interface design by Orbix Studio",
+      "Swipe Drinks playful visual style and UI elements by Orbix Studio"
+    ]
+  },
+  "rhythm": [],
+  "quotes": [
+    {
+      "text": "Welcome to Juice Buddies!",
+      "source": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+      "status": "manually transcribed artwork, style board"
+    },
+    {
+      "text": "The coolest app for kids who love sharing delicious drinks with friends.",
+      "source": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+      "status": "manually transcribed artwork, style board"
+    },
+    {
+      "text": "Explore fruity flavors and refreshing concoctions!",
+      "source": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+      "status": "manually transcribed artwork, style board"
+    },
+    {
+      "text": "Join us in spreading happiness, one sip at a time!",
+      "source": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+      "status": "manually transcribed artwork, style board"
+    },
+    {
+      "text": "Download Swipedrinks now and let the juice-sharing adventures begin!",
+      "source": "https://www.orbix.studio/case-studies/swipe-drinks-app",
+      "status": "manually transcribed artwork, style board"
+    }
+  ],
+  "voice": {
+    "corpusLines": 5,
+    "words": 41,
+    "meanHeadlineWords": 8.2,
+    "you": 0,
+    "we": 0,
+    "numbers": 0,
+    "exclamations": 4,
+    "commaPattern": 1,
+    "sentenceCase": 5,
+    "ctaVerbs": [
+      [
+        "swipe",
+        1
+      ],
+      [
+        "scan",
+        1
+      ],
+      [
+        "download",
+        1
+      ]
+    ]
+  },
+  "rules": [
+    "Keep headlines near the observed mean of 8.2 words; this is a sample, not a rule from the owner.",
+    "Use the observed address balance: 0 “you/your” and 0 “we” in the quote corpus.",
+    "Match punctuation deliberately: 4 exclamation marks and 1 single-comma lines in 5 quotes."
+  ],
+  "assumptions": [
+    "Computed DOM styles describe the host page, not typography or layout rasterised inside artwork.",
+    "Background areas overlap; painted-area weights are estimates, not exclusive pixel coverage.",
+    "Normal line-height is unknown; no font files or source images are exported.",
+    "Colour roles are assigned, not original named variables.",
+    "Offline fonts use locally installed families only; unavailable fonts fall back to Arial.",
+    "Missing role sizes, grid columns, gutters and form components are explicitly reconstructed.",
+    "Swipe is represented as raster artwork in an Orbix case study, not a live Swipe website. Orbix homepage plus four key pages and mobile passes are contextual evidence only.",
+    "Circular Std and Book/Medium/Bold are declared visually. Numeric weights 400/500/700 are conventional mappings, not extracted font metadata. Font usage share and local availability are not assumed.",
+    "Four pastel hex values are transcribed from the style board. Ten-by-ten screenshot pixel samples differ slightly due to compression. Black #1c1c1c is sampled because its printed value is inconsistent. White is observed in the artwork; role assignments are inferred.",
+    "The only declared type size is 18 PX. All other role sizes, line heights, tracking, responsive clamps, grid, spacing, radii, button geometry and inputs are guide reconstructions, not measured Swipe CSS.",
+    "No Swipe header or logo bounding box can be measured as a DOM element. Dashed logo frame is a 144 by 40 px reconstructed slot; it is not a copied mark.",
+    "No original Swipe gradients, easing or responsive breakpoints are available. Gradient, easing and breakpoints are reconstructed and labelled as such.",
+    "Voice statistics cover only the five transcribed artwork excerpts and three observed CTA labels, not all app copy. Orbix prose is excluded from Swipe voice claims.",
+    "Manual image mode makes no image-provider calls. The light edition uses gradients; the hero edition uses imported images where supplied and gradients for missing slots. AI status is declared by manual import, not detected from pixels. External image-generation costs are unknown to this CLI.",
+    "Palette bar proportions count nearest pixels within RGB distance 15 in screenshots/source/type-board.png; unmatched photographic pixels are excluded. This is not app-wide usage."
+  ],
+  "declaredVariables": {},
+  "reconstruction": {
+    "cardRadius": 32,
+    "buttonRadius": 999,
+    "buttonHeight": 52,
+    "cardPadding": 24,
+    "inputHeight": 52,
+    "navHeight": 76,
+    "easing": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+    "status": "all geometry and easing inferred from visual evidence; no original app stylesheet"
+  },
+  "rasterEvidence": [
+    {
+      "name": "yellow",
+      "declared": "#ffec89",
+      "sample": "#ffec88",
+      "cropXY": [
+        90,
+        790
+      ]
+    },
+    {
+      "name": "dark",
+      "declared": null,
+      "sample": "#1c1c1c",
+      "cropXY": [
+        300,
+        800
+      ],
+      "note": "Printed hex repeats yellow; rejected as inconsistent with dark fill."
+    },
+    {
+      "name": "lime",
+      "declared": "#b6f074",
+      "sample": "#b7f075",
+      "cropXY": [
+        820,
+        820
+      ]
+    },
+    {
+      "name": "lilac",
+      "declared": "#dab8f1",
+      "sample": "#d9b8f1",
+      "cropXY": [
+        100,
+        1120
+      ]
+    },
+    {
+      "name": "blue",
+      "declared": "#b6e1fa",
+      "sample": "#b6e2fa",
+      "cropXY": [
+        760,
+        1120
+      ]
+    }
+  ],
+  "photography": "Bright studio beverage photography, frontal or three-quarter crops, glossy clear glass and condensation, cut fruit, flat pastel yellow/lime/lilac/blue grounds, hard light softened at the edges. Lifestyle frames show people holding drinks. Some media are app mockups rather than photographs.",
+  "hostMeasurements": {
+    "spacing": {
+      "base": 2,
+      "onGrid": [
+        [
+          8,
+          515
+        ],
+        [
+          16,
+          420
+        ],
+        [
+          10,
+          383
+        ],
+        [
+          20,
+          338
+        ],
+        [
+          12,
+          282
+        ],
+        [
+          24,
+          247
+        ],
+        [
+          32,
+          222
+        ],
+        [
+          6,
+          139
+        ],
+        [
+          4,
+          133
+        ],
+        [
+          30,
+          116
+        ],
+        [
+          70,
+          90
+        ],
+        [
+          40,
+          87
+        ],
+        [
+          80,
+          85
+        ],
+        [
+          200,
+          79
+        ],
+        [
+          14,
+          71
+        ],
+        [
+          48,
+          56
+        ],
+        [
+          64,
+          54
+        ],
+        [
+          180,
+          53
+        ],
+        [
+          22,
+          50
+        ],
+        [
+          60,
+          50
+        ],
+        [
+          100,
+          36
+        ],
+        [
+          42,
+          30
+        ],
+        [
+          2,
+          29
+        ],
+        [
+          74,
+          28
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          120,
+          16
+        ],
+        [
+          140,
+          15
+        ],
+        [
+          36,
+          15
+        ],
+        [
+          28,
+          13
+        ],
+        [
+          50,
+          12
+        ],
+        [
+          90,
+          10
+        ],
+        [
+          130,
+          10
+        ],
+        [
+          160,
+          8
+        ],
+        [
+          72,
+          8
+        ],
+        [
+          78,
+          4
+        ],
+        [
+          300,
+          4
+        ],
+        [
+          284,
+          4
+        ],
+        [
+          84,
+          3
+        ],
+        [
+          900,
+          2
+        ],
+        [
+          1440,
+          2
+        ],
+        [
+          290,
+          2
+        ],
+        [
+          380,
+          2
+        ],
+        [
+          314,
+          2
+        ],
+        [
+          26,
+          2
+        ],
+        [
+          178,
+          2
+        ],
+        [
+          52,
+          2
+        ],
+        [
+          96,
+          2
+        ],
+        [
+          98,
+          2
+        ],
+        [
+          76,
+          2
+        ],
+        [
+          480,
+          1
+        ],
+        [
+          810,
+          1
+        ]
+      ],
+      "offGrid": [
+        [
+          19,
+          48
+        ],
+        [
+          3,
+          32
+        ],
+        [
+          5,
+          29
+        ],
+        [
+          65,
+          28
+        ],
+        [
+          15,
+          16
+        ],
+        [
+          1,
+          13
+        ],
+        [
+          45,
+          12
+        ],
+        [
+          14.41,
+          12
+        ],
+        [
+          85,
+          10
+        ],
+        [
+          9.5,
+          10
+        ],
+        [
+          105,
+          8
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          75,
+          2
+        ],
+        [
+          11,
+          2
+        ],
+        [
+          205,
+          2
+        ],
+        [
+          105.6,
+          1
+        ],
+        [
+          476.25,
+          1
+        ]
+      ]
+    },
+    "buttons": [
+      {
+        "text": "Get a Quote",
+        "rect": {
+          "x": 551,
+          "y": 1192.2,
+          "width": 172.95,
+          "height": 50.09
+        },
+        "paintedRect": {
+          "x": 551,
+          "y": 1192.2,
+          "width": 172.95,
+          "height": 50.09
+        },
+        "background": "#010101",
+        "colour": "#ffffff",
+        "border": "#ffffff",
+        "borderWidth": 0,
+        "radius": "99px",
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 1
+      },
+      {
+        "text": "View Case Study",
+        "rect": {
+          "x": 991.33,
+          "y": 17058.67,
+          "width": 181.97,
+          "height": 53
+        },
+        "paintedRect": {
+          "x": 991.33,
+          "y": 17058.67,
+          "width": 181.97,
+          "height": 53
+        },
+        "background": "#f9fafa",
+        "colour": "#010101",
+        "border": "#e9e9e9",
+        "borderWidth": 1,
+        "radius": "99px",
+        "padding": [
+          12,
+          24,
+          12,
+          24
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "500",
+        "media": 0
+      }
+    ],
+    "cards": [
+      {
+        "text": "01 Research & Discovery Started by looking at how people would use the app at an event and where the flow could feel unclear. User needs Event flow Pain points Feature focus",
+        "rect": {
+          "x": 208,
+          "y": 7607.08,
+          "width": 244,
+          "height": 331.63
+        },
+        "paintedRect": {
+          "x": 208,
+          "y": 7607.08,
+          "width": 244,
+          "height": 331.63
+        },
+        "background": "#ffffff",
+        "colour": "#000000",
+        "border": "#000000",
+        "borderWidth": 0,
+        "radius": "4px",
+        "padding": [
+          20,
+          16,
+          20,
+          16
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 0
+      },
+      {
+        "text": "Research & Discovery Started by looking at how people would use the app at an event and where the flow could feel unclear. User needs Event flow Pain points Feature focus",
+        "rect": {
+          "x": 224,
+          "y": 7687.88,
+          "width": 212,
+          "height": 230.83
+        },
+        "paintedRect": {
+          "x": 224,
+          "y": 7687.88,
+          "width": 212,
+          "height": 230.83
+        },
+        "background": null,
+        "colour": "#000000",
+        "border": "#000000",
+        "borderWidth": 0,
+        "radius": "0px",
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 0
+      },
+      {
+        "text": "02 Flow & Structure Mapped out the steps so choosing drinks and using tokens felt more direct. Journey mapping User flow Screen order Action placement",
+        "rect": {
+          "x": 468,
+          "y": 7607.08,
+          "width": 244,
+          "height": 331.63
+        },
+        "paintedRect": {
+          "x": 468,
+          "y": 7607.08,
+          "width": 244,
+          "height": 331.63
+        },
+        "background": "#ffffff",
+        "colour": "#000000",
+        "border": "#000000",
+        "borderWidth": 0,
+        "radius": "4px",
+        "padding": [
+          20,
+          16,
+          20,
+          16
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 0
+      },
+      {
+        "text": "Flow & Structure Mapped out the steps so choosing drinks and using tokens felt more direct. Journey mapping User flow Screen order Action placement",
+        "rect": {
+          "x": 484,
+          "y": 7687.88,
+          "width": 212,
+          "height": 230.83
+        },
+        "paintedRect": {
+          "x": 484,
+          "y": 7687.88,
+          "width": 212,
+          "height": 230.83
+        },
+        "background": null,
+        "colour": "#000000",
+        "border": "#000000",
+        "borderWidth": 0,
+        "radius": "0px",
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 0
+      },
+      {
+        "text": "03 Visual Design Built a bright, playful interface that made the app feel fun but still easy to use. UI design Visual style Interaction states Mobile layout",
+        "rect": {
+          "x": 728,
+          "y": 7607.08,
+          "width": 244,
+          "height": 331.63
+        },
+        "paintedRect": {
+          "x": 728,
+          "y": 7607.08,
+          "width": 244,
+          "height": 331.63
+        },
+        "background": "#ffffff",
+        "colour": "#000000",
+        "border": "#000000",
+        "borderWidth": 0,
+        "radius": "4px",
+        "padding": [
+          20,
+          16,
+          20,
+          16
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 0
+      },
+      {
+        "text": "Visual Design Built a bright, playful interface that made the app feel fun but still easy to use. UI design Visual style Interaction states Mobile layout",
+        "rect": {
+          "x": 744,
+          "y": 7687.88,
+          "width": 212,
+          "height": 230.83
+        },
+        "paintedRect": {
+          "x": 744,
+          "y": 7687.88,
+          "width": 212,
+          "height": 230.83
+        },
+        "background": null,
+        "colour": "#000000",
+        "border": "#000000",
+        "borderWidth": 0,
+        "radius": "0px",
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 0
+      },
+      {
+        "text": "04 Delivery & Refinement Polished the screens and adjusted details so the final design felt clear and ready to hand off. Final cleanup Design handoff Feedback updates Last refineme",
+        "rect": {
+          "x": 988,
+          "y": 7607.08,
+          "width": 244,
+          "height": 331.63
+        },
+        "paintedRect": {
+          "x": 988,
+          "y": 7607.08,
+          "width": 244,
+          "height": 331.63
+        },
+        "background": "#ffffff",
+        "colour": "#000000",
+        "border": "#000000",
+        "borderWidth": 0,
+        "radius": "4px",
+        "padding": [
+          20,
+          16,
+          20,
+          16
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 0
+      },
+      {
+        "text": "Delivery & Refinement Polished the screens and adjusted details so the final design felt clear and ready to hand off. Final cleanup Design handoff Feedback updates Last refinements",
+        "rect": {
+          "x": 1004,
+          "y": 7687.88,
+          "width": 212,
+          "height": 230.83
+        },
+        "paintedRect": {
+          "x": 1004,
+          "y": 7687.88,
+          "width": 212,
+          "height": 230.83
+        },
+        "background": null,
+        "colour": "#000000",
+        "border": "#000000",
+        "borderWidth": 0,
+        "radius": "0px",
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "backdrop": "none",
+        "font": "\"Neue Montreal\", Arial, sans-serif",
+        "size": 18,
+        "weight": "400",
+        "media": 0
+      }
+    ],
+    "input": {
+      "text": "",
+      "rect": {
+        "x": 724.66,
+        "y": 15649.7,
+        "width": 321.56,
+        "height": 60
+      },
+      "paintedRect": {
+        "x": 724.66,
+        "y": 15649.7,
+        "width": 321.56,
+        "height": 60
+      },
+      "background": null,
+      "colour": "#000000b3",
+      "border": "#e6e6e6",
+      "borderWidth": 1,
+      "radius": "10px",
+      "padding": [
+        8,
+        16,
+        8,
+        16
+      ],
+      "backdrop": "none",
+      "font": "\"Neue Montreal\", Arial, sans-serif",
+      "size": 18,
+      "weight": "400",
+      "media": 0
+    },
+    "nav": {
+      "text": "Menu Services Services Case Studies (44) Case Studies (44) Pricing Pricing About Us About Us Blog Blog Resources Resources Get a Quote Menu Behance Behance Dribbble Dribbble Instag",
+      "rect": {
+        "x": 0,
+        "y": 804,
+        "width": 1440,
+        "height": 56
+      },
+      "paintedRect": {
+        "x": 551,
+        "y": 1192.2,
+        "width": 172.95,
+        "height": 50.09
+      },
+      "background": "#010101",
+      "colour": "#000000",
+      "border": "#ffffff",
+      "borderWidth": 0,
+      "radius": "99px",
+      "padding": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "backdrop": "none",
+      "font": "\"Neue Montreal\", Arial, sans-serif",
+      "size": 18,
+      "weight": "400",
+      "media": 1,
+      "position": "fixed",
+      "links": [
+        {
+          "text": "Case Studies (44) Case Studies (44)",
+          "rect": {
+            "x": 551,
+            "y": 982.2,
+            "width": 338,
+            "height": 24
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 982.2,
+            "width": 338,
+            "height": 24
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 20,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "Pricing Pricing",
+          "rect": {
+            "x": 551,
+            "y": 1024.2,
+            "width": 338,
+            "height": 24
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1024.2,
+            "width": 338,
+            "height": 24
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 20,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "About Us About Us",
+          "rect": {
+            "x": 551,
+            "y": 1066.2,
+            "width": 338,
+            "height": 24
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1066.2,
+            "width": 338,
+            "height": 24
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 20,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "Blog Blog",
+          "rect": {
+            "x": 551,
+            "y": 1108.2,
+            "width": 338,
+            "height": 24
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1108.2,
+            "width": 338,
+            "height": 24
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 20,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "Resources Resources",
+          "rect": {
+            "x": 551,
+            "y": 1150.2,
+            "width": 338,
+            "height": 24
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1150.2,
+            "width": 338,
+            "height": 24
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 20,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "Get a Quote",
+          "rect": {
+            "x": 551,
+            "y": 1192.2,
+            "width": 172.95,
+            "height": 50.09
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1192.2,
+            "width": 172.95,
+            "height": 50.09
+          },
+          "background": "#010101",
+          "colour": "#ffffff",
+          "border": "#ffffff",
+          "borderWidth": 0,
+          "radius": "99px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 18,
+          "weight": "400",
+          "media": 1
+        },
+        {
+          "text": "Behance Behance",
+          "rect": {
+            "x": 551,
+            "y": 1326.09,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1326.09,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 14,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "Dribbble Dribbble",
+          "rect": {
+            "x": 551,
+            "y": 1354.89,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1354.89,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 14,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "Instagram Instagram",
+          "rect": {
+            "x": 551,
+            "y": 1383.69,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1383.69,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 14,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "LinkedIn LinkedIn",
+          "rect": {
+            "x": 551,
+            "y": 1412.48,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1412.48,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 14,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "X (Twitter) X (Twitter)",
+          "rect": {
+            "x": 551,
+            "y": 1441.28,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "paintedRect": {
+            "x": 551,
+            "y": 1441.28,
+            "width": 146.66,
+            "height": 16.8
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 14,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "hello@orbix.studio hello@orbix.studio",
+          "rect": {
+            "x": 705.66,
+            "y": 1332.09,
+            "width": 1,
+            "height": 16.8
+          },
+          "paintedRect": {
+            "x": 705.66,
+            "y": 1332.09,
+            "width": 1,
+            "height": 16.8
+          },
+          "background": "#e6e6e6",
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 14,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "+1 (646) 598-7983 +1 (646) 598-7983",
+          "rect": {
+            "x": 705.66,
+            "y": 1405.69,
+            "width": 183.34,
+            "height": 16.8
+          },
+          "paintedRect": {
+            "x": 705.66,
+            "y": 1405.69,
+            "width": 183.34,
+            "height": 16.8
+          },
+          "background": null,
+          "colour": "#111111",
+          "border": "#111111",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 14,
+          "weight": "500",
+          "media": 0
+        },
+        {
+          "text": "",
+          "rect": {
+            "x": 563.5,
+            "y": 820,
+            "width": 24,
+            "height": 24
+          },
+          "paintedRect": {
+            "x": 563.5,
+            "y": 820,
+            "width": 24,
+            "height": 24
+          },
+          "background": null,
+          "colour": "#000000b3",
+          "border": "#000000b3",
+          "borderWidth": 0,
+          "radius": "0px",
+          "padding": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "backdrop": "none",
+          "font": "\"Neue Montreal\", Arial, sans-serif",
+          "size": 14,
+          "weight": "500",
+          "media": 1
+        }
+      ],
+      "logo": {
+        "rect": {
+          "x": 869,
+          "y": 937.8,
+          "width": 20,
+          "height": 26.41
+        },
+        "colour": "#222222",
+        "fill": "#000000"
+      }
+    },
+    "radii": [
+      [
+        "10px",
+        158
+      ],
+      [
+        "99px",
+        130
+      ],
+      [
+        "4px",
+        82
+      ],
+      [
+        "32px",
+        49
+      ],
+      [
+        "100px",
+        41
+      ],
+      [
+        "12px",
+        41
+      ],
+      [
+        "40px",
+        38
+      ],
+      [
+        "16px",
+        30
+      ],
+      [
+        "20px",
+        28
+      ],
+      [
+        "18px",
+        12
+      ],
+      [
+        "50px",
+        12
+      ],
+      [
+        "6px",
+        10
+      ]
+    ],
+    "rhythm": [
+      {
+        "heading": "Swipe Drinks",
+        "background": "#f3f4f6",
+        "y": 0
+      },
+      {
+        "heading": "People Needed a Clearer Way to Pick Drinks and Use Tokens",
+        "background": "#f3f4f6",
+        "y": 2072.09
+      },
+      {
+        "heading": "Ready To Build\nYour Next Project?",
+        "background": "#f3f4f6",
+        "y": 15421.7
+      },
+      {
+        "heading": "Explore More Case Studies",
+        "background": "#ffffff",
+        "y": 16556.8
+      },
+      {
+        "heading": "",
+        "background": "#010101",
+        "y": 17279.67
+      },
+      {
+        "heading": "",
+        "background": "#ffffff",
+        "y": 18439.67
+      }
+    ],
+    "declaredVariables": {
+      "--_font---font-family--font-neuemontreal": "\"Neue Montreal\",Arial,sans-serif",
+      "--color--transparent": "transparent",
+      "--color--black--30": "#0000004d",
+      "--border-radius--pill": "50em",
+      "--color--white--50": "#ffffff80",
+      "--color--black--60": "#0009",
+      "--_font---font-size--text-small": "16px",
+      "--border-radius--z-index-9": "9",
+      "--_font---font-size--h4": "44px",
+      "--color-7": "#9a2eb7",
+      "--color--white--05": "#ffffff0d",
+      "--color-2": "#fd7503",
+      "--red": "#da190c",
+      "--color-6": "#0490ca",
+      "--color-11": "#4219a8",
+      "--_font---font-size--text-lead": "24px",
+      "--color--surface--green": "#a2f49d",
+      "--_font---font-size--text-label": "12px",
+      "--color-5": "#03658e",
+      "--color--white--80": "#fffc",
+      "--_font---font-size--h6": "24px",
+      "--background": "#f3f4f6",
+      "--color--actions--dark--100": "#00454a",
+      "--color--white--200": "#e6e6e6",
+      "--_font---font-size--h2": "52px",
+      "--color--surface--light-green": "#e8f4e6",
+      "--color--black--05": "#0000000d",
+      "--color--surface--light-green-overlay": "#dcedda",
+      "--color--black--70": "#000000b3",
+      "--color--surface--primary": "#00454a",
+      "--color--actions--light--100": "#ecfba9",
+      "--_font---font-size--h3": "48px",
+      "--color--white--10": "#ffffff1a",
+      "--_font---font-size--text-caption": "14px",
+      "--color--white--90": "#ffffffe6",
+      "--color-10": "#1e2338",
+      "--color--black--80": "#000c",
+      "--color-12": "#6537d7",
+      "--color--white--70": "#ffffffb3",
+      "--color--white--20": "#fff3",
+      "--color--black--100": "#000",
+      "--color-9": "#111524",
+      "--_font---font-size--h1": "64px",
+      "--background-3": "#fafafa",
+      "--color-4": "#4f698e",
+      "--color--black--90": "#000000e6",
+      "--color-3": "#314c72",
+      "--color--surface--yellow": "#f9f871",
+      "--color--black--50": "#00000080",
+      "--background-04": "#f9fafa",
+      "--dark": "#010101",
+      "--_font---font-family--font-ivoradisplay<deleted|variable-31fbf5ea-d0a5-bc82-4507-1b7bf9fa0f79>": "Ivyoradisplay",
+      "--background-2": "#f1f1f1",
+      "--color--black--40": "#0006",
+      "--color--surface--hard-blue": "#8fb4cc",
+      "--_font---font-size--text-body": "18px",
+      "--color-1": "#f94c00",
+      "--color--white--60": "#fff9",
+      "--color--white--100": "white",
+      "--color-8": "#a860a2",
+      "--color--black--10": "#0000001a",
+      "--color--surface--gray-100": "#f7f8f4",
+      "--color--black--20": "#0003",
+      "--_font---font-size--text-large": "20px",
+      "--color--surface--sky-blue": "#67e5c9",
+      "--_font---font-size--h5": "32px"
+    },
+    "imagery": {
+      "count": 42,
+      "mediaAreaShare": 41.02,
+      "fullBleedShare": 2.38,
+      "objectFit": [
+        [
+          "cover",
+          42
+        ]
+      ],
+      "formats": [
+        [
+          "svg",
+          23
+        ],
+        [
+          "avif",
+          19
+        ]
+      ],
+      "themes": [
+        "Thin horizontal right arrow icon.",
+        "Gold vertical ribbon badge reading UI.",
+        "Adobe XD logo in pink on a dark background.",
+        "Adobe XD design tool badge for Swipe Drinks event tech app case study by Orbix Studio",
+        "Orange directional triangle pointer graphic.",
+        "Orange directional triangle pointer graphic.",
+        "Swipe Drinks mobile app interface design by Orbix Studio",
+        "Swipe Drinks app onboarding and token purchase screen by Orbix Studio",
+        "Swipe Drinks drink selection and token balance screen by Orbix Studio",
+        "Swipe Drinks token top-up and payment screen by Orbix Studio",
+        "Swipe Drinks parent dashboard and spending control screen by Orbix Studio",
+        "Swipe Drinks simplified drink flow and token screens by Orbix Studio",
+        "Swipe Drinks app design process and workflow overview by Orbix Studio",
+        "Swipe Drinks user research and event flow analysis by Orbix Studio",
+        "Swipe Drinks app flow and navigation structure design by Orbix Studio",
+        "Swipe Drinks token system screen layout design by Orbix Studio",
+        "Swipe Drinks colorful event-themed app interface design by Orbix Studio",
+        "Swipe Drinks playful visual style and UI elements by Orbix Studio"
+      ]
+    }
+  },
+  "scaleRatio": 1.387,
+  "scaleInterval": "augmented fourth",
+  "contrastPairs": [
+    {
+      "fg": "text",
+      "bg": "background",
+      "ratio": 17.04,
+      "status": "reconstructed role pair; not claimed as most-read app pairs"
+    },
+    {
+      "fg": "text",
+      "bg": "surface",
+      "ratio": 14.29,
+      "status": "reconstructed role pair; not claimed as most-read app pairs"
+    },
+    {
+      "fg": "text-inverse",
+      "bg": "surface-inverse",
+      "ratio": 17.04,
+      "status": "reconstructed role pair; not claimed as most-read app pairs"
+    },
+    {
+      "fg": "on-action",
+      "bg": "action",
+      "ratio": 12.75,
+      "status": "reconstructed role pair; not claimed as most-read app pairs"
+    },
+    {
+      "fg": "text-muted",
+      "bg": "background",
+      "ratio": 17.04,
+      "status": "reconstructed role pair; not claimed as most-read app pairs"
+    }
+  ],
+  "rasterShares": [
+    {
+      "hex": "#ffffff",
+      "matchedPixels": 1118848,
+      "share": 89.46
+    },
+    {
+      "hex": "#ffec89",
+      "matchedPixels": 20478,
+      "share": 1.64
+    },
+    {
+      "hex": "#1c1c1c",
+      "matchedPixels": 30384,
+      "share": 2.43
+    },
+    {
+      "hex": "#b6f074",
+      "matchedPixels": 20404,
+      "share": 1.63
+    },
+    {
+      "hex": "#dab8f1",
+      "matchedPixels": 20547,
+      "share": 1.64
+    },
+    {
+      "hex": "#b6e1fa",
+      "matchedPixels": 39978,
+      "share": 3.2
+    }
+  ]
+}

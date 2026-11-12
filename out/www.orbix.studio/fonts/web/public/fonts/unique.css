@@ -1,0 +1,8 @@
+/* Original Unique Typeface by Rajesh Rajput, font bytes unmodified. */
+@font-face { font-family: 'Unique Display'; src: url('./unique-100.ttf') format('truetype'); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Unique Display'; src: url('./unique-200.ttf') format('truetype'); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Unique Display'; src: url('./unique-300.ttf') format('truetype'); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Unique Display'; src: url('./unique-400.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Unique Display'; src: url('./unique-500.ttf') format('truetype'); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Unique Display'; src: url('./unique-600.ttf') format('truetype'); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Unique Display'; src: url('./unique-700.ttf') format('truetype'); font-style: normal; font-weight: 700; font-display: swap; }

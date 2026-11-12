@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#9D4934</color>
-    <color name="colorPrimaryDark">#743423</color>
-    <color name="colorAccent">#D68A54</color>
+    <color name="colorPrimary">#1c1c1c</color>
+    <color name="colorPrimaryDark">#1c1c1c</color>
+    <color name="colorAccent">#b6f074</color>
+    <color name="stationBackground">#ffffff</color>
 </resources>

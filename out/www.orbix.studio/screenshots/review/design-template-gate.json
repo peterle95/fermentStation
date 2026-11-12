@@ -1,0 +1,4910 @@
+{
+ "start": "2026-11-09T21:04:44.077Z",
+ "round": 1,
+ "idle": 0,
+ "errors": 0,
+ "status": "fail",
+ "history": [
+  {
+   "at": "2026-11-09T21:09:06.931Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 136,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": "../../out/www.orbix.studio/brand-guide.html",
+  "url": null,
+  "root": null,
+  "kind": "software",
+  "category": "Unofficial brand guide",
+  "primary": "Read the guide",
+  "rounds": 3,
+  "start": "2026-11-09T21:04:44.077Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "c07bf1968f141fe7:da39a3ee",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "c07bf1968f141fe7",
+ "page": "../../out/www.orbix.studio/brand-guide.html",
+ "found": {
+  "fails": [
+   {
+    "check": "flush",
+    "where": "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\"",
+    "msg": "its last line sits -31913px above the lower edge of section#design-tokens, where the ground changes to section#method",
+    "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "flush"
+    ],
+    "wheres": [
+     "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\""
+    ]
+   },
+   {
+    "check": "placeholder",
+    "where": "p#type-specimen \"Aa Bb Cc 0123456789\"",
+    "msg": "a stand-in contact printed on the page (\"0123456789\"): no visitor can use it (and 1 more like it: \"ABCDEFGHIJKLMNOPQRSTUVWX\")",
+    "fix": "print the real address and number, or a form or a button that names the action: never an example.com address or a number of zeros",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "placeholder"
+    ],
+    "wheres": [
+     "p#type-specimen \"Aa Bb Cc 0123456789\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#overview > div.wrap > div.chapter-head.reveal \"Overview Unofficial analysis 01\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#overview > div.wrap > div.chapter-head.reveal \"Overview Unofficial analysis 01\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#contents > div.wrap > div.chapter-head.reveal \"Contents Unofficial analysis 02\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#contents > div.wrap > div.chapter-head.reveal \"Contents Unofficial analysis 02\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#token-rebuild-test > div.wrap > div.chapter-head.reveal \"Token rebuild test Unofficial analysis 0\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#token-rebuild-test > div.wrap > div.chapter-head.reveal \"Token rebuild test Unofficial analysis 0\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#typography > div.wrap > div.chapter-head.reveal \"Typography Unofficial analysis 04\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#typography > div.wrap > div.chapter-head.reveal \"Typography Unofficial analysis 04\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#fonts > div.wrap > div.chapter-head.reveal \"Fonts Unofficial analysis 05\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#fonts > div.wrap > div.chapter-head.reveal \"Fonts Unofficial analysis 05\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#colour > div.wrap > div.chapter-head.reveal \"Colour Unofficial analysis 06\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#colour > div.wrap > div.chapter-head.reveal \"Colour Unofficial analysis 06\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#layout-and-spacing > div.wrap > div.chapter-head.reveal \"Layout and spacing Unofficial analysis 0\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#layout-and-spacing > div.wrap > div.chapter-head.reveal \"Layout and spacing Unofficial analysis 0\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#components > div.wrap > div.chapter-head.reveal \"Components Unofficial analysis 08\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#components > div.wrap > div.chapter-head.reveal \"Components Unofficial analysis 08\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#imagery > div.wrap > div.chapter-head.reveal \"Imagery Unofficial analysis 09\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#imagery > div.wrap > div.chapter-head.reveal \"Imagery Unofficial analysis 09\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#voice-and-tone > div.wrap > div.chapter-head.reveal \"Voice and tone Unofficial analysis 10\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#voice-and-tone > div.wrap > div.chapter-head.reveal \"Voice and tone Unofficial analysis 10\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#design-tokens > div.wrap > div.chapter-head.reveal \"Design tokens Unofficial analysis 11\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#design-tokens > div.wrap > div.chapter-head.reveal \"Design tokens Unofficial analysis 11\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#method > div.wrap > div.chapter-head.reveal \"Method Unofficial analysis 12\"",
+    "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "section#method > div.wrap > div.chapter-head.reveal \"Method Unofficial analysis 12\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "section#overview \"Overview\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#overview \"Overview\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "section#fonts \"Fonts\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#fonts \"Fonts\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "section#layout-and-spacing \"Layout and spacing\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#layout-and-spacing \"Layout and spacing\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "section#design-tokens \"Design tokens\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#design-tokens \"Design tokens\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "section#method \"Method\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#method \"Method\""
+    ]
+   },
+   {
+    "check": "card-visual",
+    "where": "section#layout-and-spacing > div.wrap > div.rhythm \"1 background 2 surface 3 surface-inverse\"",
+    "msg": "4 cards hold only text: no picture, icon, UI fragment or effect in any of them",
+    "fix": "give the cards a visual: an inset panel with a UI fragment, a photograph or real icons",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "card-visual"
+    ],
+    "wheres": [
+     "section#layout-and-spacing > div.wrap > div.rhythm \"1 background 2 surface 3 surface-inverse\""
+    ]
+   },
+   {
+    "check": "card-visual",
+    "where": "section#voice-and-tone > div.wrap > div.rule-grid \"01 Headline length Keep headlines near t\"",
+    "msg": "3 cards hold only text: no picture, icon, UI fragment or effect in any of them",
+    "fix": "give the cards a visual: an inset panel with a UI fragment, a photograph or real icons",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "card-visual"
+    ],
+    "wheres": [
+     "section#voice-and-tone > div.wrap > div.rule-grid \"01 Headline length Keep headlines near t\""
+    ]
+   },
+   {
+    "check": "same-action",
+    "where": "button#rebuild-button \"View tokens ↗\"",
+    "msg": "\"View tokens ↗\" appears 9 times in different looks: pill, fill #b6f074 and pill, outline #ffffff",
+    "fix": "draw one action the same way everywhere (only the nav copy may be one size smaller)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "same-action"
+    ],
+    "wheres": [
+     "button#rebuild-button \"View tokens ↗\""
+    ]
+   },
+   {
+    "check": "cta",
+    "where": "section#method \"Method\"",
+    "msg": "the last section before the footer ends with no button",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "cta"
+    ],
+    "wheres": [
+     "section#method \"Method\""
+    ]
+   },
+   {
+    "check": "copy-headings",
+    "where": "section#overview > div.wrap > div.chapter-head.reveal > h2 \"Overview\"",
+    "msg": "\"Overview\" names no product, part, place or section (39 headings like it; at most one brand line per page) (and 38 more like it: \"Contents\", \"Token rebuild test\", \"Typography\", \"Fonts\", ...)",
+    "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "copy-headings"
+    ],
+    "wheres": [
+     "section#overview > div.wrap > div.chapter-head.reveal > h2 \"Overview\""
+    ]
+   },
+   {
+    "check": "heading-scale",
+    "where": "section#overview > div.wrap > div.overview-title > h3.display \"Swipe Drinks\"",
+    "msg": "an h3 at 72px, as large as the smallest h2 (56px) or larger",
+    "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "heading-scale"
+    ],
+    "wheres": [
+     "section#overview > div.wrap > div.overview-title > h3.display \"Swipe Drinks\""
+    ]
+   },
+   {
+    "check": "heading-scale",
+    "where": "div.wrap > div.stats > div:nth-of-type(1) > strong \"1\"",
+    "msg": "the figure \"1\" is set at 72px, larger than the section headings (h2 56px); 7 more like it",
+    "fix": "set figures at the h2 size or under: a stat reads as data, not as the heading",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "heading-scale"
+    ],
+    "wheres": [
+     "div.wrap > div.stats > div:nth-of-type(1) > strong \"1\""
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "section#fonts > div.wrap > details > summary \"Sizes in use and declared type variables\"",
+    "msg": "left edge at 99px, 19px off the page margin at 80px (97 elements, like h2)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "section#fonts > div.wrap > details > summary \"Sizes in use and declared type variables\""
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "section#colour > div.wrap > details > summary \"Contrast pairs and full evidence palette\"",
+    "msg": "left edge at 99px, 19px off the page margin at 80px (97 elements, like p.small)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "section#colour > div.wrap > details > summary \"Contrast pairs and full evidence palette\""
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "div.split > div:nth-of-type(2) > div.radius-grid > div.radius-demo.pill \"Pill 999px\"",
+    "msg": "left edge at 1064px, 6px off a common edge of its section at 1058px (3 elements, like div:nth-of-type(10))",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "div.split > div:nth-of-type(2) > div.radius-grid > div.radius-demo.pill \"Pill 999px\""
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "section#imagery > div.wrap > div.mosaic > div.visual.slot-fruit",
+    "msg": "left edge at 720px, 24px off a common edge of its section at 744px (4 elements, like h3); 2 more in this section off the grid too (div.visual.slot-street at 720px, summary at 99px)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "section#imagery > div.wrap > div.mosaic > div.visual.slot-fruit"
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "div.split > div:nth-of-type(1) > ul.assumptions > li:nth-of-type(1) \"Computed DOM styles describe the host pa\"",
+    "msg": "left edge at 104px, 24px off the page margin at 80px (97 elements, like h3); 15 more in this section off the grid too (li:nth-of-type(2) at 104px, li:nth-of-type(3) at 104px, li:nth-of-type(4) at 104px, li:nth-of-type(5) at 104px, ...)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "div.split > div:nth-of-type(1) > ul.assumptions > li:nth-of-type(1) \"Computed DOM styles describe the host pa\""
+    ]
+   },
+   {
+    "check": "section-tile",
+    "where": "section#token-rebuild-test \"Token rebuild test\"",
+    "msg": "the section is 1170px tall (1.30 screens at 1440x900), not one screen or two: the screen one screen on from its top (scroll 3600px) shows 194px of it and 630px of the next section, its heading \"Typography\" on screen",
+    "fix": "set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-tile"
+    ],
+    "wheres": [
+     "section#token-rebuild-test \"Token rebuild test\""
+    ]
+   },
+   {
+    "check": "section-tile",
+    "where": "section#colour \"Colour\"",
+    "msg": "the section is 1897px tall (2.11 screens at 1440x900), not one screen or two: the screen 2 screens on from its top (scroll 8215px) shows 21px of it and 803px of the next section, its heading \"Layout and spacing\" on screen",
+    "fix": "set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-tile"
+    ],
+    "wheres": [
+     "section#colour \"Colour\""
+    ]
+   },
+   {
+    "check": "section-tile",
+    "where": "section#voice-and-tone \"Voice and tone\"",
+    "msg": "the section is 2054px tall (2.28 screens at 1440x900), not one screen or two: the screen 2 screens on from its top (scroll 14208px) shows 178px of it and 646px of the next section, its heading \"Design tokens\" on screen",
+    "fix": "set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-tile"
+    ],
+    "wheres": [
+     "section#voice-and-tone \"Voice and tone\""
+    ]
+   },
+   {
+    "check": "section-tile",
+    "where": "section#design-tokens \"Design tokens\"",
+    "msg": "the section is 1085px tall (1.21 screens at 1440x900), not one screen or two: the screen one screen on from its top (scroll 15362px) shows 109px of it and 715px of the next section, its heading \"Method\" on screen",
+    "fix": "set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-tile"
+    ],
+    "wheres": [
+     "section#design-tokens \"Design tokens\""
+    ]
+   },
+   {
+    "check": "heading-order",
+    "where": "section#cover > div.wrap.cover-wrap:nth-of-type(2) > aside.glass-card > h3 \"#b6f074\"",
+    "msg": "\"#b6f074\" is an h3 after an h1: a level is skipped",
+    "fix": "step down one level at a time (h1, h2, h3): change the tag, not the look; a footer's column heads are h3",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "heading-order"
+    ],
+    "wheres": [
+     "section#cover > div.wrap.cover-wrap:nth-of-type(2) > aside.glass-card > h3 \"#b6f074\""
+    ]
+   },
+   {
+    "check": "focus-visible",
+    "where": "div.wrap > div.button-gallery:nth-of-type(3) > div.component-ground:nth-of-type(1) > button.brand-button \"View tokens ↗\"",
+    "msg": "Tab stop 21, button \"View tokens ↗\": its focus change is faint: 1:1 against the ground, 3:1 needed",
+    "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "focus-visible"
+    ],
+    "wheres": [
+     "div.wrap > div.button-gallery:nth-of-type(3) > div.component-ground:nth-of-type(1) > button.brand-button \"View tokens ↗\""
+    ]
+   },
+   {
+    "check": "focus-visible",
+    "where": "input#demo-input",
+    "msg": "Tab stop 26, input \"\": its focus change is faint: 1:1 against the ground, 3:1 needed",
+    "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "focus-visible"
+    ],
+    "wheres": [
+     "input#demo-input"
+    ]
+   },
+   {
+    "check": "focus-visible",
+    "where": "button#copy-css \"Copy CSS\"",
+    "msg": "Tab stop 34, button \"Copy CSS\": its focus change is faint: 1:1 against the ground, 3:1 needed",
+    "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "focus-visible"
+    ],
+    "wheres": [
+     "button#copy-css \"Copy CSS\""
+    ]
+   },
+   {
+    "check": "moment-none",
+    "where": "(the page)",
+    "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+    "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "moment-none"
+    ],
+    "wheres": [
+     "(the page)"
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "footer \"Unofficial analysisNot affiliated with o\"",
+    "msg": "the section is 334px tall (0.4 screens), 566px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+    "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height"
+    ],
+    "wheres": [
+     "footer \"Unofficial analysisNot affiliated with o\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "section#layout-and-spacing \"Layout and spacingUnofficial analysis074\"",
+    "msg": "the section is 1321px tall (1.5 screens), 421px over one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+    "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height",
+     "screen-height"
+    ],
+    "wheres": [
+     "section#layout-and-spacing \"Layout and spacingUnofficial analysis074\"",
+     "#layout-and-spacing section.chapter \"Layout and spacingUnofficial ana\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "section#method \"MethodUnofficial analysis12Evidence and \"",
+    "msg": "the section is 1384px tall (1.5 screens), 416px short of two screens (1800px): every section after the hero is one screen or two, 2px either way (and 7 more like it: \"ImageryUnofficial analys\", \"Token rebuild testUnoffi\", \"Voice and toneUnofficial\") (SR-2)",
+    "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height",
+     "screen-height"
+    ],
+    "wheres": [
+     "section#method \"MethodUnofficial analysis12Evidence and \"",
+     "#method section.chapter \"MethodUnofficial analysis12Evide\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "section#imagery \"ImageryUnofficial analysis09Image treatm\"",
+    "msg": "the section starts at 11220px, 420px below the screen grid (12 x 900px): sections start on whole screens (SR-2)",
+    "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height",
+     "screen-height"
+    ],
+    "wheres": [
+     "section#imagery \"ImageryUnofficial analysis09Image treatm\"",
+     "#imagery section.chapter \"ImageryUnofficial analysis09Imag\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "section#typography \"TypographyUnofficial analysis04DisplayHe\"",
+    "msg": "the section starts at 3870px, 270px below the screen grid (4 x 900px): sections start on whole screens (SR-2)",
+    "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height"
+    ],
+    "wheres": [
+     "section#typography \"TypographyUnofficial analysis04DisplayHe\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "section#fonts \"FontsUnofficial analysis05AaCircular Std\"",
+    "msg": "the section starts at 4770px, 270px below the screen grid (5 x 900px): sections start on whole screens (and 7 more like it: \"ComponentsUnofficial ana\", \"MethodUnofficial analysi\", \"Layout and spacingUnoffi\") (SR-2)",
+    "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height",
+     "screen-height"
+    ],
+    "wheres": [
+     "section#fonts \"FontsUnofficial analysis05AaCircular Std\"",
+     "#fonts section.chapter \"FontsUnofficial analysis05AaCirc\""
+    ]
+   },
+   {
+    "check": "section-air",
+    "where": "section#fonts > div.wrap > details \"Sizes in use and declared type variables\"",
+    "msg": "a top border across 100% of the container, between the section's content: sections and their parts are told apart by air and ground, not lines (SR-3)",
+    "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-air"
+    ],
+    "wheres": [
+     "section#fonts > div.wrap > details \"Sizes in use and declared type variables\""
+    ]
+   },
+   {
+    "check": "section-air",
+    "where": "section#colour > div.wrap > details \"Contrast pairs and full evidence palette\"",
+    "msg": "a top border across 100% of the container, between the section's content: sections and their parts are told apart by air and ground, not lines (SR-3)",
+    "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-air"
+    ],
+    "wheres": [
+     "section#colour > div.wrap > details \"Contrast pairs and full evidence palette\""
+    ]
+   },
+   {
+    "check": "section-air",
+    "where": "section#imagery > div.wrap > details \"Alt-text themes and source linksThin hor\"",
+    "msg": "a top border across 100% of the container, between the section's content: sections and their parts are told apart by air and ground, not lines (and 1 more like it: \"Image prompts tableSlotR\") (SR-3)",
+    "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-air"
+    ],
+    "wheres": [
+     "section#imagery > div.wrap > details \"Alt-text themes and source linksThin hor\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "section#components \"ComponentsUnofficial analysis08Rounded s\"",
+    "msg": "the screen at scroll 10800px (stride 12) shows 344px of section 9 and the content of 2 sections, over 24px each beside section 10: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+    "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section",
+     "neighbour"
+    ],
+    "wheres": [
+     "section#components \"ComponentsUnofficial analysis08Rounded s\"",
+     "section#components > div.wrap > div.chapter-head.reveal > h2 \"Components\"",
+     "#components section.chapter.dark \"ComponentsUnofficial analysis08R\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "footer \"Unofficial analysisNot affiliated with o\"",
+    "msg": "the screen at scroll 16366px (the top of section 14) shows 334px of section 14 and the content of 2 sections, over 24px each beside section 13: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+    "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "footer \"Unofficial analysisNot affiliated with o\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "section#overview > div.wrap > div.evidence-note \"Evidence boundaryThe source is a case st\"",
+    "msg": "a band: a box 89% of the section wide on a ground of its own that holds only text: the section's own ground is the band (SR-4)",
+    "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "section#overview > div.wrap > div.evidence-note \"Evidence boundaryThe source is a case st\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "section#typography > div.wrap > div.specimen.glass-card \"DisplayHeadingSubheadLeadBodyAa Bb Cc012\"",
+    "msg": "a band: a box 89% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (SR-4)",
+    "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "section#typography > div.wrap > div.specimen.glass-card \"DisplayHeadingSubheadLeadBodyAa Bb Cc012\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "section#fonts > div.wrap > div.font-grid > article.font-card \"AaCircular StdBook · Medium · BoldUsage \"",
+    "msg": "a band: a box 89% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (and 1 more like it: \"Logo slot144 × 40pxRecon\") (SR-4)",
+    "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section",
+     "neighbour"
+    ],
+    "wheres": [
+     "section#fonts > div.wrap > div.font-grid > article.font-card \"AaCircular StdBook · Medium · BoldUsage \"",
+     "#fonts section.chapter \"FontsUnofficial analysis05AaCirc\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "a.skip-link \"Skip to content\"",
+    "msg": "a <a> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "a.skip-link \"Skip to content\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "header.topbar \"Swipe Drinks / Brand guideUnofficial ana\"",
+    "msg": "a <header> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "header.topbar \"Swipe Drinks / Brand guideUnofficial ana\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "footer \"Unofficial analysisNot affiliated with o\"",
+    "msg": "a <footer> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (and 3 more like it: \"Reconstructed palette gr\", \"Brand guidelines / 2026S\", \"Brand guidelines / 2026S\") (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "footer \"Unofficial analysisNot affiliated with o\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "section#cover > div.visual.slot-hero \"Reconstructed palette gradient: hero\"",
+    "msg": "a box runs 0-1440px, outside the container lines of section 1 at 80-1360px: full width is for background layers and grounds only (SR-6)",
+    "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "section#cover > div.visual.slot-hero \"Reconstructed palette gradient: hero\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div.wrap > div.split.voice-split > div:nth-of-type(2) > h3 \"Observed language\"",
+    "msg": "6 text blocks start on a left line at x 744, 664px from the container's left: text starts on the container's left, or on one split line (x 623, 732, 841) (also \"5 excerpts.41 words.\", \"8.2Mean words / excerpt\", \"0Numerals\") (SR-6)",
+    "fix": "start the text on the container's left, or on the one split line every split shares",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div.wrap > div.split.voice-split > div:nth-of-type(2) > h3 \"Observed language\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "section#overview > div.wrap > div.overview-title > h3.display \"Swipe Drinks\"",
+    "msg": "1 text block starts on a left line at x 529, 449px from the container's left: text starts on the container's left, or on one split line (x 623, 732, 841) (and 3 more like it: x 521, x 112, x 104) (SR-6)",
+    "fix": "start the text on the container's left, or on the one split line every split shares",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "section#overview > div.wrap > div.overview-title > h3.display \"Swipe Drinks\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "table > thead > tr > th:nth-of-type(5) \"Evidence\"",
+    "msg": "a box over half the container wide runs 705-1360px, not on the container's lines at 80-1360px (SR-6)",
+    "fix": "run the picture or box from the container's left line to its right line, or put it in a row or a split",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "table > thead > tr > th:nth-of-type(5) \"Evidence\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "table > tbody > tr:nth-of-type(1) > td:nth-of-type(4) \"reconstructed; artwork has no computed t\"",
+    "msg": "a box over half the container wide runs 705-1360px, not on the container's lines at 80-1360px (and 9 more like it: \"reconstructed\", \"reconstructed\", \"reconstructed\") (SR-6)",
+    "fix": "run the picture or box from the container's left line to its right line, or put it in a row or a split",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "table > tbody > tr:nth-of-type(1) > td:nth-of-type(4) \"reconstructed; artwork has no computed t\""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "section#colour > div.wrap > div.role-grid \"background#ffffffoklch(100% 0 0)1:1 on b\"",
+    "msg": "a row of 3 items: its last item ends at 1034px, the container's right line at 1360px (2px either way) (SR-7)",
+    "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "section#colour > div.wrap > div.role-grid \"background#ffffffoklch(100% 0 0)1:1 on b\""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "section#method > div.wrap > div.split \"Evidence and assumptionsComputed DOM sty\"",
+    "msg": "a row of 2 items: its items are 928/603px tall, not one height (2px either way) (SR-7)",
+    "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "section#method > div.wrap > div.split \"Evidence and assumptionsComputed DOM sty\""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "section#imagery > div.wrap > div.mosaic",
+    "msg": "a row of 3 items: its items are 504/240/240px tall, not one height (2px either way) (and 3 more like it: \"Pastel grounds.Black and\", \"Spacing4px8px12px16px24p\", \"Image treatmentBright st\") (SR-7)",
+    "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "section#imagery > div.wrap > div.mosaic"
+    ]
+   },
+   {
+    "check": "split-pair",
+    "where": "section#voice-and-tone > div.wrap > div.split.voice-split \"Observed language5 excerpts.41 words.8.2\"",
+    "msg": "the split's left column starts with a picture or a box, not text: text left, the visual right, on every split (SR-8)",
+    "fix": "put the text in the left column and the visual in the right, on every split",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "split-pair"
+    ],
+    "wheres": [
+     "section#voice-and-tone > div.wrap > div.split.voice-split \"Observed language5 excerpts.41 words.8.2\""
+    ]
+   },
+   {
+    "check": "split-pair",
+    "where": "section#components > div.wrap > div.split:nth-of-type(2) \"Rounded surfaces.Direct actions.Filled, \"",
+    "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 744, on none of the split lines 623 (k=5), 732 (k=6), 841 (k=7) (SR-8)",
+    "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "split-pair"
+    ],
+    "wheres": [
+     "section#components > div.wrap > div.split:nth-of-type(2) \"Rounded surfaces.Direct actions.Filled, \""
+    ]
+   },
+   {
+    "check": "split-pair",
+    "where": "section#components > div.wrap > div.split:nth-of-type(5) \"Light groundDrink selectionRebuilt with \"",
+    "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 744, on none of the split lines 623 (k=5), 732 (k=6), 841 (k=7) (SR-8)",
+    "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "split-pair"
+    ],
+    "wheres": [
+     "section#components > div.wrap > div.split:nth-of-type(5) \"Light groundDrink selectionRebuilt with \""
+    ]
+   },
+   {
+    "check": "collide",
+    "where": "pre#css-panel \"/* Unofficial analysis. All inferred val\"",
+    "msg": "the words \"/* Unofficial analysis. All infe\" lie over \"JSON\": two lines in one place",
+    "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency",
+    "ids": [
+     "collide"
+    ],
+    "wheres": [
+     "pre#css-panel \"/* Unofficial analysis. All inferred val\""
+    ]
+   },
+   {
+    "check": "collide",
+    "where": "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\"",
+    "msg": "the words \"{ \"$description\": \"Unofficial an\" lie over \"Method\" of another section: two lines in one place (they run out of their own section, which is shorter than what it holds)",
+    "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "collide"
+    ],
+    "wheres": [
+     "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\""
+    ]
+   },
+   {
+    "check": "row-gap",
+    "where": "section#imagery > div.wrap > div.mosaic > div.visual.slot-street",
+    "msg": "stretched alone across the last row (342px) while the 2 like it above are 159px",
+    "fix": "fill the row at this width: span the columns, or stack the split",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-gap"
+    ],
+    "wheres": [
+     "section#imagery > div.wrap > div.mosaic > div.visual.slot-street"
+    ]
+   },
+   {
+    "check": "cut-text",
+    "where": "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\"",
+    "msg": "runs past the edge of its box pre#json-panel",
+    "fix": "give the text room: no overflow clipping a line, no line past its box",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "cut-text"
+    ],
+    "wheres": [
+     "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "section#colour \"Colour\"",
+    "msg": "pictures, effects and mocks cover 12% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#colour \"Colour\""
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "section#layout-and-spacing > div.wrap > div.column-diagram > div:nth-of-type(3) \"3\"",
+    "msg": "left edge at 81.5px, 22.5px off a common edge of its section at 104px (8 elements, like i); 4 more in this section off the grid too (div:nth-of-type(4) at 110.5px, div:nth-of-type(7) at 197px, div:nth-of-type(8) at 226px, div.radius-demo.pill at 207px)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "section#layout-and-spacing > div.wrap > div.column-diagram > div:nth-of-type(3) \"3\""
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "section#imagery > div.wrap > details > summary \"Alt-text themes and source links\"",
+    "msg": "left edge at 43px, 19px off the page margin at 24px (175 elements, like h2)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "section#imagery > div.wrap > details > summary \"Alt-text themes and source links\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#cover p.small \"Not affiliated with or endorsed \"",
+    "msg": "starts at x 233.8; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#cover p.small \"Not affiliated with or endorsed \""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#fonts p \"augmented fourth · nearest inter\"",
+    "msg": "starts at x 320.2; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#fonts p \"augmented fourth · nearest inter\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#fonts p \"Scale: reconstructed\"",
+    "msg": "starts at x 632.3; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#fonts p \"Scale: reconstructed\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p.lead \"Pastel grounds.Black and white s\"",
+    "msg": "starts at x 768; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p.lead \"Pastel grounds.Black and white s\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p \"Four pastel hex values are print\"",
+    "msg": "starts at x 768; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p \"Four pastel hex values are print\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p.small \"Gradient fallback is reconstruct\"",
+    "msg": "starts at x 768; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p.small \"Gradient fallback is reconstruct\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#layout-and-spacing h3 \"Radii\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#layout-and-spacing h3 \"Radii\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#layout-and-spacing h3 \"Breakpoints\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#layout-and-spacing h3 \"Breakpoints\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#layout-and-spacing p \"640px · 1024px\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#layout-and-spacing p \"640px · 1024px\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#layout-and-spacing p.small \"Reconstructed for the guide; not\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#layout-and-spacing p.small \"Reconstructed for the guide; not\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#components h3 \"Form input\"",
+    "msg": "starts at x 777; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#components h3 \"Form input\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#components p.small \"A local visual specimen. It send\"",
+    "msg": "starts at x 777; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#components p.small \"A local visual specimen. It send\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#imagery h3 \"Measured source media\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#imagery h3 \"Measured source media\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#imagery p \"42 rendered media elements · 41.\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#imagery p \"42 rendered media elements · 41.\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#imagery p.small \"Host-page media statistics inclu\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#imagery p.small \"Host-page media statistics inclu\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone h3 \"Observed language\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone h3 \"Observed language\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone p.lead \"5 excerpts.41 words.\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone p.lead \"5 excerpts.41 words.\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone p \"8.2Mean words / excerpt\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone p \"8.2Mean words / excerpt\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone p \"0 / 0You or your / we\"",
+    "msg": "starts at x 1064; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone p \"0 / 0You or your / we\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone p \"0Numerals\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone p \"0Numerals\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone p \"4Exclamation marks\"",
+    "msg": "starts at x 1064; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone p \"4Exclamation marks\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone p \"1Single-comma lines\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone p \"1Single-comma lines\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone p \"5Sentence-case starts\"",
+    "msg": "starts at x 1064; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone p \"5Sentence-case starts\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#voice-and-tone p.small \"Narrow corpus: transcribed artwo\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#voice-and-tone p.small \"Narrow corpus: transcribed artwo\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#method h3 \"Capture\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#method h3 \"Capture\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#method p \"5 desktop pages. Desktop 1440 × \"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#method p \"5 desktop pages. Desktop 1440 × \""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#method ul \"/ · 3197 elements/case-studies/s\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#method ul \"/ · 3197 elements/case-studies/s\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#method h3 \"Run log\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#method h3 \"Run log\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#method p \"Detailed timings, validation and\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#method p \"Detailed timings, validation and\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#method h3 \"Manual image prompts\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#method h3 \"Manual image prompts\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#method p \"Generate from text only. Save to\"",
+    "msg": "starts at x 744; the lines are 80 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#method p \"Generate from text only. Save to\""
+    ]
+   },
+   {
+    "check": "screen-height",
+    "where": "#token-rebuild-test section.chapter \"Token rebuild testUnofficial ana\"",
+    "msg": "1170px, 1.30 screens; a section is exactly one or two (--h)",
+    "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "screen-height"
+    ],
+    "wheres": [
+     "#token-rebuild-test section.chapter \"Token rebuild testUnofficial ana\""
+    ]
+   },
+   {
+    "check": "screen-height",
+    "where": "#colour section.chapter.dark \"ColourUnofficial analysis06Paste\"",
+    "msg": "1897px, 2.11 screens; a section is exactly one or two (--h)",
+    "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "screen-height"
+    ],
+    "wheres": [
+     "#colour section.chapter.dark \"ColourUnofficial analysis06Paste\""
+    ]
+   },
+   {
+    "check": "neighbour",
+    "where": "#colour section.chapter.dark \"ColourUnofficial analysis06Paste\"",
+    "msg": "framed, 20px of #fonts section.chapter \"FontsUnofficial analysis05AaCirc\" shows",
+    "fix": "keep the next section's heading and picture out of this screen",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "neighbour"
+    ],
+    "wheres": [
+     "#colour section.chapter.dark \"ColourUnofficial analysis06Paste\""
+    ]
+   },
+   {
+    "check": "neighbour",
+    "where": "#layout-and-spacing section.chapter \"Layout and spacingUnofficial ana\"",
+    "msg": "framed, 636px of #colour section.chapter.dark \"ColourUnofficial analysis06Paste\" shows",
+    "fix": "keep the next section's heading and picture out of this screen",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "neighbour"
+    ],
+    "wheres": [
+     "#layout-and-spacing section.chapter \"Layout and spacingUnofficial ana\""
+    ]
+   },
+   {
+    "check": "screen-height",
+    "where": "#components section.chapter.dark \"ComponentsUnofficial analysis08R\"",
+    "msg": "1586px, 1.76 screens; a section is exactly one or two (--h)",
+    "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "screen-height"
+    ],
+    "wheres": [
+     "#components section.chapter.dark \"ComponentsUnofficial analysis08R\""
+    ]
+   },
+   {
+    "check": "screen-height",
+    "where": "#voice-and-tone section.chapter \"Voice and toneUnofficial analysi\"",
+    "msg": "2054px, 2.28 screens; a section is exactly one or two (--h)",
+    "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "screen-height"
+    ],
+    "wheres": [
+     "#voice-and-tone section.chapter \"Voice and toneUnofficial analysi\""
+    ]
+   },
+   {
+    "check": "neighbour",
+    "where": "#voice-and-tone section.chapter \"Voice and toneUnofficial analysi\"",
+    "msg": "framed, 27px of #imagery section.chapter \"ImageryUnofficial analysis09Imag\" shows",
+    "fix": "keep the next section's heading and picture out of this screen",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "neighbour"
+    ],
+    "wheres": [
+     "#voice-and-tone section.chapter \"Voice and toneUnofficial analysi\""
+    ]
+   },
+   {
+    "check": "screen-height",
+    "where": "#design-tokens section.chapter.dark \"Design tokensUnofficial analysis\"",
+    "msg": "1085px, 1.21 screens; a section is exactly one or two (--h)",
+    "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "screen-height"
+    ],
+    "wheres": [
+     "#design-tokens section.chapter.dark \"Design tokensUnofficial analysis\""
+    ]
+   },
+   {
+    "check": "neighbour",
+    "where": "#method section.chapter \"MethodUnofficial analysis12Evide\"",
+    "msg": "framed, 334px of the footer shows",
+    "fix": "keep the next section's heading and picture out of this screen",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "neighbour"
+    ],
+    "wheres": [
+     "#method section.chapter \"MethodUnofficial analysis12Evide\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#overview p \"Rebuilt colours\"",
+    "msg": "starts at x 211; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#overview p \"Rebuilt colours\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#overview p \"Rebuilt button variants\"",
+    "msg": "starts at x 211; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#overview p \"Rebuilt button variants\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour h3 \"surface\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour h3 \"surface\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p \"#ffec89oklch(93.78% 0.1216 98.71\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p \"#ffec89oklch(93.78% 0.1216 98.71\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p.small \"1.19:1 on background · assigned \"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p.small \"1.19:1 on background · assigned \""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour h3 \"text\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour h3 \"text\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p \"#1c1c1coklch(22.64% 0 0)\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p \"#1c1c1coklch(22.64% 0 0)\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p.small \"17.04:1 on background · assigned\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p.small \"17.04:1 on background · assigned\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour h3 \"text-inverse\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour h3 \"text-inverse\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p \"#ffffffoklch(100% 0 0)\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p \"#ffffffoklch(100% 0 0)\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p.small \"1:1 on background · assigned rol\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p.small \"1:1 on background · assigned rol\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour h3 \"on-action\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour h3 \"on-action\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour h3 \"accent\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour h3 \"accent\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p \"#b6e1faoklch(88.75% 0.0565 233.7\"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p \"#b6e1faoklch(88.75% 0.0565 233.7\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#colour p.small \"1.39:1 on background · assigned \"",
+    "msg": "starts at x 203; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#colour p.small \"1.39:1 on background · assigned \""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#layout-and-spacing p \"Columns\"",
+    "msg": "starts at x 211; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#layout-and-spacing p \"Columns\""
+    ]
+   },
+   {
+    "check": "edge-left",
+    "where": "#layout-and-spacing p \"Container\"",
+    "msg": "starts at x 211; the lines are 24 and the column starts",
+    "fix": "start it on the .wrap left line",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-left"
+    ],
+    "wheres": [
+     "#layout-and-spacing p \"Container\""
+    ]
+   },
+   {
+    "check": "screen-height",
+    "where": "#contents section.chapter \"ContentsUnofficial analysis0201↗\"",
+    "msg": "2379px, 2.82 screens; a section is exactly one or two (--h), or on a phone at least one that its content fills",
+    "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "screen-height"
+    ],
+    "wheres": [
+     "#contents section.chapter \"ContentsUnofficial analysis0201↗\""
+    ]
+   },
+   {
+    "check": "neighbour-ground",
+    "where": "#fonts section.chapter \"FontsUnofficial analysis05AaCirc\"",
+    "msg": "framed, 21px of #colour section.chapter.dark \"ColourUnofficial analysis06Paste\"'s ground shows",
+    "fix": "end the ground with the section",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "neighbour-ground"
+    ],
+    "wheres": [
+     "#fonts section.chapter \"FontsUnofficial analysis05AaCirc\""
+    ]
+   },
+   {
+    "check": "copy-slop-word",
+    "msg": "old slop words (seamless)",
+    "fix": "replace each word with the fact it stands in for: the step count, the figure, the material, the place (a word in the client's own name is not counted when the logo, the title before its \":\" or og:site_name writes the name) (references/copy-tells.md)",
+    "widths": [],
+    "from": "copy",
+    "where": "copy \"seamless\" in \"Single polished chrome sphere beside a translucent ice-...\"",
+    "ids": [
+     "copy-slop-word"
+    ],
+    "wheres": [
+     "copy \"seamless\" in \"Single polished chrome sphere beside a translucent ice-...\""
+    ]
+   },
+   {
+    "check": "copy-contrast",
+    "msg": "contrast frames (\"X, not Y\", isn't, rather than, instead of, without the): 24, budget 2 (a tic, not a device)",
+    "fix": "state the positive fact on its own; count all the forms together (references/copy-tells.md)",
+    "widths": [],
+    "from": "copy",
+    "where": "copy x24: \", not a\", \", not m\", \"rather than\", \", not t\", \", not e\", \", not o...",
+    "exact": true,
+    "ids": [
+     "copy-contrast"
+    ],
+    "wheres": [
+     "copy x24: \", not a\", \", not m\", \"rather than\", \", not t\", \", not e\", \", not o..."
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "cut-text",
+    "where": "section#typography > div.wrap > div.chapter-head.reveal > h2 \"Typography\"",
+    "msg": "sits across the edge of a panel behind it",
+    "fix": "give the text room: no overflow clipping a line, no line past its box",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "no-visual",
+    "where": "section#token-rebuild-test \"Token rebuild test\"",
+    "msg": "pictures, effects and mocks cover 20% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "no-visual",
+    "where": "section#colour \"Colour\"",
+    "msg": "pictures, effects and mocks cover 20% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "no-visual",
+    "where": "section#components \"Components\"",
+    "msg": "pictures, effects and mocks cover 17% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "section#fonts \"Fonts\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "section#colour \"Colour\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-headings",
+    "where": "div.wrap > div.contents-grid > a.contents-card:nth-of-type(3) > h3 \"Layout and spacing\"",
+    "msg": "the card title \"Layout and spacing\" names no product, part, place or section (6 card titles like it) (and 5 more like it: \"Voice and tone\", \"Design tokens\", \"Form input\", \"Headline length\", ...)",
+    "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-actions",
+    "where": "(the page)",
+    "msg": "the main action \"Read the guide\" does not read word for word the same in the closing section",
+    "fix": "few actions, one wording: at most 2 in the hero, the main action word for word in nav, hero and close",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "heading-scale",
+    "where": "div.wrap > div.stats > div:nth-of-type(1) > strong \"1\"",
+    "msg": "figures in 3 sizes, 32, 56, 72px (\"8.2\" at 32px, \"1\" at 72px)",
+    "fix": "set the page's figures (stats, measures, prices) in one or two sizes",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "off-grid",
+    "where": "section#layout-and-spacing > div.wrap > div.column-diagram > div:nth-of-type(7) \"7\"",
+    "msg": "two common left edges of one section 12px apart: 732px (3 elements, like this one) and 744px (5)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "right-edge",
+    "where": "div.wrap > div.split.colour-intro > div:nth-of-type(2) > div.gradient-demo",
+    "msg": "its right edge stops 24px short of the content's right edge (1360px), which div.swatch.swatch-2 reaches",
+    "fix": "end it on the content's right edge, like the other blocks of its section",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "body-size",
+    "where": "section#overview > div.wrap > div.evidence-note > p \"The source is a case study, not a live S\"",
+    "msg": "25 of 35 paragraphs of running text are set under 16px (14px)",
+    "fix": "set running text at 16px or more",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#cover / section#overview",
+    "msg": "164px between these sections, -26% against the median 221px of gaps at a change of ground",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#design-tokens / section#method",
+    "msg": "the sections overlap by 31791px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "proximity",
+    "where": "section#layout-and-spacing > div.wrap > p.small:nth-of-type(2) \"Artwork-inspired light/dark sequence. Th\"",
+    "msg": "touches the picture or panel above it (1px) (and 1 more like it: \"Logo not reproduced. App\")",
+    "fix": "leave 8px or more between a picture and its caption, and more between rows than inside a row",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "links",
+    "where": "header.topbar > div.bar-wrap > a.brand-button.compact \"Get tokens ↗\"",
+    "msg": "\"Get tokens ↗\" only scrolls to #design-tokens, where nothing completes it",
+    "fix": "point every link at a real section, page or file",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-family",
+    "where": "header.topbar.scrolled",
+    "msg": "the nav changes form as the page scrolls: header.topbar gives way to header.topbar.scrolled",
+    "fix": "keep one nav on every screen: the same bar, fill, links and type",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "stranded-action",
+    "where": "button#rebuild-button \"View tokens ↗\"",
+    "msg": "stands 363px down from the nearest text of its block (\"Drink selection\") (and 1 more like it: \"View tokens ↗\")",
+    "fix": "put the button under or beside the text it belongs to",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-length",
+    "where": "section#design-tokens \"Design tokens\"",
+    "msg": "4 sections over 90 words a screen outside the UI mocks (\"Design tokens\" 2232, \"Method\" 776, \"Imagery\" 205); 274 words a screen across the page (5142 words in 18.8 screens): a tech page says it in about 80 or fewer",
+    "fix": "cut every section to its heading, one line and the product UI: the UI says the rest; no second paragraph, no list of feature sentences",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-contrast",
+    "where": "header.topbar > div.bar-wrap > a.brand-button.compact \"Get tokens ↗\"",
+    "msg": "the button \"Get tokens ↗\" (#b6f074) stands only 1.01:1 off the ground around it: it reads as part of the ground, or as switched off",
+    "fix": "give the button a fill that stands at least 1.5:1 off what is around it, or an outline in the ink",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-contrast",
+    "where": "section#cover > div.wrap.cover-wrap > a.brand-button \"Read the guide ↗\"",
+    "msg": "the button \"Read the guide ↗\" (#b6f074) stands only 1.03:1 off the ground around it: it reads as part of the ground, or as switched off",
+    "fix": "give the button a fill that stands at least 1.5:1 off what is around it, or an outline in the ink",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-contrast",
+    "where": "article#rebuild-card > div.card-copy > button.brand-button \"View tokens ↗\"",
+    "msg": "the button \"View tokens ↗\" (#b6f074) stands only 1.11:1 off the ground around it: it reads as part of the ground, or as switched off",
+    "fix": "give the button a fill that stands at least 1.5:1 off what is around it, or an outline in the ink",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-contrast",
+    "where": "div.rebuild-ground.dark > article.brand-card.inverse-card > div.card-copy > button.brand-button \"View tokens ↗\"",
+    "msg": "the button \"View tokens ↗\" (#b6f074) stands only 1.29:1 off the ground around it: it reads as part of the ground, or as switched off",
+    "fix": "give the button a fill that stands at least 1.5:1 off what is around it, or an outline in the ink",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-contrast",
+    "where": "article#component-card > div.card-copy > button.brand-button \"View tokens ↗\"",
+    "msg": "the button \"View tokens ↗\" (#b6f074) stands only 1.11:1 off the ground around it: it reads as part of the ground, or as switched off",
+    "fix": "give the button a fill that stands at least 1.5:1 off what is around it, or an outline in the ink",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-contrast",
+    "where": "footer > div.wrap > a.brand-button \"Back to overview ↗\"",
+    "msg": "the button \"Back to overview ↗\" (#b6f074) stands only 1.00:1 off the ground around it: it reads as part of the ground, or as switched off",
+    "fix": "give the button a fill that stands at least 1.5:1 off what is around it, or an outline in the ink",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "grounds",
+    "where": "section#typography \"Typography Unofficial analysis 04 Displa\"",
+    "msg": "5 flat grounds across the page (#ffec89 section x2, #ffffff section x8, #dab8f1 section, #1c1c1c section x3, #b6f074 footer): three at most (the base, a surface, an inverse)",
+    "fix": "three flat grounds at most (the base, one surface, one inverse): lay the other bands on one of them",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "font-load",
+    "where": "section#cover > div.wrap.cover-wrap > h1.reveal.in-view \"Circular Std\"",
+    "msg": "\"Circular Std\" is asked for by the h1, the h2s and the body text but never loaded (no font link or @font-face loads it): it shows in its fallback",
+    "fix": "load every family the type asks for: name it in the font link as start.mjs prints it, spelt as Google Fonts spells it, or ask for a family the page loads",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "empty-area",
+    "where": "section#overview \"Overview\"",
+    "msg": "37% of the section is empty: 16px under its last (div.evidence-note), 35% beside content that covers under half the container, in its 696px of rows (WARN over 35%, FAIL over 50%)",
+    "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "share-meta",
+    "where": "head",
+    "msg": "the head lacks og:title, og:description, og:image, twitter:card, an icon, theme-color: a shared link shows no picture or title of its own",
+    "fix": "copy the head block of starter.html: og tags, twitter:card, the icon and theme-color (references/system.md, Head)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "header.topbar > div.bar-wrap > a.guide-name \"Swipe Drinks\"",
+    "msg": "a 82x21px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "section#layout-and-spacing \"Layout and spacing\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#imagery / section#voice-and-tone",
+    "msg": "204px between these sections, +25% against the median 163px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#typography / section#fonts",
+    "msg": "uneven space at the edge of a band: 99px outside its edge, 64px inside it (the space on either side of a change of ground reads as one gap only when the two match)",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "proximity",
+    "where": "section#colour > div.wrap > div.role-grid \"background #ffffff oklch(100% 0 0) 1:1 o\"",
+    "msg": "the rows sit 16px apart, about as close as a picture to its own caption (16px): a caption reads with the row below",
+    "fix": "set the gap between rows at twice the gap between a picture and its caption or more",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "orphan",
+    "where": "div.wrap > div.role-grid > article.role-tile:nth-of-type(2) > p:nth-of-type(1) \"#ffec89 oklch(93.78% 0.1216 98.71)\"",
+    "msg": "its last line holds only \"98.71)\" (and 3 more like it: \"#b6f074 oklch(88.94% 0.1\", \"#dab8f1 oklch(83.07% 0.0\", \"#b6e1fa oklch(88.75% 0.0\")",
+    "fix": "rebalance the text (text-wrap: pretty, or a shorter line) so the last line holds more than one short word",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "grounds",
+    "where": "footer \"Unofficial analysis Not affiliated with \"",
+    "msg": "5 flat grounds across the page (#ffec89 section x12, #ffffff section x9, #1c1c1c band x4, #dab8f1 section x4, #b6f074 footer): three at most (the base, a surface, an inverse)",
+    "fix": "three flat grounds at most (the base, one surface, one inverse): lay the other bands on one of them",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "fold-cut",
+    "where": "section#cover > div.wrap.cover-wrap > aside.glass-card > p.small \"Declared palette. Assigned action role.\"",
+    "msg": "a line of the hero text is sliced by the bottom of the first screen",
+    "fix": "size the hero so the heading ends above the fold, or starts below it",
+    "widths": [
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-exclaim",
+    "msg": "4 lines with an exclamation mark",
+    "fix": "end on a full stop: copy.md bans exclamation marks (references/copy-tells.md)",
+    "widths": [],
+    "from": "copy",
+    "where": "copy x4: \"\"Welcome to Juice Bud...\", \"\"Explore fruity flavo...\", \"\"Join us in...",
+    "exact": false
+   },
+   {
+    "check": "copy-stat-strip",
+    "msg": "stat strip x3",
+    "fix": "a strip only of figures the brief gives (a price, hours, a count); otherwise put each number in the sentence it proves, or leave it out (references/copy-tells.md)",
+    "widths": [],
+    "from": "copy",
+    "where": "copy x3: \"1 / 6 / 3\", \"1 / 2 / 3 / 4 / 5 / 6...\", \"10 / 8.2 / 0 / 4 / 1 / 5\"",
+    "exact": false
+   },
+   {
+    "check": "copy-numbered",
+    "msg": "20 step numbers",
+    "fix": "number only steps that happen in order (references/copy-tells.md)",
+    "widths": [],
+    "from": "copy",
+    "where": "(the copy)",
+    "exact": false
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 237,
+   "layout": 16
+  }
+ },
+ "open": [
+  {
+   "check": "flush",
+   "where": "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\"",
+   "msg": "its last line sits -31913px above the lower edge of section#design-tokens, where the ground changes to section#method",
+   "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "flush"
+   ],
+   "wheres": [
+    "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\""
+   ]
+  },
+  {
+   "check": "placeholder",
+   "where": "p#type-specimen \"Aa Bb Cc 0123456789\"",
+   "msg": "a stand-in contact printed on the page (\"0123456789\"): no visitor can use it (and 1 more like it: \"ABCDEFGHIJKLMNOPQRSTUVWX\")",
+   "fix": "print the real address and number, or a form or a button that names the action: never an example.com address or a number of zeros",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "placeholder"
+   ],
+   "wheres": [
+    "p#type-specimen \"Aa Bb Cc 0123456789\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#overview > div.wrap > div.chapter-head.reveal \"Overview Unofficial analysis 01\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#overview > div.wrap > div.chapter-head.reveal \"Overview Unofficial analysis 01\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#contents > div.wrap > div.chapter-head.reveal \"Contents Unofficial analysis 02\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#contents > div.wrap > div.chapter-head.reveal \"Contents Unofficial analysis 02\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#token-rebuild-test > div.wrap > div.chapter-head.reveal \"Token rebuild test Unofficial analysis 0\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#token-rebuild-test > div.wrap > div.chapter-head.reveal \"Token rebuild test Unofficial analysis 0\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#typography > div.wrap > div.chapter-head.reveal \"Typography Unofficial analysis 04\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#typography > div.wrap > div.chapter-head.reveal \"Typography Unofficial analysis 04\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#fonts > div.wrap > div.chapter-head.reveal \"Fonts Unofficial analysis 05\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#fonts > div.wrap > div.chapter-head.reveal \"Fonts Unofficial analysis 05\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#colour > div.wrap > div.chapter-head.reveal \"Colour Unofficial analysis 06\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#colour > div.wrap > div.chapter-head.reveal \"Colour Unofficial analysis 06\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#layout-and-spacing > div.wrap > div.chapter-head.reveal \"Layout and spacing Unofficial analysis 0\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#layout-and-spacing > div.wrap > div.chapter-head.reveal \"Layout and spacing Unofficial analysis 0\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#components > div.wrap > div.chapter-head.reveal \"Components Unofficial analysis 08\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#components > div.wrap > div.chapter-head.reveal \"Components Unofficial analysis 08\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#imagery > div.wrap > div.chapter-head.reveal \"Imagery Unofficial analysis 09\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#imagery > div.wrap > div.chapter-head.reveal \"Imagery Unofficial analysis 09\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#voice-and-tone > div.wrap > div.chapter-head.reveal \"Voice and tone Unofficial analysis 10\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#voice-and-tone > div.wrap > div.chapter-head.reveal \"Voice and tone Unofficial analysis 10\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#design-tokens > div.wrap > div.chapter-head.reveal \"Design tokens Unofficial analysis 11\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#design-tokens > div.wrap > div.chapter-head.reveal \"Design tokens Unofficial analysis 11\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "section#method > div.wrap > div.chapter-head.reveal \"Method Unofficial analysis 12\"",
+   "msg": "starts \"rise-in\" (0.7 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "section#method > div.wrap > div.chapter-head.reveal \"Method Unofficial analysis 12\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "section#overview \"Overview\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#overview \"Overview\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "section#fonts \"Fonts\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#fonts \"Fonts\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "section#layout-and-spacing \"Layout and spacing\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#layout-and-spacing \"Layout and spacing\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "section#design-tokens \"Design tokens\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#design-tokens \"Design tokens\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "section#method \"Method\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#method \"Method\""
+   ]
+  },
+  {
+   "check": "card-visual",
+   "where": "section#layout-and-spacing > div.wrap > div.rhythm \"1 background 2 surface 3 surface-inverse\"",
+   "msg": "4 cards hold only text: no picture, icon, UI fragment or effect in any of them",
+   "fix": "give the cards a visual: an inset panel with a UI fragment, a photograph or real icons",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "card-visual"
+   ],
+   "wheres": [
+    "section#layout-and-spacing > div.wrap > div.rhythm \"1 background 2 surface 3 surface-inverse\""
+   ]
+  },
+  {
+   "check": "card-visual",
+   "where": "section#voice-and-tone > div.wrap > div.rule-grid \"01 Headline length Keep headlines near t\"",
+   "msg": "3 cards hold only text: no picture, icon, UI fragment or effect in any of them",
+   "fix": "give the cards a visual: an inset panel with a UI fragment, a photograph or real icons",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "card-visual"
+   ],
+   "wheres": [
+    "section#voice-and-tone > div.wrap > div.rule-grid \"01 Headline length Keep headlines near t\""
+   ]
+  },
+  {
+   "check": "same-action",
+   "where": "button#rebuild-button \"View tokens ↗\"",
+   "msg": "\"View tokens ↗\" appears 9 times in different looks: pill, fill #b6f074 and pill, outline #ffffff",
+   "fix": "draw one action the same way everywhere (only the nav copy may be one size smaller)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "same-action"
+   ],
+   "wheres": [
+    "button#rebuild-button \"View tokens ↗\""
+   ]
+  },
+  {
+   "check": "cta",
+   "where": "section#method \"Method\"",
+   "msg": "the last section before the footer ends with no button",
+   "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "cta"
+   ],
+   "wheres": [
+    "section#method \"Method\""
+   ]
+  },
+  {
+   "check": "copy-headings",
+   "where": "section#overview > div.wrap > div.chapter-head.reveal > h2 \"Overview\"",
+   "msg": "\"Overview\" names no product, part, place or section (39 headings like it; at most one brand line per page) (and 38 more like it: \"Contents\", \"Token rebuild test\", \"Typography\", \"Fonts\", ...)",
+   "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "copy-headings"
+   ],
+   "wheres": [
+    "section#overview > div.wrap > div.chapter-head.reveal > h2 \"Overview\""
+   ]
+  },
+  {
+   "check": "heading-scale",
+   "where": "section#overview > div.wrap > div.overview-title > h3.display \"Swipe Drinks\"",
+   "msg": "an h3 at 72px, as large as the smallest h2 (56px) or larger",
+   "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "heading-scale"
+   ],
+   "wheres": [
+    "section#overview > div.wrap > div.overview-title > h3.display \"Swipe Drinks\""
+   ]
+  },
+  {
+   "check": "heading-scale",
+   "where": "div.wrap > div.stats > div:nth-of-type(1) > strong \"1\"",
+   "msg": "the figure \"1\" is set at 72px, larger than the section headings (h2 56px); 7 more like it",
+   "fix": "set figures at the h2 size or under: a stat reads as data, not as the heading",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "heading-scale"
+   ],
+   "wheres": [
+    "div.wrap > div.stats > div:nth-of-type(1) > strong \"1\""
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "section#fonts > div.wrap > details > summary \"Sizes in use and declared type variables\"",
+   "msg": "left edge at 99px, 19px off the page margin at 80px (97 elements, like h2)",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "section#fonts > div.wrap > details > summary \"Sizes in use and declared type variables\""
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "section#colour > div.wrap > details > summary \"Contrast pairs and full evidence palette\"",
+   "msg": "left edge at 99px, 19px off the page margin at 80px (97 elements, like p.small)",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "section#colour > div.wrap > details > summary \"Contrast pairs and full evidence palette\""
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "div.split > div:nth-of-type(2) > div.radius-grid > div.radius-demo.pill \"Pill 999px\"",
+   "msg": "left edge at 1064px, 6px off a common edge of its section at 1058px (3 elements, like div:nth-of-type(10))",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "div.split > div:nth-of-type(2) > div.radius-grid > div.radius-demo.pill \"Pill 999px\""
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "section#imagery > div.wrap > div.mosaic > div.visual.slot-fruit",
+   "msg": "left edge at 720px, 24px off a common edge of its section at 744px (4 elements, like h3); 2 more in this section off the grid too (div.visual.slot-street at 720px, summary at 99px)",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "section#imagery > div.wrap > div.mosaic > div.visual.slot-fruit"
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "div.split > div:nth-of-type(1) > ul.assumptions > li:nth-of-type(1) \"Computed DOM styles describe the host pa\"",
+   "msg": "left edge at 104px, 24px off the page margin at 80px (97 elements, like h3); 15 more in this section off the grid too (li:nth-of-type(2) at 104px, li:nth-of-type(3) at 104px, li:nth-of-type(4) at 104px, li:nth-of-type(5) at 104px, ...)",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "div.split > div:nth-of-type(1) > ul.assumptions > li:nth-of-type(1) \"Computed DOM styles describe the host pa\""
+   ]
+  },
+  {
+   "check": "section-tile",
+   "where": "section#token-rebuild-test \"Token rebuild test\"",
+   "msg": "the section is 1170px tall (1.30 screens at 1440x900), not one screen or two: the screen one screen on from its top (scroll 3600px) shows 194px of it and 630px of the next section, its heading \"Typography\" on screen",
+   "fix": "set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-tile"
+   ],
+   "wheres": [
+    "section#token-rebuild-test \"Token rebuild test\""
+   ]
+  },
+  {
+   "check": "section-tile",
+   "where": "section#colour \"Colour\"",
+   "msg": "the section is 1897px tall (2.11 screens at 1440x900), not one screen or two: the screen 2 screens on from its top (scroll 8215px) shows 21px of it and 803px of the next section, its heading \"Layout and spacing\" on screen",
+   "fix": "set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-tile"
+   ],
+   "wheres": [
+    "section#colour \"Colour\""
+   ]
+  },
+  {
+   "check": "section-tile",
+   "where": "section#voice-and-tone \"Voice and tone\"",
+   "msg": "the section is 2054px tall (2.28 screens at 1440x900), not one screen or two: the screen 2 screens on from its top (scroll 14208px) shows 178px of it and 646px of the next section, its heading \"Design tokens\" on screen",
+   "fix": "set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-tile"
+   ],
+   "wheres": [
+    "section#voice-and-tone \"Voice and tone\""
+   ]
+  },
+  {
+   "check": "section-tile",
+   "where": "section#design-tokens \"Design tokens\"",
+   "msg": "the section is 1085px tall (1.21 screens at 1440x900), not one screen or two: the screen one screen on from its top (scroll 15362px) shows 109px of it and 715px of the next section, its heading \"Method\" on screen",
+   "fix": "set every section after the hero to one screen or two (height: calc(var(--h,1) * 100vh)) and fit its content above --padb",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-tile"
+   ],
+   "wheres": [
+    "section#design-tokens \"Design tokens\""
+   ]
+  },
+  {
+   "check": "heading-order",
+   "where": "section#cover > div.wrap.cover-wrap:nth-of-type(2) > aside.glass-card > h3 \"#b6f074\"",
+   "msg": "\"#b6f074\" is an h3 after an h1: a level is skipped",
+   "fix": "step down one level at a time (h1, h2, h3): change the tag, not the look; a footer's column heads are h3",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "heading-order"
+   ],
+   "wheres": [
+    "section#cover > div.wrap.cover-wrap:nth-of-type(2) > aside.glass-card > h3 \"#b6f074\""
+   ]
+  },
+  {
+   "check": "focus-visible",
+   "where": "div.wrap > div.button-gallery:nth-of-type(3) > div.component-ground:nth-of-type(1) > button.brand-button \"View tokens ↗\"",
+   "msg": "Tab stop 21, button \"View tokens ↗\": its focus change is faint: 1:1 against the ground, 3:1 needed",
+   "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "focus-visible"
+   ],
+   "wheres": [
+    "div.wrap > div.button-gallery:nth-of-type(3) > div.component-ground:nth-of-type(1) > button.brand-button \"View tokens ↗\""
+   ]
+  },
+  {
+   "check": "focus-visible",
+   "where": "input#demo-input",
+   "msg": "Tab stop 26, input \"\": its focus change is faint: 1:1 against the ground, 3:1 needed",
+   "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "focus-visible"
+   ],
+   "wheres": [
+    "input#demo-input"
+   ]
+  },
+  {
+   "check": "focus-visible",
+   "where": "button#copy-css \"Copy CSS\"",
+   "msg": "Tab stop 34, button \"Copy CSS\": its focus change is faint: 1:1 against the ground, 3:1 needed",
+   "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "focus-visible"
+   ],
+   "wheres": [
+    "button#copy-css \"Copy CSS\""
+   ]
+  },
+  {
+   "check": "moment-none",
+   "where": "(the page)",
+   "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+   "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "moment-none"
+   ],
+   "wheres": [
+    "(the page)"
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "footer \"Unofficial analysisNot affiliated with o\"",
+   "msg": "the section is 334px tall (0.4 screens), 566px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+   "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height"
+   ],
+   "wheres": [
+    "footer \"Unofficial analysisNot affiliated with o\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "section#layout-and-spacing \"Layout and spacingUnofficial analysis074\"",
+   "msg": "the section is 1321px tall (1.5 screens), 421px over one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+   "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height",
+    "screen-height"
+   ],
+   "wheres": [
+    "section#layout-and-spacing \"Layout and spacingUnofficial analysis074\"",
+    "#layout-and-spacing section.chapter \"Layout and spacingUnofficial ana\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "section#method \"MethodUnofficial analysis12Evidence and \"",
+   "msg": "the section is 1384px tall (1.5 screens), 416px short of two screens (1800px): every section after the hero is one screen or two, 2px either way (and 7 more like it: \"ImageryUnofficial analys\", \"Token rebuild testUnoffi\", \"Voice and toneUnofficial\") (SR-2)",
+   "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height",
+    "screen-height"
+   ],
+   "wheres": [
+    "section#method \"MethodUnofficial analysis12Evidence and \"",
+    "#method section.chapter \"MethodUnofficial analysis12Evide\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "section#imagery \"ImageryUnofficial analysis09Image treatm\"",
+   "msg": "the section starts at 11220px, 420px below the screen grid (12 x 900px): sections start on whole screens (SR-2)",
+   "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height",
+    "screen-height"
+   ],
+   "wheres": [
+    "section#imagery \"ImageryUnofficial analysis09Image treatm\"",
+    "#imagery section.chapter \"ImageryUnofficial analysis09Imag\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "section#typography \"TypographyUnofficial analysis04DisplayHe\"",
+   "msg": "the section starts at 3870px, 270px below the screen grid (4 x 900px): sections start on whole screens (SR-2)",
+   "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height"
+   ],
+   "wheres": [
+    "section#typography \"TypographyUnofficial analysis04DisplayHe\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "section#fonts \"FontsUnofficial analysis05AaCircular Std\"",
+   "msg": "the section starts at 4770px, 270px below the screen grid (5 x 900px): sections start on whole screens (and 7 more like it: \"ComponentsUnofficial ana\", \"MethodUnofficial analysi\", \"Layout and spacingUnoffi\") (SR-2)",
+   "fix": "make every section above it exactly one or two screens tall, so this one starts on a whole screen",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height",
+    "screen-height"
+   ],
+   "wheres": [
+    "section#fonts \"FontsUnofficial analysis05AaCircular Std\"",
+    "#fonts section.chapter \"FontsUnofficial analysis05AaCirc\""
+   ]
+  },
+  {
+   "check": "section-air",
+   "where": "section#fonts > div.wrap > details \"Sizes in use and declared type variables\"",
+   "msg": "a top border across 100% of the container, between the section's content: sections and their parts are told apart by air and ground, not lines (SR-3)",
+   "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-air"
+   ],
+   "wheres": [
+    "section#fonts > div.wrap > details \"Sizes in use and declared type variables\""
+   ]
+  },
+  {
+   "check": "section-air",
+   "where": "section#colour > div.wrap > details \"Contrast pairs and full evidence palette\"",
+   "msg": "a top border across 100% of the container, between the section's content: sections and their parts are told apart by air and ground, not lines (SR-3)",
+   "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-air"
+   ],
+   "wheres": [
+    "section#colour > div.wrap > details \"Contrast pairs and full evidence palette\""
+   ]
+  },
+  {
+   "check": "section-air",
+   "where": "section#imagery > div.wrap > details \"Alt-text themes and source linksThin hor\"",
+   "msg": "a top border across 100% of the container, between the section's content: sections and their parts are told apart by air and ground, not lines (and 1 more like it: \"Image prompts tableSlotR\") (SR-3)",
+   "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-air"
+   ],
+   "wheres": [
+    "section#imagery > div.wrap > details \"Alt-text themes and source linksThin hor\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "section#components \"ComponentsUnofficial analysis08Rounded s\"",
+   "msg": "the screen at scroll 10800px (stride 12) shows 344px of section 9 and the content of 2 sections, over 24px each beside section 10: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+   "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section",
+    "neighbour"
+   ],
+   "wheres": [
+    "section#components \"ComponentsUnofficial analysis08Rounded s\"",
+    "section#components > div.wrap > div.chapter-head.reveal > h2 \"Components\"",
+    "#components section.chapter.dark \"ComponentsUnofficial analysis08R\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "footer \"Unofficial analysisNot affiliated with o\"",
+   "msg": "the screen at scroll 16366px (the top of section 14) shows 334px of section 14 and the content of 2 sections, over 24px each beside section 13: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+   "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "footer \"Unofficial analysisNot affiliated with o\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "section#overview > div.wrap > div.evidence-note \"Evidence boundaryThe source is a case st\"",
+   "msg": "a band: a box 89% of the section wide on a ground of its own that holds only text: the section's own ground is the band (SR-4)",
+   "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "section#overview > div.wrap > div.evidence-note \"Evidence boundaryThe source is a case st\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "section#typography > div.wrap > div.specimen.glass-card \"DisplayHeadingSubheadLeadBodyAa Bb Cc012\"",
+   "msg": "a band: a box 89% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (SR-4)",
+   "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "section#typography > div.wrap > div.specimen.glass-card \"DisplayHeadingSubheadLeadBodyAa Bb Cc012\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "section#fonts > div.wrap > div.font-grid > article.font-card \"AaCircular StdBook · Medium · BoldUsage \"",
+   "msg": "a band: a box 89% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (and 1 more like it: \"Logo slot144 × 40pxRecon\") (SR-4)",
+   "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section",
+    "neighbour"
+   ],
+   "wheres": [
+    "section#fonts > div.wrap > div.font-grid > article.font-card \"AaCircular StdBook · Medium · BoldUsage \"",
+    "#fonts section.chapter \"FontsUnofficial analysis05AaCirc\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "a.skip-link \"Skip to content\"",
+   "msg": "a <a> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "a.skip-link \"Skip to content\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "header.topbar \"Swipe Drinks / Brand guideUnofficial ana\"",
+   "msg": "a <header> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "header.topbar \"Swipe Drinks / Brand guideUnofficial ana\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "footer \"Unofficial analysisNot affiliated with o\"",
+   "msg": "a <footer> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (and 3 more like it: \"Reconstructed palette gr\", \"Brand guidelines / 2026S\", \"Brand guidelines / 2026S\") (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "footer \"Unofficial analysisNot affiliated with o\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "section#cover > div.visual.slot-hero \"Reconstructed palette gradient: hero\"",
+   "msg": "a box runs 0-1440px, outside the container lines of section 1 at 80-1360px: full width is for background layers and grounds only (SR-6)",
+   "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "section#cover > div.visual.slot-hero \"Reconstructed palette gradient: hero\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div.wrap > div.split.voice-split > div:nth-of-type(2) > h3 \"Observed language\"",
+   "msg": "6 text blocks start on a left line at x 744, 664px from the container's left: text starts on the container's left, or on one split line (x 623, 732, 841) (also \"5 excerpts.41 words.\", \"8.2Mean words / excerpt\", \"0Numerals\") (SR-6)",
+   "fix": "start the text on the container's left, or on the one split line every split shares",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div.wrap > div.split.voice-split > div:nth-of-type(2) > h3 \"Observed language\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "section#overview > div.wrap > div.overview-title > h3.display \"Swipe Drinks\"",
+   "msg": "1 text block starts on a left line at x 529, 449px from the container's left: text starts on the container's left, or on one split line (x 623, 732, 841) (and 3 more like it: x 521, x 112, x 104) (SR-6)",
+   "fix": "start the text on the container's left, or on the one split line every split shares",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "section#overview > div.wrap > div.overview-title > h3.display \"Swipe Drinks\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "table > thead > tr > th:nth-of-type(5) \"Evidence\"",
+   "msg": "a box over half the container wide runs 705-1360px, not on the container's lines at 80-1360px (SR-6)",
+   "fix": "run the picture or box from the container's left line to its right line, or put it in a row or a split",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "table > thead > tr > th:nth-of-type(5) \"Evidence\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "table > tbody > tr:nth-of-type(1) > td:nth-of-type(4) \"reconstructed; artwork has no computed t\"",
+   "msg": "a box over half the container wide runs 705-1360px, not on the container's lines at 80-1360px (and 9 more like it: \"reconstructed\", \"reconstructed\", \"reconstructed\") (SR-6)",
+   "fix": "run the picture or box from the container's left line to its right line, or put it in a row or a split",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "table > tbody > tr:nth-of-type(1) > td:nth-of-type(4) \"reconstructed; artwork has no computed t\""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "section#colour > div.wrap > div.role-grid \"background#ffffffoklch(100% 0 0)1:1 on b\"",
+   "msg": "a row of 3 items: its last item ends at 1034px, the container's right line at 1360px (2px either way) (SR-7)",
+   "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "section#colour > div.wrap > div.role-grid \"background#ffffffoklch(100% 0 0)1:1 on b\""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "section#method > div.wrap > div.split \"Evidence and assumptionsComputed DOM sty\"",
+   "msg": "a row of 2 items: its items are 928/603px tall, not one height (2px either way) (SR-7)",
+   "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "section#method > div.wrap > div.split \"Evidence and assumptionsComputed DOM sty\""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "section#imagery > div.wrap > div.mosaic",
+   "msg": "a row of 3 items: its items are 504/240/240px tall, not one height (2px either way) (and 3 more like it: \"Pastel grounds.Black and\", \"Spacing4px8px12px16px24p\", \"Image treatmentBright st\") (SR-7)",
+   "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "section#imagery > div.wrap > div.mosaic"
+   ]
+  },
+  {
+   "check": "split-pair",
+   "where": "section#voice-and-tone > div.wrap > div.split.voice-split \"Observed language5 excerpts.41 words.8.2\"",
+   "msg": "the split's left column starts with a picture or a box, not text: text left, the visual right, on every split (SR-8)",
+   "fix": "put the text in the left column and the visual in the right, on every split",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "split-pair"
+   ],
+   "wheres": [
+    "section#voice-and-tone > div.wrap > div.split.voice-split \"Observed language5 excerpts.41 words.8.2\""
+   ]
+  },
+  {
+   "check": "split-pair",
+   "where": "section#components > div.wrap > div.split:nth-of-type(2) \"Rounded surfaces.Direct actions.Filled, \"",
+   "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 744, on none of the split lines 623 (k=5), 732 (k=6), 841 (k=7) (SR-8)",
+   "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "split-pair"
+   ],
+   "wheres": [
+    "section#components > div.wrap > div.split:nth-of-type(2) \"Rounded surfaces.Direct actions.Filled, \""
+   ]
+  },
+  {
+   "check": "split-pair",
+   "where": "section#components > div.wrap > div.split:nth-of-type(5) \"Light groundDrink selectionRebuilt with \"",
+   "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 744, on none of the split lines 623 (k=5), 732 (k=6), 841 (k=7) (SR-8)",
+   "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "split-pair"
+   ],
+   "wheres": [
+    "section#components > div.wrap > div.split:nth-of-type(5) \"Light groundDrink selectionRebuilt with \""
+   ]
+  },
+  {
+   "check": "collide",
+   "where": "pre#css-panel \"/* Unofficial analysis. All inferred val\"",
+   "msg": "the words \"/* Unofficial analysis. All infe\" lie over \"JSON\": two lines in one place",
+   "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+   "widths": [
+    390,
+    320
+   ],
+   "from": "consistency",
+   "ids": [
+    "collide"
+   ],
+   "wheres": [
+    "pre#css-panel \"/* Unofficial analysis. All inferred val\""
+   ]
+  },
+  {
+   "check": "collide",
+   "where": "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\"",
+   "msg": "the words \"{ \"$description\": \"Unofficial an\" lie over \"Method\" of another section: two lines in one place (they run out of their own section, which is shorter than what it holds)",
+   "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "collide"
+   ],
+   "wheres": [
+    "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\""
+   ]
+  },
+  {
+   "check": "row-gap",
+   "where": "section#imagery > div.wrap > div.mosaic > div.visual.slot-street",
+   "msg": "stretched alone across the last row (342px) while the 2 like it above are 159px",
+   "fix": "fill the row at this width: span the columns, or stack the split",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-gap"
+   ],
+   "wheres": [
+    "section#imagery > div.wrap > div.mosaic > div.visual.slot-street"
+   ]
+  },
+  {
+   "check": "cut-text",
+   "where": "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\"",
+   "msg": "runs past the edge of its box pre#json-panel",
+   "fix": "give the text room: no overflow clipping a line, no line past its box",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "cut-text"
+   ],
+   "wheres": [
+    "pre#json-panel \"{ \"$description\": \"Unofficial analysis o\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "section#colour \"Colour\"",
+   "msg": "pictures, effects and mocks cover 12% of this section; a feature section needs a visual (about 25% or more)",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#colour \"Colour\""
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "section#layout-and-spacing > div.wrap > div.column-diagram > div:nth-of-type(3) \"3\"",
+   "msg": "left edge at 81.5px, 22.5px off a common edge of its section at 104px (8 elements, like i); 4 more in this section off the grid too (div:nth-of-type(4) at 110.5px, div:nth-of-type(7) at 197px, div:nth-of-type(8) at 226px, div.radius-demo.pill at 207px)",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "section#layout-and-spacing > div.wrap > div.column-diagram > div:nth-of-type(3) \"3\""
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "section#imagery > div.wrap > details > summary \"Alt-text themes and source links\"",
+   "msg": "left edge at 43px, 19px off the page margin at 24px (175 elements, like h2)",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "section#imagery > div.wrap > details > summary \"Alt-text themes and source links\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#cover p.small \"Not affiliated with or endorsed \"",
+   "msg": "starts at x 233.8; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#cover p.small \"Not affiliated with or endorsed \""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#fonts p \"augmented fourth · nearest inter\"",
+   "msg": "starts at x 320.2; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#fonts p \"augmented fourth · nearest inter\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#fonts p \"Scale: reconstructed\"",
+   "msg": "starts at x 632.3; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#fonts p \"Scale: reconstructed\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p.lead \"Pastel grounds.Black and white s\"",
+   "msg": "starts at x 768; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p.lead \"Pastel grounds.Black and white s\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p \"Four pastel hex values are print\"",
+   "msg": "starts at x 768; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p \"Four pastel hex values are print\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p.small \"Gradient fallback is reconstruct\"",
+   "msg": "starts at x 768; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p.small \"Gradient fallback is reconstruct\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#layout-and-spacing h3 \"Radii\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#layout-and-spacing h3 \"Radii\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#layout-and-spacing h3 \"Breakpoints\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#layout-and-spacing h3 \"Breakpoints\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#layout-and-spacing p \"640px · 1024px\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#layout-and-spacing p \"640px · 1024px\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#layout-and-spacing p.small \"Reconstructed for the guide; not\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#layout-and-spacing p.small \"Reconstructed for the guide; not\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#components h3 \"Form input\"",
+   "msg": "starts at x 777; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#components h3 \"Form input\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#components p.small \"A local visual specimen. It send\"",
+   "msg": "starts at x 777; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#components p.small \"A local visual specimen. It send\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#imagery h3 \"Measured source media\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#imagery h3 \"Measured source media\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#imagery p \"42 rendered media elements · 41.\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#imagery p \"42 rendered media elements · 41.\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#imagery p.small \"Host-page media statistics inclu\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#imagery p.small \"Host-page media statistics inclu\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone h3 \"Observed language\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone h3 \"Observed language\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone p.lead \"5 excerpts.41 words.\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone p.lead \"5 excerpts.41 words.\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone p \"8.2Mean words / excerpt\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone p \"8.2Mean words / excerpt\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone p \"0 / 0You or your / we\"",
+   "msg": "starts at x 1064; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone p \"0 / 0You or your / we\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone p \"0Numerals\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone p \"0Numerals\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone p \"4Exclamation marks\"",
+   "msg": "starts at x 1064; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone p \"4Exclamation marks\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone p \"1Single-comma lines\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone p \"1Single-comma lines\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone p \"5Sentence-case starts\"",
+   "msg": "starts at x 1064; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone p \"5Sentence-case starts\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#voice-and-tone p.small \"Narrow corpus: transcribed artwo\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#voice-and-tone p.small \"Narrow corpus: transcribed artwo\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#method h3 \"Capture\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#method h3 \"Capture\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#method p \"5 desktop pages. Desktop 1440 × \"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#method p \"5 desktop pages. Desktop 1440 × \""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#method ul \"/ · 3197 elements/case-studies/s\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#method ul \"/ · 3197 elements/case-studies/s\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#method h3 \"Run log\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#method h3 \"Run log\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#method p \"Detailed timings, validation and\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#method p \"Detailed timings, validation and\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#method h3 \"Manual image prompts\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#method h3 \"Manual image prompts\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#method p \"Generate from text only. Save to\"",
+   "msg": "starts at x 744; the lines are 80 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#method p \"Generate from text only. Save to\""
+   ]
+  },
+  {
+   "check": "screen-height",
+   "where": "#token-rebuild-test section.chapter \"Token rebuild testUnofficial ana\"",
+   "msg": "1170px, 1.30 screens; a section is exactly one or two (--h)",
+   "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "screen-height"
+   ],
+   "wheres": [
+    "#token-rebuild-test section.chapter \"Token rebuild testUnofficial ana\""
+   ]
+  },
+  {
+   "check": "screen-height",
+   "where": "#colour section.chapter.dark \"ColourUnofficial analysis06Paste\"",
+   "msg": "1897px, 2.11 screens; a section is exactly one or two (--h)",
+   "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "screen-height"
+   ],
+   "wheres": [
+    "#colour section.chapter.dark \"ColourUnofficial analysis06Paste\""
+   ]
+  },
+  {
+   "check": "neighbour",
+   "where": "#colour section.chapter.dark \"ColourUnofficial analysis06Paste\"",
+   "msg": "framed, 20px of #fonts section.chapter \"FontsUnofficial analysis05AaCirc\" shows",
+   "fix": "keep the next section's heading and picture out of this screen",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "neighbour"
+   ],
+   "wheres": [
+    "#colour section.chapter.dark \"ColourUnofficial analysis06Paste\""
+   ]
+  },
+  {
+   "check": "neighbour",
+   "where": "#layout-and-spacing section.chapter \"Layout and spacingUnofficial ana\"",
+   "msg": "framed, 636px of #colour section.chapter.dark \"ColourUnofficial analysis06Paste\" shows",
+   "fix": "keep the next section's heading and picture out of this screen",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "neighbour"
+   ],
+   "wheres": [
+    "#layout-and-spacing section.chapter \"Layout and spacingUnofficial ana\""
+   ]
+  },
+  {
+   "check": "screen-height",
+   "where": "#components section.chapter.dark \"ComponentsUnofficial analysis08R\"",
+   "msg": "1586px, 1.76 screens; a section is exactly one or two (--h)",
+   "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "screen-height"
+   ],
+   "wheres": [
+    "#components section.chapter.dark \"ComponentsUnofficial analysis08R\""
+   ]
+  },
+  {
+   "check": "screen-height",
+   "where": "#voice-and-tone section.chapter \"Voice and toneUnofficial analysi\"",
+   "msg": "2054px, 2.28 screens; a section is exactly one or two (--h)",
+   "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "screen-height"
+   ],
+   "wheres": [
+    "#voice-and-tone section.chapter \"Voice and toneUnofficial analysi\""
+   ]
+  },
+  {
+   "check": "neighbour",
+   "where": "#voice-and-tone section.chapter \"Voice and toneUnofficial analysi\"",
+   "msg": "framed, 27px of #imagery section.chapter \"ImageryUnofficial analysis09Imag\" shows",
+   "fix": "keep the next section's heading and picture out of this screen",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "neighbour"
+   ],
+   "wheres": [
+    "#voice-and-tone section.chapter \"Voice and toneUnofficial analysi\""
+   ]
+  },
+  {
+   "check": "screen-height",
+   "where": "#design-tokens section.chapter.dark \"Design tokensUnofficial analysis\"",
+   "msg": "1085px, 1.21 screens; a section is exactly one or two (--h)",
+   "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "screen-height"
+   ],
+   "wheres": [
+    "#design-tokens section.chapter.dark \"Design tokensUnofficial analysis\""
+   ]
+  },
+  {
+   "check": "neighbour",
+   "where": "#method section.chapter \"MethodUnofficial analysis12Evide\"",
+   "msg": "framed, 334px of the footer shows",
+   "fix": "keep the next section's heading and picture out of this screen",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "neighbour"
+   ],
+   "wheres": [
+    "#method section.chapter \"MethodUnofficial analysis12Evide\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#overview p \"Rebuilt colours\"",
+   "msg": "starts at x 211; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#overview p \"Rebuilt colours\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#overview p \"Rebuilt button variants\"",
+   "msg": "starts at x 211; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#overview p \"Rebuilt button variants\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour h3 \"surface\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour h3 \"surface\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p \"#ffec89oklch(93.78% 0.1216 98.71\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p \"#ffec89oklch(93.78% 0.1216 98.71\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p.small \"1.19:1 on background · assigned \"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p.small \"1.19:1 on background · assigned \""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour h3 \"text\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour h3 \"text\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p \"#1c1c1coklch(22.64% 0 0)\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p \"#1c1c1coklch(22.64% 0 0)\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p.small \"17.04:1 on background · assigned\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p.small \"17.04:1 on background · assigned\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour h3 \"text-inverse\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour h3 \"text-inverse\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p \"#ffffffoklch(100% 0 0)\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p \"#ffffffoklch(100% 0 0)\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p.small \"1:1 on background · assigned rol\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p.small \"1:1 on background · assigned rol\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour h3 \"on-action\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour h3 \"on-action\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour h3 \"accent\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour h3 \"accent\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p \"#b6e1faoklch(88.75% 0.0565 233.7\"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p \"#b6e1faoklch(88.75% 0.0565 233.7\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#colour p.small \"1.39:1 on background · assigned \"",
+   "msg": "starts at x 203; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#colour p.small \"1.39:1 on background · assigned \""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#layout-and-spacing p \"Columns\"",
+   "msg": "starts at x 211; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#layout-and-spacing p \"Columns\""
+   ]
+  },
+  {
+   "check": "edge-left",
+   "where": "#layout-and-spacing p \"Container\"",
+   "msg": "starts at x 211; the lines are 24 and the column starts",
+   "fix": "start it on the .wrap left line",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-left"
+   ],
+   "wheres": [
+    "#layout-and-spacing p \"Container\""
+   ]
+  },
+  {
+   "check": "screen-height",
+   "where": "#contents section.chapter \"ContentsUnofficial analysis0201↗\"",
+   "msg": "2379px, 2.82 screens; a section is exactly one or two (--h), or on a phone at least one that its content fills",
+   "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "screen-height"
+   ],
+   "wheres": [
+    "#contents section.chapter \"ContentsUnofficial analysis0201↗\""
+   ]
+  },
+  {
+   "check": "neighbour-ground",
+   "where": "#fonts section.chapter \"FontsUnofficial analysis05AaCirc\"",
+   "msg": "framed, 21px of #colour section.chapter.dark \"ColourUnofficial analysis06Paste\"'s ground shows",
+   "fix": "end the ground with the section",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "neighbour-ground"
+   ],
+   "wheres": [
+    "#fonts section.chapter \"FontsUnofficial analysis05AaCirc\""
+   ]
+  },
+  {
+   "check": "copy-slop-word",
+   "msg": "old slop words (seamless)",
+   "fix": "replace each word with the fact it stands in for: the step count, the figure, the material, the place (a word in the client's own name is not counted when the logo, the title before its \":\" or og:site_name writes the name) (references/copy-tells.md)",
+   "widths": [],
+   "from": "copy",
+   "where": "copy \"seamless\" in \"Single polished chrome sphere beside a translucent ice-...\"",
+   "ids": [
+    "copy-slop-word"
+   ],
+   "wheres": [
+    "copy \"seamless\" in \"Single polished chrome sphere beside a translucent ice-...\""
+   ]
+  },
+  {
+   "check": "copy-contrast",
+   "msg": "contrast frames (\"X, not Y\", isn't, rather than, instead of, without the): 24, budget 2 (a tic, not a device)",
+   "fix": "state the positive fact on its own; count all the forms together (references/copy-tells.md)",
+   "widths": [],
+   "from": "copy",
+   "where": "copy x24: \", not a\", \", not m\", \"rather than\", \", not t\", \", not e\", \", not o...",
+   "exact": true,
+   "ids": [
+    "copy-contrast"
+   ],
+   "wheres": [
+    "copy x24: \", not a\", \", not m\", \"rather than\", \", not t\", \", not e\", \", not o..."
+   ]
+  }
+ ],
+ "waived": [],
+ "warnCount": 40,
+ "at": "2026-11-09T21:09:06.935Z"
+}
