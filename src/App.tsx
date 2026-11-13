@@ -255,7 +255,7 @@ function StationDialog({ title, mode, returnFocus, onClose, children }: { title:
       if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
     };
   }, [mode, returnFocus]);
-  return <dialog aria-labelledby="station-dialog-title" className="station-dialog" onCancel={(event) => { event.preventDefault(); onClose(); }} ref={dialogRef}>
+  return <dialog aria-labelledby="station-dialog-title" className="station-dialog bowed-clip" onCancel={(event) => { event.preventDefault(); onClose(); }} ref={dialogRef}>
     <div className="station-dialog-heading"><h2 id="station-dialog-title">{title}</h2><button aria-label="Close dialog" className="station-dialog-close" onClick={onClose} ref={closeRef} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div>
     {children}
   </dialog>;
@@ -1011,7 +1011,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
 
   return (
     <section className="settings" aria-label="Local backup and transfer">
-      <section className="settings-card settings-preferences" aria-labelledby="preferences-heading">
+      <section className="settings-card bowed settings-preferences" aria-labelledby="preferences-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="settings" /></span><h2 id="preferences-heading">Household preferences</h2></div>
         <div className="setting-row">
           <div className="setting-body"><b>Units</b><p>Readouts for temperature and volume.</p></div>
@@ -1029,7 +1029,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         </div>
         <p>Preferences save automatically. Formula terms are saved separately below.</p>
       </section>
-      <section className="settings-card settings-notifications" aria-labelledby="notifications-heading">
+      <section className="settings-card bowed settings-notifications" aria-labelledby="notifications-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="bell" /></span><h2 id="notifications-heading">Notifications</h2></div>
         <p>Choose alerts for due checks, ready batches, both, or neither.</p>
         <div className="setting-segment notification-segment" aria-label="Notifications" role="group">
@@ -1039,7 +1039,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         </div>
         <p>Scheduled alerts require the Android app and notification permission. Each batch can also be muted in its details.</p>
       </section>
-      <section className="settings-card settings-storage" aria-labelledby="data-storage-heading">
+      <section className="settings-card bowed settings-storage" aria-labelledby="data-storage-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="jar" /></span><h2 id="data-storage-heading">Data storage</h2></div>
         <div aria-atomic="true" className="settings-storage-status" role={storageStatus.state === "problem" || storageStatus.state === "conflict" ? "alert" : "status"}>
           <strong className="settings-state-label">{storageLabels[storageStatus.state]}</strong>
@@ -1068,7 +1068,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         <div aria-atomic="true" aria-live="assertive" className="settings-live" role={storageError ? "alert" : undefined}>{storageError && <p>{storageError}</p>}</div>
         {dataChoicePending && <p>Finish the current transfer or import choice before changing storage.</p>}
       </section>
-      <section className="settings-card settings-exchange" aria-labelledby="exchange-heading">
+      <section className="settings-card bowed settings-exchange" aria-labelledby="exchange-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="book" /></span><h2 id="exchange-heading">Data exchange</h2></div>
         <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
         <p>Archives contain profiles, batches (including trash), and photos, up to 200 MB zipped (250 MB expanded). They do not include app settings such as destination, units, notifications, suggestions, or formula terms.</p>
@@ -1094,7 +1094,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
           <button className="setting-export" disabled={!!operation} onClick={() => void runOperation("exchange", "Preparing journal…", downloadJournal)} type="button">Export journal</button>
         </div>
       </section>
-      <section className="settings-card settings-trash" aria-labelledby="trash-heading">
+      <section className="settings-card bowed settings-trash" aria-labelledby="trash-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="clock" /></span><h2 id="trash-heading">Recently deleted batches</h2></div>
         <p>Batches remain recoverable for seven days, then are permanently deleted. Restore timeline entries from their batch's timeline. Deleted profiles cannot be restored.</p>
           <button
@@ -1122,7 +1122,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         <div aria-atomic="true" className="settings-live" role="status">{restoreMessage && <p className="notice">{restoreMessage}</p>}</div>
         {dataChoicePending && <p>Finish the current transfer or import choice before restoring a batch.</p>}
       </section>
-      <section className="settings-card formula-term-settings" aria-labelledby="formula-terms-heading">
+      <section className="settings-card bowed formula-term-settings" aria-labelledby="formula-terms-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="plus" /></span><h2 id="formula-terms-heading">Formula dropdown terms</h2></div>
         <p>These names are stored in the shared folder when configured and are not included in archives.</p>
         <p id="formula-term-help">Start with a letter; use letters, numbers, or underscores. Keep at least one unique term.</p>
@@ -1140,12 +1140,12 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         <button className="primary-action" onClick={saveFormulaTerms} type="button">Save formula terms</button>
         <div aria-atomic="true" className="settings-live" role="status">{termMessage && <p className="notice">{termMessage}</p>}</div>
       </section>
-      <section className="settings-card settings-about" aria-labelledby="about-heading">
+      <section className="settings-card bowed settings-about" aria-labelledby="about-heading">
         <div className="settings-card-heading"><StationLogo /><h2 id="about-heading">About FermentStation</h2></div>
         <p>A local journal for household fermentation batches, observations, and recurring checks.</p>
         <p>FermentStation v1 concept · not production software.</p><span className="settings-version">v1.0-concept</span>
       </section>
-      <section className="settings-card settings-credits" aria-labelledby="credits-heading">
+      <section className="settings-card bowed settings-credits" aria-labelledby="credits-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="leaf" /></span><h2 id="credits-heading">Credits and licenses</h2></div>
         <p>Unique by Rajesh Rajput. Original, unmodified web fonts are bundled for offline use, with the user's confirmed rights. <a href={`${import.meta.env.BASE_URL}fonts/unique/License.pdf`}>Unique end-user license</a>. System sans is the font-load and unsupported-character fallback.</p>
         <p>Legacy bundled font: Outfit © 2021 The Outfit Project Authors. <a href={`${import.meta.env.BASE_URL}new-design/OFL.txt`}>SIL Open Font License 1.1</a>. Not used by the current interface.</p>
@@ -1189,7 +1189,7 @@ function BatchPicker({ date, events, onClose, onOpen }: BatchPickerProps) {
   if (batchIds.length < 2) return null;
 
   return (
-    <dialog aria-label={`Choose a batch for ${date}`} className="station-dialog upcoming-batch-picker" id={`upcoming-batch-picker-${date}`} onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }} ref={dialogRef}>
+    <dialog aria-label={`Choose a batch for ${date}`} className="station-dialog bowed-clip upcoming-batch-picker" id={`upcoming-batch-picker-${date}`} onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }} ref={dialogRef}>
         <div className="upcoming-batch-picker-heading">
           <div><p className="eyebrow">{shortDate(date)}</p><h2>Choose a batch</h2></div>
           <button aria-label="Close" className="icon-button" onClick={onClose} type="button"><DesignIcon name="close" /></button>
@@ -1245,7 +1245,7 @@ function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string
 
   return (
     <div className="calendar-layout">
-      <div className="calendar-panel">
+      <div className="calendar-panel bowed">
         <div className="calendar-head">
           <h2 aria-live="polite" aria-atomic="true">{monthLabel}</h2>
           <div className="calendar-nav">
@@ -1397,7 +1397,7 @@ function ChecksView({ batches, onOpen, onComplete }: { batches: Batch[]; onOpen(
   const paused = batches.filter(({ status, checks }) => status !== "active" && checks.length > 0);
   return <section aria-label="Batch checks" className="design-checks-view">
     <div className="design-view-heading"><p className="eyebrow">Care for your cultures</p><h1 tabIndex={-1}>Your batch checks</h1><p>Complete a check here, or open its batch for notes and readings.</p></div>
-    <div className="checks-summary"><div><strong>{due.length}</strong><span>Due or overdue</span></div><div><strong>{paused.length}</strong><span>Paused batches</span></div></div>
+    <div className="checks-summary bowed"><div><strong>{due.length}</strong><span>Due or overdue</span></div><div><strong>{paused.length}</strong><span>Paused batches</span></div></div>
     <div className="design-section-head"><h2>Scheduled checks</h2><span className="design-badge">{checks.length} checks</span></div>
     <div className="design-all-checks">{checks.map(({ batch, check }) => {
       const completed = check.lastCompletedDate === today;
@@ -1465,7 +1465,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
       {pane === "profiles" ? profilePane : pane === "checks" ? <ChecksView batches={batches} onOpen={onOpen} onComplete={onComplete} /> : <>
         <h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1} className="sr-only">My batches <span>{batches.length}</span></h1>
         <div className="design-search-row"><div className="design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /><button aria-label="Sort batches by finish date" aria-pressed={sorted} onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
-        <section className="design-summary" aria-label="Kitchen summary" hidden={mode !== "today"}>
+        <section className="design-summary bowed" aria-label="Kitchen summary" hidden={mode !== "today"}>
           <div className="design-gauge"><strong>{batches.length}</strong><span>Total batches</span><small>{dueChecks.length} checks due</small></div>
           <div className="design-summary-label"><h2>Kitchen summary</h2><p>{readyBatches.length} ready to enjoy</p></div>
           <div className="design-summary-stats">{batchStatuses.map((status) => {
@@ -1567,7 +1567,7 @@ function CompactBatchCard({ batch, selected, units, onOpen }: { batch: Batch; se
   const isAttention = batch.status === "active" && dueBatchChecks(batch, localDate()).length > 0;
   const statusText = isAttention ? "Active · attention" : statusLabel(batch.status);
   return (
-    <button aria-label={`Open ${batch.name}`} aria-pressed={selected} className={`design-batch-card${selected ? " selected" : ""}`} style={{ "--batch-colour": profileVisual(batch.profileSnapshot).color } as CSSProperties} onClick={() => onOpen(batch.id)} type="button">
+    <button aria-label={`Open ${batch.name}`} aria-pressed={selected} className={`design-batch-card bowed${selected ? " selected" : ""}`} style={{ "--batch-colour": profileVisual(batch.profileSnapshot).color } as CSSProperties} onClick={() => onOpen(batch.id)} type="button">
       <div className="design-batch-copy"><span className={`status status-${batch.status}`}>{statusText}</span><h3>{batch.name}</h3><p className="design-batch-profile">{batch.profileSnapshot.name}</p><BatchMeta batch={batch} units={units} /><div className="design-batch-bottom"><strong>{batch.status === "to-fridge" ? "Chilled" : `Day ${day}`}</strong>{batch.status !== "to-fridge" && batch.finishDate && <span>/ {Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))} days</span>}</div><p className="design-batch-next">{nextCheck ? `${nextCheck.name} · ${shortDate(nextCheck.nextDueDate)}` : batch.finishDate ? `Finish · ${shortDate(batch.finishDate)}` : "No finish date"}</p><span className="sr-only">{latestPh && `pH ${latestPh.value}.`} Next: {next}</span></div>
       <BatchPhoto batch={batch} />
     </button>
@@ -2005,7 +2005,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
 
   return (
     <article className="batch-workspace">
-      <div className="design-detail-card">
+      <div className="design-detail-card bowed">
         <div className="design-detail-heading"><span className="design-check-symbol"><DesignIcon name="jar" /></span><div><h3>{batch.name}</h3><p>{batch.profileSnapshot.name} batch</p></div><button aria-label="Add observation" className="primary-action design-record-observation" onClick={showLogger} ref={observationTrigger} type="button"><DesignIcon name="plus" /><span>Add observation</span></button></div>
         <div className="design-detail-metrics"><span>Started {shortDate(batch.startDate)}</span><strong>Day {day}<small>{batch.finishDate ? ` / ${Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))}` : ""}</small></strong></div>
         <BatchPhoto batch={batch} detail />
@@ -2089,14 +2089,14 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
 
         <section className="batch-components-shell" aria-label="Batch configuration components">
           <div className="batch-components-grid">
-            <article className="batch-component-card" aria-labelledby="finish-heading" id="batch-date-editor">
+            <article className="batch-component-card bowed" aria-labelledby="finish-heading" id="batch-date-editor">
               <header className="batch-component-header"><h4 id="finish-heading">Batch dates</h4><span className="batch-component-step" aria-hidden="true">01</span></header>
               <p className="component-empty">Started <time dateTime={batch.startDate}>{shortDate(batch.startDate)}</time> · {statusLabel(batch.status)}</p>
               <label className="component-field"><span>Finish date</span><input {...fieldErrorProps(toolErrors, "batch-finish-date")} onChange={(event) => { if (event.target.reportValidity()) { onChange(setFinishDate(batch, event.target.value, localDate())); setToolFeedback("Finish date saved. Batch status and check scheduling updated."); } }} required type="date" value={batch.finishDate ?? ""} /><FieldError errors={toolErrors} id="batch-finish-date" /></label>
               <p className="component-empty">Saves immediately. A future finish date returns this batch to active; on its finish date it becomes ready.</p>
             </article>
 
-            <article className="batch-component-card" aria-labelledby="inputs-heading" id="batch-input-editor">
+            <article className="batch-component-card bowed" aria-labelledby="inputs-heading" id="batch-input-editor">
               <header className="batch-component-header"><h4 id="inputs-heading">Profile inputs</h4><span className="batch-component-step" aria-hidden="true">02</span></header>
               {batch.profileSnapshot.inputs.length > 0 ? <form className="component-inputs" onChange={() => managementDrafts.current.add("inputs")} onSubmit={saveInputs}>
                 <div className="component-input-fields">
@@ -2109,7 +2109,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
               </form> : <p className="component-empty">No profile inputs.</p>}
             </article>
 
-            <article className="batch-component-card" aria-labelledby="calculations-heading">
+            <article className="batch-component-card bowed" aria-labelledby="calculations-heading">
               <header className="batch-component-header"><h4 id="calculations-heading">Profile calculations</h4><span className="batch-component-step" aria-hidden="true">03</span></header>
               {batch.profileSnapshot.calculations.length > 0 ? batch.profileSnapshot.calculations.map((calculation, index) => {
                 const value = batch.calculationValues[calculation.name];
@@ -2133,7 +2133,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
               }) : <p className="component-empty">No calculations.</p>}
             </article>
 
-            <article className="batch-component-card" aria-label={`${batch.name} checks`} id="batch-check-editor" tabIndex={-1}>
+            <article className="batch-component-card bowed" aria-label={`${batch.name} checks`} id="batch-check-editor" tabIndex={-1}>
               <header className="batch-component-header"><h4>Recurring checks</h4><button className="component-button component-button-quiet" disabled={batch.status !== "active"} onClick={() => { setAddingCheck(true); setCheckError(""); }} ref={addCheckRef} type="button">Add check</button></header>
               <p className="component-check-state">{batch.status === "active" ? "Intervals save immediately. New checks count from today and belong only to this batch." : "Checks paused. Adding checks and changing intervals are unavailable until this batch is active. Names and removal remain available."}</p>
               {checkError && <p className="notice" id="batch-check-error" role="alert">{checkError}</p>}
@@ -2175,7 +2175,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
         <div className="wb-main">
           <section className="wb-panel activity-logger" aria-labelledby="activity-logger-heading" hidden={!managementOpen && !loggerModal}>
             <h2 hidden={loggerModal} id="activity-logger-heading">Log {loggerKind === "ph" ? "pH reading" : loggerKind === "status" ? "status change" : loggerKind}</h2>
-            <dialog aria-labelledby={loggerModal ? "observation-dialog-title" : undefined} className={`observation-logger${loggerModal ? " station-dialog" : " inline-logger"}`} onCancel={(event) => { event.preventDefault(); dismissLogger(); }} onClose={(event) => { if (!event.currentTarget.open && modal.current) dismissLogger(); }} ref={dialogRef} role={loggerModal ? "dialog" : "presentation"}>
+            <dialog aria-labelledby={loggerModal ? "observation-dialog-title" : undefined} className={`observation-logger${loggerModal ? " station-dialog bowed-clip" : " inline-logger"}`} onCancel={(event) => { event.preventDefault(); dismissLogger(); }} onClose={(event) => { if (!event.currentTarget.open && modal.current) dismissLogger(); }} ref={dialogRef} role={loggerModal ? "dialog" : "presentation"}>
             <div className="station-dialog-heading" hidden={!loggerModal}><h2 id="observation-dialog-title">{editing ? "Edit observation" : "Add observation"}</h2><button aria-label="Close dialog" className="station-dialog-close" onClick={() => dismissLogger()} ref={closeRef} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div>
             <form className={basicObservation ? "observation-form" : "timeline-form quick-log-form"} id="batch-activity-form" onChange={() => { revision.current++; dirty.current = true; }} onInput={() => { revision.current++; dirty.current = true; formRef.current?.querySelector("textarea")?.setCustomValidity(""); }} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") event.currentTarget.requestSubmit(); }} onSubmit={saveEntry} ref={formRef}>
               <p className="station-dialog-body" hidden={!loggerModal}>{batch.name}</p>
@@ -2212,7 +2212,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
             <section className="timeline">
               {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
               {[...batch.timeline].reverse().map((entry) => (
-                <div className={`timeline-entry timeline-${entry.kind}`} key={entry.id}>
+                <div className={`timeline-entry bowed timeline-${entry.kind}`} key={entry.id}>
                   <span className="timeline-dot" aria-hidden="true" />
                   <span className="timeline-content"><strong>{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong><span className="timeline-description">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <span className="timeline-photo user-photo"><BatchImage key={entry.dataUrl} source={entry.dataUrl} description={entry.caption || entry.name} userPhoto retryable /></span>}</span></span>
                   <time dateTime={entry.date}>{shortDate(entry.date)}</time>
@@ -2573,14 +2573,14 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
               <button aria-label="Back to profiles" className="icon-button" onClick={closeEditor} type="button"><DesignIcon name="back" /></button>
             </header>
             <nav className="profile-editor-crumbs" aria-label="Breadcrumb"><button onClick={closeEditor} type="button">Profiles</button></nav>
-            <header className="profile-editor-head">
+            <header className="profile-editor-head bowed">
               <div><label className="profile-editor-eyebrow" htmlFor="profile-name">Name</label><h1><input {...fieldErrorProps(fieldErrors, "profile-name")} autoFocus className="profile-editor-title-input" defaultValue={editing.name} form="profile-editor-form" name="name" placeholder="Profile name" required /><FieldError errors={fieldErrors} id="profile-name" /></h1></div>
               <span className="profile-editor-status"><i />Editable profile</span>
             </header>
 
             <div className="profile-editor-grid">
               <form className="profile-editor-form" id="profile-editor-form" key={editing.id} onSubmit={save}>
-                <section className="profile-editor-section">
+                <section className="profile-editor-section bowed">
                   <div className="profile-editor-section-head profile-editor-basics-head"><div><p className="profile-editor-kicker">01 / The method</p><h2>Guidance and conditions</h2><p className="profile-editor-intro">Set the steps and conditions used to start new batches.</p></div></div>
                   <div className="profile-editor-fields">
                     <div className="profile-editor-guidance">
@@ -2599,7 +2599,7 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
                    </div>
                 </section>
 
-                <section className="profile-editor-section">
+                <section className="profile-editor-section bowed">
                   <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">02 / Recurring checks</p><h2>Checks for each batch</h2><p className="profile-editor-intro">Copied to new batches and scheduled from their start date.</p></div><button className="profile-editor-text-button" onClick={addCheck} type="button">Add check</button></div>
                   <div className="profile-editor-checks">
                     {checkRows.length === 0 && <p className="profile-editor-check-empty">No recurring checks yet. Add one when this profile needs a repeating rhythm.</p>}
@@ -2614,7 +2614,7 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
                   </div>
                 </section>
 
-                <section className="profile-editor-section">
+                <section className="profile-editor-section bowed">
                   <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">03 / Calculations</p><h2>Formulas</h2></div></div>
                   <fieldset className="profile-editor-formula"><legend className="sr-only">Formulas</legend>
                     {calculations.map((row, index) => row.kind === "legacy" ? (
@@ -2654,7 +2654,7 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
         {profiles.map((profile) => {
           const presentation = presentationFor(profile);
           return (
-            <article className="profile-card" key={profile.id} style={{ "--profile-colour": profileVisual(profile).color } as CSSProperties}>
+            <article className="profile-card bowed" key={profile.id} style={{ "--profile-colour": profileVisual(profile).color } as CSSProperties}>
               <button aria-label={`View ${profile.name} guidance`} className="profile-card-main" onClick={() => onView(profile)} type="button">
                 <span className="design-profile-copy"><h2>{profile.name}</h2><span className="profile-facts"><span>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "Duration not set"}</span><span>{profile.temperatureMinC === undefined ? "Temperature not set" : presentation.params[0][0]}</span></span><span className="profile-card-guidance"><RichProfileText value={presentation.description} /></span></span>
                 <span className="profile-card-link">View guidance <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="m7 17 10-10M7 7h10v10" /></svg></span>

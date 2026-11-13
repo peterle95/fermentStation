@@ -12,23 +12,74 @@ function rule(selector: string, source = styles) {
   return match![1];
 }
 
+type Rule = { selector: string; selectors: string[]; declarations: [property: string, value: string][] };
+
+/** Every innermost `selector { declarations }` block, including those nested in @media/@supports. */
+function rules(source = styles): Rule[] {
+  return [...source.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, prelude, body]) => {
+    const selector = prelude.trim().replace(/\s+/g, " ");
+    return {
+      selector,
+      selectors: selector.split(/,(?![^(]*\))/).map((part) => part.trim()),
+      declarations: body.split(";").map((part) => part.trim()).filter(Boolean).map((part) => {
+        const colon = part.indexOf(":");
+        return [part.slice(0, colon).trim(), part.slice(colon + 1).trim()] as [string, string];
+      }),
+    };
+  });
+}
+
+/** The bowed-outline primitive owns its own radius, clip and pseudo-element layers. */
+const isPrimitive = (rule: Rule) => rule.selectors.every((selector) => /\.bowed(?:-clip)?\b|^:where\(\.bowed/.test(selector));
+
+/** Classes that share a className literal with `bowed` / `bowed-clip` in App.tsx, mapped to the variant. */
+function bowedSurfaces() {
+  const surfaces = new Map<string, "bowed" | "bowed-clip">();
+  for (const [, literal] of app.matchAll(/["`]([^"`]*\bbowed(?:-clip)?\b[^"`]*)["`]/g)) {
+    const words = literal.split(/\s+/).filter((word) => /^[a-z][a-z\d-]*$/.test(word));
+    const variant = words.includes("bowed-clip") ? "bowed-clip" : "bowed";
+    for (const word of words) if (word !== "bowed" && word !== "bowed-clip") surfaces.set(word, variant);
+  }
+  return surfaces;
+}
+
+const colourLiteral = /#[\da-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i;
+const namedColour = /\b(?:white|black|red|green|blue|yellow|orange|purple|pink|gr[ae]y|silver|navy|teal|lime|olive|maroon|aqua|fuchsia)\b/i;
+
 describe("Swipe-derived design contract", () => {
-  it("uses one shared six-color palette, including lilac, with no competing legacy colors", () => {
-    const palette = ["#ffffff", "#1c1c1c", "#ffec89", "#b6f074", "#dab8f1", "#b6e1fa"];
+  it("takes every colour from the :root token layer, with the boards' black ground and ink", () => {
     expect(styles.match(/:root \{/g)).toHaveLength(1);
-    expect([...new Set(styles.match(/#[\da-f]{6}\b/gi))].sort()).toEqual([...palette].sort());
-    for (const [name, value] of Object.entries({ background: "#ffffff", surface: "#ffec89", text: "#1c1c1c", "text-muted": "#1c1c1c", action: "#b6f074", "action-alt": "#dab8f1", accent: "#b6e1fa" })) {
-      expect(styles).toContain(`--colour-${name}: ${value};`);
+    for (const [name, value] of Object.entries({
+      background: "#ffffff", surface: "#ffec89", "surface-inverse": "#000000", text: "#000000", "text-muted": "#000000", "text-inverse": "#ffffff",
+      action: "#b6f074", "on-action": "#000000", "action-alt": "#dab8f1", emblem: "#c5b4ec", accent: "#b6e1fa", border: "#000000",
+    })) expect(styles).toContain(`--colour-${name}: ${value};`);
+    // The retired near-black must not come back as ground, ink or border.
+    expect(styles).not.toMatch(/#1c1c1c/i);
+    for (const { selector, declarations } of rules()) {
+      for (const [property, value] of declarations) {
+        if (selector === ":root") {
+          if (colourLiteral.test(value)) expect(property, `colour literal outside a --colour-* token: ${property}`).toMatch(/^--colour-[\w-]+$/);
+          continue;
+        }
+        expect(value, `${selector} { ${property} } must use a --colour-* token`).not.toMatch(colourLiteral);
+        expect(value, `${selector} { ${property} } must use a --colour-* token`).not.toMatch(namedColour);
+      }
     }
-    expect(styles).not.toMatch(/oklch\(|linear-gradient\(|--bg:|--accent:/);
+    expect(styles).not.toMatch(/--bg:|--accent:/);
     for (const layer of ["editor", "component"]) {
       const definitions = [...styles.matchAll(new RegExp(`--${layer}-[\\w-]+: ([^;]+);`, "g"))];
       expect(definitions.length).toBeGreaterThan(5);
       expect(definitions.every(([, value]) => /^var\(--colour-[\w-]+\)$/.test(value))).toBe(true);
     }
+    expect(app).not.toMatch(colourLiteral);
     const visuals = app.slice(app.indexOf("function profileVisual"), app.indexOf("function BatchPhoto"));
-    expect(visuals).not.toMatch(/#[\da-f]{3,8}/i);
     for (const color of ["surface", "action", "action-alt", "accent"]) expect(visuals).toContain(`var(--colour-${color})`);
+  });
+
+  it("paints avatar and emblem circles in the board's second lilac", () => {
+    for (const selector of [".design-avatar", ".queue-icon, .design-check-symbol, .next-action-icon"]) {
+      expect(rule(selector)).toContain("background: var(--colour-emblem)");
+    }
   });
 
   it("uses genuine offline Unique throughout with readable relative sizing and no synthesis", () => {
@@ -72,19 +123,15 @@ describe("Swipe-derived design contract", () => {
     expect(rule("input, select, textarea")).toContain("min-height: var(--input-height)");
     expect(rule("input, select, textarea")).toContain("font-size: var(--type-body)");
     expect(rule("textarea")).toContain("border-radius: var(--radius-small)");
-    for (const selector of [".batch-component-card", ".settings-card, .trash", ".station-dialog"]) {
-      expect(rule(selector)).toContain("var(--radius-card)");
-      expect(rule(selector)).toContain("var(--card-padding)");
-    }
-    for (const selector of [".profile-card", ".profile-editor-section"]) {
-      expect(rule(selector)).toContain("border-radius: 2rem 2rem 2.5rem 2.5rem / 2.5rem 2.5rem 2rem 2rem");
+    for (const selector of [".batch-component-card", ".settings-card", ".station-dialog", ".profile-card", ".profile-editor-section"]) {
       expect(rule(selector)).toContain("var(--card-padding)");
     }
   });
 
   it("renews card anatomy and presents real statuses instead of a decorative progress gauge", () => {
     expect(rule(".design-batch-card")).toContain("grid-template-columns:");
-    expect(rule(".design-batch-card.selected")).toContain("background: var(--colour-surface-inverse)");
+    const selected = rule(".design-batch-card.selected");
+    for (const declaration of ["--fill: var(--colour-surface-inverse)", "--stroke: var(--colour-action)", "--stroke-w: var(--bowed-stroke)"]) expect(selected).toContain(declaration);
     expect(rule(".design-batch-photo img")).toContain("object-fit: contain");
     expect(app).toContain('className="design-batch-profile"');
     expect(app).toContain('className="design-batch-next"');
@@ -92,6 +139,100 @@ describe("Swipe-derived design contract", () => {
     expect(app).toContain("{dueChecks.length} checks due");
     expect(app.replaceAll("©", "")).not.toMatch(/\p{Extended_Pictographic}/u);
     expect(rule(".primary-action, .station-primary, .profile-add, .component-button-primary, .profile-editor-button.primary")).toContain("color: var(--colour-on-action)");
+  });
+});
+
+describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", () => {
+  // Gap 1 of the spec: every large card takes its silhouette from the primitive.
+  const bowedCards = [
+    "design-batch-card", "design-summary", "checks-summary", "design-detail-card", "profile-card", "profile-editor-section",
+    "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "timeline-entry",
+  ];
+  const clippedScrollers = ["station-dialog"];
+  // Rounded rectangles that predate the primitive. Shrink only: when a ticket bows one of these
+  // surfaces (or makes it a capsule), delete it here. A new large card must use `bowed` instead.
+  const legacyCardRadius = [
+    ".storage-warning", ".app-loading", ".empty-state, .design-empty-checks, .calendar-empty", ".calendar-screen, .profiles-screen, .design-checks-view",
+    ".design-detail", ".ios-install-guide", ".batch-view-switch", ".design-batch-next", ".queue-card", ".design-checks-view .queue-card", ".design-tip",
+    ".design-detail-photo", ".detail-readings > div", ".design-detail-next", ".design-input-summary", ".batch-guidance", ".design-timeline-panel",
+    ".batch-management > .wb-panel", ".batch-tools-danger", ".next-action", ".activity-logger", ".station-dialog-heading", ".profile-overview-intro",
+    ".start-batch-basics", ".start-profile-summary", ".profile-card-actions", ".profile-editor-card", ".upcoming-item", ".setting-segment", ".trash-item",
+  ];
+
+  it("carries the measured outline in tokens and defines the shape exactly once", () => {
+    for (const declaration of ["--bowed-radius: 52px;", "--bowed-bow: 4.4px;", "--bowed-k: 0.64;", "--bowed-stroke: 3px;"]) expect(styles).toContain(declaration);
+    expect(styles.match(/--bowed-shape: shape\(/g)).toHaveLength(1);
+    const shaped = rules().filter((entry) => entry.declarations.some(([property]) => property === "--bowed-shape"));
+    expect(shaped.map((entry) => entry.selector)).toEqual([".bowed, .bowed::before, .bowed::after, .bowed > .bowed-media, .bowed-clip"]);
+    // Concave top and bottom edges, straight sides, superellipse-like corners.
+    const shape = shaped[0].declarations.find(([property]) => property === "--bowed-shape")![1];
+    expect(shape).toContain("curve to calc(100% - var(--rr)) 0 with 50% calc(var(--bow) * 4 / 3)");
+    expect(shape).toContain("line to 100% calc(100% - var(--rr))");
+    expect(shape).toContain("calc(var(--rr) * (1 - var(--k)))");
+  });
+
+  it("clips only dedicated fill, stroke and media layers so overhanging parts and focus rings stay visible", () => {
+    const box = rule(".bowed");
+    for (const declaration of ["position: relative", "isolation: isolate", "border: 0", "background: none !important"]) expect(box).toContain(declaration);
+    expect(box).not.toContain("clip-path");
+    expect(rule(".bowed::before")).toContain("background: var(--stroke)");
+    const fill = rule(".bowed::after");
+    for (const declaration of ["inset: var(--stroke-w)", "background: var(--fill)", "--rr: max(0px, min(var(--r), 50%) - var(--stroke-w))"]) expect(fill).toContain(declaration);
+    expect(rule(".bowed > .bowed-media")).toContain("clip-path: var(--bowed-shape)");
+    expect(rule(".bowed-clip")).toContain("background: var(--fill)");
+    // Layers sit below every in-flow child without forcing a position onto the children.
+    expect(styles).not.toMatch(/\.bowed > :not/);
+    // Without shape() support the layers fall back to a clean rounded rectangle.
+    const fallback = styles.slice(styles.indexOf("@supports not (clip-path: shape("));
+    expect(rule(".bowed::before, .bowed > .bowed-media", fallback)).toContain("border-radius: var(--r)");
+    expect(rule(".bowed::after", fallback)).toContain("border-radius: max(0px, var(--r) - var(--stroke-w))");
+    // Nothing outside the primitive clips or masks a surface into shape.
+    for (const entry of rules()) {
+      if (isPrimitive(entry)) continue;
+      for (const [property, value] of entry.declarations) {
+        if (property === "clip-path") expect(value, `${entry.selector} clips itself`).toBe("inset(50%)");
+        expect(property, `${entry.selector} shapes itself`).not.toMatch(/^(?:-webkit-)?mask|^corner-shape$/);
+      }
+    }
+  });
+
+  it("applies the primitive to every large card listed in the gap audit", () => {
+    const surfaces = bowedSurfaces();
+    for (const name of bowedCards) expect(surfaces.get(name), `${name} needs className "bowed"`).toBe("bowed");
+    for (const name of clippedScrollers) expect(surfaces.get(name), `${name} needs className "bowed-clip"`).toBe("bowed-clip");
+  });
+
+  it("never gives a bowed surface its own background, border, radius or pseudo-element layers", () => {
+    const surfaces = bowedSurfaces();
+    for (const entry of rules()) {
+      if (isPrimitive(entry)) continue;
+      for (const selector of entry.selectors) {
+        const subject = selector.split(/\s*[\s>+~]\s*(?![^(]*\))/).pop()!;
+        const classes = [...subject.replace(/:not\([^)]*\)/g, "").matchAll(/\.([\w-]+)/g)].map(([, name]) => name);
+        if (!classes.some((name) => surfaces.has(name))) continue;
+        expect(subject, `${selector}: the primitive owns ::before/::after`).not.toMatch(/::?(?:before|after)\b/);
+        if (subject.includes("::")) continue;
+        for (const [property] of entry.declarations) {
+          expect(property, `${selector} { ${property} } — set --fill/--stroke/--r instead`).not.toMatch(/^(?:background(?:-[\w-]+)?|border(?:-[\w-]+)?|box-shadow)$/);
+        }
+      }
+    }
+  });
+
+  it("keeps the retired notch imitation and one-off radii out of the stylesheet", () => {
+    expect(styles).not.toMatch(/border-radius: 0 0 50% 50%/);
+    expect(styles).not.toMatch(/border-radius:[^;]*\//);
+    const allowed = /^(?:var\(--radius-(?:control|small|card)\)|50%|0)$/;
+    const cardRadius: string[] = [];
+    for (const entry of rules()) {
+      if (isPrimitive(entry)) continue;
+      for (const [property, value] of entry.declarations) {
+        if (!/^border(?:-[\w-]+)?-radius$/.test(property)) continue;
+        for (const part of value.split(/\s+/)) expect(part, `${entry.selector} { ${property}: ${value} }`).toMatch(allowed);
+        if (value.includes("--radius-card")) cardRadius.push(entry.selector);
+      }
+    }
+    expect(cardRadius.filter((selector) => !legacyCardRadius.includes(selector)), "new rounded-rectangle card: use className \"bowed\"").toEqual([]);
   });
 });
 
@@ -104,7 +245,12 @@ describe("responsive workflow safeguards", () => {
     expect(styles).not.toContain(".main-content:has(.design-workspace)");
     expect(rule("[hidden], .new-design [hidden]")).toContain("display: none !important");
     expect(rule(".design-workspace")).toContain("grid-template-rows: minmax(0, 1fr)");
-    for (const selector of [".design-dashboard", ".design-detail", ".main-content"]) expect(rule(selector)).toContain("overflow: auto");
+    for (const selector of [".design-dashboard", ".design-detail", ".main-content"]) {
+      expect(rule(selector)).toContain("overflow: auto");
+      // Scroll panes contain their absolutely positioned visually-hidden text, so it cannot stretch the document.
+      expect(rule(selector)).toContain("position: relative");
+    }
+    expect(rule(".sr-only, .calendar-event-date")).toContain("position: absolute");
   });
 
   it("aligns phone, rail and sidebar boundaries with detail focus behavior", () => {
@@ -176,7 +322,7 @@ describe("responsive workflow safeguards", () => {
   });
 
   it("retains source 24px profile and settings card padding on phones", () => {
-    for (const selector of [".profile-editor-section", ".settings-card, .trash"]) expect(rule(selector)).toContain("padding: var(--card-padding)");
+    for (const selector of [".profile-editor-section", ".settings-card"]) expect(rule(selector)).toContain("padding: var(--card-padding)");
     expect(mobile).not.toMatch(/\.(?:profile-editor-section|settings-card) \{ padding: var\(--space-4\)/);
   });
 
