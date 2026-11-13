@@ -34,12 +34,31 @@ describe("Swipe-derived design contract", () => {
   it("uses genuine offline Unique throughout with readable relative sizing and no synthesis", () => {
     expect(styles).toContain('--font-family: "Unique", system-ui, sans-serif;');
     for (const declaration of [
-      "--type-body: 1.75rem;", "--type-small: 1.5rem;", "font-synthesis: none;",
+      "--type-body: 2rem;", "--type-small: 1.75rem;", "font-synthesis: none;",
     ]) expect(styles).toContain(declaration);
     expect(styles.match(/@font-face/g)).toHaveLength(7);
     expect(styles).not.toMatch(/Circular Std|Outfit|Sofia|Georgia|text-transform: uppercase/);
     expect(read("../index.html")).not.toMatch(/rel="preload"[^>]+\.ttf/);
     expect(rule(".station-dialog")).toContain("var(--font-family)");
+  });
+
+  it("opens condensed lettering without distorting the font or losing control tracking", () => {
+    expect(rule(":root")).toContain("letter-spacing: var(--type-body-tracking)");
+    expect(styles).toContain("--type-body-tracking: 0.045em;");
+    expect(styles).toContain("--type-small-leading: 1.25;");
+    expect(rule("button, input, select, textarea")).toContain("letter-spacing: inherit");
+    expect(rule(".design-section-head h1")).toContain("font-size: var(--type-h2)");
+    expect(rule(".batch-view-switch button")).toContain("font-size: var(--type-small)");
+    expect(styles).not.toMatch(/scale[XY]\(|font-stretch:|size-adjust:/);
+  });
+
+  it("groups summary numbers with their labels and stacks the phone summary without hiding its heading", () => {
+    expect(rule(".design-stat-row > div:first-child")).toContain("flex-direction: column-reverse");
+    expect(rule(".design-stat-number")).not.toContain("margin-left: auto");
+    const mobile = styles.slice(styles.indexOf("@media (max-width: 599px) {"));
+    expect(rule(".design-summary", mobile)).toContain("grid-template-columns: minmax(0, 1fr)");
+    expect(rule(".design-gauge", mobile)).toContain("grid-template-columns: auto minmax(0, 1fr)");
+    expect(rule(".design-summary-label", mobile)).not.toContain("display: none");
   });
 
   it("shares the 32/12/999 geometry, 24px spacing and 52px control baseline", () => {

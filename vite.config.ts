@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, configDefaults } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { pwaManifest } from "./src/platform/pwa";
@@ -32,5 +32,6 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    exclude: [...configDefaults.exclude, "tools/**"],
   },
 });

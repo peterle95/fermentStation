@@ -685,15 +685,14 @@ export function App() {
           ))}
         </nav>
         <div className="design-sidebar-bottom">
-          <div className="design-side-note"><DesignIcon name="jar" /><h2>Your local journal</h2><p>Batch notes, readings, and the next check.</p></div>
-          <button aria-label="Open station information" className="design-account" onClick={() => showDialog({ kind: "info" })} type="button"><span className="design-avatar"><DesignIcon name="user" /></span><span>My kitchen<small>Home fermenter</small></span><span aria-hidden="true">›</span></button>
+          <button aria-label="Home — station information" className="design-account" onClick={() => showDialog({ kind: "info" })} type="button"><span className="design-avatar"><DesignIcon name="user" /></span><span>Home</span><span aria-hidden="true">›</span></button>
         </div>
       </aside>
 
       <div className="content-shell">
         <header className="design-topbar">
           <button aria-label="Open station information" className="icon-button station-identity" onClick={() => showDialog({ kind: "info" })} type="button"><StationLogo /></button>
-          <div className="design-topbar-copy"><p>{formatToday()}</p><div>Your fermentation station</div></div>
+          <div className="design-topbar-copy"><p>{formatToday()}</p></div>
           <button aria-label="Open calendar" className="design-date-chip" onClick={() => navigate("calendar")} type="button"><NavIcon destination="calendar" /><span>{shortDate(localDate())}</span></button>
           <div className="design-topbar-actions">
             <button aria-label="View batch checks" className="icon-button" onClick={openChecks} type="button"><DesignIcon name="bell" /></button>
@@ -1464,8 +1463,8 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
     <section className={`batches design-workspace${pane === "profiles" ? " profile-workspace" : ""}${openBatch && showPhoneDetail ? " design-selected" : ""}`} aria-label="Fermentation workspace">
       <div className="design-dashboard" key={pane}>
       {pane === "profiles" ? profilePane : pane === "checks" ? <ChecksView batches={batches} onOpen={onOpen} onComplete={onComplete} /> : <>
-        <div className="design-section-head"><div><p className="eyebrow">Your local journal</p><h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1}>My batches <span>{batches.length}</span></h1></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
-        <div className="design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /><button aria-label="Sort batches by finish date" aria-pressed={sorted} onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div>
+        <h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1} className="sr-only">My batches <span>{batches.length}</span></h1>
+        <div className="design-search-row"><div className="design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /><button aria-label="Sort batches by finish date" aria-pressed={sorted} onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
         <section className="design-summary" aria-label="Kitchen summary" hidden={mode !== "today"}>
           <div className="design-gauge"><strong>{batches.length}</strong><span>Total batches</span><small>{dueChecks.length} checks due</small></div>
           <div className="design-summary-label"><h2>Kitchen summary</h2><p>{readyBatches.length} ready to enjoy</p></div>
