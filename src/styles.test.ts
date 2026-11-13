@@ -317,17 +317,24 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
   const bowedCards = [
     "design-batch-card", "design-summary", "checks-summary", "design-detail-card", "profile-card", "profile-editor-section",
     "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "timeline-entry", "summary-row", "small-card",
+    // Ticket 12: the former rounded rectangles.
+    "app-loading", "empty-state", "ios-install-guide", "design-tip", "design-input-summary", "batch-guidance", "next-action", "wb-panel",
+    "batch-tools-danger", "profile-overview-intro", "start-batch-basics", "start-profile-summary", "profile-editor-card",
   ];
   const clippedScrollers = ["station-dialog"];
   // Rounded rectangles that predate the primitive. Shrink only: when a ticket bows one of these
   // surfaces (or makes it a capsule), delete it here. A new large card must use `bowed` instead.
-  const legacyCardRadius = [
-    ".storage-warning", ".app-loading", ".empty-state, .design-empty-checks, .calendar-empty", ".calendar-screen, .profiles-screen, .design-checks-view",
-    ".design-detail", ".ios-install-guide", ".batch-view-switch", ".queue-card", ".design-checks-view .queue-card", ".design-tip",
-    ".design-detail-photo", ".design-detail-next", ".design-input-summary", ".batch-guidance",
-    ".batch-management > .wb-panel", ".batch-tools-danger", ".next-action", ".activity-logger", ".profile-overview-intro",
-    ".start-batch-basics", ".start-profile-summary", ".profile-card-actions", ".profile-editor-card",
-  ];
+  // `.activity-logger` stays: it switches to `display: contents` while the modal logger is open, and
+  // the primitive's absolutely positioned fill layer would then escape to the pane.
+  const legacyCardRadius = [".activity-logger"];
+
+  it("moves the last legacy rounded rectangles onto the bowed card, the small card, the capsule or a photo frame", () => {
+    for (const name of ["design-empty-checks", "calendar-empty"]) expect(app).toContain(`className="${name} small-card bowed"`);
+    for (const selector of [".batch-view-switch", ".queue-card", ".profile-card-actions"]) expect(rule(selector)).toContain("border-radius: var(--radius-control)");
+    expect(rule(".design-detail-photo")).toContain("border-radius: var(--radius-small)");
+    expect(rule(".batch-tools-danger")).toContain("--stroke-w: var(--stroke-width)");
+    expect(app).not.toMatch(/className="[^"]*\bactivity-logger\b[^"]*\bbowed\b/);
+  });
 
   it("carries the measured outline in tokens and defines the shape exactly once", () => {
     for (const declaration of ["--bowed-radius: 52px;", "--bowed-bow: 4.4px;", "--bowed-k: 0.64;", "--bowed-stroke: 3px;"]) expect(styles).toContain(declaration);
@@ -697,10 +704,10 @@ describe("utility circles and search field (swipe-rework-log.md, ticket 4; spec 
   it("makes every icon-only button in the app a utility circle, except the card and row actions of later tickets", () => {
     const tags = iconOnlyButtons();
     expect(tags.length).toBeGreaterThanOrEqual(16);
-    // The profile editor's remove-check button is a row action of a later ticket. Check completion joined the dark circle (ticket 8).
-    const later = /className="profile-editor-icon-button"/;
+    // Check completion joined the dark circle (ticket 8); the profile editor's remove-check button followed (ticket 12).
     expect(app.match(/className="utility-circle utility-circle-dark design-check-complete"/g)).toHaveLength(2);
-    for (const tag of tags) if (!later.test(tag)) expect(tag).toMatch(/className="utility-circle(?: utility-circle-dark)?(?: [\w-]+)*"/);
+    expect(app).toContain('className="utility-circle utility-circle-dark profile-editor-icon-button"');
+    for (const tag of tags) expect(tag).toMatch(/className="utility-circle(?: utility-circle-dark)?(?: [\w-]+)*"/);
     expect(app).not.toMatch(/["\s]icon-button\b/);
     // The notifications toggle keeps its visible state word, so it is the capsule form of the same primitive.
     const notifications = app.slice(app.indexOf('className="utility-circle utility-circle-dark utility-capsule batch-head-notifications"'));
@@ -968,6 +975,11 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     const chip = rule(".design-batch-card .status");
     for (const declaration of ["min-height: var(--batch-chip-height)", "background: var(--colour-frost)", "backdrop-filter: blur(var(--batch-chip-blur))"]) expect(chip).toContain(declaration);
     expect(rule(".design-batch-next")).toContain("border-radius: var(--radius-control)");
+    // Ticket 12: the chip row stays one line at every card width, so narrow cards keep the card ratio. The status chip
+    // keeps its size; the next-check chip shortens with an ellipsis (the card's sr-only line still reads the full next step).
+    expect(rule(".design-batch-chips")).not.toContain("flex-wrap: wrap");
+    expect(chip).toContain("flex: none");
+    for (const declaration of ["min-width: 0", "overflow: hidden", "text-overflow: ellipsis", "white-space: nowrap"]) expect(rule(".design-batch-next")).toContain(declaration);
     const pill = rule(".design-batch-pill");
     for (const declaration of [
       "position: absolute", "left: var(--batch-pill-inset-x)", "bottom: 0", "margin-bottom: var(--batch-pill-inset-bottom)", "width: var(--batch-pill-width)",
@@ -983,11 +995,11 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
       "position: absolute", "left: calc((100% - var(--card-action-width)) / 2)", "bottom: calc(var(--card-action-height) / -2)",
       "width: var(--card-action-width)", "height: var(--card-action-height)", "min-height: var(--card-action-height)", "border-radius: var(--radius-control)",
     ]) expect(action).toContain(declaration);
-    // The host keeps the upper half inside and the lower half plus the reserve below, so a scrolling pane never clips it.
-    const host = rule(".design-detail-card");
+    // Any bowed host keeps the upper half inside and the lower half plus the reserve below, so a scrolling pane never clips it.
+    const host = rule(".bowed:has(.card-action)");
     expect(host).toContain("padding-bottom: calc(var(--card-padding) + var(--card-action-height) / 2)");
     expect(host).toContain("margin-bottom: calc(var(--card-action-height) / 2 + var(--card-action-reserve))");
-    expect(rules().filter((entry) => entry.selectors.some((selector) => /\.card-action\b/.test(selector)))).toHaveLength(1);
+    expect(rules().filter((entry) => entry.selectors.some((selector) => /\.card-action\b/.test(selector))).map((entry) => entry.selector)).toEqual([".card-action", ".bowed:has(.card-action)"]);
   });
 
   it("pairs a Bold and a Regular 28 px line in the pill and keeps the title pair's roles", () => {
@@ -1038,7 +1050,13 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
   });
 
   it("puts the batch detail's single primary action on the card edge without moving it in the focus order", () => {
-    expect(app.match(/\bcard-action\b(?!s)/g)).toHaveLength(1);
+    // Three cards own a primary action: the batch detail, Settings "Data exchange" and the first-run card.
+    expect(app.match(/\bcard-action\b(?!s)/g)).toHaveLength(3);
+    expect(app).toContain('<button className="primary-action card-action" disabled={!!operation} onClick={() => void runOperation("exchange", "Preparing ZIP archive…", downloadArchive)} type="button">Export ZIP archive</button>');
+    expect(app).toContain('{batches.length === 0 && profiles.length > 0 && <button className="primary-action card-action" onClick={() => onDialog({ kind: "start" })} type="button"><DesignIcon name="plus" /><span>Start your first batch</span></button>}');
+    // Settings card headings carry the row avatar (lilac circle d 63) instead of the old bordered 52 px capsule.
+    expect(app.match(/<div className="settings-card-heading"><span className="toggle-avatar">/g)).toHaveLength(7);
+    expect(styles).not.toContain("settings-emblem");
     const heading = app.slice(app.indexOf('<div className="design-detail-heading">'), app.indexOf("</div>", app.indexOf('<div className="design-detail-heading">') + 40) + 400);
     expect(heading).toContain('aria-label="Add observation" className="primary-action card-action design-record-observation"');
     expect(rule(".design-record-observation")).not.toContain("width");

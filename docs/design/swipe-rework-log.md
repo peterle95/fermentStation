@@ -17,11 +17,12 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 15 Big numbers | **closed**: figures are coral wherever they sit on black; the Kitchen summary's hero count is the `big-number` (coral display figure, white circle d 118, white caption) beside or below the lime card; counts on lime (Checks summary) stay ink | type system, Kitchen summary (ticket 9) |
 | 7 Search field | **closed**: black capsule h 53, 1 px lime outline, lime caret, dark sort circle beside it | utility circles |
 | 8 Dialogs | **closed**: one black sheet (`.station-dialog`, r 40 / bow 5.7, inset 21), phone bottom sheet with flat bottom, centred `label` title on the close circle's line, `dark-field` controls | dialogs |
-| 9 Batch card anatomy | **closed**: H/W 0.94 from width tokens, full-width title pair, frosted chip, pill + black circle, 48–94 % photo slot (stand-ins clipped by the bow, user photos rectangular); narrow cards grow when their chips wrap | batch card (ticket 8) |
+| 9 Batch card anatomy | **closed**: H/W 0.94 from width tokens, full-width title pair, frosted chip, pill + black circle, 48–94 % photo slot (stand-ins clipped by the bow, user photos rectangular); the chip row stays one line (the next-check chip ellipsizes), so narrow cards keep the ratio unless a title runs to three lines | batch card (ticket 8), ticket 12 |
 | 11 Kitchen summary | **closed**: lime bowed card H/W 0.58 capped at 382, lilac emblem d 0.309 W 47 % above, yellow `summary-row` 0.916 × 0.252 W 49 % below with the `#fff6ce` count pill 79 × 49; the batch detail's next check uses the same `summary-row` | Kitchen summary (ticket 9) |
 | 10 Settings controls | **closed**: one `toggle-list` / `toggle-row` primitive (h 72, gap 8, inset 16, black selected row), lilac avatar d 63, switch 42 × 25 / knob 20; Suggestions is a real `role="switch"`, Units and Notifications are row choices | settings |
-| 12 Primary action | **closed** for the batch detail ("Add observation" is the `card-action` capsule); Settings export and dialog submits remain | batch card (ticket 8) |
+| 12 Primary action | **closed** for the batch detail ("Add observation"), Settings "Export ZIP archive" and the first-run card ("Start your first batch"), all `card-action`; dialog submits stay inline (needs a decision, see ticket 12) | batch card (ticket 8), ticket 12 |
 | 13 Timeline | **closed**: one `small-card` (bowed at r = min(52, 0.16 W), bow = min(4.4, 0.0125 W) from its own width; lilac `#d9b4eb → #f6eafc` or blue `#b4dff9 → #e6f6ff` gradient; lime tag chip h 27; Light value; translucent time chip h 30; all ink black) for timeline entries, the latest readings, the calendar's upcoming/overdue items and the Checks upcoming strip; the white timeline panel is gone | small cards (ticket 10) |
+| Legacy rounded rectangles (gap 1 follow-up) | **closed** except `.activity-logger`: the `--radius-card` allowlist holds one entry; Settings heading icons are the row avatar | ticket 12 |
 | Calendar month grid (spec §3, no gap number) | **closed**: day circles min(column, 60) ≥ 44, emblem event days, black selected day, `#3e3e40` today ring; Today / arrows / top-bar date chip on `utility-circle` / `utility-capsule`; no 320 overflow (the screen spans the pane below 380); strip days carry lime tag chips at 160 px; bowed focus rings follow the bow | calendar (ticket 11) |
 
 Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text inside the scroll panes was absolutely positioned against `.app-shell`, which made the whole document scroll in 49 of 60 captures. `.main-content`, `.design-dashboard` and `.design-detail` are now `position: relative`, so they contain it.
@@ -43,7 +44,7 @@ The primitive is defined once, in `src/styles.css` directly after `.sr-only`. It
 - **Fallback:** without `shape()` support (Firefox and older WebKitGTK were not verified), every layer becomes a rounded rectangle at `--r`. The scratchpad demo was checked with shape support forced off: fill, ring, media and overhang all stayed intact.
 - **Fidelity:** a 382×359 `bowed` box rendered in Chrome 157 against the ui-board drink card measures 0.25 board px rms and 1.2 board px max, including the ill-conditioned corner tips. The top-edge bow is 2.96 against the board's 3.0.
 
-Bowed surfaces today (enforced by `src/styles.test.ts`): `design-batch-card`, `design-summary`, `checks-summary`, `design-detail-card`, `profile-card`, `profile-editor-section`, `profile-editor-head`, `calendar-panel`, `settings-card`, `batch-component-card`, `timeline-entry`, `summary-row`, `small-card` (`bowed`) and `station-dialog` (`bowed-clip`). The retired `::before` black-notch bars and the asymmetric `2rem 2rem 2.5rem 2.5rem / …` radii are gone.
+Bowed surfaces today (enforced by `src/styles.test.ts`): `design-batch-card`, `design-summary`, `checks-summary`, `design-detail-card`, `profile-card`, `profile-editor-section`, `profile-editor-head`, `calendar-panel`, `settings-card`, `batch-component-card`, `timeline-entry`, `summary-row`, `small-card`, and since ticket 12 `app-loading`, `empty-state`, `ios-install-guide`, `design-tip`, `design-input-summary`, `batch-guidance`, `next-action`, `wb-panel` (measurements), `batch-tools-danger`, `profile-overview-intro`, `start-batch-basics`, `start-profile-summary`, `profile-editor-card` (`bowed`) and `station-dialog` (`bowed-clip`). The retired `::before` black-notch bars and the asymmetric `2rem 2rem 2.5rem 2.5rem / …` radii are gone.
 
 ### Colour tokens
 
@@ -485,11 +486,49 @@ Controls: Today capsule h 57 (dark, like the arrows d 57); date chip h 60 (white
 - `.calendar-overdue-mark` is still a 44 px literal black capsule; `.upcoming-date` keeps `min-width: 44px`.
 - The calendar head wraps to two lines at 320 (month label above Today and the arrows); readable, but a later polish could put the month between the arrows.
 
+## Ticket 12: legacy rounded rectangles, primary actions, heading icons, narrow cards — done
+
+Scope: the `--radius-card` allowlist, the gap 12 leftovers, the Settings card-heading icons and the chip row of narrow batch cards. No new component, no new token.
+
+### As built
+
+- **Bowed (large surfaces).** `bowed` className plus `--fill`, with no `background`, `border` or `border-radius` left on them: `.app-loading`, `.empty-state` (Profiles; `.profile-list .empty-state` keeps white), `.ios-install-guide`, `.design-tip` (overview), `.design-input-summary`, `.batch-guidance`, `.next-action`, the measurements `.wb-panel` in `.batch-management`, `.profile-editor-card` (with `.profile-editor-note` as its accent variant), and the pastel boxes in the sheets: `.profile-overview-intro`, `.start-batch-basics` (a `<fieldset>`) and `.start-profile-summary`. `.batch-tools-danger` is a black bowed card with the primitive's stroke (`--stroke: currentColor; --stroke-w: var(--stroke-width)`), which replaces its 1 px border.
+- **Small card.** The empty messages `.design-empty-checks` (overview, Checks) and `.calendar-empty` are `small-card bowed` (lilac gradient). Their old yellow bordered rule is gone.
+- **Capsule (shared row / control radius).** `.queue-card` (the overview's "A little care today" rows; the Checks view's `.queue-card` inherits it), `.batch-view-switch` and `.profile-card-actions`.
+- **Not a card.** `.calendar-screen, .profiles-screen, .design-checks-view` was a dead rule (every screen overrides it to transparent with no padding), and the `.design-detail` top radius was black on black. Both were deleted. `.design-detail-photo` is a photo frame on `--radius-small` (#53: user photos stay rectangular). `.storage-warning` drops its override and shares the notice/alert shape (`--radius-small`). `.design-detail-next` was a stale allowlist entry (ticket 9 made it a `summary-row`).
+- **Primary actions.** `.bowed:has(.card-action)` is now the one host rule (padding-bottom and margin-bottom). It replaces the `.design-detail-card` declarations, so any bowed card can own the capsule. Settings "Data exchange" → "Export ZIP archive" is `primary-action card-action`. The first-run card (`.design-empty-card`, when `batches.length === 0` and a profile exists) gets "Start your first batch" (`primary-action card-action`, plus glyph), which opens the start sheet. It has its own name, so it never collides with the top bar's "Start a batch" in tests or for screen readers. `.form-actions:empty { display: none }` removes the gap the export button left behind.
+- **Heading icons.** The seven `.settings-emblem` spans (52 px bordered capsules) are now the row avatar `.toggle-avatar` (lilac `--colour-emblem` circle d 63), and the rule is deleted. `.profile-editor-icon-button` (remove check) is `utility-circle utility-circle-dark` (d 57 on the white section), and both of its old rules are deleted.
+- **Narrow batch cards.** `.design-batch-chips` no longer wraps. The status chip is `flex: none`. `.design-batch-next` is a block capsule (`min-width: 0`, ellipsis, `nowrap`, vertical padding `(chip height − 1lh) / 2`). The card's `sr-only` line still reads the full next step. At 768 and 320 the cards keep the ratio. Only a card whose title runs to three lines at 320 still grows, and that is the title, not the chips.
+
+### Allowlist
+
+`legacyCardRadius` = `[".activity-logger"]`. It cannot be bowed: it turns into `display: contents` while the modal logger is open, and the primitive's absolutely positioned fill layer would escape to the pane. Moving it needs either a wrapper element or a decision to drop its card look.
+
+### Tests (`src/styles.test.ts`)
+
+- `bowedCards` gained the 13 new bowed surfaces. A new test pins the small-card empty messages, the three capsules, the photo frame, the danger stroke and "activity-logger is never bowed".
+- The card-action test checks the generic host rule, the three `card-action` uses (detail, export, first-run) with their exact markup, the seven `toggle-avatar` heading icons and the absence of `settings-emblem`.
+- The utility-circle test lost its `profile-editor-icon-button` exception. The anatomy test asserts the one-line chip row.
+
+### Results
+
+- `npm run typecheck` is clean; `src/styles.test.ts` passes 82 tests; full `npm test`: 15 files, 308 tests passed.
+- Full harness (65 captures): 0 failed, 0 step-failed, 0 page errors, 0 document, vertical or surface overflow, 0 clippedControls, 0 smallTargets.
+- Looked at: settings, batch-tools, profile-editor, first-run, batch-creation and profiles at 390; overview at 768 and 320; settings at 1440.
+
+### Left by ticket 12 (for ticket 13)
+
+- **Dialog submits** stay inline. `station-dialog` is a `bowed-clip` scroll container, so a capsule half outside its bottom edge would be clipped. The options are a non-overhanging capsule variant at the sheet's foot (a new card-action form) or a sticky footer. This needs a decision.
+- `.start-batch-basics` is a `<fieldset>`, so the primitive's fill starts below the rendered `<legend>`. "Your batch" now reads as a lime label above the blue card, not as a black capsule on it. It can stay; otherwise float the legend or swap the fieldset for a `role="group"` div.
+- Small bowed surfaces (`.start-profile-summary`, `.profile-overview-intro`, `.next-action` at narrow widths) use the default r 52, so short ones read as near-capsules. `small-card`'s width-derived `--r` could become a modifier if that matters.
+- `.activity-logger` (see Allowlist). Notices and alerts (`.notice`, `[role="alert"]`, `.storage-warning`) are still `--radius-small` boxes; the spec maps them to black capsules.
+- Batch card titles that need three lines at 320 still grow the card.
+
 ## Left for later tickets / known issues
 
 - ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).
 - ~~Timeout~~ fixed by ticket 2 with `testTimeout` in `vite.config.ts`. Was: `src/App.test.tsx` "reflects edited cadence and pauses and resumes checks with batch status" times out at the 5 s default (it takes 5.3–8 s). It fails the same way at `7133bca` with the foundation changes stashed, so it is a pre-existing slow test, not a regression. Full suite after foundation: 254 passed, 2 failed (these two), 228 s with `--maxWorkers=1`.
-- These rounded-rectangle surfaces are not bowed yet, though they are large cards on the ground (ticket 10 retired `.design-timeline-panel`): `.batch-guidance`, `.design-input-summary`, `.batch-management > .wb-panel`, `.next-action`, `.design-detail-next` (yellow sub-row → a bowed row with `--r` = H/2, gap 11), `.design-tip`, `.empty-state`, `.profile-editor-card` and `.batch-tools-danger`. Bow them in the ticket that owns them. `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
+- ~~Rounded-rectangle surfaces not bowed yet~~ settled by ticket 12; only `.activity-logger` keeps `--radius-card`. `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
 - ~~`timeline-entry` radius~~ settled by ticket 10 (small-card rule). Was: `timeline-entry` uses the default 52px radius, capped at 50 % of its height. Short entries therefore read as near-capsules. Gap 13 should give them their event-card size and the small-component rule (`--r` ≈ 0.16 W, `--bow` ≈ 0.0125 W below 300px).
 - ~~Calendar event days still use `--colour-action-alt` on tall capsules~~ settled by ticket 11 (`--colour-emblem` circles).
 - The native launch colours are still `#1c1c1c`: `android/app/src/main/res/values/colors.xml` `colorPrimary`/`colorPrimaryDark`, and `capacitor.config.ts` `iconColor`. `styles.test.ts` asserts them. Switch them to `#000000` together with that test if the launch screen should match the new ground.
