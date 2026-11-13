@@ -210,6 +210,8 @@
   --radius-small: 12px;
   /* A capsule's end for a row that may wrap: half its one-line height (padding --space-3, 1 px border). */
   --radius-line: calc(0.5lh + var(--space-3) + var(--stroke-width));
+  /* Minimum hit target (WCAG 2.5.5): the smallest box any control may draw. */
+  --target-min: 44px;
   --button-height: 52px;
   --button-padding-x: 24px;
   --card-padding: 24px;
@@ -259,7 +261,7 @@ button:active:not(:disabled) { transform: translateY(1px); }
 button:disabled { cursor: not-allowed; opacity: 0.6; }
 a { color: inherit; text-underline-offset: 0.2em; }
 a:hover { text-decoration-thickness: 2px; }
-summary { min-height: 44px; padding-block: var(--space-3); }
+summary { min-height: var(--target-min); padding-block: var(--space-3); }
 input, select, textarea {
   width: 100%;
   min-width: 0;
@@ -272,7 +274,7 @@ input, select, textarea {
 }
 input::placeholder, textarea::placeholder { color: var(--ink-meta); opacity: 1; }
 input[type="file"] { border-radius: var(--radius-small); overflow: hidden; }
-input::file-selector-button { min-height: 44px; margin-right: var(--space-2); border: 0; border-radius: var(--radius-control); padding: var(--space-2) var(--space-4); background: var(--colour-action); font: inherit; cursor: pointer; }
+input::file-selector-button { min-height: var(--target-min); margin-right: var(--space-2); border: 0; border-radius: var(--radius-control); padding: var(--space-2) var(--space-4); background: var(--colour-action); font: inherit; cursor: pointer; }
 textarea { min-height: 128px; border-radius: var(--radius-small); resize: vertical; }
 label { min-width: 0; }
 fieldset { min-width: 0; margin: 0; }
@@ -383,7 +385,7 @@ input::file-selector-button,
 [role="alert"],
 .settings-live[role="alert"] > p,
 .batch-view-switch button[aria-pressed="true"],
-:is(.filter-row, .quick-log-types) button[aria-pressed="true"],
+.quick-log-types button[aria-pressed="true"],
 .toggle-row:is([aria-pressed="true"], [aria-checked="true"]),
 .design-batch-card.selected,
 .design-batch-next,
@@ -495,7 +497,9 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
    outside its edge, so there the same capsule sits in flow at the sheet's foot, centred, and needs no host. */
 .card-action-foot { position: static; flex: none; margin-inline: auto; }
 .bowed:has(.card-action:not(.card-action-foot)) { padding-bottom: calc(var(--card-padding) + var(--card-action-height) / 2); margin-bottom: calc(var(--card-action-height) / 2 + var(--card-action-reserve)); }
-.design-quiet, .profile-editor-text-button, .station-text-action, .component-remove { min-width: 44px; border-color: transparent; text-decoration: underline; text-underline-offset: 4px; padding-inline: var(--space-2); }
+.design-quiet, .profile-editor-text-button, .station-text-action, .component-remove { min-width: var(--target-min); border-color: transparent; text-decoration: underline; text-underline-offset: 4px; padding-inline: var(--space-2); }
+/* A text action inside a sentence sits on the words' spacing: no side padding, so no gap before the full stop. */
+.station-text-action { padding-inline: 0; }
 .form-actions, .trash-item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
 /* A row whose only action moved onto the card edge (card-action) leaves no empty grid gap behind. */
 .form-actions:empty { display: none; }
@@ -580,6 +584,8 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 .screen-head .eyebrow { margin-bottom: var(--space-2); }
 /* Kickers above a title are lime on the ground (ink on fills). */
 .eyebrow, .profile-editor-eyebrow, .profile-editor-kicker { color: var(--ink-accent); }
+/* A date in an eyebrow is a date, not an accent: blue on black. */
+.eyebrow time { color: var(--ink-time); }
 .design-skip-link { position: fixed; top: -128px; left: var(--space-6); z-index: 100; padding: var(--space-4); border-radius: var(--radius-small); background: var(--colour-action); }
 .design-skip-link:focus { top: calc(var(--safe-top) + var(--space-3)); }
 .design-toast, .profile-editor-toast { position: fixed; bottom: var(--space-6); left: 50%; transform: translateX(-50%); z-index: 50; width: max-content; max-width: calc(100% - 48px); border: 1px solid var(--colour-text-inverse); border-radius: var(--radius-control); padding: var(--space-3) var(--space-6); background: var(--colour-surface-inverse); text-align: center; overflow-wrap: anywhere; pointer-events: none; }
@@ -645,12 +651,13 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-stat-track i { display: block; height: 100%; background: var(--colour-text); }
 .design-section-head, .section-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); margin-bottom: var(--space-4); }
 .batch-view-switch { display: flex; flex-wrap: wrap; gap: var(--space-1); padding: var(--space-1); border-radius: var(--radius-control); background: var(--colour-background); }
-.batch-view-switch button { border: 0; min-height: 44px; padding: var(--space-2) var(--space-4); }
+.batch-view-switch button { border: 0; min-height: var(--target-min); padding: var(--space-2) var(--space-4); }
 .batch-view-switch button[aria-pressed="true"] { background: var(--colour-surface-inverse); }
-.filter-row { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-6); }
-.filter-row button { min-height: 44px; padding: var(--space-2) var(--space-4); background: var(--colour-background); }
-.filter-row button[aria-pressed="true"] { outline: 2px solid var(--colour-action); outline-offset: 2px; }
-:is(.filter-row, .quick-log-types) button[aria-pressed="true"] { background: var(--colour-surface-inverse); border-color: var(--colour-surface-inverse); }
+/* Filter chips borrow the bottom row (spec §1.5, §3): white capsules h 60 at gap 6, the chosen one lime. */
+.filter-row { display: flex; flex-wrap: wrap; gap: var(--nav-gap); margin-bottom: var(--space-6); }
+.filter-row button { min-height: var(--nav-circle); padding: var(--space-2) var(--space-4); background: var(--colour-background); }
+.filter-row button[aria-pressed="true"] { background: var(--colour-action); border-color: var(--colour-action); }
+.quick-log-types button[aria-pressed="true"] { background: var(--colour-surface-inverse); border-color: var(--colour-surface-inverse); }
 .batch-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--batch-card-min)), 1fr)); gap: var(--layout-gutter); }
 /* Batch card (spec §1.1 drink card; gap 9). The card is a full-width grid item, so its percentage padding and
    its children's percentage margins and horizontal offsets are fractions of the card's width. Title pair at the
@@ -701,7 +708,7 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .action-queue { margin-top: var(--space-8); }
 .queue-grid, .design-all-checks { display: grid; gap: var(--space-4); }
 .queue-card { display: flex; align-items: center; gap: var(--space-3); min-width: 0; padding: var(--space-3); border-radius: var(--radius-control); background: var(--colour-background); }
-.queue-icon, .design-check-symbol, .next-action-icon { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: var(--radius-control); background: var(--colour-emblem); }
+.queue-icon, .design-check-symbol, .next-action-icon { display: grid; place-items: center; flex: none; width: var(--target-min); height: var(--target-min); border-radius: var(--radius-control); background: var(--colour-emblem); }
 .queue-icon.overdue { background: var(--colour-surface-inverse); color: var(--ink-attention); }
 .design-check-copy { flex: 1; min-width: 0; padding: var(--space-2) 0; border: 0; border-radius: var(--radius-small); text-align: left; }
 .design-check-copy strong { display: block; overflow-wrap: anywhere; }
@@ -722,7 +729,7 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-tip h3 { margin-bottom: var(--space-2); }
 .design-more-actions { margin-top: var(--space-6); }
 .design-more-actions > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); padding-block: var(--space-4); }
-.section-label a { display: inline-flex; align-items: center; min-height: 44px; }
+.section-label a { display: inline-flex; align-items: center; min-height: var(--target-min); }
 .upcoming-strip { display: flex; gap: var(--small-card-spacing); overflow-x: auto; padding: var(--space-2) var(--space-2) var(--space-4); overscroll-behavior-inline: contain; }
 .upcoming-strip button { flex: 0 0 var(--strip-day); text-align: center; }
 .upcoming-strip time { display: grid; color: var(--ink-time); }
@@ -781,7 +788,7 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .warning { text-decoration: underline; }
 .zone { justify-self: start; background: var(--colour-action); }
 .timeline-entry-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
-.timeline-entry-actions button { min-height: 44px; padding: var(--space-2) var(--space-4); border-color: transparent; background: var(--colour-frost); }
+.timeline-entry-actions button { min-height: var(--target-min); padding: var(--space-2) var(--space-4); border-color: transparent; background: var(--colour-frost); }
 .timeline-trash { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px solid currentColor; border-radius: var(--radius-small); }
 .design-detail-footer { order: 6; display: flex; align-items: center; gap: var(--space-2); }
 .detail-photo-credits { order: 7; }
@@ -801,7 +808,7 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .batch-tools-danger { order: 3; display: grid; gap: var(--space-4); padding: var(--card-padding); --fill: var(--colour-surface-inverse); --stroke: currentColor; --stroke-w: var(--stroke-width); }
 .batch-tools-danger h4 { margin-bottom: var(--space-2); }
 .batch-tools-danger button { justify-self: start; background: var(--colour-background); }
-.next-action { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--space-3); padding: var(--card-padding); --fill: var(--colour-surface); }
+.next-action { display: grid; grid-template-columns: var(--target-min) minmax(0, 1fr); gap: var(--space-3); padding: var(--card-padding); --fill: var(--colour-surface); }
 .next-action p { margin-top: var(--space-2); }
 .next-action .next-action-kick { margin-top: 0; }
 .next-action-complete { grid-column: 2; justify-self: start; background: var(--colour-action); }
@@ -834,7 +841,7 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .batch-component-card:nth-child(3) { --fill: var(--colour-surface); }
 .batch-component-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-4); }
 .batch-component-header h4 { flex: 1; }
-.batch-component-step { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; border: 1px solid currentColor; border-radius: 50%; }
+.batch-component-step { display: grid; place-items: center; flex: 0 0 var(--target-min); width: var(--target-min); height: var(--target-min); border: 1px solid currentColor; border-radius: 50%; }
 .component-field, .component-inputs, .component-input-fields, .component-calculation, .component-check { display: grid; gap: var(--space-3); }
 .component-calculation + .component-calculation { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--component-border); }
 .component-calculation-value { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-control); background: var(--colour-surface-inverse); }
@@ -885,7 +892,8 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .station-dialog .quick-log-types button[aria-pressed="true"] { background: var(--colour-action); border-color: var(--colour-action); }
 .station-dialog-body h3 { margin-block: var(--space-6) var(--space-2); }
 .station-dialog-body dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); margin-block: var(--space-6); }
-.station-dialog-body dd { margin: 0; overflow-wrap: anywhere; }
+/* Facts on the sheet: lilac meta labels, values in the sheet's text ink. */
+.station-dialog-body dd { margin: 0; overflow-wrap: anywhere; color: var(--ink); }
 .station-field { display: grid; gap: var(--space-2); margin-top: var(--space-6); }
 .station-helper, .station-options { margin-top: var(--space-4); }
 /* The sheet's foot: secondary actions above, the lime card-action-foot capsule last (DOM order = visual order). */
@@ -901,7 +909,7 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .observation-form { margin: 0; padding: 0; }
 .quick-log-form { display: grid; gap: var(--space-6); margin-top: var(--space-6); }
 .quick-log-types { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.quick-log-types button { min-height: 44px; padding: var(--space-2) var(--space-3); }
+.quick-log-types button { min-height: var(--target-min); padding: var(--space-2) var(--space-3); }
 .quick-log-fields { display: grid; gap: var(--space-4); }
 .quick-log-fields label { display: grid; gap: var(--space-2); }
 .quick-log-fields .logger-context { order: 1; }
@@ -932,7 +940,8 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .design-profile-visual .batch-photo-retry { bottom: 0; }
 .design-profile-copy { display: grid; gap: var(--space-4); min-width: 0; }
 .profile-facts { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.profile-facts > span { border: 1px solid currentColor; border-radius: var(--radius-control); padding: var(--space-1) var(--space-3); }
+/* Profile facts are the drink card's frosted chip (spec §1.1, §3), like the batch card's status chip. */
+.profile-facts > span { display: inline-flex; align-items: center; min-height: var(--batch-chip-height); border-radius: var(--radius-control); padding-inline: var(--space-4); background: var(--colour-frost); backdrop-filter: blur(var(--batch-chip-blur)); }
 .profile-card-guidance { overflow-wrap: anywhere; }
 .profile-card-link { display: flex; justify-content: space-between; gap: var(--space-2); }
 .profile-card-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-2); background: var(--colour-background); border-radius: var(--radius-control); }
@@ -978,7 +987,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .profile-editor-suffix { position: relative; }
 .profile-editor-suffix input { padding-right: 64px; }
 .profile-editor-suffix i { position: absolute; top: 50%; right: var(--space-4); transform: translateY(-50%); pointer-events: none; font-style: normal; }
-.profile-editor-check-row { display: grid; align-items: end; gap: var(--space-3); grid-template-columns: minmax(0, 1fr) 88px auto 44px; padding-block: var(--space-4); border-top: 1px solid var(--editor-border); }
+.profile-editor-check-row { display: grid; align-items: end; gap: var(--space-3); grid-template-columns: minmax(0, 1fr) 88px auto var(--target-min); padding-block: var(--space-4); border-top: 1px solid var(--editor-border); }
 .profile-editor-check-unit { align-self: center; }
 .profile-editor-formula { display: grid; gap: var(--space-4); border: 0; padding: 0; }
 .profile-editor-formula-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); padding: var(--space-4); border-radius: var(--radius-small); background: var(--editor-warm); }
@@ -1026,8 +1035,8 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .upcoming-list { display: grid; gap: var(--small-card-spacing); }
 .upcoming-item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); width: 100%; text-align: left; }
 .upcoming-item:hover { transform: translateY(-2px); }
-.calendar-overdue-mark { display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--radius-control); background: var(--colour-surface-inverse); color: var(--ink-attention); }
-.upcoming-date { display: grid; justify-items: center; flex: none; min-width: 44px; }
+.calendar-overdue-mark { display: grid; place-items: center; width: var(--target-min); height: var(--target-min); border-radius: var(--radius-control); background: var(--colour-surface-inverse); color: var(--ink-attention); }
+.upcoming-date { display: grid; justify-items: center; flex: none; min-width: var(--target-min); }
 .upcoming-body { flex: 1; min-width: 112px; }
 .upcoming-batch-picker { display: grid; gap: var(--space-4); }
 .upcoming-batch-choice { display: grid; gap: var(--space-2); text-align: left; background: var(--colour-accent); }
@@ -1092,7 +1101,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .settings-exchange label, .formula-term label { display: grid; gap: var(--space-2); }
 .formula-term { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--space-3); }
 .settings-trash-toggle { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); width: 100%; text-align: left; background: var(--colour-surface-inverse); }
-.settings-count { display: grid; place-items: center; flex: none; min-width: 44px; min-height: 44px; padding-inline: var(--space-2); border-radius: var(--radius-control); background: var(--colour-action); }
+.settings-count { display: grid; place-items: center; flex: none; min-width: var(--target-min); min-height: var(--target-min); padding-inline: var(--space-2); border-radius: var(--radius-control); background: var(--colour-action); }
 .deleted-batches-panel { display: grid; gap: var(--space-3); }
 /* A deleted batch is a toggle row with its Restore action in the switch slot. */
 .trash-item { min-height: var(--toggle-row); padding: var(--space-2) calc((var(--toggle-row) - var(--button-height)) / 2) var(--space-2) var(--switch-inset); border-radius: var(--radius-control); background: var(--colour-row); }
@@ -1108,7 +1117,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .design-date-chip { display: none; }
   .batch-overview, .profile-list { grid-template-columns: minmax(0, 1fr); }
   .profile-editor-grid, .calendar-layout { grid-template-columns: minmax(0, 1fr); }
-  .profile-editor-check-row { grid-template-columns: minmax(0, 1fr) 88px auto 44px; }
+  .profile-editor-check-row { grid-template-columns: minmax(0, 1fr) 88px auto var(--target-min); }
 }
 
 /* Tablet rail (spec §1.4): the logo circle and the four destinations form one chain. Each circle is
@@ -1191,7 +1200,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .station-dialog-body dl { grid-template-columns: minmax(0, 1fr); }
   .station-dialog-body dd { margin-bottom: var(--space-2); }
   .profile-editor-fields, .profile-editor-formula-row { grid-template-columns: minmax(0, 1fr); }
-  .profile-editor-check-row { grid-template-columns: minmax(0, 1fr) auto 44px; }
+  .profile-editor-check-row { grid-template-columns: minmax(0, 1fr) auto var(--target-min); }
   .profile-editor-check-row label:first-child { grid-column: 1 / -1; }
   .profile-editor-head { display: grid; }
   .profile-editor-head > div { min-width: 0; }

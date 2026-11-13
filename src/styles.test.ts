@@ -1447,7 +1447,7 @@ describe("calendar and upcoming strip (swipe-rework-log.md, ticket 11; spec §3 
     expect(styles).not.toMatch(/\.upcoming-strip \[class\^="event-"\]/);
     // The strip may scroll inside its section, so the actions panel's column cannot grow to the strip's width.
     expect(rule(".design-more-actions > div")).toContain("grid-template-columns: minmax(0, 1fr)");
-    expect(rule(".section-label a")).toContain("min-height: 44px");
+    expect(rule(".section-label a")).toContain("min-height: var(--target-min)");
   });
 
   it("draws a focused bowed control's ring with the stroke layer, so it follows the bow", () => {
@@ -1459,5 +1459,50 @@ describe("calendar and upcoming strip (swipe-rework-log.md, ticket 11; spec §3 
     }
     // White on the black ground around every focusable bowed card.
     expect(contrast(hex("--colour-text-inverse"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("final 1:1 audit (ticket 15)", () => {
+  it("takes every 44 px minimum target from --target-min, never a literal", () => {
+    expect(rootTokens().get("--target-min")).toBe("44px");
+    for (const entry of rules()) {
+      if (entry.selector === ":root") continue;
+      for (const [property, value] of entry.declarations) expect(value, `${entry.selector} { ${property}: ${value} }`).not.toMatch(/(?<![\d.])44px/);
+    }
+    const mark = rule(".calendar-overdue-mark");
+    for (const declaration of ["width: var(--target-min)", "height: var(--target-min)"]) expect(mark).toContain(declaration);
+    expect(rule(".upcoming-date")).toContain("min-width: var(--target-min)");
+  });
+
+  it("draws filter chips as the bottom row: white capsules h 60 at gap 6, the chosen one lime with ink", () => {
+    expect(rule(".filter-row")).toContain("gap: var(--nav-gap)");
+    expect(rule(".filter-row button")).toContain("min-height: var(--nav-circle)");
+    const chosen = rule('.filter-row button[aria-pressed="true"]');
+    expect(chosen).toContain("background: var(--colour-action)");
+    expect(chosen).not.toContain("outline");
+    // Lime takes the fill ink: the chip stays in the light-fill list and out of the ground list.
+    const ground = rules().find((entry) => entry.selectors.includes(".settings-trash-toggle") && entry.declarations.some(([property, value]) => property === "--ink" && value === "var(--ink-ground)"));
+    expect(ground).toBeDefined();
+    expect(ground!.selectors.some((selector) => selector.includes(".filter-row"))).toBe(false);
+  });
+
+  it("gives profile facts the batch card's frosted chip", () => {
+    const chip = rule(".profile-facts > span");
+    for (const declaration of ["min-height: var(--batch-chip-height)", "background: var(--colour-frost)", "backdrop-filter: blur(var(--batch-chip-blur))"]) expect(chip).toContain(declaration);
+    expect(chip).not.toContain("border:");
+  });
+
+  it("shows sheet facts as lilac labels with values in the sheet's text ink", () => {
+    expect(rule(".station-dialog-body dd")).toContain("color: var(--ink)");
+  });
+
+  it("sets an inline text action on the sentence's own spacing", () => {
+    expect(rule(".station-text-action").trim()).toBe("padding-inline: 0;");
+    expect(app).toContain('credits in <button className="station-text-action" onClick={() => navigate("settings")} type="button">Settings</button>.</p>');
+  });
+
+  it("colours a date in an eyebrow as a date (blue on black), not an accent", () => {
+    expect(rule(".eyebrow time")).toContain("color: var(--ink-time)");
+    expect(app).toContain('<p className="eyebrow"><time dateTime={date}>{shortDate(date)}</time></p><h2>Choose a batch</h2>');
   });
 });

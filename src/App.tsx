@@ -1197,7 +1197,7 @@ function BatchPicker({ date, events, onClose, onOpen }: BatchPickerProps) {
   return (
     <dialog aria-label={`Choose a batch for ${date}`} className="station-dialog bowed-clip upcoming-batch-picker" id={`upcoming-batch-picker-${date}`} onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }} ref={dialogRef}>
         <div className="station-dialog-heading">
-          <div><p className="eyebrow">{shortDate(date)}</p><h2>Choose a batch</h2></div>
+          <div><p className="eyebrow"><time dateTime={date}>{shortDate(date)}</time></p><h2>Choose a batch</h2></div>
           <button aria-label="Close" className="utility-circle utility-circle-dark" onClick={onClose} type="button"><DesignIcon name="close" /></button>
         </div>
         {batchIds.map((batchId) => {

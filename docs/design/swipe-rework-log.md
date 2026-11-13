@@ -25,6 +25,7 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 13 Timeline | **closed**: one `small-card` (bowed at r = min(52, 0.16 W), bow = min(4.4, 0.0125 W) from its own width; lilac `#d9b4eb → #f6eafc` or blue `#b4dff9 → #e6f6ff` gradient; lime tag chip h 27; Light value; translucent time chip h 30; all ink black) for timeline entries, the latest readings, the calendar's upcoming/overdue items and the Checks upcoming strip; the white timeline panel is gone; pH and temperature entries show their number as the Light value | small cards (ticket 10), ticket 13 |
 | Legacy rounded rectangles (gap 1 follow-up) | **closed**: the `--radius-card` allowlist is empty; the inline logger's card is `.activity-logger-card bowed`; Settings heading icons are the row avatar | tickets 12, 13 |
 | Launch colours (gap 2 follow-up) | **closed**: Android launch/splash/window/status/navigation bars, the notification tint, `theme-color`, the web manifest and the Tauri window are `#000000`, the ground | ticket 14 |
+| Final 1:1 audit | **done**: 26 components / surfaces, 15 match, 6 minor, 5 differ; cheap fixes applied, the rest in "Needs a decision" | ticket 15 |
 | Calendar month grid (spec §3, no gap number) | **closed**: day circles min(column, 60) ≥ 44, emblem event days, black selected day, `#3e3e40` today ring; Today / arrows / top-bar date chip on `utility-circle` / `utility-capsule`; no 320 overflow (the screen spans the pane below 380); strip days carry lime tag chips at 160 px; bowed focus rings follow the bow | calendar (ticket 11) |
 
 Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text inside the scroll panes was absolutely positioned against `.app-shell`, which made the whole document scroll in 49 of 60 captures. `.main-content`, `.design-dashboard` and `.design-detail` are now `position: relative`, so they contain it.
@@ -600,6 +601,72 @@ Config, tests and harness only. `src/App.tsx` and `src/styles.css` are untouched
 - **Long sheets** (profile overview at 390 and 1440): the native scrollbar is light grey (`color-scheme: light`) and draws at the sheet's right edge, outside the bow. It is the same in the existing `batch-creation` capture.
 - **Android launch**: `station_launch_logo.png` (the transparent logo, unchanged) now sits on black. The jar's dark lid has little contrast against black; the orange cat and jar read. The unused Capacitor placeholder `drawable*/splash.png` files (white ground, blue mark) are not referenced (tested) and were not edited. The adaptive app icon background `ic_launcher_background` stays `#fff`; it is an icon, not a launch surface.
 - Not verified on a device or emulator (out of scope): status-bar icon contrast and whether the splash-to-WebView handover has a frame of another colour.
+
+## Ticket 15: final 1:1 audit — done
+
+Full harness at `60dc406` first: 95 captures, 0 failed, every finding count 0. Each spec §1 component (and the §3 surfaces that borrow it) was compared against `ui-board.png` / `drinks-board.png` at 390, 768 (one tablet) and 1440, plus 320 where a narrow layout was in question. The type face (Unique, condensed) is the user's D1 decision and is not counted as a difference.
+
+### Audit
+
+| Component | Board reference | App surface(s) | Verdict | What differs |
+| --- | --- | --- | --- | --- |
+| Drink card | ui §1.1 | batch card (overview, all-batches) | minor difference | Fill is the batch's pastel, not white (kept from before the rework; §3 does not ask for white). Stand-in jars sit in the 48–94 % slot as rectangles (#53). Ratio, title pair, frosted chip, pill + black circle match. |
+| Drink card | ui §1.1 | profile card (profiles) | differs | Facts were outlined capsules → **fixed**, now the frosted chip. Actions are still a white capsule holding a black "Edit profile" capsule and an outlined "Delete" capsule; §3 asks for the Swipe pill with the black circle (= Edit) and Delete as a text action. Needs markup, not cheap. |
+| Toggle list | ui §1.2 | Settings preference cards | match | Rows h 72, black selected row, blue switch, avatar d 63 on Suggestions. Units and Notifications rows carry no avatar (minor, content). |
+| Toggle list | ui §1.2 | Checks list (checks, overview "A little care today") | minor difference | Separate white capsule rows on black, no enclosing white bowed card; avatar 44 (`--target-min`), board 63; overdue is a yellow row (ink rule: yellow = due/overdue), §3 says black selected row. |
+| Toggle list | ui §1.2 | desktop sidebar | differs | White circles + labels on black, lime current capsule (decision below). |
+| Toggle list | ui §1.2 | batch picker sheet | differs | Light-blue capsules (decision below). Its date eyebrow was lime → **fixed**, blue (`time`). |
+| Toggle list | ui §1.2 | trash ("Open recently deleted batches", trash row) | match | The toggle is black in both states. The yellow at 390 is the generic `button:hover` fill: the harness's pointer stays on the toggle after its click; at 1440 the scroll moves the toggle away from it. Touch browsers keep that hover after a tap (decision below). Trash row = grey row + white Restore capsule. |
+| Lime button | ui §1.2 | `card-action` (detail "Add observation", Export ZIP, first-run, sheet submits) | match | |
+| Profile card | ui §1.3 | Kitchen summary, Checks summary | match | Summary-row avatar is a check icon, board a photo (decision below). Count pill holds the number only (board "8x" + glyph). |
+| Profile card | ui §1.3 | batch detail head | minor difference | Title and meta left-aligned, no emblem; "Day 5 / 5" as the Light figure top right. The photo frame is a 1 px bordered `--radius-small` box, its "Active" badge a bordered yellow `.status`, not the frosted chip. |
+| Profile card | ui §1.3 | profile editor head | match | Lime bowed head; name field focused (black ring). |
+| Utility stack | ui §1.4 | tablet rail | match | Ringed chain, logo on top, lime current circle. |
+| Utility circles | ui §1.4/§1.5/§1.7 | top bar, detail top, sheet close, sort, calendar arrows | match | |
+| Bottom row | ui §1.5 | phone bottom navigation | match | |
+| Bottom row | ui §1.5 | filter chips (overview, all-batches) | match (was differs) | Were h 44 white capsules, gap 8, selected black with a 2 px lime outline → **fixed**: h 60, gap 6, selected lime with ink. |
+| 64+ stat | ui §1.6 | big number (overview, first-run) | match | Coral Light figure, white circle d 118, white caption; the condensed face makes the figure narrow (D1). |
+| Phone sheet | drinks §1.7 | dialogs, observation logger | match | Long sheets: light native scrollbar drawn outside the bow (ticket 14 note). |
+| Search field | drinks §1.7 | overview search row | match | Placeholder is lilac meta; board shows typed white text. |
+| Event card | drinks §1.7 | timeline, latest readings, calendar upcoming list | match | No bookmark circle (entry actions are text buttons); the pH "safe" zone chip is a bordered `.zone`, minor. |
+| Event card | drinks §1.7 | upcoming strip | minor difference | A four-word label ("Feed ginger and sugar") wraps the lime tag chip to two lines at `--strip-day` 160, a tall blob instead of the h 27 chip. |
+| Calendar month grid | §3 (borrows §1.2/§1.4/§1.5) | calendar | minor difference | Matches at 390/768/1440. At 320 the head wraps: "March 2026" on one line, Today + arrows below (heading 100 + controls 194 + gap > 272). Decision below. `.calendar-overdue-mark` 44 literals → **fixed** (`--target-min`). |
+| Sheet facts (`dl`) | §3 (ink rules) | profile overview, batch dates | match (was differs) | Values were lilac like their labels → **fixed**, white `--ink`. "pH conditions" stays a bulleted list (decision below). |
+| Inline text action | §3 (ink rules) | station info, start-batch notice | match (was minor) | "Settings ." gap → **fixed**: no side padding; the 44 minimum width now only adds ≈ 1 px a side. |
+| Profile overview intro | §1.1 vocabulary | profile overview | minor difference | Yellow bowed box at the default r 52 on a tall box (ticket 12 note). |
+| Form fields on white | §3 profile editor form | profile editor, inline logger | differs | White fields with a 1 px black border; §3 asks for `#f6f8fa` fill, no border, black focus ring. Touches every editor and logger state (error, focus, disabled), not cheap. |
+| Legacy small boxes | gap 1 follow-up | batch tools, detail, settings, editor | differs | `--radius-small` boxes remain: `.meas` tiles (1 px bordered, in "Key measurements"), `.design-detail-photo`, `.component-check-state`, `.timeline-trash`, `.settings-recovery`, `.legacy-formula`, `.profile-editor-formula-row`. Decision below. |
+
+Totals (26 rows): **15 match** (3 of them after this ticket's fixes), **6 minor difference**, **5 differs**.
+
+### Fixed
+
+- `src/styles.css`: new token `--target-min: 44px` (WCAG minimum target); all 22 literal `44px` values (17 rules) outside `:root` now use it, including `.calendar-overdue-mark` (width, height) and `.upcoming-date`.
+- `src/styles.css`: filter chips are the bottom-row capsule: `.filter-row` gap `--nav-gap`, buttons `min-height: var(--nav-circle)`, pressed = `--colour-action` with ink (removed from the ground-ink list; the outline is gone). `.quick-log-types` keeps its black pressed state.
+- `src/styles.css`: `.profile-facts > span` is the batch card's frosted chip (`--batch-chip-height`, `--colour-frost`, `--batch-chip-blur`, no border).
+- `src/styles.css`: `.station-dialog-body dd` takes `color: var(--ink)` (white on the sheet; labels stay lilac meta).
+- `src/styles.css`: `.station-text-action { padding-inline: 0; }` (inline sentence action).
+- `src/App.tsx` (one line, endings preserved) + `src/styles.css`: the picker's date eyebrow is `<time dateTime>`; `.eyebrow time` takes `--ink-time` (blue on black).
+- `src/styles.test.ts`: new "final 1:1 audit (ticket 15)" block (6 tests: no `44px` outside `:root` and the overdue mark on the token; filter chips; profile facts; sheet facts; inline action; eyebrow date). The `.section-label a` assertion now expects `var(--target-min)`.
+
+### Needs a decision
+
+- **Unique Thin / ExtraLight**: unused since the display and figure roles went to Light. Options: drop the two `@font-face` files; keep them for a future display role.
+- **Desktop sidebar**: keep white circles + labels on black with the lime current capsule; or the spec §3 white bowed toggle card (rows, black current row, pastel avatars, batch count pill).
+- **"Open recently deleted batches"**: keep the black capsule toggle; or a `toggle-row` with the count in the switch slot.
+- **Summary-row avatar**: keep the check icon in the lilac circle; or a batch photo / cutout like the board's "Jacob".
+- **Picker choices**: keep light-blue capsules; `toggle-row`s (selected black); or small cards.
+- **pH conditions** (profile overview): keep the bulleted list; small cards; or `summary-row`s.
+- **`splash.png` placeholders and the `#fff` adaptive-icon background**: leave; delete the unreferenced `drawable*/splash.png`; make the icon background the black ground.
+- **Calendar head at 320**: accept the two-line head; hide "Today" below 380 (the date chip in the top bar already jumps to today); or smaller dark circles below 380 (needs a token below 57).
+- **Sticky hover on touch**: gate the generic yellow `button:hover` fills behind `@media (hover: hover)` (touches every hover rule and its tests); or keep.
+- **Remaining `--radius-small` boxes** (list above): bowed small card; `--colour-row` capsule; or flat with no box.
+- **Profile card actions** and **form fields on white**: the spec is clear on both; they are listed here only because each needs a markup or state pass that is larger than this ticket.
+
+### Results
+
+- `npm run typecheck` clean; full `npm test` 15 files, 318 / 318.
+- Harness re-run for overview, all-batches, profiles, batch-dates, profile-overview, station-info, batch-picker, calendar and checks at 320, 390, 768 and 1440: 0 failed, every finding count 0. Looked at the filter chips (1440), profile facts (390), station-info sentence (390), picker eyebrow (390) and batch-dates facts (390).
 
 ## Left for later tickets / known issues
 
