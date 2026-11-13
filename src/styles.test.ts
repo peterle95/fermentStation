@@ -52,7 +52,7 @@ describe("Swipe-derived design contract", () => {
     for (const [name, value] of Object.entries({
       background: "#ffffff", surface: "#ffec89", "surface-inverse": "#000000", text: "#000000", "text-muted": "#000000", "text-inverse": "#ffffff",
       action: "#b6f074", "on-action": "#000000", "action-alt": "#dab8f1", emblem: "#c5b4ec", accent: "#b6e1fa", border: "#000000",
-      rail: "#3e3e40",
+      rail: "#3e3e40", "sheet-control": "#1b1b1b",
     })) expect(styles).toContain(`--colour-${name}: ${value};`);
     // The retired near-black must not come back as ground, ink or border.
     expect(styles).not.toMatch(/#1c1c1c/i);
@@ -606,6 +606,117 @@ describe("navigation circles, capsule and rail (swipe-rework-log.md, ticket 3; s
 
   it("keeps the two-tone focus ring outside the circles and the rail ring", () => {
     expect(rule(".navigation button:focus-visible, .design-account:focus-visible")).toContain("outline-offset: var(--stroke-focus)");
+  });
+});
+
+/** Every icon-only button in App.tsx (only an svg or an icon component inside), as its opening tag. */
+function iconOnlyButtons() {
+  const tags: string[] = [];
+  for (const match of app.matchAll(/<button\b/g)) {
+    const chunk = app.slice(match.index, app.indexOf("</button>", match.index));
+    // Blank out JSX expressions so the ">" of an arrow function cannot end the opening tag early.
+    let depth = 0;
+    let flat = "";
+    for (const char of chunk) { if (char === "{") depth++; flat += depth ? " " : char; if (char === "}") depth--; }
+    const open = flat.indexOf(">");
+    const content = chunk.slice(open + 1).replace(/<svg[\s\S]*?<\/svg>/g, "").replace(/<(?:DesignIcon|NavIcon|StationLogo)\b[^>]*\/>/g, "");
+    if (!content.trim()) tags.push(chunk.slice(0, open + 1));
+  }
+  return tags;
+}
+
+function inkMembership() {
+  const membership = new Map<string, string>();
+  for (const group of inkGroups()) for (const selector of group.selectors) membership.set(selector, group.kind);
+  return membership;
+}
+
+describe("utility circles and search field (swipe-rework-log.md, ticket 4; spec §1.4, §1.7, gaps 5 and 7)", () => {
+  const px = (token: string): number => {
+    const value = rootTokens().get(token)!;
+    const alias = value.match(/^var\((--[\w-]+)\)$/);
+    return alias ? px(alias[1]) : Number(value.match(/^(\d+(?:\.\d+)?)px$/)![1]);
+  };
+  const state = '.utility-circle:is(:hover:not(:disabled), [aria-pressed="true"], [aria-current="page"])';
+
+  it("carries the measured circle, glyph and field geometry in :root tokens", () => {
+    for (const declaration of [
+      "--utility-circle: var(--nav-circle);", "--utility-circle-dark: 57px;", "--utility-stroke: 2;", "--utility-stroke-dark: 1.6;",
+      "--search-height: 53px;", "--colour-sheet-control: #1b1b1b;", "--stroke-width: 1px;", "--nav-icon: 21px;",
+    ]) expect(rule(":root")).toContain(declaration);
+    expect(px("--utility-circle")).toBe(60);
+    for (const token of ["--utility-circle", "--utility-circle-dark", "--search-height"]) expect(px(token)).toBeGreaterThanOrEqual(44);
+  });
+
+  it("defines the circle once: one geometry rule, one dark variant, one state rule, one glyph rule", () => {
+    const circle = rule(".utility-circle");
+    for (const declaration of [
+      "width: var(--utility-d)", "height: var(--utility-d)", "min-height: var(--utility-d)", "padding: 0", "border: 0",
+      "border-radius: 50%", "background: var(--utility-fill)", "justify-content: center", "align-items: center",
+    ]) expect(circle).toContain(declaration);
+    for (const declaration of ["--utility-d: var(--utility-circle)", "--utility-fill: var(--colour-background)", "--utility-glyph: var(--utility-stroke)"]) {
+      expect(rule(":where(.utility-circle)")).toContain(declaration);
+    }
+    for (const declaration of ["--utility-d: var(--utility-circle-dark)", "--utility-fill: var(--colour-sheet-control)", "--utility-glyph: var(--utility-stroke-dark)"]) {
+      expect(rule(".utility-circle-dark")).toContain(declaration);
+    }
+    expect(rule(state)).toContain("background: var(--colour-action)");
+    const glyph = rule(".utility-circle svg");
+    for (const declaration of ["width: var(--nav-icon)", "height: var(--nav-icon)", "stroke-width: calc(var(--utility-glyph) * 24 / 21)"]) expect(glyph).toContain(declaration);
+    // Apart from these rules, utility-circle appears only in the ink lists; nothing else re-sizes or re-paints it.
+    const definitions = rules().filter((entry) => /utility-(?:circle|capsule)/.test(entry.selector) && !entry.declarations.some(([property]) => property === "--ink"));
+    expect(definitions.map((entry) => entry.selector).sort()).toEqual([".utility-circle", ".utility-circle svg", state, ".utility-circle-dark", ":where(.utility-circle)", ".utility-capsule"].sort());
+    // The capsule stretches the same circle: height, fill, glyph and states come from .utility-circle.
+    const capsule = rule(".utility-capsule");
+    for (const declaration of ["min-width: var(--utility-d)", "padding-inline: calc((var(--utility-d) - var(--nav-icon)) / 2)", "border-radius: var(--radius-control)"]) expect(capsule).toContain(declaration);
+    expect(capsule).not.toMatch(/height|background/);
+    expect(styles.indexOf(".utility-capsule {")).toBeGreaterThan(styles.indexOf(".utility-circle {"));
+    expect(styles).not.toMatch(/\.icon-button\b|\.batch-head-(?:camera|notifications)\b|\.calendar-nav button\b/);
+    const geometry = /^(?:width|height|min-height|padding|border(?:-[\w-]+)?|background(?:-color)?)$/;
+    for (const entry of rules()) {
+      if (!entry.selectors.some((selector) => /\.(?:station-dialog-close|design-back|station-identity)\b/.test(selector))) continue;
+      for (const [property] of entry.declarations) expect(property, `${entry.selector} re-styles a utility circle`).not.toMatch(geometry);
+    }
+  });
+
+  it("makes every icon-only button in the app a utility circle, except the card and row actions of later tickets", () => {
+    const tags = iconOnlyButtons();
+    expect(tags.length).toBeGreaterThanOrEqual(16);
+    // Check completion and the profile editor's remove-check button are card/row actions (gaps 9, 12).
+    const later = /className="(?:design-check-complete|profile-editor-icon-button)"/;
+    for (const tag of tags) if (!later.test(tag)) expect(tag).toMatch(/className="utility-circle(?: utility-circle-dark)?(?: [\w-]+)*"/);
+    expect(app).not.toMatch(/["\s]icon-button\b/);
+    // The notifications toggle keeps its visible state word, so it is the capsule form of the same primitive.
+    const notifications = app.slice(app.indexOf('className="utility-circle utility-circle-dark utility-capsule batch-head-notifications"'));
+    expect(notifications.slice(0, notifications.indexOf("</button>"))).toContain('<span>Notifications {batch.notificationsMuted ? "muted" : "on"}</span>');
+  });
+
+  it("paints white circles with ink, dark circles with white glyphs, and pressed or current circles lime with ink", () => {
+    const membership = inkMembership();
+    expect(membership.get(".utility-circle")).toBe("fill");
+    expect(membership.get(".utility-circle-dark")).toBe("ground");
+    expect(membership.get(state)).toBe("fill");
+    expect(contrast(hex("--ink-fill"), hex("--colour-background"))).toBeGreaterThanOrEqual(7);
+    expect(contrast(hex("--ink-ground"), hex("--colour-sheet-control"))).toBeGreaterThanOrEqual(7);
+    expect(contrast(hex("--ink-fill"), hex("--colour-action"))).toBeGreaterThanOrEqual(7);
+  });
+
+  it("draws the search field as a black capsule with a lime outline and the sort circle beside it", () => {
+    const field = rule(".design-search-box");
+    for (const declaration of [
+      "height: var(--search-height)", "border: var(--stroke-width) solid var(--colour-action)", "border-radius: var(--radius-control)", "background: var(--colour-surface-inverse)",
+    ]) expect(field).toContain(declaration);
+    const input = rule(".design-search-box input");
+    for (const declaration of ["caret-color: var(--ink-accent)", "min-height: 0", "border: 0", "background: transparent"]) expect(input).toContain(declaration);
+    expect(rule(".design-search")).toContain("display: flex");
+    expect(rule(".design-search")).not.toContain("flex-wrap: wrap");
+    const membership = inkMembership();
+    for (const selector of [".design-search-box", ".design-search-box input"]) expect(membership.get(selector), selector).toBe("ground");
+    expect(rule("input::placeholder, textarea::placeholder")).toContain("color: var(--ink-meta)");
+    expect(contrast(hex("--ink-ground-meta"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(7);
+    // Field first, then the sort circle, both inside .design-search; the input keeps its name and type.
+    const search = app.slice(app.indexOf('<div className="design-search">'), app.indexOf('className="batch-view-switch"'));
+    expect(search).toMatch(/<div className="design-search-box">.*<input aria-label="Search batches"[\s\S]*?type="search" value=\{query\} \/><\/div><button aria-label="Sort batches by finish date" aria-pressed=\{sorted\} className="utility-circle utility-circle-dark"/);
   });
 });
 

@@ -41,6 +41,7 @@
   --colour-scrim: rgb(0 0 0 / 56%);
   --colour-figure: #fc5659;
   --colour-rail: #3e3e40;
+  --colour-sheet-control: #1b1b1b;
   /* Text colour pairs. Each --ink-ground-* is a role colour on the black ground; --ink-fill is every role on
      white and pastel fills. src/styles.test.ts checks every pair's contrast from these tokens. */
   --ink-ground: var(--colour-text-inverse);
@@ -72,6 +73,15 @@
   --nav-ring: 6px;
   --nav-rail: calc(var(--nav-circle) + 2 * var(--nav-ring));
   --nav-waist: 46px;
+  /* Utility circles (spec §1.4, §1.5, §1.7; gap 5): the one icon-only button. White d 60 on the ground,
+     glyph stroke 2; inside dark panes and sheets a --colour-sheet-control circle d 57, stroke 1.6. Glyph 21.
+     Strokes are CSS px at the 21 px glyph size. */
+  --utility-circle: var(--nav-circle);
+  --utility-circle-dark: 57px;
+  --utility-stroke: 2;
+  --utility-stroke-dark: 1.6;
+  /* Search field (spec §1.7; gap 7): black capsule h 53 with a 1 px lime outline. */
+  --search-height: 53px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -177,6 +187,8 @@ input,
 select,
 textarea,
 input::file-selector-button,
+.utility-circle,
+.utility-circle:is(:hover:not(:disabled), [aria-pressed="true"], [aria-current="page"]),
 .primary-action,
 .station-primary,
 .profile-add,
@@ -195,11 +207,9 @@ input::file-selector-button,
 .design-account:hover,
 .design-avatar,
 .nav-mark,
-.design-topbar .icon-button,
 .design-topbar .batch-fab,
 .design-skip-link,
 .ios-install-guide,
-.design-search-box,
 .design-summary,
 .batch-view-switch,
 .filter-row button,
@@ -230,8 +240,6 @@ input::file-selector-button,
 .timeline-entry,
 .timeline-photo,
 .batch-tools-shortcuts button,
-.batch-head-camera,
-.batch-head-notifications,
 .batch-management > .next-action,
 .batch-management > .wb-panel,
 .batch-tools-danger button,
@@ -259,6 +267,9 @@ input::file-selector-button,
 .app-shell,
 .sidebar,
 .design-detail,
+.utility-circle-dark,
+.design-search-box,
+.design-search-box input,
 .design-toast,
 .profile-editor-toast,
 .batch-view-switch button[aria-pressed="true"],
@@ -353,7 +364,7 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 }
 :is(.primary-action, .station-primary, .profile-add, .component-button-primary, .profile-editor-button.primary):hover:not(:disabled) { transform: translateY(-2px); background: var(--colour-surface); }
 :is(.primary-action, .station-primary, .profile-add, .component-button-primary, .profile-editor-button.primary):active:not(:disabled) { transform: translateY(1px); }
-.icon-button, .station-dialog-close, .design-check-complete, .profile-editor-icon-button, .setting-trash-button, .batch-head-camera, .batch-head-notifications {
+.design-check-complete, .profile-editor-icon-button, .setting-trash-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -418,8 +429,18 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 .today-screen { height: 100%; min-width: 0; }
 .calendar-screen, .profiles-screen, .design-checks-view { border-radius: var(--radius-card); padding: var(--card-padding); }
 .design-workspace { display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 28vw, 400px); grid-template-rows: minmax(0, 1fr); height: 100%; min-height: 0; margin: 0; gap: var(--space-2); padding-right: var(--layout-edge); }
+/* Utility circles (gap 5): the one icon-only utility button. Class "utility-circle" is a white circle on
+   the ground; add "utility-circle-dark" inside dark panes and sheets. Hover, pressed and current are lime.
+   "utility-capsule" adds a visible word. The glyph is drawn at --nav-icon; its stroke is given in CSS px, so it is scaled into the 24-unit viewBox. */
+:where(.utility-circle) { --utility-d: var(--utility-circle); --utility-fill: var(--colour-background); --utility-glyph: var(--utility-stroke); }
+.utility-circle-dark { --utility-d: var(--utility-circle-dark); --utility-fill: var(--colour-sheet-control); --utility-glyph: var(--utility-stroke-dark); }
+.utility-circle { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--utility-d); height: var(--utility-d); min-height: var(--utility-d); padding: 0; border: 0; border-radius: 50%; background: var(--utility-fill); }
+.utility-circle:is(:hover:not(:disabled), [aria-pressed="true"], [aria-current="page"]) { background: var(--colour-action); }
+/* A utility with a visible state word (batch notifications): the same circle stretched to a capsule, the
+   glyph where it sits in the circle, then the word in the label role (spec §1.5 "Scan" pill). */
+.utility-capsule { width: auto; min-width: var(--utility-d); gap: var(--space-2); padding-inline: calc((var(--utility-d) - var(--nav-icon)) / 2); border-radius: var(--radius-control); }
+.utility-circle svg { width: var(--nav-icon); height: var(--nav-icon); stroke-width: calc(var(--utility-glyph) * 24 / 21); }
 .design-topbar { display: flex; flex: none; flex-wrap: wrap; align-items: center; gap: var(--space-4); padding: calc(var(--safe-top) + var(--space-6)) var(--layout-edge) var(--space-6); }
-.design-topbar .icon-button { background: var(--colour-background); }
 .station-identity { display: none; }
 .design-topbar-copy { flex: 1; min-width: 160px; }
 .design-topbar-copy p { color: var(--ink-time); }
@@ -445,12 +466,12 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 
 /* Batches and checks: real counts, explicit statuses, authentic local photos. */
 .design-search-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-6); }
-.design-search-row .design-search-box { flex: 1 1 240px; margin-bottom: 0; }
+/* Search field (spec §1.7, gap 7): black capsule with a 1 px lime outline, white text, lime caret; the
+   sort/filter control beside it is the dark utility circle. .design-search keeps the two on one line. */
+.design-search { display: flex; flex: 1 1 240px; align-items: center; gap: var(--space-2); min-width: 0; }
 .design-search-row .batch-view-switch { margin-left: auto; }
-.design-search-box { display: flex; align-items: center; gap: var(--space-2); min-height: 52px; margin-bottom: var(--space-6); border-radius: var(--radius-control); padding-inline: var(--space-4) var(--space-1); background: var(--colour-background); }
-.design-search-box input { flex: 1; width: 0; border: 0; background: transparent; padding-inline: var(--space-1); }
-.design-search-box button { display: grid; place-items: center; flex: none; width: 44px; min-height: 44px; padding: 0; border-color: transparent; }
-.design-search-box button[aria-pressed="true"] { background: var(--colour-action-alt); }
+.design-search-box { display: flex; flex: 1; align-items: center; gap: var(--space-2); min-width: 0; height: var(--search-height); border: var(--stroke-width) solid var(--colour-action); border-radius: var(--radius-control); padding-inline: var(--space-4) var(--space-1); background: var(--colour-surface-inverse); }
+.design-search-box input { flex: 1; align-self: stretch; width: 0; min-height: 0; border: 0; background: transparent; padding-inline: var(--space-1); caret-color: var(--ink-accent); }
 .design-summary { display: grid; grid-template-columns: minmax(100px, 0.7fr) minmax(0, 3fr); align-items: start; gap: var(--space-4) var(--space-6); padding: var(--card-padding); --fill: var(--colour-action); margin-bottom: var(--space-8); }
 .design-gauge { display: grid; gap: var(--space-1); }
 .design-gauge strong { font-variant-numeric: tabular-nums; }
@@ -610,10 +631,6 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .batch-tool-feedback:empty { display: none; }
 .batch-workspace-head { order: -1; }
 .batch-head-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
-.batch-head-camera { flex: 0 0 52px; width: 52px; padding: var(--space-3); background: var(--colour-background); }
-.batch-head-notifications { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); background: var(--colour-background); }
-.batch-head-notifications svg { flex-shrink: 0; }
-.batch-head-notifications[aria-pressed="true"] { background: var(--colour-action); }
 .batch-management > .wb-panel { padding: var(--card-padding); border-radius: var(--radius-card); background: var(--colour-background); }
 .batch-tools-danger { order: 3; display: grid; gap: var(--space-4); padding: var(--card-padding); border: 1px solid currentColor; border-radius: var(--radius-card); }
 .batch-tools-danger h4 { margin-bottom: var(--space-2); }
@@ -688,7 +705,6 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .station-dialog::backdrop { background: var(--colour-scrim); backdrop-filter: blur(4px); }
 .station-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin: calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding)) var(--space-6); padding: var(--card-padding); border-radius: var(--radius-card) var(--radius-card) 0 0; background: var(--colour-accent); }
 .station-dialog-heading h2 { align-self: center; }
-.station-dialog-close { width: 44px; height: 44px; min-height: 44px; background: var(--colour-background); }
 .station-dialog-body h3 { margin-block: var(--space-6) var(--space-2); }
 .station-dialog-body dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); margin-block: var(--space-6); }
 .station-dialog-body dd { margin: 0; overflow-wrap: anywhere; }
@@ -806,9 +822,8 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .calendar-layout { display: grid; grid-template-columns: minmax(380px, 1.2fr) minmax(0, 1fr); align-items: start; gap: var(--space-6); margin-top: var(--space-6); }
 .calendar-panel { min-width: 0; padding: var(--card-padding); }
 .calendar-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-3); margin-bottom: var(--space-6); }
-.calendar-nav { display: flex; gap: var(--space-2); }
-.calendar-nav button { display: grid; place-items: center; width: 44px; height: 44px; min-height: 44px; padding: 0; }
-.calendar-nav .calendar-today { width: auto; padding-inline: var(--space-3); }
+.calendar-nav { display: flex; align-items: center; gap: var(--space-2); }
+.calendar-nav .calendar-today { display: grid; place-items: center; height: 44px; min-height: 44px; padding: 0 var(--space-3); }
 .calendar-weekdays, .calendar-grid { display: grid; gap: var(--space-1); }
 .calendar-week, .calendar-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--space-1); }
 .calendar-weekdays { margin-bottom: var(--space-2); text-align: center; }

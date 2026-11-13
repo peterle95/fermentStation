@@ -12,10 +12,11 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 16 Lilac shade | **closed** for avatar and icon circles (`--colour-emblem`) | foundation |
 | 3 Phone bottom navigation | **closed**: white circles d 60, lime capsule, gap 6, no bar fill | navigation |
 | 4 Tablet rail | **closed**: ringed chain, logo on top, lime current circle | navigation |
-| 5 Utility circles (top bar) | open; `--nav-circle` / `--nav-icon` are ready for it | utility circles |
+| 5 Utility circles | **closed**: one `utility-circle` primitive, white d 60 / dark `#1b1b1b` d 57, glyph 21; notifications as its capsule form | utility circles |
 | 6 Typography (D1 resolved by the user: readable sizes inside 1:1 geometry) | **closed** for the type system; components still pick their roles in their own tickets | type system |
 | 15 Big numbers (colour part) | **partly closed**: figures are coral Light/ExtraLight/Thin wherever they sit on black; the counts on the lime summary stay ink until gap 11 moves them onto black | type system |
-| 7, 8 Search field, dialogs | open (dialogs are already bowed via `bowed-clip`) | search and dialogs |
+| 7 Search field | **closed**: black capsule h 53, 1 px lime outline, lime caret, dark sort circle beside it | utility circles |
+| 8 Dialogs | open (already bowed via `bowed-clip`; close buttons are already dark utility circles) | dialogs |
 | 9, 11, 15 Batch card anatomy, Kitchen summary, big numbers | open | batch card and Kitchen summary |
 | 10, 12, 13 Settings rows, primary action, timeline | open (timeline entries are already bowed) | settings / action / timeline |
 
@@ -177,6 +178,44 @@ As planned and built:
 - The desktop batch count is plain `row` text in the lime capsule; spec suggests a count pill (§1.3 vocabulary).
 - The rail has no Settings circle (spec §3 lists one): Settings lives in the top bar, and adding it to the rail would change the focus order. Decide together with gap 5.
 - Desktop labels use `row` (28), the phone capsule `label` (22), the Home account `label`; harmonise if the desktop sidebar is restyled again.
+
+## Ticket 4: utility circles and search field (gaps 5, 7) — done
+
+Accessible names, `aria-pressed` / `aria-current`, focus order and behaviour are unchanged. The harness selectors still match (Settings is reached by `aria-label`).
+
+### As built
+
+- **Primitive** (one block in `src/styles.css`, just before `.design-topbar`): add `utility-circle` in `App.tsx` for a white circle d `--utility-circle` (= `--nav-circle`, 60) on the ground. Add `utility-circle-dark` as well inside dark panes, sheets and cards for the `--colour-sheet-control` `#1b1b1b` circle d `--utility-circle-dark` (57). The glyph is `--nav-icon` 21. Its stroke is `--utility-stroke` 2 / `--utility-stroke-dark` 1.6 CSS px, scaled into the 24-unit viewBox (`calc(var(--utility-glyph) * 24 / 21)`), so the `strokeWidth` attributes in the markup no longer matter. Hover, `aria-pressed="true"` and `aria-current="page"` turn lime with ink. Ink comes through the ink lists: `.utility-circle` is fill, `.utility-circle-dark` is ground, and the state selector is fill.
+- **`utility-capsule`** modifier: the same circle stretched to a capsule with a visible word. The glyph sits where it would in the circle (padding `(d − icon) / 2`), followed by the word in the `label` role. It is used only by `.batch-head-notifications`. The first attempt made it icon-only, but `App.test.tsx` "shows notification state…" asserts the visible "muted"/"on" word, so the word stayed. This closes the clipped-text defect: clippedControls 5 → **0**.
+- White circles: station logo (phone top bar), checks bell, Settings (lime while Settings is current), profile-editor phone back. Dark circles: detail-pane back and dates, batch camera, notifications capsule, both dialog close buttons, the upcoming-picker close, the calendar's Previous/Next month (inside the white calendar card) and the search field's sort/filter.
+- **Search** (gap 7): a new `.design-search` wrapper keeps the field and the sort circle on one line. The field is `.design-search-box`: fill `--colour-surface-inverse`, `var(--stroke-width) solid var(--colour-action)`, h `--search-height` 53, white icon and text (ground ink), lilac placeholder (`--ink-meta`, 12:1), `caret-color: var(--ink-accent)` (lime). The DOM order is unchanged: input, then sort, then the view switch.
+- **Retired:** `.icon-button` (class and rules), the 52 px shared rule for these buttons, `.station-dialog-close` / `.batch-head-camera` / `.batch-head-notifications` sizing and fills, and `.calendar-nav button` (only `.calendar-today` keeps its 44 px capsule rule). `.design-check-complete`, `.profile-editor-icon-button` and `.setting-trash-button` keep the old 52/44 rule (card and row actions).
+- **Measured** (phone overview PNG, pixel scan): white Settings circle 60, dark sort circle 57, field outline 53. At 1440 the top-bar bell and Settings are white d 60 and the detail back and dates are dark d 57.
+
+### Tests
+
+`src/styles.test.ts` "utility circles and search field" (5 tests):
+
+- Tokens: d 60 = `--nav-circle`, 57, strokes, field 53, `--colour-sheet-control`; all three sizes ≥ 44.
+- Exactly one geometry rule, one dark variant, one state rule, one glyph rule and one capsule rule mention the primitive. No `.icon-button`, `.batch-head-*` or `.calendar-nav button` rule exists, and no per-button rule re-sizes or re-paints a circle.
+- Every icon-only `<button>` in `App.tsx` carries `utility-circle`, except check completion and the profile editor's remove-check button. The notifications capsule keeps its state word.
+- Ink-list membership and contrast for white, dark and lime circles.
+- Search field geometry, outline, fill, caret, ground ink and the markup order (field, then sort circle).
+
+`#1b1b1b` joined the palette list.
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 48 / 48; plain `npm test` 274 / 274, 15 files, 174 s.
+- Harness, full run (60 captures): 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0. surfaceOverflow 1 (calendar 320, known). **clippedControls 0** (was 5). smallTargets 8 (Settings On/Off/All and the licence links, known).
+
+### Left by ticket 4
+
+- Settings circle in the tablet rail: **not added**. It would put a second Settings button into the rail before the top bar, which changes the focus order; the top-bar Settings circle stays the only one.
+- Gap 8: the dialog close circles are already the dark d 57 circle. Gap 8 should align them to the title's centre line with right inset 21 and turn dialog fields into the gap 7 field. `--search-height`, the lime outline and the caret are the vocabulary for that; if they are shared, lift them into a field class instead of copying them.
+- The calendar's "Today" button is a 44 px outlined capsule next to 57 px circles (calendar restyle). The top-bar date chip is still an outlined capsule.
+- `.design-check-complete` (44, lime) and `.profile-editor-icon-button` (44, bordered) are icon-only row actions that remain outside the primitive (gaps 9 and 12 / profile editor). `.setting-trash-button` goes with gap 10.
+- The dark circle on the black ground is 1.2:1 against the ground, as on the board; the white glyph (17:1) identifies the control.
 
 ## Left for later tickets / known issues
 

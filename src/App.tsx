@@ -256,7 +256,7 @@ function StationDialog({ title, mode, returnFocus, onClose, children }: { title:
     };
   }, [mode, returnFocus]);
   return <dialog aria-labelledby="station-dialog-title" className="station-dialog bowed-clip" onCancel={(event) => { event.preventDefault(); onClose(); }} ref={dialogRef}>
-    <div className="station-dialog-heading"><h2 id="station-dialog-title">{title}</h2><button aria-label="Close dialog" className="station-dialog-close" onClick={onClose} ref={closeRef} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div>
+    <div className="station-dialog-heading"><h2 id="station-dialog-title">{title}</h2><button aria-label="Close dialog" className="utility-circle utility-circle-dark station-dialog-close" onClick={onClose} ref={closeRef} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div>
     {children}
   </dialog>;
 }
@@ -691,12 +691,12 @@ export function App() {
 
       <div className="content-shell">
         <header className="design-topbar">
-          <button aria-label="Open station information" className="icon-button station-identity" onClick={() => showDialog({ kind: "info" })} type="button"><StationLogo /></button>
+          <button aria-label="Open station information" className="utility-circle station-identity" onClick={() => showDialog({ kind: "info" })} type="button"><StationLogo /></button>
           <div className="design-topbar-copy"><p>{formatToday()}</p></div>
           <button aria-label="Open calendar" className="design-date-chip" onClick={() => navigate("calendar")} type="button"><NavIcon destination="calendar" /><span>{shortDate(localDate())}</span></button>
           <div className="design-topbar-actions">
-            <button aria-label="View batch checks" className="icon-button" onClick={openChecks} type="button"><DesignIcon name="bell" /></button>
-            <button aria-label="Settings" aria-current={shell.destination === "settings" ? "page" : undefined} className="icon-button" onClick={() => navigate("settings")} type="button"><DesignIcon name="settings" /></button>
+            <button aria-label="View batch checks" className="utility-circle" onClick={openChecks} type="button"><DesignIcon name="bell" /></button>
+            <button aria-label="Settings" aria-current={shell.destination === "settings" ? "page" : undefined} className="utility-circle" onClick={() => navigate("settings")} type="button"><DesignIcon name="settings" /></button>
             <button aria-label="Start a batch" className="batch-fab primary-action" onClick={() => showDialog({ kind: "start" })} type="button"><DesignIcon name="plus" /><span>Start a batch</span></button>
           </div>
         </header>
@@ -1192,7 +1192,7 @@ function BatchPicker({ date, events, onClose, onOpen }: BatchPickerProps) {
     <dialog aria-label={`Choose a batch for ${date}`} className="station-dialog bowed-clip upcoming-batch-picker" id={`upcoming-batch-picker-${date}`} onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }} ref={dialogRef}>
         <div className="upcoming-batch-picker-heading">
           <div><p className="eyebrow">{shortDate(date)}</p><h2>Choose a batch</h2></div>
-          <button aria-label="Close" className="icon-button" onClick={onClose} type="button"><DesignIcon name="close" /></button>
+          <button aria-label="Close" className="utility-circle utility-circle-dark" onClick={onClose} type="button"><DesignIcon name="close" /></button>
         </div>
         {batchIds.map((batchId) => {
           const batchEvents = events.filter((event) => event.batchId === batchId);
@@ -1250,8 +1250,8 @@ function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string
           <h2 aria-live="polite" aria-atomic="true">{monthLabel}</h2>
           <div className="calendar-nav">
             <button className="calendar-today" onClick={() => { setViewDate(new Date(`${today}T12:00:00`)); setFocusDate(today); }} type="button">Today</button>
-            <button aria-label="Previous month" onClick={() => shiftMonth(-1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button>
-            <button aria-label="Next month" onClick={() => shiftMonth(1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg></button>
+            <button aria-label="Previous month" className="utility-circle utility-circle-dark" onClick={() => shiftMonth(-1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button>
+            <button aria-label="Next month" className="utility-circle utility-circle-dark" onClick={() => shiftMonth(1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg></button>
           </div>
         </div>
         <div className="calendar-grid" role="grid" aria-label={monthLabel} onKeyDown={(event) => {
@@ -1464,7 +1464,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
       <div className="design-dashboard" key={pane}>
       {pane === "profiles" ? profilePane : pane === "checks" ? <ChecksView batches={batches} onOpen={onOpen} onComplete={onComplete} /> : <>
         <h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1} className="sr-only">My batches <span>{batches.length}</span></h1>
-        <div className="design-search-row"><div className="design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /><button aria-label="Sort batches by finish date" aria-pressed={sorted} onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
+        <div className="design-search-row"><div className="design-search"><div className="design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /></div><button aria-label="Sort batches by finish date" aria-pressed={sorted} className="utility-circle utility-circle-dark" onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
         <section className="design-summary bowed" aria-label="Kitchen summary" hidden={mode !== "today"}>
           <div className="design-gauge"><strong>{batches.length}</strong><span>Total batches</span><small>{dueChecks.length} checks due</small></div>
           <div className="design-summary-label"><h2>Kitchen summary</h2><p>{readyBatches.length} ready to enjoy</p></div>
@@ -1553,7 +1553,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
       </>}
       </div>
       <aside aria-label="Selected batch" className="design-detail" ref={detailRef} tabIndex={-1}>
-        {openBatch ? <><div className="design-detail-top"><button aria-label={`Back to ${backLabel}`} className="icon-button design-back" onClick={closeBatch} type="button"><DesignIcon name="back" /></button><h2>Batch details</h2><button aria-label="View batch dates" className="icon-button" onClick={() => onDialog({ kind: "dates", batch: openBatch })} type="button"><NavIcon destination="calendar" /></button></div><BatchCard batch={openBatch} key={openBatch.id} beforeBatchReplace={beforeBatchReplace} visible={workspaceVisible} onChange={onChange} onUpdate={onUpdate} onComplete={onComplete} onObservationAdded={onObservationAdded} onDialog={onDialog} onDelete={onDelete} units={units} /></> : <div className="design-detail-empty"><DesignIcon name="jar" /><h2>Your batch details</h2><p>Choose a batch to see its progress and record an observation.</p></div>}
+        {openBatch ? <><div className="design-detail-top"><button aria-label={`Back to ${backLabel}`} className="utility-circle utility-circle-dark design-back" onClick={closeBatch} type="button"><DesignIcon name="back" /></button><h2>Batch details</h2><button aria-label="View batch dates" className="utility-circle utility-circle-dark" onClick={() => onDialog({ kind: "dates", batch: openBatch })} type="button"><NavIcon destination="calendar" /></button></div><BatchCard batch={openBatch} key={openBatch.id} beforeBatchReplace={beforeBatchReplace} visible={workspaceVisible} onChange={onChange} onUpdate={onUpdate} onComplete={onComplete} onObservationAdded={onObservationAdded} onDialog={onDialog} onDelete={onDelete} units={units} /></> : <div className="design-detail-empty"><DesignIcon name="jar" /><h2>Your batch details</h2><p>Choose a batch to see its progress and record an observation.</p></div>}
       </aside>
     </section>
   );
@@ -2026,11 +2026,11 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
       <p className="batch-tool-feedback" role="status">{toolFeedback}</p>
       <div className="batch-workspace-head">
         <div className="batch-head-actions">
-          <button aria-label="Take photo" className="batch-head-camera" onClick={takePhoto} type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M4 7h3l1.2-2h7.6L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" /><circle cx="12" cy="13" r="3.5" /></svg></button>
+          <button aria-label="Take photo" className="utility-circle utility-circle-dark batch-head-camera" onClick={takePhoto} type="button"><svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M4 7h3l1.2-2h7.6L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" /><circle cx="12" cy="13" r="3.5" /></svg></button>
           <button
             aria-label={`Notifications for ${batch.name}`}
             aria-pressed={!batch.notificationsMuted}
-            className="batch-head-notifications"
+            className="utility-circle utility-circle-dark utility-capsule batch-head-notifications"
             onClick={() => { onChange({ ...batch, notificationsMuted: !batch.notificationsMuted }); setToolFeedback(batch.notificationsMuted ? "Batch notifications enabled, subject to device notification settings." : "Batch notifications muted."); }}
             title={batch.notificationsMuted ? "Enable notifications for this batch" : "Mute notifications for this batch"}
             type="button"
@@ -2176,7 +2176,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
           <section className="wb-panel activity-logger" aria-labelledby="activity-logger-heading" hidden={!managementOpen && !loggerModal}>
             <h2 hidden={loggerModal} id="activity-logger-heading">Log {loggerKind === "ph" ? "pH reading" : loggerKind === "status" ? "status change" : loggerKind}</h2>
             <dialog aria-labelledby={loggerModal ? "observation-dialog-title" : undefined} className={`observation-logger${loggerModal ? " station-dialog bowed-clip" : " inline-logger"}`} onCancel={(event) => { event.preventDefault(); dismissLogger(); }} onClose={(event) => { if (!event.currentTarget.open && modal.current) dismissLogger(); }} ref={dialogRef} role={loggerModal ? "dialog" : "presentation"}>
-            <div className="station-dialog-heading" hidden={!loggerModal}><h2 id="observation-dialog-title">{editing ? "Edit observation" : "Add observation"}</h2><button aria-label="Close dialog" className="station-dialog-close" onClick={() => dismissLogger()} ref={closeRef} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div>
+            <div className="station-dialog-heading" hidden={!loggerModal}><h2 id="observation-dialog-title">{editing ? "Edit observation" : "Add observation"}</h2><button aria-label="Close dialog" className="utility-circle utility-circle-dark station-dialog-close" onClick={() => dismissLogger()} ref={closeRef} type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m6 6 12 12M6 18 18 6" /></svg></button></div>
             <form className={basicObservation ? "observation-form" : "timeline-form quick-log-form"} id="batch-activity-form" onChange={() => { revision.current++; dirty.current = true; }} onInput={() => { revision.current++; dirty.current = true; formRef.current?.querySelector("textarea")?.setCustomValidity(""); }} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") event.currentTarget.requestSubmit(); }} onSubmit={saveEntry} ref={formRef}>
               <p className="station-dialog-body" hidden={!loggerModal}>{batch.name}</p>
               <label className="sr-only" hidden={basicObservation}>Activity type<select disabled={!!editing || basicObservation} name="kind" onChange={(event) => changeKind(event.target.value as LoggerKind)} tabIndex={-1} value={loggerKind}>
@@ -2570,7 +2570,7 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
             <header className="profile-mobile-bar">
               <StationLogo />
               <strong>FermentStation</strong>
-              <button aria-label="Back to profiles" className="icon-button" onClick={closeEditor} type="button"><DesignIcon name="back" /></button>
+              <button aria-label="Back to profiles" className="utility-circle" onClick={closeEditor} type="button"><DesignIcon name="back" /></button>
             </header>
             <nav className="profile-editor-crumbs" aria-label="Breadcrumb"><button onClick={closeEditor} type="button">Profiles</button></nav>
             <header className="profile-editor-head bowed">
