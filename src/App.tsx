@@ -170,14 +170,22 @@ function profileVisual(profile: FermentationProfile) {
   if (name.includes("kombucha")) return { photo: "kombucha", color: "var(--colour-accent)" };
   if (name.includes("sourdough")) return { photo: "sourdough", color: "var(--colour-surface)" };
   if (name.includes("sauerkraut")) return { photo: "kraut", color: "var(--colour-action)" };
+  // Swipe cutouts (docs/design/swipe-cutouts.md) stand in only where no profile photograph exists, on a pastel card.
+  if (drinkProfile.test(name)) return { photo: "grapefruit-spritz", color: "var(--colour-accent)", pastelOnly: true };
+  if (fruitProfile.test(name)) return { photo: "fruit-still-life", color: "var(--colour-action)", pastelOnly: true };
   return { photo: null, color: "var(--colour-action-alt)" };
 }
+
+const drinkProfile = /water kefir|kvass|soda|ginger beer|\bjun\b|tepache|switchel|shrub|lemonade|mead\b|cider/;
+const fruitProfile = /fruit|berr|plum|apple|pear\b|cherr|peach|apricot|mango|pineapple|lemon|citrus/;
 
 function BatchPhoto({ batch, detail = false }: { batch: Batch; detail?: boolean }) {
   const visual = profileVisual(batch.profileSnapshot);
   const photo = batch.timeline.filter((entry) => entry.kind === "photo").at(-1);
   const source = photo?.dataUrl ?? (visual.photo ? `${import.meta.env.BASE_URL}new-design/${visual.photo}.webp` : null);
-  return <div className={`${detail ? "design-detail-photo" : "design-batch-photo"}${photo ? " user-photo" : ""}`} style={detail ? { background: visual.color } : undefined}>
+  // On the batch card a stand-in is a cutout clipped by the card outline; a user photo stays a rectangle (#53).
+  const card = detail ? "" : photo ? "" : ` bowed-media${visual.pastelOnly ? " pastel-only" : ""}`;
+  return <div className={`${detail ? "design-detail-photo" : "design-batch-photo"}${photo ? " user-photo" : ""}${card}`} style={detail ? { background: visual.color } : undefined}>
     {source ? <BatchImage key={source} source={source} userPhoto={!!photo} retryable={detail} description={photo ? `Batch photograph: ${photo.caption || photo.name}` : `${batch.profileSnapshot.name} stand-in photograph`} />
       : <DesignIcon name="jar" />}
     {detail && <span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span>}
@@ -226,6 +234,7 @@ function PhotoCredits() {
     <li><a href="https://commons.wikimedia.org/wiki/File:Kombucha_jar.jpg">Kombucha jar</a> · Romarin · Public domain.</li>
     <li><a href="https://commons.wikimedia.org/wiki/File:Sourdough_starter.jpg">Sourdough starter</a> · PilotChicago · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</li>
     <li><a href="https://commons.wikimedia.org/wiki/File:Sauerkraut_Jar.jpg">Sauerkraut Jar</a> · Bdubay · <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
+    <li>Grapefruit spritz and fruit still life · AI-generated images supplied by the user, cut out for this app · not affiliated with Swipe Drinks.</li>
   </ul><p>Stand-in photographs, cropped with backgrounds removed. Your own batch photos replace these illustrations.</p></details>;
 }
 
@@ -1402,7 +1411,7 @@ function ChecksView({ batches, onOpen, onComplete }: { batches: Batch[]; onOpen(
       return <article className={`queue-card${completed ? " done" : overdue ? " overdue" : ""}`} key={`${batch.id}-${check.id}`}>
         <span className={`queue-icon${overdue ? " overdue" : ""}`} aria-hidden="true">{overdue ? "!" : <DesignIcon name={check.name.toLowerCase().includes("brine") ? "drop" : "leaf"} />}</span>
         <button aria-label={`Open ${batch.name} for ${check.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{check.name}</strong><span>{batch.name} · {check.nextDueDate === today ? "Today" : `${overdue ? "Overdue" : "Due"} ${shortDate(check.nextDueDate)}`}</span>{completed && <span>Completed today</span>}</button>
-        <button aria-label={`${completed ? "Completed" : "Complete"} ${check.name} for ${batch.name}`} className="design-check-complete" disabled={completed} onClick={(event) => { if (document.activeElement === event.currentTarget) (event.currentTarget.previousElementSibling as HTMLButtonElement)?.focus({ preventScroll: true }); onComplete(batch.id, check.id); }} type="button"><DesignIcon name="check" /></button>
+        <button aria-label={`${completed ? "Completed" : "Complete"} ${check.name} for ${batch.name}`} className="utility-circle utility-circle-dark design-check-complete" disabled={completed} onClick={(event) => { if (document.activeElement === event.currentTarget) (event.currentTarget.previousElementSibling as HTMLButtonElement)?.focus({ preventScroll: true }); onComplete(batch.id, check.id); }} type="button"><DesignIcon name="check" /></button>
       </article>;
     })}</div>
     {checks.length === 0 && <p className="design-empty-checks">No checks scheduled for your active batches.</p>}
@@ -1478,10 +1487,11 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
       {profiles.length === 0 && <p className="notice">Restore or create a profile before starting a batch. <button className="station-text-action" onClick={() => onNavigate("profiles")} type="button">Open Profiles</button></p>}
 
       {visible.length === 0 ? (
-        <section className="empty-state">
+        <section className="design-empty-batches"><div className="design-empty-card bowed">
           <p>{batches.length === 0 ? "No batches yet." : query ? "No batches found." : "No batches match this status."}</p>
           <p>{query ? "Try another name or batch status." : "Start one from a fermentation profile when you are ready."}</p>
-        </section>
+          <div className="design-batch-photo bowed-media"><BatchImage source={`${import.meta.env.BASE_URL}new-design/grapefruit-spritz.webp`} description="Grapefruit spritz stand-in photograph" userPhoto={false} /></div>
+        </div></section>
       ) : (
         <section aria-label="Batch overview">
           <div className="batch-overview">
@@ -1497,7 +1507,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
               <article className="queue-card attention" key={`${batch.id}-${check.id}`}>
                 <span className={`queue-icon${check.overdue ? " overdue" : ""}`} aria-hidden="true">{check.overdue ? "!" : <DesignIcon name={check.name.toLowerCase().includes("brine") ? "drop" : "leaf"} />}</span>
                 <button aria-label={`Open ${batch.name} for ${check.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{check.name}</strong><span>{batch.name} · {check.overdue ? `Overdue ${shortDate(check.nextDueDate)}` : "Today"}</span></button>
-                <button aria-label={`Complete ${check.name} for ${batch.name}`} className="design-check-complete" onClick={() => onComplete(batch.id, check.id)} type="button"><DesignIcon name="check" /></button>
+                <button aria-label={`Complete ${check.name} for ${batch.name}`} className="utility-circle utility-circle-dark design-check-complete" onClick={() => onComplete(batch.id, check.id)} type="button"><DesignIcon name="check" /></button>
               </article>
             ))}
           </div>
@@ -1565,7 +1575,8 @@ function CompactBatchCard({ batch, selected, units, onOpen }: { batch: Batch; se
   const statusText = isAttention ? "Active · attention" : statusLabel(batch.status);
   return (
     <button aria-label={`Open ${batch.name}`} aria-pressed={selected} className={`design-batch-card bowed${selected ? " selected" : ""}`} style={{ "--batch-colour": profileVisual(batch.profileSnapshot).color } as CSSProperties} onClick={() => onOpen(batch.id)} type="button">
-      <div className="design-batch-copy"><span className={`status status-${batch.status}`}>{statusText}</span><h3>{batch.name}</h3><p className="design-batch-profile">{batch.profileSnapshot.name}</p><BatchMeta batch={batch} units={units} /><div className="design-batch-bottom"><strong>{batch.status === "to-fridge" ? "Chilled" : `Day ${day}`}</strong>{batch.status !== "to-fridge" && batch.finishDate && <span>/ {Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))} days</span>}</div><p className="design-batch-next">{nextCheck ? `${nextCheck.name} · ${shortDate(nextCheck.nextDueDate)}` : batch.finishDate ? `Finish · ${shortDate(batch.finishDate)}` : "No finish date"}</p><span className="sr-only">{latestPh && `pH ${latestPh.value}.`} Next: {next}</span></div>
+      <div className="design-batch-copy"><h3>{batch.name}</h3><p className="design-batch-profile">{batch.profileSnapshot.name}</p><BatchMeta batch={batch} units={units} /><div className="design-batch-chips"><span className={`status status-${batch.status}`}>{statusText}</span><p className="design-batch-next">{nextCheck ? `${nextCheck.name} · ${shortDate(nextCheck.nextDueDate)}` : batch.finishDate ? `Finish · ${shortDate(batch.finishDate)}` : "No finish date"}</p></div><span className="sr-only">{latestPh && `pH ${latestPh.value}.`} Next: {next}</span></div>
+      <div className="design-batch-pill"><div className="design-batch-bottom"><strong>{batch.status === "to-fridge" ? "Chilled" : `Day ${day}`}</strong>{batch.status !== "to-fridge" && batch.finishDate && <span>/ {Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))} days</span>}</div><span className="design-batch-go" aria-hidden="true"><DesignIcon name="back" /></span></div>
       <BatchPhoto batch={batch} />
     </button>
   );
@@ -2005,7 +2016,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
   return (
     <article className="batch-workspace">
       <div className="design-detail-card bowed">
-        <div className="design-detail-heading"><span className="design-check-symbol"><DesignIcon name="jar" /></span><div><h3>{batch.name}</h3><p>{batch.profileSnapshot.name} batch</p></div><button aria-label="Add observation" className="primary-action design-record-observation" onClick={showLogger} ref={observationTrigger} type="button"><DesignIcon name="plus" /><span>Add observation</span></button></div>
+        <div className="design-detail-heading"><span className="design-check-symbol"><DesignIcon name="jar" /></span><div><h3>{batch.name}</h3><p>{batch.profileSnapshot.name} batch</p></div><button aria-label="Add observation" className="primary-action card-action design-record-observation" onClick={showLogger} ref={observationTrigger} type="button"><DesignIcon name="plus" /><span>Add observation</span></button></div>
         <div className="design-detail-metrics"><span>Started {shortDate(batch.startDate)}</span><strong>Day {day}<small>{batch.finishDate ? ` / ${Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))}` : ""}</small></strong></div>
         <BatchPhoto batch={batch} detail />
         <dl className="detail-readings" aria-label="Latest observed readings"><div><dt><DesignIcon name="drop" />pH</dt><dd>{latestPh ? latestPh.value : "Not recorded"}</dd>{latestPh && <time dateTime={latestPh.date}>{shortDate(latestPh.date)}</time>}</div><div><dt><DesignIcon name="temp" />Temperature</dt><dd>{latestTemperature ? `${displayTemperature(latestTemperature.value, units)} ${temperatureUnit}` : "Not recorded"}</dd>{latestTemperature && <time dateTime={latestTemperature.date}>{shortDate(latestTemperature.date)}</time>}</div></dl>

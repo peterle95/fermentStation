@@ -319,7 +319,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
   // surfaces (or makes it a capsule), delete it here. A new large card must use `bowed` instead.
   const legacyCardRadius = [
     ".storage-warning", ".app-loading", ".empty-state, .design-empty-checks, .calendar-empty", ".calendar-screen, .profiles-screen, .design-checks-view",
-    ".design-detail", ".ios-install-guide", ".batch-view-switch", ".design-batch-next", ".queue-card", ".design-checks-view .queue-card", ".design-tip",
+    ".design-detail", ".ios-install-guide", ".batch-view-switch", ".queue-card", ".design-checks-view .queue-card", ".design-tip",
     ".design-detail-photo", ".detail-readings > div", ".design-detail-next", ".design-input-summary", ".batch-guidance", ".design-timeline-panel",
     ".batch-management > .wb-panel", ".batch-tools-danger", ".next-action", ".activity-logger", ".profile-overview-intro",
     ".start-batch-basics", ".start-profile-summary", ".profile-card-actions", ".profile-editor-card", ".upcoming-item",
@@ -687,8 +687,9 @@ describe("utility circles and search field (swipe-rework-log.md, ticket 4; spec 
   it("makes every icon-only button in the app a utility circle, except the card and row actions of later tickets", () => {
     const tags = iconOnlyButtons();
     expect(tags.length).toBeGreaterThanOrEqual(16);
-    // Check completion and the profile editor's remove-check button are card/row actions (gaps 9, 12).
-    const later = /className="(?:design-check-complete|profile-editor-icon-button)"/;
+    // The profile editor's remove-check button is a row action of a later ticket. Check completion joined the dark circle (ticket 8).
+    const later = /className="profile-editor-icon-button"/;
+    expect(app.match(/className="utility-circle utility-circle-dark design-check-complete"/g)).toHaveLength(2);
     for (const tag of tags) if (!later.test(tag)) expect(tag).toMatch(/className="utility-circle(?: utility-circle-dark)?(?: [\w-]+)*"/);
     expect(app).not.toMatch(/["\s]icon-button\b/);
     // The notifications toggle keeps its visible state word, so it is the capsule form of the same primitive.
@@ -903,6 +904,134 @@ describe("settings toggle rows and switch (swipe-rework-log.md, ticket 7; spec �
     const item = own[0].declarations.map(([property, value]) => `${property}: ${value}`).join("; ");
     for (const declaration of ["min-height: var(--toggle-row)", "border-radius: var(--radius-control)", "background: var(--colour-row)"]) expect(item).toContain(declaration);
     expect(item).toContain("calc((var(--toggle-row) - var(--button-height)) / 2) var(--space-2) var(--switch-inset)");
+  });
+});
+
+describe("batch card anatomy and the card's primary action (swipe-rework-log.md, ticket 8; spec §1.1, gaps 9 and 12)", () => {
+  const tokens = () => rootTokens();
+  const percent = (token: string) => Number(tokens().get(token)!.match(/^(\d+(?:\.\d+)?)%$/)![1]);
+  const ratio = (token: string) => { const [a, b] = tokens().get(token)!.split("/").map(Number); return a / b; };
+  const anatomy = /\.(?:design-batch-(?:card|copy|chips|pill|bottom|go|photo|next|meta)|design-empty-(?:batches|card)|card-action)\b/;
+  const component = (name: string) => { const start = app.indexOf(`function ${name}`); return app.slice(start, start + app.slice(start).search(/\r?\n\}\r?\n/)); };
+
+  it("carries the measured drink-card geometry in :root tokens, as fractions of the card's width", () => {
+    for (const declaration of [
+      "--batch-card-ratio: 382 / 359;", "--batch-card-inset-x: 9.3%;", "--batch-card-inset-y: 9.4%;", "--batch-pill-width: 55.6%;",
+      "--batch-pill-ratio: 212 / 77;", "--batch-pill-height: 20.2%;", "--batch-pill-inset-x: 4.3%;", "--batch-pill-inset-bottom: 3.3%;",
+      "--batch-pill-circle: 16.5%;", "--batch-go-inset-y: 8%;", "--batch-go-inset-x: 3.3%;", "--batch-pill-text: 7%;", "--batch-photo-left: 48%;",
+      "--batch-photo-width: 46%;", "--batch-chip-height: 42px;", "--batch-chip-inset-x: 6.2%;", "--colour-hairline: #f1f1f1;",
+      "--colour-frost: rgb(255 255 255 / 60%);", "--card-action-width: 60%;", "--card-action-height: 63px;", "--card-action-reserve: 32px;",
+    ]) expect(rule(":root")).toContain(declaration);
+    expect(1 / ratio("--batch-card-ratio")).toBeCloseTo(0.94, 2);
+    // The pill's aspect gives the measured height; the photo slot spans 48-94 % of the width.
+    expect(percent("--batch-pill-width") / ratio("--batch-pill-ratio")).toBeCloseTo(percent("--batch-pill-height"), 1);
+    expect(percent("--batch-photo-left") + percent("--batch-photo-width")).toBe(94);
+    // Circle d 63 = the pill's inner height (inside its 1 px hairline) minus its insets at the board's 382 px.
+    expect((382 * percent("--batch-pill-height") / 100 - 2) * (1 - 2 * percent("--batch-go-inset-y") / 100)).toBeCloseTo(63, 0);
+    expect(percent("--batch-pill-circle") * 382 / 100).toBeCloseTo(63, 0);
+    expect(Number.parseFloat(tokens().get("--card-action-height")!)).toBeGreaterThanOrEqual(44);
+    expect(tokens().get("--batch-pill-reserve")).toBe("max(var(--batch-pill-height), var(--batch-pill-label))");
+  });
+
+  it("defines each part once, from tokens only", () => {
+    const owned = rules().filter((entry) => anatomy.test(entry.selector) && !entry.declarations.some(([property]) => property === "--ink") && !/font-size/.test(entry.declarations.map(([p]) => p).join()));
+    const selectors = owned.map((entry) => entry.selector);
+    for (const selector of [".design-batch-card", ".design-batch-pill", ".design-batch-go", ".design-batch-photo", ".design-batch-photo img", ".card-action", ".design-empty-card"]) {
+      expect(selectors.filter((entry) => entry === selector), selector).toHaveLength(1);
+    }
+    // No literal length in the anatomy, apart from whole-box percentages and the jar glyph's existing size.
+    for (const entry of owned) {
+      if (/\bsvg\b/.test(entry.selector)) continue;
+      for (const [property, value] of entry.declarations) {
+        if (property === "transform") continue; // the shared 2 px hover lift
+        const literals = value.replace(/var\([^)]*\)/g, "").match(/-?\d*\.?\d+(?:px|rem|em|%)/g) ?? [];
+        for (const literal of literals) expect(["100%", "50%", "-50%"], `${entry.selector} { ${property}: ${value} }`).toContain(literal);
+      }
+    }
+    const card = rule(".design-batch-card");
+    for (const declaration of [
+      "aspect-ratio: var(--batch-card-ratio)", "min-height: auto", "width: 100%",
+      "padding: var(--batch-card-inset-y) 0 calc(var(--batch-pill-inset-bottom) + var(--batch-pill-reserve) + var(--space-3))",
+    ]) expect(card).toContain(declaration);
+    expect(rule(".design-batch-copy > :not(.sr-only)")).toContain("margin-inline: var(--batch-card-inset-x)");
+    expect(rule(".design-batch-copy > .design-batch-chips")).toContain("margin-inline-start: var(--batch-chip-inset-x)");
+    const chip = rule(".design-batch-card .status");
+    for (const declaration of ["min-height: var(--batch-chip-height)", "background: var(--colour-frost)", "backdrop-filter: blur(var(--batch-chip-blur))"]) expect(chip).toContain(declaration);
+    expect(rule(".design-batch-next")).toContain("border-radius: var(--radius-control)");
+    const pill = rule(".design-batch-pill");
+    for (const declaration of [
+      "position: absolute", "left: var(--batch-pill-inset-x)", "bottom: 0", "margin-bottom: var(--batch-pill-inset-bottom)", "width: var(--batch-pill-width)",
+      "aspect-ratio: var(--batch-pill-ratio)", "padding: 0 calc(var(--batch-pill-circle) + var(--space-3)) 0 var(--batch-pill-text)",
+      "border: var(--stroke-width) solid var(--colour-hairline)", "border-radius: var(--radius-control)", "background: var(--colour-background)",
+    ]) expect(pill).toContain(declaration);
+    const go = rule(".design-batch-go");
+    for (const declaration of ["position: absolute", "top: var(--batch-go-inset-y)", "bottom: var(--batch-go-inset-y)", "right: var(--batch-go-inset-x)", "aspect-ratio: 1", "border-radius: 50%", "background: var(--colour-surface-inverse)"]) expect(go).toContain(declaration);
+    const image = rule(".design-batch-photo img");
+    for (const declaration of ["left: var(--batch-photo-left)", "width: var(--batch-photo-width)", "padding-top: var(--batch-title-band)", "object-fit: contain", "object-position: center bottom"]) expect(image).toContain(declaration);
+    const action = rule(".card-action");
+    for (const declaration of [
+      "position: absolute", "left: calc((100% - var(--card-action-width)) / 2)", "bottom: calc(var(--card-action-height) / -2)",
+      "width: var(--card-action-width)", "height: var(--card-action-height)", "min-height: var(--card-action-height)", "border-radius: var(--radius-control)",
+    ]) expect(action).toContain(declaration);
+    // The host keeps the upper half inside and the lower half plus the reserve below, so a scrolling pane never clips it.
+    const host = rule(".design-detail-card");
+    expect(host).toContain("padding-bottom: calc(var(--card-padding) + var(--card-action-height) / 2)");
+    expect(host).toContain("margin-bottom: calc(var(--card-action-height) / 2 + var(--card-action-reserve))");
+    expect(rules().filter((entry) => entry.selectors.some((selector) => /\.card-action\b/.test(selector)))).toHaveLength(1);
+  });
+
+  it("pairs a Bold and a Regular 28 px line in the pill and keeps the title pair's roles", () => {
+    const roleOf = (selector: string) => rules().find((entry) => entry.selectors.includes(selector) && new Map(entry.declarations).has("font-size"))
+      ?.declarations.find(([property]) => property === "font-size")?.[1].match(/^var\(--type-([\w-]+)\)$/)?.[1];
+    expect(roleOf(".design-batch-bottom strong")).toBe("subheading");
+    expect(roleOf(".design-batch-bottom > span")).toBe("row");
+    expect(tokens().get("--type-subheading")).toBe(tokens().get("--type-row"));
+    expect(roleOf(".design-batch-copy h3")).toBe("title");
+    expect(roleOf(".design-empty-card > p:first-child")).toBe("title");
+    const membership = inkMembership();
+    expect(membership.get(".design-batch-pill")).toBe("fill");
+    expect(membership.get(".design-batch-go")).toBe("ground");
+    expect(membership.get(".design-empty-card")).toBe("fill");
+    // The frosted chip holds ink at 7:1 even where it lies over the selected card's black (60 % white on black).
+    const frost = Math.round(0.6 * 255).toString(16).padStart(2, "0");
+    expect(contrast(hex("--ink-fill"), `#${frost.repeat(3)}`)).toBeGreaterThanOrEqual(7);
+  });
+
+  it("builds the card from title pair, meta, chips, pill and photo, and keeps it one button", () => {
+    const card = component("CompactBatchCard");
+    expect(card.match(/<button\b/g)).toHaveLength(1);
+    const order = ["<h3>", 'className="design-batch-profile"', "<BatchMeta", 'className="design-batch-chips"', "className={`status", 'className="design-batch-next"', 'className="design-batch-pill"', 'className="design-batch-go" aria-hidden="true"', "<BatchPhoto"];
+    const positions = order.map((part) => card.indexOf(part));
+    expect(positions.every((position) => position >= 0), order.filter((_, index) => positions[index] < 0).join()).toBe(true);
+    expect([...positions].sort((a, b) => a - b)).toEqual(positions);
+    expect(card).toContain('aria-label={`Open ${batch.name}`}');
+  });
+
+  it("clips stand-ins by the outline but never a user photo, and puts the new cutouts only on pastel cards", () => {
+    const photo = component("BatchPhoto");
+    expect(photo).toContain('const card = detail ? "" : photo ? "" : ` bowed-media${visual.pastelOnly ? " pastel-only" : ""}`;');
+    const visuals = app.slice(app.indexOf("function profileVisual"), app.indexOf("function BatchPhoto"));
+    for (const [cutout, colour] of [["grapefruit-spritz", "accent"], ["fruit-still-life", "action"]]) {
+      expect(visuals).toContain(`{ photo: "${cutout}", color: "var(--colour-${colour})", pastelOnly: true }`);
+      expect(read("../public/new-design/README.md")).toContain(`${cutout}.webp`);
+    }
+    // The four profile photographs keep their own stand-ins and win over a cutout.
+    for (const name of ["kimchi", "kombucha", "sourdough", "kraut"]) expect(visuals.indexOf(`photo: "${name}"`)).toBeLessThan(visuals.indexOf("grapefruit-spritz"));
+    expect(rule(".design-batch-card.selected .pastel-only :is(img, .batch-image-credit)")).toContain("visibility: hidden");
+    expect(rule(".design-empty-card")).toContain("--fill: var(--colour-action-alt)");
+    expect(app).toContain('<section className="design-empty-batches"><div className="design-empty-card bowed">');
+    expect(app).toContain('<div className="design-batch-photo bowed-media"><BatchImage source={`${import.meta.env.BASE_URL}new-design/grapefruit-spritz.webp`}');
+    expect(app).toContain("Grapefruit spritz and fruit still life");
+    // User photos keep their rectangle and today's uncropped fit.
+    expect(rule(".design-batch-photo.user-photo img")).toContain("width: calc(100% - var(--batch-photo-left) - var(--batch-card-inset-x))");
+    expect(rule(".user-photo img")).toContain("object-fit: contain");
+  });
+
+  it("puts the batch detail's single primary action on the card edge without moving it in the focus order", () => {
+    expect(app.match(/\bcard-action\b(?!s)/g)).toHaveLength(1);
+    const heading = app.slice(app.indexOf('<div className="design-detail-heading">'), app.indexOf("</div>", app.indexOf('<div className="design-detail-heading">') + 40) + 400);
+    expect(heading).toContain('aria-label="Add observation" className="primary-action card-action design-record-observation"');
+    expect(rule(".design-record-observation")).not.toContain("width");
   });
 });
 

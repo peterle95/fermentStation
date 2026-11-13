@@ -17,9 +17,11 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 15 Big numbers (colour part) | **partly closed**: figures are coral Light/ExtraLight/Thin wherever they sit on black; the counts on the lime summary stay ink until gap 11 moves them onto black | type system |
 | 7 Search field | **closed**: black capsule h 53, 1 px lime outline, lime caret, dark sort circle beside it | utility circles |
 | 8 Dialogs | **closed**: one black sheet (`.station-dialog`, r 40 / bow 5.7, inset 21), phone bottom sheet with flat bottom, centred `label` title on the close circle's line, `dark-field` controls | dialogs |
-| 9, 11, 15 Batch card anatomy, Kitchen summary, big numbers | open | batch card and Kitchen summary |
+| 9 Batch card anatomy | **closed**: H/W 0.94 from width tokens, full-width title pair, frosted chip, pill + black circle, 48–94 % photo slot (stand-ins clipped by the bow, user photos rectangular); narrow cards grow when their chips wrap | batch card (ticket 8) |
+| 11, 15 Kitchen summary, big numbers | open | Kitchen summary |
 | 10 Settings controls | **closed**: one `toggle-list` / `toggle-row` primitive (h 72, gap 8, inset 16, black selected row), lilac avatar d 63, switch 42 × 25 / knob 20; Suggestions is a real `role="switch"`, Units and Notifications are row choices | settings |
-| 12, 13 Primary action, timeline | open (timeline entries are already bowed) | action / timeline |
+| 12 Primary action | **closed** for the batch detail ("Add observation" is the `card-action` capsule); Settings export and dialog submits remain | batch card (ticket 8) |
+| 13 Timeline | open (timeline entries are already bowed) | timeline |
 
 Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text inside the scroll panes was absolutely positioned against `.app-shell`, which made the whole document scroll in 49 of 60 captures. `.main-content`, `.design-dashboard` and `.design-detail` are now `position: relative`, so they contain it.
 
@@ -32,7 +34,7 @@ The primitive is defined once, in `src/styles.css` directly after `.sr-only`. It
 - **Use it** by adding `bowed` to the element's `className` in `App.tsx`. Then set the colour on the surface rule with `--fill: var(--colour-…)`. `--fill` also accepts a gradient built from tokens, such as `linear-gradient(90deg, var(--colour-action-alt), var(--colour-background))`.
 - **Tune** a surface with `--r` (corner radius, default `--bowed-radius` 52px; a bowed row uses half its height), `--bow` (default `--bowed-bow` 4.4px) and `--k` (default `--bowed-k` 0.64). The defaults are declared with `:where()`, so any surface rule overrides them regardless of order. `--r-end` / `--bow-end` (ticket 5) tune the bottom corners and bottom edge on their own; they default to `--r` / `--bow`, and `0px` for both gives a flat, square bottom (phone bottom sheet).
 - **Selected ring:** set `--stroke: var(--colour-action); --stroke-w: var(--bowed-stroke);`. See `.design-batch-card.selected`.
-- **Clipped media:** a *direct child* with class `bowed-media` fills the box (`inset: 0`) and is clipped by the outline, like the glass running into the drink card's bottom edge. It sits under all other content. Nothing in the app uses it yet; gap 9 will.
+- **Clipped media:** a *direct child* with class `bowed-media` fills the box (`inset: 0`) and is clipped by the outline, like the glass running into the drink card's bottom edge. It sits under all other content. Since ticket 8 the batch card and the batch empty card use it for stand-in photographs (`.design-batch-photo bowed-media`).
 - **Overhang:** content is not clipped. A circle above the top edge or a button half below the bottom edge simply overflows the box. Only the fill, stroke and media layers are clipped.
 - **Scroll containers** (the `<dialog>`s) use `bowed-clip` instead. It clips the element itself with `background: var(--fill)`, because a pseudo-element fill would scroll away. It cannot have overhang or a stroke.
 - **Never** give a bowed surface `background`, `border*`, `border-radius`, `box-shadow`, or its own `::before`/`::after`. The primitive owns all of them. `.bowed` forces `background: none !important`, so the generic `button:hover` background cannot paint the rectangle.
@@ -294,6 +296,66 @@ Ink on `#f6f8fa` 19.3:1, white on black 21:1, ink on the lilac avatar ≥ 7. Blu
 - The trash rows are not captured by the harness (the panel starts closed); they were checked in CSS and tests only.
 - Other `.setting-row` users (Journal export) and the Data storage / exchange cards are unchanged (spec: "Export ZIP" is gap 12's lime primary action).
 - Not in scope, noticed: none new in batch cards, Kitchen summary, timeline, calendar or dialogs during this ticket.
+
+## Ticket 8: batch card anatomy and the card's primary action (gaps 9, 12) — done
+
+Labels, accessible names (`Open <batch>`, `Add observation`, `Complete <check> for <batch>`), selection (`aria-pressed`) and focus order are unchanged. Each batch card is still one `<button>`. Harness selectors (`.design-batch-card[aria-label=…]`, `.design-detail .design-record-observation`) still match, so the capture steps needed no change.
+
+### As built
+
+- **Geometry from the card's own width (convention).** The card is a full-width grid item. Percentage padding and margins resolve against the containing block's *width*, and absolute offsets resolve against the padding box. Every part of the anatomy is therefore a fraction of the card width, held in `:root` tokens: `--batch-card-ratio` 382 / 359, `--batch-card-inset-x` 9.3 %, `-inset-y` 9.4 %, `--batch-pill-width` 55.6 %, `--batch-pill-ratio` 212 / 77 (so its height is 20.2 %), `--batch-pill-inset-x` 4.3 %, `--batch-pill-inset-bottom` 3.3 %, `--batch-pill-text` 7 % (label start), `--batch-pill-circle` 16.5 % (space kept for the circle), `--batch-go-inset-y` 8 % / `-x` 3.3 % (circle inside the pill, of the pill's box), `--batch-photo-left` 48 %, `--batch-photo-width` 46 %, `--batch-chip-inset-x` 6.2 %, `--batch-chip-height` 42 px. The card has `aspect-ratio` plus `min-height: auto`. The global `button { min-height }` had disabled the content minimum, so long content overlapped the pill instead of growing the card. The card now grows instead of clipping.
+- **Title fix.** The title pair (`title` Bold + `title-light` Light, both 40, role table unchanged) spans the full content width. The old 1fr / 0.9fr copy column was what made it wrap. The meta line (temperature, amount) follows on one full-width line. The photo slot starts below this band (`--batch-title-band` = top inset + two title lines + one meta line) instead of at the board's 8 % of the height: the board's photo sits beside a one-word title, and here the titles are full width.
+- **Chips:** the status is the frosted chip (`--colour-frost` `rgb(255 255 255 / 60%)` + `backdrop-filter: blur(--batch-chip-blur)`, h 42, at inset 6.2 %). The next check stays the black capsule with yellow text. Its radius is now `--radius-control`, and it left `legacyCardRadius`.
+- **Pill** (`.design-batch-pill`, absolute bottom-left): white with a 1 px `--colour-hairline` `#f1f1f1` line, two lines "Day N" (`subheading`, Bold) over "/ M days" (`row`, Regular), both 28 px. Light at 28 would break the stem floor (Light ≥ 30), so Regular stands in for the board's Light line. The Bold line is the day, because that is the information; the board puts its Bold line second. The black circle `.design-batch-go` (ground ink, mirrored `back` glyph at `--nav-icon`) is `aria-hidden`: the whole card is the target, so a second control inside it is impossible. Where the card is narrower than the board, the two 28 px lines need more than 20.2 % of the width. The pill then grows (`--batch-pill-label`), and the card reserves `--batch-pill-reserve` = `max(20.2 %, label)` below the copy.
+- **Photos:** `BatchPhoto` on a card adds `bowed-media` only when there is no user photo, so stand-ins (the four profile photographs and the two new cutouts) are clipped by the outline. User photos stay rectangles inside the content box: `object-fit: contain`, the same uncropped fit as before, never clipped. The image sits in the 48–94 % slot, bottom-aligned (`object-position: center bottom`), so it runs into the bottom bow. The "Stand-in" credit and the finish/status label stack at the bottom right, beside the pill.
+- **Cutouts:** `profileVisual` keeps the four existing stand-ins first. After them, drink profiles (`water kefir|kvass|soda|ginger beer|jun|tepache|switchel|shrub|lemonade|mead|cider`) get `grapefruit-spritz` on blue, and fruit profiles (`fruit|berr|plum|apple|pear|cherr|peach|apricot|mango|pineapple|lemon|citrus`) get `fruit-still-life` on lime, both with `pastelOnly`. Milk kefir and the Ginger bug custom profile do not match. They keep the jar fallback, which the seed relies on. A selected (black) card hides a `pastel-only` image and its credit, so the spritz is never shown on black. The batch empty state (`.design-empty-batches` > `.design-empty-card bowed`, lilac, max 382 wide, copy left of the slot, first line in `title`) shows the spritz. The Settings credits list and `public/new-design/README.md` name both cutouts. In the seeded journal the spritz appears on "Water kefir with figs" (and on the profile card for "Water kefir"). **No seeded or starter profile is fruit-based**, so `fruit-still-life` is wired but not visible in the harness.
+- **Grid:** `.batch-overview` uses `minmax(min(100%, --batch-card-min 300px), 1fr)` (was 360). At 1440 the list column fits two 351-wide cards instead of one 726-wide card, which at H/W 0.94 would have been 682 tall.
+- **Gap 12:** `card-action` (one rule, after the primary-action rules) is a lime capsule `--card-action-width` 60 % × `--card-action-height` 63, centred on the nearest positioned card, `bottom: −h/2`. It uses no transform, so the shared hover lift still works. "Add observation" in `.design-detail-card` carries it. The host keeps `padding-bottom: card padding + h/2` and `margin-bottom: h/2 + --card-action-reserve` (32), so the lower half is part of the pane's scroll content and is never clipped. The button stays where it was in the DOM (in the heading), so the focus order is unchanged. Visually it is now the card's last element, while focus reaches it before the readings and the check row. The first-run empty state got no primary capsule: the "Start a batch" action already exists in the top bar, and a second one would change the focus order and duplicate the accessible name.
+- **`.design-check-complete`** (queue cards in the overview's action queue and in Checks) is a card action, so it is now `utility-circle utility-circle-dark` (d 57, white glyph, lime on hover). `.done .design-check-complete` keeps only `opacity: 1` and the lime glyph. The 52 px shared rule now holds only `.profile-editor-icon-button`.
+- **Detail photo:** `.design-detail-photo` had shared its box rule with `.design-batch-photo`. It now carries `position: relative; display: grid; overflow: hidden` itself, and its label renders as before.
+
+### Measured (harness DOM boxes, Chrome 157; spec at 382: card H/W 0.94, title 9.3 / 9.4 %, chip h 42 at 6.2 %, pill 55.6 × 20.2 %, circle 63, slot 48–94 %)
+
+| Viewport | Card | H/W (7 seeded cards) | Pill | Circle | Title / chip / slot |
+| --- | --- | --- | --- | --- | --- |
+| 1440 | 351 × 330 | 0.94 ×6, ginger 1.10 | 195 × 71 | 58 | 9.3 / 9.4 %, chip 42 at 6.2 %, slot x 48 % w 46 % (user photo 42.7 %) |
+| 1024 | 400 × 376 | 0.94 ×7 | 222 × 81 | 64 | same |
+| 768 | 304 × 286 | 0.94 ×5, kimchi 1.10, ginger 1.37 | 169 × 66 | 54 | same |
+| 390 | 342 × 321 | 0.94 ×6, ginger 1.12 | 190 × 69 | 56 | same |
+| 320 | 272 × 281–445 | 1.03–1.22, ginger 1.51 | 151 × 66 | 54 | same |
+
+The cards that grow are those whose status and next-check chips do not fit on one line (and the 55-character ginger name, which takes two title lines). At 320 the card is narrower than every chip pair. "Add observation": 60 % of the detail card (219.6 at 1440, 360 at 768, 205 at 390), h 63, centre offset 0, 32 inside and 32 below the card edge. The pane's scroll height contains it.
+
+### Tests
+
+`src/styles.test.ts` adds "batch card anatomy and the card's primary action" (6 tests):
+
+- The token values and their arithmetic: H/W 0.94, pill width / ratio = 20.2 %, slot ends at 94 %, circle 63 at 382 inside the hairline, capsule ≥ 44.
+- Exactly one rule each for card, pill, circle, photo, photo image, `card-action` and empty card. No length literal anywhere in the anatomy except 100 %, 50 % and −50 % (glyph `svg` rules and the shared hover lift are exempt). The geometry declarations of the card, copy insets, frosted chip, next capsule, pill, circle, slot image and capsule, and the host's reserve.
+- The pill roles (`subheading` + `row`, equal size), the title roles, ink membership, and frosted-chip contrast over black (≥ 7).
+- The markup order inside `CompactBatchCard` (one `<button>`; title, profile, meta, chips, pill, circle `aria-hidden`, photo).
+- `bowed-media` only without a user photo; the cutouts are `pastelOnly` on accent/action and come after the four profile photographs; selected cards hide them; the empty card is lilac with the spritz; credits.
+- `card-action` is used once, on "Add observation", still inside the heading.
+
+Tightened existing tests: the utility-circle exception list no longer includes `.design-check-complete`, and both of its buttons must be dark circles. `.design-batch-next` left `legacyCardRadius`. The palette list gained `--colour-hairline` and `--colour-frost`, both checked by the new token test.
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 65 / 65; plain `npm test` 291 / 291, 15 files, 197 s.
+- Harness, full run (60 captures): 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0. surfaceOverflow 1 (calendar 320, known), clippedControls 0, smallTargets 0.
+
+### Left by ticket 8
+
+- Narrow cards (768 two-column, 320) grow when the status and next-check chips wrap. The next fix would be a card container query that moves the next check into the pill's second line at narrow widths, or that drops the yellow capsule for a meta line. Either one changes the content, so it needs a decision.
+- The pill's Bold line is the day ("Day 5") and the Regular line the total. The board's Light-over-Bold order would have put the total in Bold.
+- The spec maps the black circle to "open / complete the next check". It stays decorative while the card is one button. Making it a real control means splitting the card into an `<article>` with two buttons, which changes the focus order.
+- `fruit-still-life` is not visible in the seeded journal (no fruit profile). Add a fruit custom profile to `scripts/visual/seed.ts` if the harness should show it.
+- Gap 12 elsewhere: Settings "Export ZIP" and dialog submits still use their own buttons (Settings and dialog tickets). The first-run empty state has no capsule (see above).
+- Out of scope, noticed (one line each):
+  - Kitchen summary (gap 11): still a full-width lime grid above the now two-column cards at 1440, with ink counts.
+  - Batch detail next-check sub-row (gaps 11/13): its full-width lime "Complete check" button is a second lime action right above the new capsule.
+  - Detail readings (gap 13): still black rounded rectangles on the white card.
+  - Checks summary (gap 15): the counts on lime are still ink figures.
 
 ## Left for later tickets / known issues
 

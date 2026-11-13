@@ -1,6 +1,6 @@
 # Swipe cutouts
 
-Background-removed cutouts for the card photo role in spec gap 9 (§1.1 batch overview card, §4 item 9): a bundled transparent subject that overflows the card and is clipped by the bowed outline. They are derived from the user-supplied, AI-generated images in `out/www.orbix.studio/images/` (see `out/www.orbix.studio/review-notes.md`). The originals are unchanged. The cutouts are not wired into the app yet.
+Background-removed cutouts for the card photo role in spec gap 9 (§1.1 batch overview card, §4 item 9): a bundled transparent subject that overflows the card and is clipped by the bowed outline. They are derived from the user-supplied, AI-generated images in `out/www.orbix.studio/images/` (see `out/www.orbix.studio/review-notes.md`). The originals are unchanged. Since ticket 8 (`docs/design/swipe-rework-log.md`) `profileVisual` in `src/App.tsx` uses them where a profile has no stand-in of its own: the spritz for drink profiles (blue card) and the batch empty state (lilac card), the fruit for fruit profiles (lime card). A selected batch card is black, so it hides these two cutouts.
 
 Derived from user-supplied, AI-generated imagery; not affiliated with Swipe Drinks.
 

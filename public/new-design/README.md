@@ -16,7 +16,7 @@ The adapted share-alike photographic assets retain their respective CC BY-SA lic
 | grapefruit-spritz.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/hero.png` (glass only) | User-supplied; no third-party license |
 | fruit-still-life.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/fruit.png` | User-supplied; no third-party license |
 
-These two Swipe-rework cutouts are derived from user-supplied, AI-generated imagery and are not affiliated with Swipe Drinks. They were background-removed, trimmed and downscaled by `scripts/assets/make-cutouts.py`; the originals are unchanged. Method, sizes, intended card use and known flaws are in `docs/design/swipe-cutouts.md`. They are not yet used by the app.
+These two Swipe-rework cutouts are derived from user-supplied, AI-generated imagery and are not affiliated with Swipe Drinks. They were background-removed, trimmed and downscaled by `scripts/assets/make-cutouts.py`; the originals are unchanged. Method, sizes, intended card use and known flaws are in `docs/design/swipe-cutouts.md`. The app uses them as batch-card stand-ins only where a profile has no photograph of its own: `grapefruit-spritz` for drink profiles (water kefir, kvass, soda, jun, …) and the batch empty state, `fruit-still-life` for fruit profiles; both always on a pastel card.
 
 `Outfit.ttf`: Copyright 2021 The Outfit Project Authors (https://github.com/Outfitio/Outfit-Fonts). SIL Open Font License 1.1; full text in `OFL.txt`.
 
