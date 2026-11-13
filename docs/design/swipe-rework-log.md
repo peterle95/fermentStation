@@ -16,7 +16,7 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 6 Typography (D1 resolved by the user: readable sizes inside 1:1 geometry) | **closed** for the type system; components still pick their roles in their own tickets | type system |
 | 15 Big numbers (colour part) | **partly closed**: figures are coral Light/ExtraLight/Thin wherever they sit on black; the counts on the lime summary stay ink until gap 11 moves them onto black | type system |
 | 7 Search field | **closed**: black capsule h 53, 1 px lime outline, lime caret, dark sort circle beside it | utility circles |
-| 8 Dialogs | open (already bowed via `bowed-clip`; close buttons are already dark utility circles) | dialogs |
+| 8 Dialogs | **closed**: one black sheet (`.station-dialog`, r 40 / bow 5.7, inset 21), phone bottom sheet with flat bottom, centred `label` title on the close circle's line, `dark-field` controls | dialogs |
 | 9, 11, 15 Batch card anatomy, Kitchen summary, big numbers | open | batch card and Kitchen summary |
 | 10, 12, 13 Settings rows, primary action, timeline | open (timeline entries are already bowed) | settings / action / timeline |
 
@@ -29,7 +29,7 @@ Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text in
 The primitive is defined once, in `src/styles.css` directly after `.sr-only`. It implements spec §2.3 (`clip-path: shape()`).
 
 - **Use it** by adding `bowed` to the element's `className` in `App.tsx`. Then set the colour on the surface rule with `--fill: var(--colour-…)`. `--fill` also accepts a gradient built from tokens, such as `linear-gradient(90deg, var(--colour-action-alt), var(--colour-background))`.
-- **Tune** a surface with `--r` (corner radius, default `--bowed-radius` 52px; a bowed row uses half its height), `--bow` (default `--bowed-bow` 4.4px) and `--k` (default `--bowed-k` 0.64). The defaults are declared with `:where()`, so any surface rule overrides them regardless of order.
+- **Tune** a surface with `--r` (corner radius, default `--bowed-radius` 52px; a bowed row uses half its height), `--bow` (default `--bowed-bow` 4.4px) and `--k` (default `--bowed-k` 0.64). The defaults are declared with `:where()`, so any surface rule overrides them regardless of order. `--r-end` / `--bow-end` (ticket 5) tune the bottom corners and bottom edge on their own; they default to `--r` / `--bow`, and `0px` for both gives a flat, square bottom (phone bottom sheet).
 - **Selected ring:** set `--stroke: var(--colour-action); --stroke-w: var(--bowed-stroke);`. See `.design-batch-card.selected`.
 - **Clipped media:** a *direct child* with class `bowed-media` fills the box (`inset: 0`) and is clipped by the outline, like the glass running into the drink card's bottom edge. It sits under all other content. Nothing in the app uses it yet; gap 9 will.
 - **Overhang:** content is not clipped. A circle above the top edge or a button half below the bottom edge simply overflows the box. Only the fill, stroke and media layers are clipped.
@@ -216,6 +216,45 @@ Accessible names, `aria-pressed` / `aria-current`, focus order and behaviour are
 - The calendar's "Today" button is a 44 px outlined capsule next to 57 px circles (calendar restyle). The top-bar date chip is still an outlined capsule.
 - `.design-check-complete` (44, lime) and `.profile-editor-icon-button` (44, bordered) are icon-only row actions that remain outside the primitive (gaps 9 and 12 / profile editor). `.setting-trash-button` goes with gap 10.
 - The dark circle on the black ground is 1.2:1 against the ground, as on the board; the white glyph (17:1) identifies the control.
+
+## Ticket 5: dialogs and the observation logger as Swipe sheets (gap 8) — done
+
+Behaviour is unchanged: no handler, ref, `showModal`/`close`, focus or label code was touched. Markup changes are class names only. The harness selectors (`dialog.station-dialog[open]`, `dialog.observation-logger.station-dialog[open]`) still match.
+
+### As built
+
+- **Tokens** (`:root`): `--sheet-radius` 40, `--sheet-bow` 5.7, `--sheet-inset` 21 (spec §1.7).
+- **Sheet**: `.station-dialog` is the one sheet definition. It covers every `StationDialog` (start, profile, dates, inputs, info), the modal observation logger and the upcoming-batch picker. It has `bowed-clip` with `--r`/`--bow` from the sheet tokens, `--fill: var(--colour-surface-inverse)`, `padding: var(--sheet-inset)` and `color-scheme: dark`, so the scrollbar and native pickers are dark. It is in the ground ink list (it was in the fill list). Tablet and desktop keep the centred modal at `min(480px, 100% − 48)` with all four edges bowed. On phones (`max-width: 599px`) it becomes a bottom sheet: width 100%, `margin: auto 0 0`, flat bottom (`--r-end`/`--bow-end: 0px`), and `max-height: 100dvh − --space-12 − safe-top`, so the scrim stays visible above it. Its bottom padding adds `--safe-bottom`.
+- **Primitive change (convention fix):** the shape had one radius and one bow for all four sides, so a sheet could not be bowed on top and flat at the bottom. The bottom corners and bottom edge now use `--rr-end` (from `--r-end`) and `--bow-end`. Both default to the top values, so no existing surface changed. The rounded-rectangle fallbacks and `.bowed::after` honour them too.
+- **Header**: `.station-dialog-heading` is a grid `57 | 1fr | 57` with `align-items: center`. The title (first child) sits in the middle column, centred. The close circle sits in the last column, so its centre is on the title's centre line and its right edge is at the sheet inset. The blue band, its negative margins and its radius are gone, and `.station-dialog-heading` was removed from `legacyCardRadius`. The upcoming-batch picker header now uses the same class; its `.upcoming-batch-picker-heading` rules were deleted.
+- **Title role**: `.station-dialog-heading h2` uses `label` (22 px SemiBold). Spec ≈ 22 px; `label` is the existing role closest to that size, and Regular at 22 would fall below the stem floor. The role table is unchanged.
+- **Shared field** `dark-field` (one rule plus one `:is(textarea, [type="file"])` rule, placed before the search rules): `height: var(--search-height)`, `var(--stroke-width) solid var(--colour-action)`, capsule radius, black fill, `caret-color: var(--ink-accent)`, `color-scheme: dark`, ground ink list. Textarea and file fields grow with their content and keep `--radius-small`. The search box is now `className="dark-field design-search-box"` and keeps only layout; its inner input inherits the caret. The start-batch controls carry `dark-field`. The logger controls carry `className={sheetField}` (`loggerModal ? "dark-field" : undefined`), so the inline logger on the white batch-tools card keeps the white fields.
+- **Ink inside the sheet**: `.profile-overview-intro`, `.start-batch-basics`, `.start-profile-summary` and `.upcoming-batch-choice` (pastel boxes) joined the fill list. Before, they inherited ink from the white dialog. Pressed logger chips (`.station-dialog .quick-log-types button[aria-pressed="true"]`) turn lime with ink, because black-on-black would hide the state. Buttons keep their component styles: lime `.station-primary`, outlined `.station-secondary` (white outline on black) and underlined quiet actions.
+
+### Measured (pixel scan of the harness PNGs)
+
+- Phone 390: the sheet spans the full width and ends flush with the bottom edge. Its top dips about 5 px at mid-width against the corners (bow 5.7). Close circle: d 57, x 312–368 (right inset **21**), y 124–180 (centre 152), on the same centre line as the title. The fields are 348 wide and **53** high with a 1 px lime line.
+- Desktop 1440: sheet x 480–959 (480 wide), close circle 882–938 (inset **21**), d 57. Tablet 768: sheet 144–623 (480), content inset 21.
+
+### Tests
+
+`src/styles.test.ts` adds the block "sheet and field on black" (6 tests). It checks the sheet tokens; one sheet definition that takes its `--r`/`--bow`/`--fill`/padding from tokens; that no other `.station-dialog` rule reshapes or repaints the sheet; that every `<dialog>` in `App.tsx` is `station-dialog bowed-clip`; ground ink; the phone bottom sheet; the header grid and its centred title; the `label` role on the title; that every sheet header ends in the dark utility circle; one field definition, used by the search box, by every start-batch control and (through `sheetField`) by every logger control; that no other rule draws the 1 px lime outline; and the ink-list membership of the pastel boxes and the pressed chip. Existing tests that changed:
+
+- The search-field test now checks the look on `.dark-field` and requires the search box to use it.
+- The shape test checks the bottom side through `--rr-end` / `--bow-end` and the new defaults.
+- `.station-dialog` left the `--card-padding` list. The new block checks `--sheet-inset` instead.
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 54 / 54; plain `npm test` 280 / 280, 15 files, 168 s.
+- Harness, full run (60 captures): 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0. surfaceOverflow 1 (calendar 320, known), clippedControls 0, smallTargets 8 (Settings On/Off/All and the licence links, known). The sheet surfaces have no findings.
+
+### Left by ticket 5
+
+- The board's grabber bar above the phone sheet was not added. The sheet cannot be dragged, so a grabber would promise a gesture that does not exist.
+- The pastel boxes inside the start-batch and profile sheets (blue "Your batch", yellow profile summary and intro) are still rounded rectangles on `--radius-card` (legacy list). They hold black fields now. A later pass could drop the box and keep the lime legend on black.
+- The upcoming-batch picker and the profile/dates/info dialogs are not captured by the harness. They inherit the sheet through `.station-dialog` and were checked only in CSS.
+- The inline logger in batch tools (white `.activity-logger` card, white fields, black pressed chips) is unchanged. `.activity-logger` must still never get `bowed`.
 
 ## Left for later tickets / known issues
 

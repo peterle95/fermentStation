@@ -82,6 +82,11 @@
   --utility-stroke-dark: 1.6;
   /* Search field (spec §1.7; gap 7): black capsule h 53 with a 1 px lime outline. */
   --search-height: 53px;
+  /* Sheet (spec §1.7; gap 8): the black sheet that holds every dialog. Bowed top r 40 / bow 5.7, close circle
+     and content at inset 21. */
+  --sheet-radius: 40px;
+  --sheet-bow: 5.7px;
+  --sheet-inset: 21px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -246,8 +251,11 @@ input::file-selector-button,
 .batch-components-shell,
 .component-button,
 .activity-logger,
-.station-dialog,
-.station-dialog-heading,
+.profile-overview-intro,
+.start-batch-basics,
+.start-profile-summary,
+.upcoming-batch-choice,
+.station-dialog .quick-log-types button[aria-pressed="true"],
 .profile-card,
 .profile-list .empty-state,
 .profile-editor-head,
@@ -268,7 +276,8 @@ input::file-selector-button,
 .sidebar,
 .design-detail,
 .utility-circle-dark,
-.design-search-box,
+.station-dialog,
+.dark-field,
 .design-search-box input,
 .design-toast,
 .profile-editor-toast,
@@ -311,7 +320,7 @@ h2, h3, h4, .brand strong { font-size: var(--type-heading); font-weight: var(--t
 .design-tip h3, .design-detail-top h2, .design-input-summary h3, .timeline-panel-heading h3, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .design-detail-next strong, .timeline-content > strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 .navigation button, .design-topbar-copy p, .design-check-copy strong, .calendar-day, .calendar-day-button { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
 body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .guide-step p, .batch-guidance > p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
-button, summary, .section-label a, .field-error, .design-date-chip, .design-toast, .profile-editor-toast, .status, .calendar-status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+button, summary, .station-dialog-heading h2, .section-label a, .field-error, .design-date-chip, .design-toast, .profile-editor-toast, .status, .calendar-status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
 small, .optional, .hint, .muted-copy, .eyebrow, .design-gauge > span, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .design-batch-bottom > span, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-summary span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-readings dt, .detail-readings time, .detail-check-state, .design-detail-next p, .timeline-entry time, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
 strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(--type-title-weight); }
 
@@ -320,6 +329,8 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
    - Add class "bowed" in the markup and give the surface rule a --fill (colour or gradient).
      Never give a bowed surface a background, border, border-radius or ::before/::after.
    - Tune per surface: --r (corner radius; bowed rows use half their height), --bow, --k.
+     --r-end and --bow-end tune the bottom corners and edge on their own (default --r and --bow);
+     0px for both gives a flat, square bottom, as on the phone bottom sheet.
    - Selected ring: --stroke (colour) and --stroke-w (use var(--bowed-stroke)).
    - A direct child with class "bowed-media" fills the box and is clipped by the outline.
    - Scroll containers (dialogs) use "bowed-clip": the element itself is clipped, so nothing
@@ -330,32 +341,35 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
   --r: var(--bowed-radius);
   --bow: var(--bowed-bow);
   --k: var(--bowed-k);
+  --r-end: var(--r);
+  --bow-end: var(--bow);
   --fill: var(--colour-background);
   --stroke: transparent;
   --stroke-w: 0px;
 }
-.bowed { position: relative; isolation: isolate; border: 0; border-radius: var(--r); background: none !important; }
-/* Declared on every clipped layer so each one substitutes its own --rr and box. */
+.bowed { position: relative; isolation: isolate; border: 0; border-radius: var(--r) var(--r) var(--r-end) var(--r-end); background: none !important; }
+/* Declared on every clipped layer so each one substitutes its own --rr / --rr-end and box. */
 .bowed, .bowed::before, .bowed::after, .bowed > .bowed-media, .bowed-clip {
   --rr: min(var(--r), 50%);
+  --rr-end: min(var(--r-end), 50%);
   --bowed-shape: shape(from 0 var(--rr),
     curve to var(--rr) 0 with 0 calc(var(--rr) * (1 - var(--k))) / calc(var(--rr) * (1 - var(--k))) 0,
     curve to calc(100% - var(--rr)) 0 with 50% calc(var(--bow) * 4 / 3) / 50% calc(var(--bow) * 4 / 3),
     curve to 100% var(--rr) with calc(100% - var(--rr) * (1 - var(--k))) 0 / 100% calc(var(--rr) * (1 - var(--k))),
-    line to 100% calc(100% - var(--rr)),
-    curve to calc(100% - var(--rr)) 100% with 100% calc(100% - var(--rr) * (1 - var(--k))) / calc(100% - var(--rr) * (1 - var(--k))) 100%,
-    curve to var(--rr) 100% with 50% calc(100% - var(--bow) * 4 / 3) / 50% calc(100% - var(--bow) * 4 / 3),
-    curve to 0 calc(100% - var(--rr)) with calc(var(--rr) * (1 - var(--k))) 100% / 0 calc(100% - var(--rr) * (1 - var(--k))),
+    line to 100% calc(100% - var(--rr-end)),
+    curve to calc(100% - var(--rr-end)) 100% with 100% calc(100% - var(--rr-end) * (1 - var(--k))) / calc(100% - var(--rr-end) * (1 - var(--k))) 100%,
+    curve to var(--rr-end) 100% with 50% calc(100% - var(--bow-end) * 4 / 3) / 50% calc(100% - var(--bow-end) * 4 / 3),
+    curve to 0 calc(100% - var(--rr-end)) with calc(var(--rr-end) * (1 - var(--k))) 100% / 0 calc(100% - var(--rr-end) * (1 - var(--k))),
     close);
 }
 .bowed::before, .bowed::after { content: ""; position: absolute; pointer-events: none; clip-path: var(--bowed-shape); }
 .bowed::before { inset: 0; z-index: -3; background: var(--stroke); }
-.bowed::after { inset: var(--stroke-w); z-index: -2; background: var(--fill); --rr: max(0px, min(var(--r), 50%) - var(--stroke-w)); }
+.bowed::after { inset: var(--stroke-w); z-index: -2; background: var(--fill); --rr: max(0px, min(var(--r), 50%) - var(--stroke-w)); --rr-end: max(0px, min(var(--r-end), 50%) - var(--stroke-w)); }
 .bowed > .bowed-media { position: absolute; inset: 0; z-index: -1; overflow: hidden; clip-path: var(--bowed-shape); }
-.bowed-clip { border: 0; border-radius: var(--r); background: var(--fill); clip-path: var(--bowed-shape); }
+.bowed-clip { border: 0; border-radius: var(--r) var(--r) var(--r-end) var(--r-end); background: var(--fill); clip-path: var(--bowed-shape); }
 @supports not (clip-path: shape(from 0 0, line to 1px 1px)) {
-  .bowed::before, .bowed > .bowed-media { clip-path: none; border-radius: var(--r); }
-  .bowed::after { clip-path: none; border-radius: max(0px, var(--r) - var(--stroke-w)); }
+  .bowed::before, .bowed > .bowed-media { clip-path: none; border-radius: var(--r) var(--r) var(--r-end) var(--r-end); }
+  .bowed::after { clip-path: none; border-radius: max(0px, var(--r) - var(--stroke-w)) max(0px, var(--r) - var(--stroke-w)) max(0px, var(--r-end) - var(--stroke-w)) max(0px, var(--r-end) - var(--stroke-w)); }
   .bowed-clip { clip-path: none; }
 }
 .primary-action, .station-primary, .profile-add, .component-button-primary, .profile-editor-button.primary {
@@ -466,12 +480,18 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 
 /* Batches and checks: real counts, explicit statuses, authentic local photos. */
 .design-search-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-6); }
-/* Search field (spec §1.7, gap 7): black capsule with a 1 px lime outline, white text, lime caret; the
-   sort/filter control beside it is the dark utility circle. .design-search keeps the two on one line. */
+/* Field on black (spec §1.7; gaps 7, 8): the one field look for the search box and every control in a sheet.
+   Add class "dark-field" to the control (or to a wrapper such as the search box, whose inner input then drops
+   its own box). Black capsule h 53, 1 px lime outline, white text (ground ink list), lilac placeholder,
+   lime caret (inherited by a wrapped input), dark native pickers. Multi-line and file fields keep the small
+   radius and grow with their content. */
+.dark-field { height: var(--search-height); border: var(--stroke-width) solid var(--colour-action); border-radius: var(--radius-control); background: var(--colour-surface-inverse); caret-color: var(--ink-accent); color-scheme: dark; }
+.dark-field:is(textarea, [type="file"]) { height: auto; border-radius: var(--radius-small); }
+/* Search (gap 7): the field and the dark sort circle on one line. */
 .design-search { display: flex; flex: 1 1 240px; align-items: center; gap: var(--space-2); min-width: 0; }
 .design-search-row .batch-view-switch { margin-left: auto; }
-.design-search-box { display: flex; flex: 1; align-items: center; gap: var(--space-2); min-width: 0; height: var(--search-height); border: var(--stroke-width) solid var(--colour-action); border-radius: var(--radius-control); padding-inline: var(--space-4) var(--space-1); background: var(--colour-surface-inverse); }
-.design-search-box input { flex: 1; align-self: stretch; width: 0; min-height: 0; border: 0; background: transparent; padding-inline: var(--space-1); caret-color: var(--ink-accent); }
+.design-search-box { display: flex; flex: 1; align-items: center; gap: var(--space-2); min-width: 0; padding-inline: var(--space-4) var(--space-1); }
+.design-search-box input { flex: 1; align-self: stretch; width: 0; min-height: 0; border: 0; background: transparent; padding-inline: var(--space-1); }
 .design-summary { display: grid; grid-template-columns: minmax(100px, 0.7fr) minmax(0, 3fr); align-items: start; gap: var(--space-4) var(--space-6); padding: var(--card-padding); --fill: var(--colour-action); margin-bottom: var(--space-8); }
 .design-gauge { display: grid; gap: var(--space-1); }
 .design-gauge strong { font-variant-numeric: tabular-nums; }
@@ -690,12 +710,18 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .activity-logger { order: 1; border-radius: var(--radius-card); padding: var(--card-padding); background: var(--colour-background); }
 .activity-logger:has(.station-dialog) { display: contents; }
 .inline-logger { display: block; position: static; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; overflow: visible; }
+/* Sheet (spec §1.7; gap 8): every dialog is the board's black sheet. Bowed r 40 / bow 5.7, content and the
+   close circle at inset 21, white text (ground ink list). Tablet and desktop: a centred modal, all four edges
+   bowed. Phone (< 600): a bottom sheet with a flat bottom, see the max-width: 599px block. */
 .station-dialog {
+  --r: var(--sheet-radius);
+  --bow: var(--sheet-bow);
+  --fill: var(--colour-surface-inverse);
   width: min(480px, calc(100% - 48px));
   max-width: none;
   max-height: calc(100svh - 48px - var(--safe-top) - var(--safe-bottom));
-  padding: var(--card-padding);
-  --fill: var(--colour-background);
+  padding: var(--sheet-inset);
+  color-scheme: dark;
   font-family: var(--font-family);
   overflow: auto;
   overscroll-behavior: contain;
@@ -703,8 +729,11 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 }
 .station-dialog:not([open]) { display: none; }
 .station-dialog::backdrop { background: var(--colour-scrim); backdrop-filter: blur(4px); }
-.station-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin: calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding)) var(--space-6); padding: var(--card-padding); border-radius: var(--radius-card) var(--radius-card) 0 0; background: var(--colour-accent); }
-.station-dialog-heading h2 { align-self: center; }
+/* Sheet header: centred title between two close-circle-wide columns, so the title's centre line is the
+   circle's and the circle sits at the sheet's right inset. */
+.station-dialog-heading { display: grid; grid-template-columns: var(--utility-circle-dark) minmax(0, 1fr) var(--utility-circle-dark); align-items: center; gap: var(--space-2); margin-bottom: var(--space-6); }
+.station-dialog-heading > :first-child { grid-column: 2; text-align: center; }
+.station-dialog .quick-log-types button[aria-pressed="true"] { background: var(--colour-action); border-color: var(--colour-action); }
 .station-dialog-body h3 { margin-block: var(--space-6) var(--space-2); }
 .station-dialog-body dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); margin-block: var(--space-6); }
 .station-dialog-body dd { margin: 0; overflow-wrap: anywhere; }
@@ -856,8 +885,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .upcoming-date { display: grid; justify-items: center; flex: none; min-width: 44px; }
 .upcoming-body { flex: 1; min-width: 112px; }
 .upcoming-batch-picker { display: grid; gap: var(--space-4); }
-.upcoming-batch-picker-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
-.upcoming-batch-picker-heading > div { flex: 1; min-width: 0; }
 .upcoming-batch-choice { display: grid; gap: var(--space-2); text-align: left; background: var(--colour-accent); }
 .settings-screen { min-width: 0; }
 .settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); align-items: start; gap: var(--space-6); margin-top: var(--space-8); }
@@ -992,9 +1019,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .station-dialog-actions { flex-direction: column-reverse; }
   .station-dialog-body dl { grid-template-columns: minmax(0, 1fr); }
   .station-dialog-body dd { margin-bottom: var(--space-2); }
-  .station-dialog-heading { flex-wrap: wrap-reverse; }
-  .station-dialog-heading h2 { flex: 1; min-width: 120px; }
-  .station-dialog-close { margin-left: auto; }
   .profile-editor-fields, .profile-editor-formula-row { grid-template-columns: minmax(0, 1fr); }
   .profile-editor-check-row { grid-template-columns: minmax(0, 1fr) auto 44px; }
   .profile-editor-check-row label:first-child { grid-column: 1 / -1; }
@@ -1016,8 +1040,9 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .upcoming-item .calendar-status { margin-left: auto; }
   .calendar-screen, .settings-screen, .profiles-screen, .design-checks-view { padding: var(--space-4); }
   .calendar-screen, .design-checks-view, .settings-screen, .profiles-screen { padding: 0; }
-  .station-dialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px - var(--safe-top) - var(--safe-bottom)); padding: var(--space-4); }
-  .station-dialog-heading { margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-6); padding: var(--space-4); }
+  /* Bottom sheet: full width, anchored to the bottom edge, bowed top and a flat bottom; the scrim stays
+     visible above it. */
+  .station-dialog { --r-end: 0px; --bow-end: 0px; width: 100%; max-height: calc(100dvh - var(--space-12) - var(--safe-top)); margin: auto 0 0; padding-bottom: calc(var(--sheet-inset) + var(--safe-bottom)); }
   .navigation button { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
   .calendar-head h2 { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 }

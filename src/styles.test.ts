@@ -117,7 +117,8 @@ describe("Swipe-derived design contract", () => {
     expect(rule("button")).toContain("border-radius: var(--radius-control)");
     expect(rule("input, select, textarea")).toContain("min-height: var(--input-height)");
     expect(rule("textarea")).toContain("border-radius: var(--radius-small)");
-    for (const selector of [".batch-component-card", ".settings-card", ".station-dialog", ".profile-card", ".profile-editor-section"]) {
+    // The dialog sheet takes the measured sheet inset instead (see "sheet and field on black").
+    for (const selector of [".batch-component-card", ".settings-card", ".profile-card", ".profile-editor-section"]) {
       expect(rule(selector)).toContain("var(--card-padding)");
     }
   });
@@ -320,7 +321,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
     ".storage-warning", ".app-loading", ".empty-state, .design-empty-checks, .calendar-empty", ".calendar-screen, .profiles-screen, .design-checks-view",
     ".design-detail", ".ios-install-guide", ".batch-view-switch", ".design-batch-next", ".queue-card", ".design-checks-view .queue-card", ".design-tip",
     ".design-detail-photo", ".detail-readings > div", ".design-detail-next", ".design-input-summary", ".batch-guidance", ".design-timeline-panel",
-    ".batch-management > .wb-panel", ".batch-tools-danger", ".next-action", ".activity-logger", ".station-dialog-heading", ".profile-overview-intro",
+    ".batch-management > .wb-panel", ".batch-tools-danger", ".next-action", ".activity-logger", ".profile-overview-intro",
     ".start-batch-basics", ".start-profile-summary", ".profile-card-actions", ".profile-editor-card", ".upcoming-item", ".setting-segment", ".trash-item",
   ];
 
@@ -332,7 +333,11 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
     // Concave top and bottom edges, straight sides, superellipse-like corners.
     const shape = shaped[0].declarations.find(([property]) => property === "--bowed-shape")![1];
     expect(shape).toContain("curve to calc(100% - var(--rr)) 0 with 50% calc(var(--bow) * 4 / 3)");
-    expect(shape).toContain("line to 100% calc(100% - var(--rr))");
+    expect(shape).toContain("line to 100% calc(100% - var(--rr-end))");
+    // The bottom corners and edge can be tuned on their own (flat-bottomed phone sheet); by default they follow the top.
+    expect(shape).toContain("curve to var(--rr-end) 100% with 50% calc(100% - var(--bow-end) * 4 / 3)");
+    for (const declaration of ["--r-end: var(--r)", "--bow-end: var(--bow)"]) expect(rule(":where(.bowed, .bowed-clip)")).toContain(declaration);
+    expect(shaped[0].declarations).toContainEqual(["--rr-end", "min(var(--r-end), 50%)"]);
     expect(shape).toContain("calc(var(--rr) * (1 - var(--k)))");
   });
 
@@ -702,21 +707,106 @@ describe("utility circles and search field (swipe-rework-log.md, ticket 4; spec 
   });
 
   it("draws the search field as a black capsule with a lime outline and the sort circle beside it", () => {
-    const field = rule(".design-search-box");
+    // The look lives in the shared field class (ticket 5); the search box wears it and only lays out its icon and input.
+    const field = rule(".dark-field");
     for (const declaration of [
       "height: var(--search-height)", "border: var(--stroke-width) solid var(--colour-action)", "border-radius: var(--radius-control)", "background: var(--colour-surface-inverse)",
+      "caret-color: var(--ink-accent)",
     ]) expect(field).toContain(declaration);
+    expect(rule(".design-search-box")).not.toMatch(/height|border|background|caret/);
     const input = rule(".design-search-box input");
-    for (const declaration of ["caret-color: var(--ink-accent)", "min-height: 0", "border: 0", "background: transparent"]) expect(input).toContain(declaration);
+    for (const declaration of ["min-height: 0", "border: 0", "background: transparent"]) expect(input).toContain(declaration);
+    // caret-color inherits from the field, so the wrapped input must not reset it.
+    expect(input).not.toContain("caret-color");
     expect(rule(".design-search")).toContain("display: flex");
     expect(rule(".design-search")).not.toContain("flex-wrap: wrap");
     const membership = inkMembership();
-    for (const selector of [".design-search-box", ".design-search-box input"]) expect(membership.get(selector), selector).toBe("ground");
+    for (const selector of [".dark-field", ".design-search-box input"]) expect(membership.get(selector), selector).toBe("ground");
     expect(rule("input::placeholder, textarea::placeholder")).toContain("color: var(--ink-meta)");
     expect(contrast(hex("--ink-ground-meta"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(7);
     // Field first, then the sort circle, both inside .design-search; the input keeps its name and type.
     const search = app.slice(app.indexOf('<div className="design-search">'), app.indexOf('className="batch-view-switch"'));
-    expect(search).toMatch(/<div className="design-search-box">.*<input aria-label="Search batches"[\s\S]*?type="search" value=\{query\} \/><\/div><button aria-label="Sort batches by finish date" aria-pressed=\{sorted\} className="utility-circle utility-circle-dark"/);
+    expect(search).toMatch(/<div className="dark-field design-search-box">.*<input aria-label="Search batches"[\s\S]*?type="search" value=\{query\} \/><\/div><button aria-label="Sort batches by finish date" aria-pressed=\{sorted\} className="utility-circle utility-circle-dark"/);
+  });
+});
+
+describe("sheet and field on black (swipe-rework-log.md, ticket 5; spec §1.7, gap 8)", () => {
+  const mobile = styles.slice(styles.indexOf("@media (max-width: 599px) {"), styles.indexOf("@media (max-width: 379px)"));
+  const sheetRules = () => rules().filter((entry) => entry.selectors.some((selector) => /\.station-dialog(?![\w-])/.test(selector)) && !entry.declarations.some(([property]) => property === "--ink"));
+
+  it("carries the measured sheet outline and inset in :root tokens", () => {
+    for (const declaration of ["--sheet-radius: 40px;", "--sheet-bow: 5.7px;", "--sheet-inset: 21px;"]) expect(rule(":root")).toContain(declaration);
+  });
+
+  it("defines the sheet once: black, bowed from the sheet tokens, at the sheet inset", () => {
+    const sheet = rule(".station-dialog");
+    for (const declaration of ["--r: var(--sheet-radius)", "--bow: var(--sheet-bow)", "--fill: var(--colour-surface-inverse)", "padding: var(--sheet-inset)"]) expect(sheet).toContain(declaration);
+    // No other rule re-shapes or re-paints the sheet; the phone rule only flattens its bottom.
+    for (const entry of sheetRules()) {
+      if (entry.selector === ".station-dialog") continue;
+      for (const [property, value] of entry.declarations) {
+        expect(property, `${entry.selector} re-shapes the sheet`).not.toMatch(/^--(?:r|bow|k|fill)$/);
+        if (/^--(?:r|bow)-end$/.test(property)) expect(value).toBe("0px");
+        if (/^(?:background|border|border-radius)$/.test(property)) expect([".station-dialog::backdrop", '.station-dialog .quick-log-types button[aria-pressed="true"]'], `${entry.selector} paints the sheet`).toContain(entry.selector);
+      }
+    }
+    // Every dialog in the app is that sheet; the observation logger becomes it while it is modal.
+    const dialogs = [...app.matchAll(/<dialog\b[^>]*className=(\{`[^`]*`\}|"[^"]*")/g)].map(([, className]) => className);
+    expect(dialogs.length).toBeGreaterThanOrEqual(3);
+    for (const className of dialogs) expect(className).toContain("station-dialog bowed-clip");
+    expect(inkMembership().get(".station-dialog")).toBe("ground");
+    expect(contrast(hex("--ink-ground"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(7);
+  });
+
+  it("anchors the phone sheet to the bottom edge with a bowed top and a flat bottom", () => {
+    const phone = rule(".station-dialog", mobile);
+    for (const declaration of ["--r-end: 0px", "--bow-end: 0px", "width: 100%", "margin: auto 0 0", "padding-bottom: calc(var(--sheet-inset) + var(--safe-bottom))"]) expect(phone).toContain(declaration);
+    expect(phone).not.toMatch(/(?:^|;)\s*--(?:r|bow):/);
+  });
+
+  it("centres the title on the close circle's line and puts the dark circle at the sheet inset", () => {
+    const heading = rule(".station-dialog-heading");
+    for (const declaration of ["display: grid", "grid-template-columns: var(--utility-circle-dark) minmax(0, 1fr) var(--utility-circle-dark)", "align-items: center"]) expect(heading).toContain(declaration);
+    expect(heading).not.toMatch(/background|border-radius|margin:|padding/);
+    const title = rule(".station-dialog-heading > :first-child");
+    for (const declaration of ["grid-column: 2", "text-align: center"]) expect(title).toContain(declaration);
+    // Title ≈ 22 px (spec §1.7): the label role.
+    const role = rules().find((entry) => entry.selectors.includes(".station-dialog-heading h2"))!;
+    expect(role.declarations).toContainEqual(["font-size", "var(--type-label)"]);
+    // Every sheet header ends in the dark utility circle.
+    const headers = [...app.matchAll(/className="station-dialog-heading"/g)].map((match) => app.slice(match.index, app.indexOf("</button>", match.index)));
+    expect(headers.length).toBeGreaterThanOrEqual(3);
+    for (const header of headers) expect(header).toMatch(/<button aria-label="Close(?: dialog)?" className="utility-circle utility-circle-dark(?: [\w-]+)*"/);
+  });
+
+  it("uses one field definition for the search box and every control in a sheet", () => {
+    const definitions = rules().filter((entry) => /dark-field/.test(entry.selector) && !entry.declarations.some(([property]) => property === "--ink"));
+    expect(definitions.map((entry) => entry.selector).sort()).toEqual([".dark-field", '.dark-field:is(textarea, [type="file"])'].sort());
+    expect(rule('.dark-field:is(textarea, [type="file"])')).not.toMatch(/border:|background|caret/);
+    expect(inkMembership().get(".dark-field")).toBe("ground");
+    // Start-batch controls live only in the sheet; the logger's controls wear the field while the logger is modal.
+    const start = app.slice(app.indexOf("function StartBatchForm"), app.indexOf("</form>", app.indexOf("function StartBatchForm")));
+    const startControls = [...start.matchAll(/<(?:input|select|textarea)\b[^>]*/g)].map(([tag]) => tag);
+    expect(startControls.length).toBeGreaterThanOrEqual(4);
+    for (const tag of startControls) expect(tag).toContain('className="dark-field"');
+    expect(app).toContain('const sheetField = loggerModal ? "dark-field" : undefined;');
+    const logger = app.slice(app.indexOf('id="batch-activity-form"'), app.indexOf("</form>", app.indexOf('id="batch-activity-form"')));
+    const loggerControls = [...logger.matchAll(/<(?:input|select|textarea)\b[^>]*/g)].map(([tag]) => tag).filter((tag) => !tag.includes('name="kind"'));
+    expect(loggerControls.length).toBeGreaterThanOrEqual(7);
+    for (const tag of loggerControls) expect(tag).toContain("className={sheetField}");
+    // Nothing else draws a field: no other rule paints the 1 px lime outline.
+    for (const entry of rules()) {
+      if (entry.selector === ".dark-field") continue;
+      for (const [property, value] of entry.declarations) if (/^border/.test(property)) expect(value, entry.selector).not.toContain("var(--stroke-width) solid var(--colour-action)");
+    }
+  });
+
+  it("keeps pastel boxes and pressed chips inside the sheet readable with ink", () => {
+    const membership = inkMembership();
+    for (const selector of [".profile-overview-intro", ".start-batch-basics", ".start-profile-summary", ".upcoming-batch-choice", '.station-dialog .quick-log-types button[aria-pressed="true"]']) {
+      expect(membership.get(selector), selector).toBe("fill");
+    }
+    expect(rule('.station-dialog .quick-log-types button[aria-pressed="true"]')).toContain("background: var(--colour-action)");
   });
 });
 
