@@ -1013,28 +1013,25 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
     <section className="settings" aria-label="Local backup and transfer">
       <section className="settings-card bowed settings-preferences" aria-labelledby="preferences-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="settings" /></span><h2 id="preferences-heading">Household preferences</h2></div>
-        <div className="setting-row">
-          <div className="setting-body"><b>Units</b><p>Readouts for temperature and volume.</p></div>
-          <div className="setting-segment" aria-label="Units" role="group">
-            <button aria-pressed={preferences.units === "metric"} onClick={() => onPreferencesChange({ ...preferences, units: "metric" })} type="button">°C / L</button>
-            <button aria-pressed={preferences.units === "imperial"} onClick={() => onPreferencesChange({ ...preferences, units: "imperial" })} type="button">°F / qt</button>
-          </div>
+        <div className="setting-body"><b>Units</b><p>Readouts for temperature and volume.</p></div>
+        <div className="toggle-list" aria-label="Units" role="group">
+          <button aria-pressed={preferences.units === "metric"} className="toggle-row" onClick={() => onPreferencesChange({ ...preferences, units: "metric" })} type="button">°C / L</button>
+          <button aria-pressed={preferences.units === "imperial"} className="toggle-row" onClick={() => onPreferencesChange({ ...preferences, units: "imperial" })} type="button">°F / qt</button>
         </div>
-        <div className="setting-row">
-          <div className="setting-body"><b>Suggestions</b><p>Show computed suggested values on timeline entries.</p></div>
-          <div className="setting-segment" aria-label="Suggestions" role="group">
-            <button aria-pressed={preferences.suggestions} onClick={() => onPreferencesChange({ ...preferences, suggestions: true })} type="button">On</button>
-            <button aria-pressed={!preferences.suggestions} onClick={() => onPreferencesChange({ ...preferences, suggestions: false })} type="button">Off</button>
-          </div>
+        <p>Show computed suggested values on timeline entries.</p>
+        <div className="toggle-list">
+          <button aria-checked={preferences.suggestions} className="toggle-row" onClick={() => onPreferencesChange({ ...preferences, suggestions: !preferences.suggestions })} role="switch" type="button">
+            <span className="toggle-avatar"><DesignIcon name="sparkles" /></span><span className="toggle-label">Suggestions</span><span className="toggle-switch" />
+          </button>
         </div>
         <p>Preferences save automatically. Formula terms are saved separately below.</p>
       </section>
       <section className="settings-card bowed settings-notifications" aria-labelledby="notifications-heading">
         <div className="settings-card-heading"><span className="settings-emblem"><DesignIcon name="bell" /></span><h2 id="notifications-heading">Notifications</h2></div>
         <p>Choose alerts for due checks, ready batches, both, or neither.</p>
-        <div className="setting-segment notification-segment" aria-label="Notifications" role="group">
+        <div className="toggle-list" aria-label="Notifications" role="group">
           {([["all", "All"], ["checks", "Checks"], ["ready", "Ready"], ["off", "Off"]] as const).map(([mode, label]) => (
-            <button aria-pressed={preferences.notificationMode === mode} key={mode} onClick={() => onPreferencesChange({ ...preferences, notificationMode: mode }, true)} type="button">{label}</button>
+            <button aria-pressed={preferences.notificationMode === mode} className="toggle-row" key={mode} onClick={() => onPreferencesChange({ ...preferences, notificationMode: mode }, true)} type="button">{label}</button>
           ))}
         </div>
         <p>Scheduled alerts require the Android app and notification permission. Each batch can also be muted in its details.</p>

@@ -52,7 +52,7 @@ describe("Swipe-derived design contract", () => {
     for (const [name, value] of Object.entries({
       background: "#ffffff", surface: "#ffec89", "surface-inverse": "#000000", text: "#000000", "text-muted": "#000000", "text-inverse": "#ffffff",
       action: "#b6f074", "on-action": "#000000", "action-alt": "#dab8f1", emblem: "#c5b4ec", accent: "#b6e1fa", border: "#000000",
-      rail: "#3e3e40", "sheet-control": "#1b1b1b",
+      rail: "#3e3e40", "sheet-control": "#1b1b1b", row: "#f6f8fa", "switch-on": "#2089fd", "switch-off": "#eceef0",
     })) expect(styles).toContain(`--colour-${name}: ${value};`);
     // The retired near-black must not come back as ground, ink or border.
     expect(styles).not.toMatch(/#1c1c1c/i);
@@ -322,7 +322,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
     ".design-detail", ".ios-install-guide", ".batch-view-switch", ".design-batch-next", ".queue-card", ".design-checks-view .queue-card", ".design-tip",
     ".design-detail-photo", ".detail-readings > div", ".design-detail-next", ".design-input-summary", ".batch-guidance", ".design-timeline-panel",
     ".batch-management > .wb-panel", ".batch-tools-danger", ".next-action", ".activity-logger", ".profile-overview-intro",
-    ".start-batch-basics", ".start-profile-summary", ".profile-card-actions", ".profile-editor-card", ".upcoming-item", ".setting-segment", ".trash-item",
+    ".start-batch-basics", ".start-profile-summary", ".profile-card-actions", ".profile-editor-card", ".upcoming-item",
   ];
 
   it("carries the measured outline in tokens and defines the shape exactly once", () => {
@@ -807,6 +807,102 @@ describe("sheet and field on black (swipe-rework-log.md, ticket 5; spec §1.7, g
       expect(membership.get(selector), selector).toBe("fill");
     }
     expect(rule('.station-dialog .quick-log-types button[aria-pressed="true"]')).toContain("background: var(--colour-action)");
+  });
+});
+
+describe("settings toggle rows and switch (swipe-rework-log.md, ticket 7; spec §1.2, gap 10)", () => {
+  const px = (token: string): number => {
+    const value = rootTokens().get(token)!;
+    const alias = value.match(/^var\((--[\w-]+)\)$/);
+    return alias ? px(alias[1]) : Number(value.match(/^(\d+(?:\.\d+)?)px$/)![1]);
+  };
+  const state = '.toggle-row:is([aria-pressed="true"], [aria-checked="true"])';
+  const isRoleRule = (entry: Rule) => entry.declarations.some(([property]) => property === "font-size");
+  const toggleRules = () => rules().filter((entry) => /\.toggle-(?:list|row|avatar|label|switch)\b/.test(entry.selector)
+    && !entry.declarations.some(([property]) => property === "--ink") && !isRoleRule(entry));
+
+  it("carries the measured row and switch geometry and the three new colours in :root tokens", () => {
+    expect(Object.fromEntries(["--toggle-row", "--toggle-gap", "--toggle-inset", "--toggle-avatar", "--toggle-label-gap", "--switch-width", "--switch-height", "--switch-knob", "--switch-inset"]
+      .map((token) => [token, px(token)]))).toEqual({
+      "--toggle-row": 72, "--toggle-gap": 8, "--toggle-inset": 16, "--toggle-avatar": 63, "--toggle-label-gap": 18,
+      "--switch-width": 42, "--switch-height": 25, "--switch-knob": 20, "--switch-inset": 21,
+    });
+    for (const declaration of ["--colour-row: #f6f8fa;", "--colour-switch-on: #2089fd;", "--colour-switch-off: #eceef0;"]) expect(rule(":root")).toContain(declaration);
+    // Every row is a full-height touch target, and the avatar and knob fit inside what holds them.
+    expect(px("--toggle-row")).toBeGreaterThanOrEqual(44);
+    expect(px("--toggle-avatar")).toBeLessThan(px("--toggle-row"));
+    expect(px("--switch-knob")).toBeLessThan(px("--switch-height"));
+  });
+
+  it("defines the list, row, avatar and switch exactly once, from tokens only", () => {
+    expect(toggleRules().map((entry) => entry.selector).sort()).toEqual([
+      ".toggle-list", ".toggle-row", state, ".toggle-row:hover:not(:disabled)", ".toggle-row:has(> .toggle-avatar)", ".toggle-avatar", ".toggle-label",
+      ".toggle-switch", ".toggle-switch::after", '[aria-checked="true"] > .toggle-switch', '[aria-checked="true"] > .toggle-switch::after',
+    ].sort());
+    for (const entry of toggleRules()) {
+      for (const [property, value] of entry.declarations) expect(value, `${entry.selector} { ${property} } must use a token`).not.toMatch(/(?<![\w-])\d*\.?\d+(?:px|rem|em)\b/);
+    }
+    const list = rule(".toggle-list");
+    for (const declaration of ["display: grid", "gap: var(--toggle-gap)", "margin-inline: calc(var(--toggle-inset) - var(--card-padding))"]) expect(list).toContain(declaration);
+    const row = rule(".toggle-row");
+    for (const declaration of [
+      "--row-fill: var(--colour-row)", "min-height: var(--toggle-row)", "padding: 0 var(--switch-inset)", "gap: var(--toggle-label-gap)",
+      "border: 0", "border-radius: var(--radius-control)", "background: var(--row-fill)", "align-items: center",
+    ]) expect(row).toContain(declaration);
+    expect(rule(state)).toContain("--row-fill: var(--colour-surface-inverse)");
+    // The generic yellow button hover must not repaint a row (white text on a black row would vanish).
+    expect(rule(".toggle-row:hover:not(:disabled)")).toContain("background: var(--row-fill)");
+    expect(rule(".toggle-row:has(> .toggle-avatar)")).toContain("padding-inline-start: calc((var(--toggle-row) - var(--toggle-avatar)) / 2)");
+    const avatar = rule(".toggle-avatar");
+    for (const declaration of ["width: var(--toggle-avatar)", "height: var(--toggle-avatar)", "border-radius: 50%", "background: var(--colour-emblem)"]) expect(avatar).toContain(declaration);
+    const track = rule(".toggle-switch");
+    for (const declaration of ["width: var(--switch-width)", "height: var(--switch-height)", "border-radius: var(--radius-control)", "background: var(--colour-switch-off)", "margin-inline-start: auto"]) expect(track).toContain(declaration);
+    const knob = rule(".toggle-switch::after");
+    for (const declaration of ["width: var(--switch-knob)", "height: var(--switch-knob)", "border-radius: 50%", "background: var(--colour-background)", "top: calc((var(--switch-height) - var(--switch-knob)) / 2)"]) expect(knob).toContain(declaration);
+    expect(rule('[aria-checked="true"] > .toggle-switch')).toContain("background: var(--colour-switch-on)");
+    expect(rule('[aria-checked="true"] > .toggle-switch::after')).toContain("transform: translateX(calc(var(--switch-width) - var(--switch-height)))");
+    // Rows use the row role; their colours come from the ink sets.
+    const roleRule = rules().find((entry) => isRoleRule(entry) && entry.declarations.some(([, value]) => value === "var(--type-row)") && entry.selectors.includes(".toggle-row"));
+    expect(roleRule, ".toggle-row must apply the row role").toBeDefined();
+  });
+
+  it("reads every row state and the switch at WCAG contrast, with the selected state carried by the black row", () => {
+    const membership = inkMembership();
+    expect(membership.get(".toggle-row")).toBe("fill");
+    expect(membership.get(".toggle-avatar")).toBe("fill");
+    expect(membership.get(state)).toBe("ground");
+    expect(contrast(hex("--ink-fill"), hex("--colour-row"))).toBeGreaterThanOrEqual(7);
+    expect(contrast(hex("--ink-ground"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(7);
+    expect(contrast(hex("--ink-fill"), hex("--colour-emblem"))).toBeGreaterThanOrEqual(7);
+    // Non-text contrast (3:1): the on track against the black row and the knob on the on track. The off track is
+    // as pale as the board's (about 1.1:1 on the row), so the state is carried by the row fill and aria-checked.
+    expect(contrast(hex("--colour-switch-on"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(3);
+    expect(contrast(hex("--colour-background"), hex("--colour-switch-on"))).toBeGreaterThanOrEqual(3);
+    expect(contrast(hex("--colour-row"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(3);
+  });
+
+  it("builds Settings choices from rows and the on/off preference from one real switch", () => {
+    const settings = app.slice(app.indexOf("function SettingsView"), app.indexOf('className="settings-card bowed settings-storage"'));
+    const rows = [...settings.matchAll(/<button\b[\s\S]*?type="button">/g)].map(([tag]) => tag).filter((tag) => tag.includes('className="toggle-row"'));
+    expect(rows).toHaveLength(4); // °C / L, °F / qt, the Suggestions switch and the mapped notification row
+    for (const tag of rows) expect(tag).toMatch(/aria-pressed=|role="switch"/);
+    const switches = rows.filter((tag) => tag.includes('role="switch"'));
+    expect(switches).toHaveLength(1);
+    expect(switches[0]).toContain("aria-checked={preferences.suggestions}");
+    expect(settings).toContain('<span className="toggle-label">Suggestions</span><span className="toggle-switch" />');
+    for (const name of ["Units", "Notifications"]) expect(settings).toContain(`<div className="toggle-list" aria-label="${name}" role="group">`);
+    expect(app).not.toMatch(/setting-segment|notification-segment|setting-trash-button/);
+    expect(styles).not.toMatch(/setting-segment|notification-segment|setting-trash-button/);
+    // Rows sit on the white toggle card.
+    expect(rules().some((entry) => entry.selectors.includes(".settings-notifications") && entry.declarations.some(([property]) => property === "--fill"))).toBe(false);
+  });
+
+  it("draws a recently deleted batch as a row with Restore in the switch slot", () => {
+    const own = rules().filter((entry) => entry.selector === ".trash-item" && !entry.declarations.some(([property]) => property === "--ink"));
+    expect(own).toHaveLength(1);
+    const item = own[0].declarations.map(([property, value]) => `${property}: ${value}`).join("; ");
+    for (const declaration of ["min-height: var(--toggle-row)", "border-radius: var(--radius-control)", "background: var(--colour-row)"]) expect(item).toContain(declaration);
+    expect(item).toContain("calc((var(--toggle-row) - var(--button-height)) / 2) var(--space-2) var(--switch-inset)");
   });
 });
 

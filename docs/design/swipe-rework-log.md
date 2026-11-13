@@ -18,7 +18,8 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 7 Search field | **closed**: black capsule h 53, 1 px lime outline, lime caret, dark sort circle beside it | utility circles |
 | 8 Dialogs | **closed**: one black sheet (`.station-dialog`, r 40 / bow 5.7, inset 21), phone bottom sheet with flat bottom, centred `label` title on the close circle's line, `dark-field` controls | dialogs |
 | 9, 11, 15 Batch card anatomy, Kitchen summary, big numbers | open | batch card and Kitchen summary |
-| 10, 12, 13 Settings rows, primary action, timeline | open (timeline entries are already bowed) | settings / action / timeline |
+| 10 Settings controls | **closed**: one `toggle-list` / `toggle-row` primitive (h 72, gap 8, inset 16, black selected row), lilac avatar d 63, switch 42 × 25 / knob 20; Suggestions is a real `role="switch"`, Units and Notifications are row choices | settings |
+| 12, 13 Primary action, timeline | open (timeline entries are already bowed) | action / timeline |
 
 Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text inside the scroll panes was absolutely positioned against `.app-shell`, which made the whole document scroll in 49 of 60 captures. `.main-content`, `.design-dashboard` and `.design-detail` are now `position: relative`, so they contain it.
 
@@ -255,6 +256,44 @@ Behaviour is unchanged: no handler, ref, `showModal`/`close`, focus or label cod
 - The pastel boxes inside the start-batch and profile sheets (blue "Your batch", yellow profile summary and intro) are still rounded rectangles on `--radius-card` (legacy list). They hold black fields now. A later pass could drop the box and keep the lime legend on black.
 - The upcoming-batch picker and the profile/dates/info dialogs are not captured by the harness. They inherit the sheet through `.station-dialog` and were checked only in CSS.
 - The inline logger in batch tools (white `.activity-logger` card, white fields, black pressed chips) is unchanged. `.activity-logger` must still never get `bowed`.
+
+## Ticket 7: Settings toggle rows (gap 10) — done
+
+Persisted settings, labels, handlers and focus order are unchanged. The only semantic change is the Suggestions control: the On/Off pair became one switch.
+
+### As built
+
+- **Tokens** (`:root`): `--colour-row` `#f6f8fa`, `--colour-switch-on` `#2089fd`, `--colour-switch-off` `#eceef0`; `--toggle-row` 72, `--toggle-gap` 8, `--toggle-inset` 16, `--toggle-avatar` 63, `--toggle-label-gap` 18, `--switch-width` 42, `--switch-height` 25, `--switch-knob` 20, `--switch-inset` 21 (spec §1.2 / gap 10).
+- **Primitive** (one block in `src/styles.css`, where the `.setting-segment` rules were): `toggle-list` is a grid with gap 8 whose `margin-inline` is `--toggle-inset − --card-padding`, so the rows sit 16 from the card edge while the rest of the card keeps its 24 padding. `toggle-row` is a capsule `<button>`: min-height 72, fill `--row-fill` (= `--colour-row`), padding `0 21`, `row` type role, fill ink. `aria-pressed="true"` (a choice) or `aria-checked="true"` (a switch) sets `--row-fill` to black and moves the row to the ground ink list. A hover rule repaints `--row-fill`, because the generic yellow `button:hover` would put the selected row's white text on yellow. Optional children: `toggle-avatar` (lilac `--colour-emblem` circle d 63; a row that has one gets a start padding of `(72 − 63) / 2`), `toggle-label` (flex 1), `toggle-switch` (track 42 × 25, `margin-inline-start: auto`, knob 20 white as `::after`, which travels `width − height` when the parent is `aria-checked="true"`; the track turns blue).
+- **Settings markup**: Units (°C / L, °F / qt) and Notifications (All / Checks / Ready / Off) are single choices. They stay `role="group"` with the same `aria-label`s and `aria-pressed` buttons, now one 72 px row each; the chosen row is black. They have no trailing switch, because a switch would announce an independent on/off. **Suggestions** is now one `<button role="switch" aria-checked={preferences.suggestions}>` row: lilac avatar with the `sparkles` glyph, the visible label "Suggestions" (its accessible name, as the group's was), and the switch. Clicking it toggles the preference. Its description moved above the row as a card paragraph, so the row keeps h 72. The Notifications card is now white (the toggle card is white); About stays lilac.
+- **Retired**: `.setting-segment`, `.notification-segment`, the phone `.setting-segment button { flex: 1 }` and both `:is(…, .setting-segment)` pressed rules. `.setting-row` is kept for the Journal export row. `.setting-segment` and `.trash-item` left `legacyCardRadius`.
+- **`.setting-trash-button`** was a dead selector: no element in `App.tsx` uses it. It was removed from the 52 px shared rule, which now holds only `.design-check-complete` and `.profile-editor-icon-button`. The element it was meant for, a deleted batch in the trash panel, joined the row vocabulary instead: `.trash-item` is a `--colour-row` capsule, min-height 72, name in the `row` role at inset 21, and Restore (a 52 px text button) sits in the switch slot, `(72 − 52) / 2` from the end.
+
+### Measured (pixel scan of the 390 × 844 full capture)
+
+Rows 72 high with gap 8 (pale and black). Row x 40–349: 16 in from the card edge (card 24–366). Switch track 42 × 25 (x 287–328, y 781–805), right end 21 from the row end. Avatar d 63 (x 45–107), 5 in from the row start, centred vertically. The selected rows are `#000000` with white text, the unselected ones `#f6f8fa` with ink. At 1440 the two cards sit side by side with the same geometry.
+
+### Contrast
+
+Ink on `#f6f8fa` 19.3:1, white on black 21:1, ink on the lilac avatar ≥ 7. Blue track on the black row 6.1:1, white knob on blue 3.5:1. The off track `#eceef0` is as pale as the board's (about 1.1:1 against the row), so the switch alone does not carry the state at 3:1. The row fill does (black against `#f6f8fa`, 19.3:1), together with `aria-checked` and the knob position. The test states this.
+
+### Tests
+
+- `src/styles.test.ts` adds "settings toggle rows and switch" (5 tests): the token values and their relations (row ≥ 44, avatar < row, knob < track); exactly one rule each for list, row, state, hover, avatar padding, avatar, label, track, knob, on-track and on-knob, with no literal length in any of them; the declarations that fix geometry and colours to tokens; `.toggle-row` in the `row` role; ink membership and contrast (above); the Settings markup (four `toggle-row` tags, each `aria-pressed` or `role="switch"`, exactly one switch, bound to `preferences.suggestions` and labelled "Suggestions"; Units and Notifications groups; no `setting-segment` / `notification-segment` / `setting-trash-button` anywhere; no `--fill` on the Notifications card); the trash row. The palette list gained the three colours.
+- `src/App.settings.test.tsx` "exposes named groups…": the Suggestions step now finds `getByRole("switch", { name: "Suggestions" })`, checks `aria-checked` true → false → true and the persisted value after each click (it used to click "Off" once). It ends with `suggestions: false`, as before. `src/App.test.tsx` needed no change: its Units and Notifications assertions (`aria-pressed`, persisted modes) still hold.
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 59 / 59; plain `npm test` 285 / 285, 15 files, 207 s.
+- Harness, full run (60 captures): 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0. surfaceOverflow 1 (calendar 320, known), clippedControls 0, **smallTargets 0** (was 8: "On"/"Off" at 1440, 1024 and 768, "All"/"Off" at 320). `uniqueSmallTargets` is empty. The inline licence links were not among the 8 in this harness version, so no small-target finding is left. No harness selector needed a change (Settings is reached by the top-bar `aria-label`).
+
+### Left by ticket 7
+
+- The Settings card headings still use the old 52 px bordered `.settings-emblem` capsule; the spec's avatar circle is d 63 lilac. Restyle it with the card headings (spec §1.3 vocabulary), not as a row.
+- `.settings-trash-toggle` (the black "Open recently deleted batches" disclosure with its lime count) is still a 52 px black capsule. It could become a `toggle-row` with the count in the switch slot, but its black fill would then mean "selected", not "disclosure". Decide with the user.
+- The trash rows are not captured by the harness (the panel starts closed); they were checked in CSS and tests only.
+- Other `.setting-row` users (Journal export) and the Data storage / exchange cards are unchanged (spec: "Export ZIP" is gap 12's lime primary action).
+- Not in scope, noticed: none new in batch cards, Kitchen summary, timeline, calendar or dialogs during this ticket.
 
 ## Left for later tickets / known issues
 

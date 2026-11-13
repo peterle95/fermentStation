@@ -145,8 +145,17 @@ describe("Settings and data feedback", () => {
       expect(settings.getByRole("heading", { name, level: 2 })).toBeTruthy();
     }
     fireEvent.click(within(settings.getByRole("group", { name: "Units" })).getByRole("button", { name: "°F / qt" }));
-    fireEvent.click(within(settings.getByRole("group", { name: "Suggestions" })).getByRole("button", { name: "Off" }));
+    // Suggestions is one switch (was an On/Off pair): same name, same two persisted states.
+    const suggestions = settings.getByRole("switch", { name: "Suggestions" });
+    expect(suggestions.getAttribute("aria-checked")).toBe("true");
+    fireEvent.click(suggestions);
+    expect(suggestions.getAttribute("aria-checked")).toBe("false");
     expect(JSON.parse(localStorage.getItem("fermentstation.shell")!)).toMatchObject({ units: "imperial", suggestions: false });
+    fireEvent.click(suggestions);
+    expect(suggestions.getAttribute("aria-checked")).toBe("true");
+    expect(JSON.parse(localStorage.getItem("fermentstation.shell")!)).toMatchObject({ units: "imperial", suggestions: true });
+    fireEvent.click(suggestions);
+    expect(JSON.parse(localStorage.getItem("fermentstation.shell")!)).toMatchObject({ suggestions: false });
     expect(settings.queryByRole("button", { name: "Choose folder" })).toBeNull();
 
     const term = settings.getByLabelText("New formula term");
