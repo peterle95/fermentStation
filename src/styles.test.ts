@@ -52,7 +52,7 @@ describe("Swipe-derived design contract", () => {
     for (const [name, value] of Object.entries({
       background: "#ffffff", surface: "#ffec89", "surface-inverse": "#000000", text: "#000000", "text-muted": "#000000", "text-inverse": "#ffffff",
       action: "#b6f074", "on-action": "#000000", "action-alt": "#dab8f1", emblem: "#c5b4ec", accent: "#b6e1fa", border: "#000000",
-      rail: "#3e3e40", "sheet-control": "#1b1b1b", row: "#f6f8fa", "switch-on": "#2089fd", "switch-off": "#eceef0",
+      rail: "#3e3e40", "sheet-control": "#1b1b1b", row: "#f6f8fa", "switch-on": "#2089fd", "switch-off": "#eceef0", count: "#fff6ce",
     })) expect(styles).toContain(`--colour-${name}: ${value};`);
     // The retired near-black must not come back as ground, ink or border.
     expect(styles).not.toMatch(/#1c1c1c/i);
@@ -98,13 +98,12 @@ describe("Swipe-derived design contract", () => {
     expect(styles).not.toMatch(/scale[XY]\(|font-stretch:|size-adjust:/);
   });
 
-  it("groups summary numbers with their labels and stacks the phone summary without hiding its heading", () => {
+  it("groups summary numbers with their labels and never hides the summary heading", () => {
     expect(rule(".design-stat-row > div:first-child")).toContain("flex-direction: column-reverse");
     expect(rule(".design-stat-number")).not.toContain("margin-left: auto");
-    const mobile = styles.slice(styles.indexOf("@media (max-width: 599px) {"));
-    expect(rule(".design-summary", mobile)).toContain("grid-template-columns: minmax(0, 1fr)");
-    expect(rule(".design-gauge", mobile)).toContain("grid-template-columns: auto minmax(0, 1fr)");
-    expect(rule(".design-summary-label", mobile)).not.toContain("display: none");
+    // The phone summary no longer needs its own grid (ticket 9): the card and the figures wrap in one flex group.
+    for (const entry of rules()) if (entry.selectors.some((selector) => /\.design-summary(?:-label)?\b/.test(selector))) expect(entry.declarations, entry.selector).not.toContainEqual(["display", "none"]);
+    expect(app).toContain('<div className="design-summary-label"><h2>Kitchen summary</h2>');
   });
 
   it("shares the 32/12/999 geometry, 24px spacing and 52px control baseline", () => {
@@ -131,7 +130,7 @@ describe("Swipe-derived design contract", () => {
     expect(app).toContain('className="design-batch-profile"');
     expect(app).toContain('className="design-batch-next"');
     expect(app).not.toContain('strokeDasharray={`${batches.length ? 76');
-    expect(app).toContain("{dueChecks.length} checks due");
+    expect(app).toContain('<span className="summary-row-count">{dueChecks.length}</span>{" "}<span className="summary-row-label">checks due</span>');
     expect(app.replaceAll("©", "")).not.toMatch(/\p{Extended_Pictographic}/u);
     const lightInk = inkGroups().find(({ kind }) => kind === "fill")!.selectors;
     for (const selector of [".primary-action", ".station-primary", ".profile-add", ".component-button-primary", ".profile-editor-button.primary"]) expect(lightInk).toContain(selector);
@@ -247,7 +246,7 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
     const roleOf = (selector: string) => rules().find((entry) => entry.selectors.includes(selector) && new Map(entry.declarations).has("font-size"))
       ?.declarations.find(([property]) => property === "font-size")?.[1].match(/^var\(--type-([\w-]+)\)$/)?.[1];
     for (const [selector, role] of [
-      ["h1", "headline"], ["h2", "heading"], ["h3", "heading"], ["button", "label"], ["body", "body"], ["input", "body"], [".design-gauge strong", "display"],
+      ["h1", "headline"], ["h2", "heading"], ["h3", "heading"], ["button", "label"], ["body", "body"], ["input", "body"], [".big-number > strong", "display"],
       [".checks-summary strong", "display"], [".design-batch-copy h3", "title"], [".design-batch-profile", "title-light"], ["small", "meta"], [".eyebrow", "meta"],
     ]) expect(roleOf(selector), selector).toBe(role);
     // Two-line card titles pair Bold with Light at one size, as on the drink card (spec §1.1).
@@ -312,7 +311,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
   // Gap 1 of the spec: every large card takes its silhouette from the primitive.
   const bowedCards = [
     "design-batch-card", "design-summary", "checks-summary", "design-detail-card", "profile-card", "profile-editor-section",
-    "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "timeline-entry",
+    "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "timeline-entry", "summary-row",
   ];
   const clippedScrollers = ["station-dialog"];
   // Rounded rectangles that predate the primitive. Shrink only: when a ticket bows one of these
@@ -1063,5 +1062,103 @@ describe("installed appearance and provenance", () => {
     expect(launch).toContain('name="postSplashScreenTheme">@style/AppTheme.NoActionBar');
     const original = readFileSync(new URL("../public/new-design/new_app_logo/FermentStation_Logo_Asset_Pack/transparent/logo-transparent-432.png", import.meta.url));
     expect(readFileSync(new URL("../android/app/src/main/res/drawable-nodpi/station_launch_logo.png", import.meta.url))).toEqual(original);
+  });
+});
+
+describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec §1.3, §1.6, gaps 11 and 15)", () => {
+  const tokens = () => rootTokens();
+  const number = (token: string) => Number(tokens().get(token));
+  const px = (token: string) => Number(tokens().get(token)!.match(/^(\d+(?:\.\d+)?)px$/)![1]);
+  const parts = [
+    ".design-summary-group", ".design-summary", ".design-summary-emblem", ".design-summary-label", ".design-summary-next", ".summary-row",
+    ".summary-row-avatar", ".summary-row-count", ".design-summary-figures", ".big-number", ".big-number > strong", ".big-number-circle", ".big-number-caption",
+  ];
+  const isPart = (selector: string) => parts.includes(selector);
+  const summary = () => app.slice(app.indexOf('<section className="design-summary-group"'), app.indexOf("</section>", app.indexOf('<section className="design-summary-group"')));
+
+  it("carries the measured profile-card and 64+ geometry in :root tokens", () => {
+    for (const declaration of [
+      "--summary-max: 382px;", "--summary-w: min(100cqi, var(--summary-max));", "--summary-ratio: 382 / 221;", "--summary-emblem: 0.309;",
+      "--summary-emblem-above: 0.47;", "--summary-glyph: 0.45;", "--summary-row-width: 0.916;", "--summary-row-height: 0.252;", "--summary-row-below: 0.49;",
+      "--summary-row-k: 0.54;", "--summary-row-avatar: 0.167;", "--count-pill-width: 79px;", "--count-pill-height: 49px;", "--colour-count: #fff6ce;",
+      "--big-number-circle: 118px;", "--big-number-glyph: 0.4;",
+    ]) expect(rule(":root")).toContain(declaration);
+    const [w, h] = tokens().get("--summary-ratio")!.split("/").map(Number);
+    expect(h / w).toBeCloseTo(0.58, 2);
+    // At the board's 382 px: emblem d 118, sub-row 350 x 96, and the circle beside the hero figure is the emblem's size.
+    expect(px("--summary-max") * number("--summary-emblem")).toBeCloseTo(118, 0);
+    expect(px("--summary-max") * number("--summary-row-width")).toBeCloseTo(350, 0);
+    expect(px("--summary-max") * number("--summary-row-height")).toBeCloseTo(96, 0);
+    expect(px("--big-number-circle")).toBe(118);
+    // The pill can hold a button (batch detail "Complete check"), so it is a target.
+    expect(px("--count-pill-height")).toBeGreaterThanOrEqual(44);
+    expect(contrast(hex("--ink-fill"), hex("--colour-count"))).toBeGreaterThanOrEqual(7);
+    expect(contrast(hex("--ink-fill"), hex("--colour-surface"))).toBeGreaterThanOrEqual(7);
+  });
+
+  it("defines each part once, from tokens only, with the overhangs inside the card's own margins", () => {
+    const owned = rules().filter((entry) => entry.selectors.some(isPart) && !entry.declarations.some(([property]) => property === "--ink" || property === "font-size"));
+    for (const selector of parts) expect(owned.filter((entry) => entry.selectors.includes(selector)).length, selector).toBe(1);
+    for (const entry of owned) for (const [property, value] of entry.declarations) {
+      const literals = value.replace(/var\([^)]*\)/g, "").match(/-?\d*\.?\d+(?:px|rem|em|%|cqi|vw|vh)/g) ?? [];
+      for (const literal of literals) expect(["100%", "50%"], `${entry.selector} { ${property}: ${value} }`).toContain(literal);
+    }
+    const W = "var(--summary-w)";
+    expect(rule(".design-summary-group")).toContain("container-type: inline-size");
+    const card = rule(".design-summary");
+    for (const declaration of [
+      `width: ${W}`, "aspect-ratio: var(--summary-ratio)", "min-height: auto", "--fill: var(--colour-action)",
+      `margin-block: calc(${W} * var(--summary-emblem) * var(--summary-emblem-above)) calc(${W} * var(--summary-row-height) * var(--summary-row-below))`,
+    ]) expect(card).toContain(declaration);
+    expect(card).not.toContain("container-type");
+    const emblem = rule(".design-summary-emblem");
+    for (const declaration of [
+      `top: calc(${W} * var(--summary-emblem) * var(--summary-emblem-above) * -1)`, `left: calc(50% - ${W} * var(--summary-emblem) / 2)`,
+      `width: calc(${W} * var(--summary-emblem))`, "border-radius: 50%", "background: var(--colour-emblem)",
+    ]) expect(emblem).toContain(declaration);
+    const row = rule(".design-summary-next");
+    for (const declaration of [
+      `bottom: calc(${W} * var(--summary-row-height) * var(--summary-row-below) * -1)`, `left: calc(50% - ${W} * var(--summary-row-width) / 2)`,
+      `width: calc(${W} * var(--summary-row-width))`, `height: calc(${W} * var(--summary-row-height))`, `--r: calc(${W} * var(--summary-row-height) / 2)`,
+    ]) expect(row).toContain(declaration);
+    for (const declaration of ["--fill: var(--colour-surface)", "--k: var(--summary-row-k)"]) expect(rule(".summary-row")).toContain(declaration);
+    for (const declaration of ["min-width: var(--count-pill-width)", "height: var(--count-pill-height)", "min-height: var(--count-pill-height)", "background: var(--colour-count)", "border-radius: var(--radius-control)", "order: 1"]) {
+      expect(rule(".summary-row-count")).toContain(declaration);
+    }
+    for (const declaration of ["width: var(--big-number-circle)", "height: var(--big-number-circle)", "background: var(--colour-background)", "border-radius: 50%"]) expect(rule(".big-number-circle")).toContain(declaration);
+    expect(rule(".big-number-circle svg")).toContain("width: calc(var(--big-number-circle) * var(--big-number-glyph))");
+  });
+
+  it("puts the hero figure on black (coral) and keeps the counts on lime and yellow in ink", () => {
+    const fill = inkGroups().filter(({ kind }) => kind === "fill").flatMap(({ selectors }) => selectors);
+    for (const selector of [".design-summary", ".big-number-circle", ".checks-summary"]) expect(fill).toContain(selector);
+    for (const selector of [".design-summary-group", ".design-summary-figures", ".big-number", ".design-summary-stats", ".design-stat-row"]) expect(fill).not.toContain(selector);
+    expect(rule(".big-number > strong, .checks-summary strong")).toContain("color: var(--ink-figure)");
+    expect(rule(".big-number-caption")).toContain("color: var(--ink)");
+    expect(hex("--ink-ground-figure")).toBe("#fc5659");
+    expect(contrast(hex("--ink-ground-figure"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(4.5);
+    // Markup: the lime card closes before the figures, so the figures sit on the ground, not inside a light fill.
+    const markup = summary();
+    const cardEnd = markup.indexOf('<div className="design-summary-figures">');
+    expect(cardEnd).toBeGreaterThan(0);
+    expect(markup.slice(0, cardEnd)).not.toMatch(/big-number|design-stat/);
+    expect(markup.slice(0, cardEnd).match(/<div/g)!.length).toBe(markup.slice(0, cardEnd).match(/<\/div>/g)!.length);
+  });
+
+  it("maps the app's content onto the anatomy without changing labels or focus order", () => {
+    const markup = summary();
+    expect(markup).toContain('<section className="design-summary-group" aria-label="Kitchen summary" hidden={mode !== "today"}>');
+    const order = ['className="design-summary bowed"', '<span className="design-summary-emblem"><StationLogo /></span>', "<h2>Kitchen summary</h2>",
+      "ready to enjoy", 'className="summary-row design-summary-next bowed"', 'className="summary-row-avatar" aria-hidden="true"', "summary-row-count",
+      'className="big-number design-gauge"', "<strong>{batches.length}</strong>", 'className="big-number-circle" aria-hidden="true"',
+      '<span className="big-number-caption">Total batches</span>', 'className="design-summary-stats"'].map((part) => markup.indexOf(part));
+    expect(order.every((index) => index >= 0)).toBe(true);
+    expect([...order].sort((a, b) => a - b)).toEqual(order);
+    expect(markup).not.toMatch(/<button|tabIndex/);
+    // The batch detail's next check is the same sub-row; its "Complete check" button is the count pill.
+    expect(app).toContain('<section className="summary-row design-detail-next bowed" aria-label="Next batch check">');
+    expect(app).toMatch(/aria-label=\{`Complete check: \$\{dueCheck\.name\} for this batch`\} className="summary-row-count"/);
+    expect(app.match(/summary-row-count/g)).toHaveLength(2);
+    expect(rule("button.summary-row-count:hover:not(:disabled)")).toContain("background: var(--colour-background)");
   });
 });

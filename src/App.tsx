@@ -1471,13 +1471,19 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
       {pane === "profiles" ? profilePane : pane === "checks" ? <ChecksView batches={batches} onOpen={onOpen} onComplete={onComplete} /> : <>
         <h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1} className="sr-only">My batches <span>{batches.length}</span></h1>
         <div className="design-search-row"><div className="design-search"><div className="dark-field design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /></div><button aria-label="Sort batches by finish date" aria-pressed={sorted} className="utility-circle utility-circle-dark" onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
-        <section className="design-summary bowed" aria-label="Kitchen summary" hidden={mode !== "today"}>
-          <div className="design-gauge"><strong>{batches.length}</strong><span>Total batches</span><small>{dueChecks.length} checks due</small></div>
-          <div className="design-summary-label"><h2>Kitchen summary</h2><p>{readyBatches.length} ready to enjoy</p></div>
-          <div className="design-summary-stats">{batchStatuses.map((status) => {
-            const count = batches.filter((batch) => batch.status === status).length;
-            return <div className="design-stat-row" key={status}><div>{statusLabel(status)}<span className="design-stat-number">{count}<span>/{batches.length}</span></span></div><div className="design-stat-track"><i style={{ width: `${batches.length ? count / batches.length * 100 : 0}%` }} /></div></div>;
-          })}</div>
+        <section className="design-summary-group" aria-label="Kitchen summary" hidden={mode !== "today"}>
+          <div className="design-summary bowed">
+            <span className="design-summary-emblem"><StationLogo /></span>
+            <div className="design-summary-label"><h2>Kitchen summary</h2><p>{readyBatches.length} ready to enjoy</p></div>
+            <p className="summary-row design-summary-next bowed"><span className="summary-row-avatar" aria-hidden="true"><DesignIcon name="check" /></span><span className="summary-row-count">{dueChecks.length}</span>{" "}<span className="summary-row-label">checks due</span></p>
+          </div>
+          <div className="design-summary-figures">
+            <div className="big-number design-gauge"><strong>{batches.length}</strong><span className="big-number-circle" aria-hidden="true"><DesignIcon name="jar" /></span><span className="big-number-caption">Total batches</span></div>
+            <div className="design-summary-stats">{batchStatuses.map((status) => {
+              const count = batches.filter((batch) => batch.status === status).length;
+              return <div className="design-stat-row" key={status}><div>{statusLabel(status)}<span className="design-stat-number">{count}<span>/{batches.length}</span></span></div><div className="design-stat-track"><i style={{ width: `${batches.length ? count / batches.length * 100 : 0}%` }} /></div></div>;
+            })}</div>
+          </div>
         </section>
         <div className="design-section-head"><h2>{mode === "today" ? "Batch overview" : "All batches"}</h2><span>{visible.length} shown</span></div>
         <div className="filter-row" role="group" aria-label="Filter batches by status">
@@ -2020,7 +2026,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
         <div className="design-detail-metrics"><span>Started {shortDate(batch.startDate)}</span><strong>Day {day}<small>{batch.finishDate ? ` / ${Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))}` : ""}</small></strong></div>
         <BatchPhoto batch={batch} detail />
         <dl className="detail-readings" aria-label="Latest observed readings"><div><dt><DesignIcon name="drop" />pH</dt><dd>{latestPh ? latestPh.value : "Not recorded"}</dd>{latestPh && <time dateTime={latestPh.date}>{shortDate(latestPh.date)}</time>}</div><div><dt><DesignIcon name="temp" />Temperature</dt><dd>{latestTemperature ? `${displayTemperature(latestTemperature.value, units)} ${temperatureUnit}` : "Not recorded"}</dd>{latestTemperature && <time dateTime={latestTemperature.date}>{shortDate(latestTemperature.date)}</time>}</div></dl>
-        {batch.status === "active" && nextCheck && <section className="design-detail-next" aria-label="Next batch check"><div><p>{dueCheck ? "Check due" : "Next check"}</p><strong>{dueCheck?.name ?? nextCheck.name}</strong><p>{dueCheck?.overdue ? "Overdue · " : "Due · "}{shortDate((dueCheck ?? nextCheck).nextDueDate)}</p></div>{dueCheck && <button aria-label={`Complete check: ${dueCheck.name} for this batch`} className="primary-action" onClick={(event) => { if (document.activeElement === event.currentTarget && dueBatchChecks(batch, localDate()).length === 1) observationTrigger.current?.focus({ preventScroll: true }); onComplete(batch.id, dueCheck.id); }} type="button"><DesignIcon name="check" /><span>Complete check</span></button>}</section>}
+        {batch.status === "active" && nextCheck && <section className="summary-row design-detail-next bowed" aria-label="Next batch check"><div><p>{dueCheck ? "Check due" : "Next check"}</p><strong>{dueCheck?.name ?? nextCheck.name}</strong><p>{dueCheck?.overdue ? "Overdue · " : "Due · "}{shortDate((dueCheck ?? nextCheck).nextDueDate)}</p></div>{dueCheck && <button aria-label={`Complete check: ${dueCheck.name} for this batch`} className="summary-row-count" onClick={(event) => { if (document.activeElement === event.currentTarget && dueBatchChecks(batch, localDate()).length === 1) observationTrigger.current?.focus({ preventScroll: true }); onComplete(batch.id, dueCheck.id); }} type="button"><DesignIcon name="check" /><span>Complete check</span></button>}</section>}
         {(!nextCheck || batch.status !== "active") && <p className="detail-check-state">{batch.status !== "active" ? "Recurring checks paused while this batch is not active." : "No recurring checks scheduled."}</p>}
       </div>
       <section className="design-input-summary"><div className="design-section-head"><h3>Profile inputs</h3><button className="design-quiet" onClick={() => onDialog({ kind: "inputs", batch })} type="button">See all</button></div><div className="design-ingredients">{batch.profileSnapshot.inputs.map((input) => <span key={input.name}>{input.name}</span>)}{batch.profileSnapshot.inputs.length === 0 && <p>No profile inputs.</p>}</div></section>

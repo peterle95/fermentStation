@@ -47,6 +47,7 @@
   --colour-switch-off: #eceef0;
   --colour-hairline: #f1f1f1;
   --colour-frost: rgb(255 255 255 / 60%);
+  --colour-count: #fff6ce;
   /* Text colour pairs. Each --ink-ground-* is a role colour on the black ground; --ink-fill is every role on
      white and pastel fills. src/styles.test.ts checks every pair's contrast from these tokens. */
   --ink-ground: var(--colour-text-inverse);
@@ -136,6 +137,30 @@
   --card-action-width: 60%;
   --card-action-height: 63px;
   --card-action-reserve: 32px;
+  /* Kitchen summary (spec §1.3 lime profile card; gap 11): W 382 x H 221 at most. The card is never wider than
+     the board's (wide-surface decision, see the ledger), and every part is a fraction of its width --summary-w,
+     which reads the summary group's inline size (the group is the container, the card is not). */
+  --summary-max: 382px;
+  --summary-w: min(100cqi, var(--summary-max));
+  --summary-ratio: 382 / 221;
+  --summary-emblem: 0.309;
+  --summary-emblem-above: 0.47;
+  --summary-glyph: 0.45;
+  --summary-row-width: 0.916;
+  --summary-row-height: 0.252;
+  --summary-row-below: 0.49;
+  --summary-row-k: 0.54;
+  --summary-row-avatar: 0.167;
+  --summary-row-inset: 0.043;
+  --summary-row-end: 0.037;
+  --summary-figures-min: 200px;
+  /* Count pill (spec §1.3 "8x"): fixed CSS size, so the same pill can hold a 44 px+ button. */
+  --count-pill-width: 79px;
+  --count-pill-height: 49px;
+  /* Big number (spec §1.6 "64+"; gap 15): display figure, white circle d 118 with a 0.40 d glyph, caption under it. */
+  --big-number-circle: 118px;
+  --big-number-glyph: 0.4;
+  --big-number-gap: 10px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -265,6 +290,7 @@ input::file-selector-button,
 .design-skip-link,
 .ios-install-guide,
 .design-summary,
+.big-number-circle,
 .batch-view-switch,
 .filter-row button,
 .design-batch-card,
@@ -365,17 +391,17 @@ input::file-selector-button,
 
 /* Type roles: the only place that sets font-size, weight, leading and tracking. Each rule applies one
    complete role from :root. Role colours (meta, figure) resolve through the surface's ink set. */
-.design-gauge strong, .checks-summary strong { font-size: var(--type-display); font-weight: var(--type-display-weight); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); color: var(--ink-figure); }
+.big-number > strong, .checks-summary strong { font-size: var(--type-display); font-weight: var(--type-display-weight); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); color: var(--ink-figure); }
 .design-stat-number, .upcoming-strip strong, .design-detail-metrics > strong, .detail-readings dd, .meas-value, .upcoming-date b { font-size: var(--type-figure); font-weight: var(--type-figure-weight); line-height: var(--type-figure-leading); letter-spacing: var(--type-figure-tracking); color: var(--ink-figure); }
 h1 { font-size: var(--type-headline); font-weight: var(--type-headline-weight); line-height: var(--type-headline-leading); letter-spacing: var(--type-headline-tracking); }
 .design-batch-copy h3, .design-empty-card > p:first-child, .design-detail-heading h3, .design-profile-copy h2, .profile-editor-title-input { font-size: var(--type-title); font-weight: var(--type-title-weight); line-height: var(--type-title-leading); letter-spacing: var(--type-title-tracking); }
 .design-batch-profile, .design-detail-heading p, .meas-value-small { font-size: var(--type-title-light); font-weight: var(--type-title-light-weight); line-height: var(--type-title-light-leading); letter-spacing: var(--type-title-light-tracking); }
 h2, h3, h4, .brand strong { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); }
 .design-tip h3, .design-batch-bottom strong, .design-detail-top h2, .design-input-summary h3, .timeline-panel-heading h3, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .design-detail-next strong, .timeline-content > strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
-.navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .calendar-day, .calendar-day-button, .toggle-row, .trash-item > span { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
+.navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .calendar-day, .calendar-day-button, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
 body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .guide-step p, .batch-guidance > p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
-button, summary, .station-dialog-heading h2, .section-label a, .field-error, .design-date-chip, .design-toast, .profile-editor-toast, .status, .calendar-status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
-small, .optional, .hint, .muted-copy, .eyebrow, .design-gauge > span, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-summary span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-readings dt, .detail-readings time, .detail-check-state, .design-detail-next p, .timeline-entry time, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
+button, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .design-date-chip, .design-toast, .profile-editor-toast, .status, .calendar-status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+small, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-summary span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-readings dt, .detail-readings time, .detail-check-state, .design-detail-next p, .timeline-entry time, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
 strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(--type-title-weight); }
 
 /* Bowed outline (spec §2.3): the one silhouette for every large card. Straight sides, top and
@@ -551,12 +577,29 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 .design-search-row .batch-view-switch { margin-left: auto; }
 .design-search-box { display: flex; flex: 1; align-items: center; gap: var(--space-2); min-width: 0; padding-inline: var(--space-4) var(--space-1); }
 .design-search-box input { flex: 1; align-self: stretch; width: 0; min-height: 0; border: 0; background: transparent; padding-inline: var(--space-1); }
-.design-summary { display: grid; grid-template-columns: minmax(100px, 0.7fr) minmax(0, 3fr); align-items: start; gap: var(--space-4) var(--space-6); padding: var(--card-padding); --fill: var(--colour-action); margin-bottom: var(--space-8); }
-.design-gauge { display: grid; gap: var(--space-1); }
-.design-gauge strong { font-variant-numeric: tabular-nums; }
-.design-gauge small { grid-column: 1 / -1; margin-top: var(--space-2); }
-.design-summary-label { grid-column: 1 / -1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-4); justify-content: space-between; }
-.design-summary-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+.design-summary-group { container-type: inline-size; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6) var(--space-8); margin-bottom: var(--space-8); }
+/* Lime summary card (gap 11): lilac emblem 47 % above the top edge, yellow sub-row 49 % below the bottom edge.
+   Both overhang into the card's own margins, so the scroll pane never clips them and neighbours keep clear. */
+.design-summary { position: relative; flex: none; display: grid; align-content: start; justify-items: center; width: var(--summary-w); min-height: auto; aspect-ratio: var(--summary-ratio); margin-block: calc(var(--summary-w) * var(--summary-emblem) * var(--summary-emblem-above)) calc(var(--summary-w) * var(--summary-row-height) * var(--summary-row-below)); padding: calc(var(--summary-w) * var(--summary-emblem) * (1 - var(--summary-emblem-above)) + var(--space-3)) var(--card-padding) calc(var(--summary-w) * var(--summary-row-height) * (1 - var(--summary-row-below)) + var(--space-3)); text-align: center; --fill: var(--colour-action); }
+.design-summary-emblem { position: absolute; top: calc(var(--summary-w) * var(--summary-emblem) * var(--summary-emblem-above) * -1); left: calc(50% - var(--summary-w) * var(--summary-emblem) / 2); display: grid; place-items: center; width: calc(var(--summary-w) * var(--summary-emblem)); height: calc(var(--summary-w) * var(--summary-emblem)); border-radius: 50%; background: var(--colour-emblem); }
+.design-summary-emblem .brand-mark, .design-summary-emblem img { width: calc(var(--summary-w) * var(--summary-emblem) * var(--summary-glyph)); height: calc(var(--summary-w) * var(--summary-emblem) * var(--summary-glyph)); }
+.design-summary-label { display: grid; justify-items: center; gap: var(--space-1); min-width: 0; }
+.design-summary-next { position: absolute; left: calc(50% - var(--summary-w) * var(--summary-row-width) / 2); bottom: calc(var(--summary-w) * var(--summary-row-height) * var(--summary-row-below) * -1); width: calc(var(--summary-w) * var(--summary-row-width)); height: calc(var(--summary-w) * var(--summary-row-height)); margin: 0; padding-inline: calc(var(--summary-w) * var(--summary-row-inset)) calc(var(--summary-w) * var(--summary-row-end)); text-align: start; --r: calc(var(--summary-w) * var(--summary-row-height) / 2); }
+/* Yellow sub-row (spec §1.3): the summary's "checks due" row and the batch detail's next check; count pill at its end. */
+.summary-row { display: flex; align-items: center; gap: var(--space-3); --fill: var(--colour-surface); --k: var(--summary-row-k); }
+.summary-row-avatar { display: grid; place-items: center; flex: none; width: calc(var(--summary-w) * var(--summary-row-avatar)); height: calc(var(--summary-w) * var(--summary-row-avatar)); border-radius: 50%; background: var(--colour-emblem); }
+.summary-row-avatar svg { width: var(--nav-icon); height: var(--nav-icon); }
+.summary-row-label { min-width: 0; overflow-wrap: anywhere; }
+.summary-row-count { order: 1; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); flex: none; min-width: var(--count-pill-width); height: var(--count-pill-height); min-height: var(--count-pill-height); margin-left: auto; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-control); background: var(--colour-count); }
+button.summary-row-count:hover:not(:disabled) { background: var(--colour-background); }
+/* Big number (gap 15): the figure sits on black, so the display role turns it coral through the ground ink. */
+.design-summary-figures { display: flex; flex: 1 1 var(--summary-figures-min); flex-wrap: wrap; align-items: end; gap: var(--space-6) var(--space-8); min-width: 0; }
+.big-number { display: grid; grid-template-columns: auto var(--big-number-circle); grid-template-rows: var(--big-number-circle) auto; justify-content: start; column-gap: var(--big-number-gap); row-gap: var(--space-3); }
+.big-number > strong { grid-row: 1 / -1; align-self: end; font-variant-numeric: tabular-nums; }
+.big-number-circle { grid-column: 2; display: grid; place-items: center; width: var(--big-number-circle); height: var(--big-number-circle); border-radius: 50%; background: var(--colour-background); }
+.big-number-circle svg { width: calc(var(--big-number-circle) * var(--big-number-glyph)); height: calc(var(--big-number-circle) * var(--big-number-glyph)); }
+.big-number-caption { grid-column: 2; text-align: center; color: var(--ink); }
+.design-summary-stats { display: grid; flex: 1 1 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
 .design-stat-row { display: grid; gap: var(--space-3); }
 .design-stat-row > div:first-child { display: flex; flex-direction: column-reverse; align-items: flex-start; gap: var(--space-1); }
 .design-stat-number { font-variant-numeric: tabular-nums; }
@@ -678,9 +721,8 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 .batch-photo-retry { position: absolute; bottom: var(--space-12); z-index: 1; background: var(--colour-background); padding: var(--space-2) var(--space-3); }
 .design-detail-photo > svg { width: 80px; height: 112px; }
 .design-detail-photo .status { position: absolute; left: var(--space-3); top: var(--space-3); max-width: calc(100% - 24px); }
-.design-detail-next { display: grid; gap: var(--space-4); margin-top: var(--space-6); padding: var(--card-padding); border-radius: var(--radius-card); background: var(--colour-surface); }
+.design-detail-next { flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-6); padding: var(--space-4) var(--card-padding); }
 .design-detail-next strong { display: block; margin-block: var(--space-2); overflow-wrap: anywhere; }
-.design-detail-next button { display: flex; align-items: center; justify-content: center; gap: var(--space-2); padding-inline: var(--space-3); }
 .design-input-summary { order: 3; padding: var(--card-padding); border-radius: var(--radius-card); background: var(--colour-accent); }
 .design-input-summary .design-section-head { margin-bottom: var(--space-2); }
 .design-ingredients { display: flex; flex-wrap: wrap; gap: var(--space-2); }
@@ -1115,9 +1157,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .profile-overview-intro { grid-template-columns: minmax(0, 1fr); }
   .design-profile-visual { height: auto; min-height: 240px; }
   .design-profile-visual img { min-height: 240px; padding: var(--space-8) 0 var(--space-12); }
-  .design-summary { grid-template-columns: minmax(0, 1fr); gap: var(--space-4); }
-  .design-summary-label { align-items: flex-start; }
-  .design-gauge { grid-template-columns: auto minmax(0, 1fr); align-items: baseline; column-gap: var(--space-3); }
   .design-summary-stats { gap: var(--space-2); }
   .design-detail-photo { height: 320px; }
   .design-detail-photo img { max-height: 320px; }

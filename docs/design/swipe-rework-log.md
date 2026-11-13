@@ -14,11 +14,11 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 4 Tablet rail | **closed**: ringed chain, logo on top, lime current circle | navigation |
 | 5 Utility circles | **closed**: one `utility-circle` primitive, white d 60 / dark `#1b1b1b` d 57, glyph 21; notifications as its capsule form | utility circles |
 | 6 Typography (D1 resolved by the user: readable sizes inside 1:1 geometry) | **closed** for the type system; components still pick their roles in their own tickets | type system |
-| 15 Big numbers (colour part) | **partly closed**: figures are coral Light/ExtraLight/Thin wherever they sit on black; the counts on the lime summary stay ink until gap 11 moves them onto black | type system |
+| 15 Big numbers | **closed**: figures are coral wherever they sit on black; the Kitchen summary's hero count is the `big-number` (coral display figure, white circle d 118, white caption) beside or below the lime card; counts on lime (Checks summary) stay ink | type system, Kitchen summary (ticket 9) |
 | 7 Search field | **closed**: black capsule h 53, 1 px lime outline, lime caret, dark sort circle beside it | utility circles |
 | 8 Dialogs | **closed**: one black sheet (`.station-dialog`, r 40 / bow 5.7, inset 21), phone bottom sheet with flat bottom, centred `label` title on the close circle's line, `dark-field` controls | dialogs |
 | 9 Batch card anatomy | **closed**: H/W 0.94 from width tokens, full-width title pair, frosted chip, pill + black circle, 48–94 % photo slot (stand-ins clipped by the bow, user photos rectangular); narrow cards grow when their chips wrap | batch card (ticket 8) |
-| 11, 15 Kitchen summary, big numbers | open | Kitchen summary |
+| 11 Kitchen summary | **closed**: lime bowed card H/W 0.58 capped at 382, lilac emblem d 0.309 W 47 % above, yellow `summary-row` 0.916 × 0.252 W 49 % below with the `#fff6ce` count pill 79 × 49; the batch detail's next check uses the same `summary-row` | Kitchen summary (ticket 9) |
 | 10 Settings controls | **closed**: one `toggle-list` / `toggle-row` primitive (h 72, gap 8, inset 16, black selected row), lilac avatar d 63, switch 42 × 25 / knob 20; Suggestions is a real `role="switch"`, Units and Notifications are row choices | settings |
 | 12 Primary action | **closed** for the batch detail ("Add observation" is the `card-action` capsule); Settings export and dialog submits remain | batch card (ticket 8) |
 | 13 Timeline | open (timeline entries are already bowed) | timeline |
@@ -356,6 +356,48 @@ Tightened existing tests: the utility-circle exception list no longer includes `
   - Batch detail next-check sub-row (gaps 11/13): its full-width lime "Complete check" button is a second lime action right above the new capsule.
   - Detail readings (gap 13): still black rounded rectangles on the white card.
   - Checks summary (gap 15): the counts on lime are still ink figures.
+
+## Ticket 9: Kitchen summary and big numbers (gaps 11, 15) — done
+
+The region is still `section[aria-label="Kitchen summary"]` with `hidden` outside Overview. No text changed: "Kitchen summary", "N ready to enjoy", "N checks due" (count now in the pill, same DOM reading order), "Total batches" and the three status figures. The summary has no focusable element, so the focus order is unchanged. "Complete check: … for this batch" keeps its name and handler.
+
+### As built
+
+- **Markup** (`App.tsx`): `section.design-summary-group` (flex, wraps, `container-type: inline-size`) > the lime `design-summary bowed` card (emblem `design-summary-emblem` with `StationLogo`, `design-summary-label` h2 + meta, yellow `summary-row design-summary-next bowed`) + `design-summary-figures` on black (`big-number design-gauge` and `design-summary-stats`).
+- **Geometry from the card width (convention extended).** Ticket 8's percentages resolve against the containing block, which is not the card once the card is capped. Here the group is the container, and `--summary-w: min(100cqi, var(--summary-max))` is the card width in every rule, so each part is `calc(var(--summary-w) * ratio)`. Tokens: `--summary-ratio` 382 / 221 (H/W 0.58), `--summary-emblem` 0.309 (d 118 at 382), `-emblem-above` 0.47, `-glyph` 0.45, `--summary-row-width` 0.916, `-height` 0.252, `-below` 0.49, `-k` 0.54, `-avatar` 0.167, `-inset` 0.043, `-end` 0.037. The overhangs (emblem above, sub-row below) are the card's own `margin-block`, so the scroll pane never clips them and the next element keeps clear.
+- **Wide surfaces: the card is capped, not stretched.** `--summary-max` 382 px (the board's width). With the wide-surface rule (keep r 52 / bow 4.4 and stretch), the 726 px card would have needed either a 225 px emblem (keeping 0.31 W) or a different composition, and H/W 0.58 would have made it 421 tall. Capped, every proportion is 1:1, and the black space beside it holds the big number, as on the board, where "64+" sits next to the profile card. The figures sit beside the card once the group is at least 382 + 32 + `--summary-figures-min` 200 wide (tablet, desktop). On phones they wrap below it.
+- **Sub-row** `summary-row` (one rule: yellow fill, k 0.54, flex): lilac `summary-row-avatar` (check glyph, `aria-hidden`; the board's photo slot), label (`row` role), and `summary-row-count` = the `#fff6ce` pill (`--colour-count`, new token), `--count-pill-width` 79 × `--count-pill-height` 49, `order: 1` + `margin-left: auto`, so the DOM reads "3 checks due" and the pill shows at the end. The pill is a fixed CSS size, not a fraction of W, because the same pill holds a button on the batch detail and has to stay ≥ 44.
+- **`.design-detail-next`** is now `summary-row … bowed` inside the detail card (not overhanging: the detail card's bottom edge belongs to the "Add observation" capsule). "Complete check" moved from the lime `primary-action` to the cream count pill (`button.summary-row-count`, white on hover), which removes the second lime action that ticket 8 noted. The row keeps the default `--r` 52, because its three text lines make it taller than a sub-row, and r = H/2 would cut the text corners.
+- **Big number** `big-number` (gap 15): grid of the display figure (rows 1–2, bottom-aligned), the white `big-number-circle` d 118 (`--big-number-circle`, jar glyph 0.40 d) and the white caption (`meta` role, `color: var(--ink)`) under the circle, gap 10 (board 7 × 1.406). It is outside the lime card, so the display role turns it coral through the ground ink. The status figures (`figure` role) moved onto black with it and are coral too, with lilac "/N" and labels. The display role anchor moved from `.design-gauge strong` to `.big-number > strong`.
+- **Coral elsewhere:** unchanged. `.checks-summary` counts stay ink on lime (spec §3 maps the Checks summary to a lime card; gap 15 asks for coral only on black). Readings and the detail "Day N" were already coral on black or ink on fills through their roles.
+- **Retired:** the old 3-column summary grid, `.design-gauge small` and the phone overrides for `.design-summary` / `.design-gauge` / `.design-summary-label`.
+
+### Measured (pixel scan of the harness PNGs; spec at 382: emblem 118, 47 % above; sub-row 350 × 96, 49 % below; pill 79 × 49)
+
+| Viewport | Card | Emblem | Sub-row | Pill | Figures |
+| --- | --- | --- | --- | --- | --- |
+| 390 | 342 × 198 (H/W 0.58) | d 106, 50 px (47 %) above the top | 312 × 85 (0.912 / 0.249 W), ≈ 47 % below (bow AA) | 79 × 49 | below the card |
+| 768 | 382 × 221 | d 118 | 348 × 95 | 79 × 49 | beside the card |
+| 1440 | 382 × 221 | d 118 | 348 × 95 | 79 × 49 | beside the card |
+
+### Tests
+
+- New describe block "Kitchen summary and big numbers" (4 tests): the token values and their arithmetic (H/W 0.58; emblem 118, sub-row 350 × 96 at 382; pill ≥ 44; ink on `#fff6ce` and on yellow ≥ 7); one rule per part with no length literals except 100 % / 50 %; the card, emblem, sub-row, pill and circle geometry declarations; the group is the container and the card is not; coral only on black (the card closes before the figures in the markup, the figures are in no light-fill ink group, the lime card, white circle and Checks summary are); the content order inside the region and no focusable element; the batch detail's sub-row and its pill button.
+- Changed: the old "stacks the phone summary" test now asserts that the summary heading is never `display: none` and that the label holds the h2 (the phone grid it guarded is gone). "{dueChecks.length} checks due" is asserted in its new pill/label form. The hierarchy anchor is `.big-number > strong` = display. The palette list gained `count: #fff6ce`. `summary-row` joined the required bowed surfaces.
+
+At 320 the card is 272 wide: emblem d 84, sub-row 249 × 69, pill 79 × 49.
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 69 / 69; plain `npm test` 295 / 295, 15 files.
+- Harness, full run (60 captures): 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0, clippedControls 0, smallTargets 0. surfaceOverflow 1 (calendar 320, known). No capture step needed changes.
+
+### Left by ticket 9
+
+- The display role is Thin (100). The board's "64+" is Light. A single-digit Thin figure reads thin next to the 118 circle. Moving `display` to Light 300 is a type-system decision (ticket 2 table), so it is left as is.
+- The Checks summary (`.checks-summary`) is still a two-count lime card without the profile-card anatomy (no emblem, no sub-row). If it should take the "64+" treatment, its counts must move onto black like the Kitchen summary's.
+- The sub-row's avatar is a lilac check circle where the board has a photo. The pill shows only the count, without the board's glyph.
+- Out of scope, noticed: none new in timeline, calendar, batch cards or Settings.
 
 ## Left for later tickets / known issues
 
