@@ -11,6 +11,13 @@ Extracted unchanged from `prototypes/new_design/phone/index.html`. All photograp
 
 The adapted share-alike photographic assets retain their respective CC BY-SA licenses. Interface credits are available in the dashboard and Settings.
 
+| File | Author / source | License |
+| --- | --- | --- |
+| grapefruit-spritz.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/hero.png` (glass only) | User-supplied; no third-party license |
+| fruit-still-life.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/fruit.png` | User-supplied; no third-party license |
+
+These two Swipe-rework cutouts are derived from user-supplied, AI-generated imagery and are not affiliated with Swipe Drinks. They were background-removed, trimmed and downscaled by `scripts/assets/make-cutouts.py`; the originals are unchanged. Method, sizes, intended card use and known flaws are in `docs/design/swipe-cutouts.md`. They are not yet used by the app.
+
 `Outfit.ttf`: Copyright 2021 The Outfit Project Authors (https://github.com/Outfitio/Outfit-Fonts). SIL Open Font License 1.1; full text in `OFL.txt`.
 
 ## Current interface: Swipe-derived journal
