@@ -252,7 +252,7 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
       ?.declarations.find(([property]) => property === "font-size")?.[1].match(/^var\(--type-([\w-]+)\)$/)?.[1];
     for (const [selector, role] of [
       ["h1", "headline"], ["h2", "heading"], ["h3", "heading"], ["button", "label"], ["body", "body"], ["input", "body"], [".big-number > strong", "display"],
-      [".checks-summary strong", "display"], [".design-batch-copy h3", "title"], [".design-batch-profile", "title-light"], ["small", "meta"], [".eyebrow", "meta"],
+      [".design-batch-copy h3", "title"], [".design-batch-profile", "title-light"], ["small", "meta"], [".eyebrow", "meta"],
     ]) expect(roleOf(selector), selector).toBe(role);
     // Two-line card titles pair Bold with Light at one size, as on the drink card (spec §1.1).
     const tokens = rootTokens();
@@ -315,18 +315,20 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
 describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", () => {
   // Gap 1 of the spec: every large card takes its silhouette from the primitive.
   const bowedCards = [
-    "design-batch-card", "design-summary", "checks-summary", "design-detail-card", "profile-card", "profile-editor-section",
+    "design-batch-card", "design-summary", "design-detail-card", "profile-card", "profile-editor-section",
     "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "timeline-entry", "summary-row", "small-card",
     // Ticket 12: the former rounded rectangles.
     "app-loading", "empty-state", "ios-install-guide", "design-tip", "design-input-summary", "batch-guidance", "next-action", "wb-panel",
     "batch-tools-danger", "profile-overview-intro", "start-batch-basics", "start-profile-summary", "profile-editor-card",
+    // Ticket 13: the inline observation logger's card (bowed only while inline).
+    "activity-logger-card",
   ];
   const clippedScrollers = ["station-dialog"];
   // Rounded rectangles that predate the primitive. Shrink only: when a ticket bows one of these
   // surfaces (or makes it a capsule), delete it here. A new large card must use `bowed` instead.
-  // `.activity-logger` stays: it switches to `display: contents` while the modal logger is open, and
-  // the primitive's absolutely positioned fill layer would then escape to the pane.
-  const legacyCardRadius = [".activity-logger"];
+  // Empty since ticket 13: `.activity-logger` itself is still never bowed (it switches to `display: contents`
+  // while the modal logger is open); its inline card look comes from the inner `.activity-logger-card bowed`.
+  const legacyCardRadius: string[] = [];
 
   it("moves the last legacy rounded rectangles onto the bowed card, the small card, the capsule or a photo frame", () => {
     for (const name of ["design-empty-checks", "calendar-empty"]) expect(app).toContain(`className="${name} small-card bowed"`);
@@ -334,6 +336,19 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
     expect(rule(".design-detail-photo")).toContain("border-radius: var(--radius-small)");
     expect(rule(".batch-tools-danger")).toContain("--stroke-w: var(--stroke-width)");
     expect(app).not.toMatch(/className="[^"]*\bactivity-logger\b[^"]*\bbowed\b/);
+  });
+
+  it("draws notices and alerts as the toast's black capsule with white ink (ticket 13)", () => {
+    const notice = rule('.notice, .storage-warning, [role="alert"], .settings-live[role="alert"] > p');
+    for (const declaration of ["border-radius: var(--radius-line)", "background: var(--colour-surface-inverse)", "border: var(--stroke-width) solid var(--colour-text-inverse)", "padding: var(--space-3) var(--space-6)"]) expect(notice).toContain(declaration);
+    // A one-line notice is an exact capsule (half its height); a wrapping one keeps that end radius.
+    expect(rule(":root")).toContain("--radius-line: calc(0.5lh + var(--space-3) + var(--stroke-width));");
+    const membership = inkMembership();
+    for (const selector of [".notice", ".storage-warning", '[role="alert"]', '.settings-live[role="alert"] > p']) expect(membership.get(selector), selector).toBe("ground");
+    expect(styles).not.toMatch(/\n\.settings-live\[role="alert"\] > p \{/);
+    // Roles and texts are unchanged.
+    expect(app).toContain('{capturedPhoto && <p className="notice" role="status">Photo captured. Add a caption or save the activity.</p>}');
+    expect(app).toContain('{checkError && <p className="notice" id="batch-check-error" role="alert">{checkError}</p>}');
   });
 
   it("carries the measured outline in tokens and defines the shape exactly once", () => {
@@ -403,7 +418,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
   it("keeps the retired notch imitation and one-off radii out of the stylesheet", () => {
     expect(styles).not.toMatch(/border-radius: 0 0 50% 50%/);
     expect(styles).not.toMatch(/border-radius:[^;]*\//);
-    const allowed = /^(?:var\(--radius-(?:control|small|card)\)|50%|0)$/;
+    const allowed = /^(?:var\(--radius-(?:control|small|card|line)\)|50%|0)$/;
     const cardRadius: string[] = [];
     for (const entry of rules()) {
       if (isPrimitive(entry)) continue;
@@ -534,7 +549,10 @@ describe("responsive workflow safeguards", () => {
   });
 
   it("promotes the permanent logger without hiding its ancestor or replacing its form", () => {
-    expect(rule(".activity-logger:has(.station-dialog)")).toContain("display: contents");
+    expect(rule(".activity-logger:has(.station-dialog), .activity-logger-card:has(.station-dialog)")).toContain("display: contents");
+    // The inline logger's card is the inner wrapper, bowed only while inline, so no fill layer exists in modal mode.
+    expect(app).toContain('<div className={loggerModal ? "activity-logger-card" : "activity-logger-card bowed"}>');
+    expect(rule(".activity-logger")).toBe(" order: 1; ");
     const inline = rule(".inline-logger");
     for (const declaration of ["position: static", "width: auto", "margin: 0", "padding: 0", "overflow: visible"]) expect(inline).toContain(declaration);
     expect(rule(".observation-fields, .observation-actions")).toContain("display: contents");
@@ -996,10 +1014,15 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
       "width: var(--card-action-width)", "height: var(--card-action-height)", "min-height: var(--card-action-height)", "border-radius: var(--radius-control)",
     ]) expect(action).toContain(declaration);
     // Any bowed host keeps the upper half inside and the lower half plus the reserve below, so a scrolling pane never clips it.
-    const host = rule(".bowed:has(.card-action)");
+    const host = rule(".bowed:has(.card-action:not(.card-action-foot))");
     expect(host).toContain("padding-bottom: calc(var(--card-padding) + var(--card-action-height) / 2)");
     expect(host).toContain("margin-bottom: calc(var(--card-action-height) / 2 + var(--card-action-reserve))");
-    expect(rules().filter((entry) => entry.selectors.some((selector) => /\.card-action\b/.test(selector))).map((entry) => entry.selector)).toEqual([".card-action", ".bowed:has(.card-action)"]);
+    // Foot placement (ticket 13): the same capsule in flow at a sheet's foot; only its placement differs.
+    const foot = rule(".card-action-foot");
+    for (const declaration of ["position: static", "flex: none", "margin-inline: auto"]) expect(foot).toContain(declaration);
+    expect(foot).not.toMatch(/width|height|radius|background/);
+    expect(rules().filter((entry) => entry.selectors.some((selector) => /\.card-action\b/.test(selector))).map((entry) => entry.selector))
+      .toEqual([".card-action", ".card-action-foot", ".bowed:has(.card-action:not(.card-action-foot))"]);
   });
 
   it("pairs a Bold and a Regular 28 px line in the pill and keeps the title pair's roles", () => {
@@ -1027,6 +1050,11 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     expect(positions.every((position) => position >= 0), order.filter((_, index) => positions[index] < 0).join()).toBe(true);
     expect([...positions].sort((a, b) => a - b)).toEqual(positions);
     expect(card).toContain('aria-label={`Open ${batch.name}`}');
+    // Ticket 13: the title is clamped to the two lines its band holds, so a long name cannot grow the card at 320.
+    const title = rule(".design-batch-copy h3");
+    for (const declaration of ["-webkit-line-clamp: var(--batch-title-lines)", "line-clamp: var(--batch-title-lines)", "overflow: hidden", "padding-block: var(--batch-title-overhang)", "margin-block: calc(-1 * var(--batch-title-overhang))"]) expect(title).toContain(declaration);
+    expect(styles).toContain("--batch-title-lines: 2;");
+    expect(styles).toContain("2 * var(--type-title) * var(--type-title-leading)");
   });
 
   it("clips stand-ins by the outline but never a user photo, and puts the new cutouts only on pastel cards", () => {
@@ -1051,7 +1079,8 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
 
   it("puts the batch detail's single primary action on the card edge without moving it in the focus order", () => {
     // Three cards own a primary action: the batch detail, Settings "Data exchange" and the first-run card.
-    expect(app.match(/\bcard-action\b(?!s)/g)).toHaveLength(3);
+    expect(app.match(/\bcard-action\b(?![s-])/g)).toHaveLength(7);
+    expect(app.match(/"primary-action card-action[ "]/g)).toHaveLength(3);
     expect(app).toContain('<button className="primary-action card-action" disabled={!!operation} onClick={() => void runOperation("exchange", "Preparing ZIP archive…", downloadArchive)} type="button">Export ZIP archive</button>');
     expect(app).toContain('{batches.length === 0 && profiles.length > 0 && <button className="primary-action card-action" onClick={() => onDialog({ kind: "start" })} type="button"><DesignIcon name="plus" /><span>Start your first batch</span></button>}');
     // Settings card headings carry the row avatar (lilac circle d 63) instead of the old bordered 52 px capsule.
@@ -1060,6 +1089,18 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     const heading = app.slice(app.indexOf('<div className="design-detail-heading">'), app.indexOf("</div>", app.indexOf('<div className="design-detail-heading">') + 40) + 400);
     expect(heading).toContain('aria-label="Add observation" className="primary-action card-action design-record-observation"');
     expect(rule(".design-record-observation")).not.toContain("width");
+  });
+
+  it("puts every sheet's submit on the lime capsule inside the sheet's foot (ticket 13)", () => {
+    // Four sheet submits: profile overview, start without profiles, start form, and the modal logger (both modes).
+    expect(app.match(/station-primary card-action card-action-foot/g)).toHaveLength(4);
+    expect(app).not.toMatch(/className="station-primary"/);
+    expect(app).toContain('className={loggerModal ? "station-primary card-action card-action-foot" : "primary-action"} type="submit"');
+    expect(app).toContain('<div className={loggerModal ? "station-dialog-actions" : "quick-log-actions"}>');
+    // The foot is a centred column; the capsule is last in the DOM and on screen.
+    const actions = rule(".station-dialog-actions");
+    for (const declaration of ["flex-direction: column", "align-items: center"]) expect(actions).toContain(declaration);
+    expect(styles).not.toMatch(/\.station-dialog-actions(?: button)? \{[^}]*(?:column-reverse|flex: 1)/);
   });
 });
 
@@ -1103,7 +1144,8 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
     ".summary-row-avatar", ".summary-row-count", ".design-summary-figures", ".big-number", ".big-number > strong", ".big-number-circle", ".big-number-caption",
   ];
   const isPart = (selector: string) => parts.includes(selector);
-  const summary = () => app.slice(app.indexOf('<section className="design-summary-group"'), app.indexOf("</section>", app.indexOf('<section className="design-summary-group"')));
+  const kitchen = '<section className="design-summary-group" aria-label="Kitchen summary"';
+  const summary = () => app.slice(app.indexOf(kitchen), app.indexOf("</section>", app.indexOf(kitchen)));
 
   it("carries the measured profile-card and 64+ geometry in :root tokens", () => {
     for (const declaration of [
@@ -1160,9 +1202,10 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
 
   it("puts the hero figure on black (coral) and keeps the counts on lime and yellow in ink", () => {
     const fill = inkGroups().filter(({ kind }) => kind === "fill").flatMap(({ selectors }) => selectors);
-    for (const selector of [".design-summary", ".big-number-circle", ".checks-summary"]) expect(fill).toContain(selector);
+    for (const selector of [".design-summary", ".big-number-circle"]) expect(fill).toContain(selector);
+    expect(styles).not.toContain("checks-summary");
     for (const selector of [".design-summary-group", ".design-summary-figures", ".big-number", ".design-summary-stats", ".design-stat-row"]) expect(fill).not.toContain(selector);
-    expect(rule(".big-number > strong, .checks-summary strong")).toContain("color: var(--ink-figure)");
+    expect(rule(".big-number > strong")).toContain("color: var(--ink-figure)");
     expect(rule(".big-number-caption")).toContain("color: var(--ink)");
     expect(hex("--ink-ground-figure")).toBe("#fc5659");
     expect(contrast(hex("--ink-ground-figure"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(4.5);
@@ -1187,8 +1230,14 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
     // The batch detail's next check is the same sub-row; its "Complete check" button is the count pill.
     expect(app).toContain('<section className="summary-row design-detail-next bowed" aria-label="Next batch check">');
     expect(app).toMatch(/aria-label=\{`Complete check: \$\{dueCheck\.name\} for this batch`\} className="summary-row-count"/);
-    expect(app.match(/summary-row-count/g)).toHaveLength(2);
+    expect(app.match(/summary-row-count/g)).toHaveLength(3);
     expect(rule("button.summary-row-count:hover:not(:disabled)")).toContain("background: var(--colour-background)");
+  });
+
+  it("gives the Checks summary the same component, with both counts on lime and yellow in ink (ticket 13)", () => {
+    expect(app).toContain('<section className="design-summary-group" aria-label="Checks summary"><div className="design-summary bowed"><span className="design-summary-emblem"><StationLogo /></span><div className="design-summary-label"><h2>Checks summary</h2><p>{paused.length} paused batches</p></div><p className="summary-row design-summary-next bowed"><span className="summary-row-avatar" aria-hidden="true"><DesignIcon name="check" /></span><span className="summary-row-count">{due.length}</span>{" "}<span className="summary-row-label">checks due or overdue</span></p></div></section>');
+    // No rule is scoped to the Checks view's summary: it is the Kitchen summary's anatomy unchanged.
+    expect(styles).not.toMatch(/design-checks-view[^{]*design-summary|design-checks-view[^{]*summary-row/);
   });
 });
 
@@ -1282,6 +1331,9 @@ describe("small cards (swipe-rework-log.md, ticket 10; spec §1.7 event card, §
     expect(readings.match(/<dd className="small-card-value">/g)).toHaveLength(2);
     expect(readings.match(/<time className="small-card-chip"/g)).toHaveLength(2);
     expect(app).toContain('<span className="timeline-content"><strong className="small-card-tag">');
+    // Ticket 13: a reading entry shows its number in the value part; screen readers keep the full sentence.
+    expect(app).toContain('{timelineReading(entry, units) ? <><span className="sr-only">{timelineEntryText(entry, units)}</span><span aria-hidden="true" className="small-card-value">{timelineReading(entry, units)}</span></> : timelineEntryText(entry, units)}');
+    expect(app).toContain('if (entry.kind === "temperature") return `${displayTemperature(entry.value, units)} °${units === "imperial" ? "F" : "C"}`;');
     expect(app).toContain('<span className="small-card-tag">{isFinish ? "Finish" : "Check"}</span>');
     // Type roles: the tag is a label, the value the Light figure, the time chip meta.
     expect(roleOf(".small-card-tag")).toBe("label");

@@ -112,6 +112,8 @@
      margins and horizontal offsets resolve against it). */
   --batch-card-ratio: 382 / 359;
   --batch-card-inset-x: 9.3%;
+  --batch-title-lines: 2;
+  --batch-title-overhang: 0.2em;
   --batch-card-inset-y: 9.4%;
   --batch-pill-width: 55.6%;
   --batch-pill-ratio: 212 / 77;
@@ -206,6 +208,8 @@
   --radius-card: 32px;
   --radius-control: 999px;
   --radius-small: 12px;
+  /* A capsule's end for a row that may wrap: half its one-line height (padding --space-3, 1 px border). */
+  --radius-line: calc(0.5lh + var(--space-3) + var(--stroke-width));
   --button-height: 52px;
   --button-padding-x: 24px;
   --card-padding: 24px;
@@ -299,9 +303,6 @@ input::file-selector-button,
 .profile-add,
 .component-button-primary,
 .profile-editor-button.primary,
-.notice,
-.storage-warning,
-[role="alert"],
 .field-error,
 .app-loading,
 .empty-state,
@@ -334,7 +335,6 @@ input::file-selector-button,
 .queue-icon,
 .design-check-symbol,
 .next-action-icon,
-.checks-summary,
 .checks-paused-row,
 .design-tip,
 .design-detail-card,
@@ -349,7 +349,7 @@ input::file-selector-button,
 .batch-tools-danger button,
 .batch-components-shell,
 .component-button,
-.activity-logger,
+.activity-logger-card,
 .profile-overview-intro,
 .start-batch-basics,
 .start-profile-summary,
@@ -363,7 +363,6 @@ input::file-selector-button,
 .calendar-panel,
 .settings-card,
 .settings-recovery,
-.settings-live[role="alert"] > p,
 .toggle-row,
 .toggle-avatar,
 .settings-count,
@@ -379,6 +378,10 @@ input::file-selector-button,
 .design-search-box input,
 .design-toast,
 .profile-editor-toast,
+.notice,
+.storage-warning,
+[role="alert"],
+.settings-live[role="alert"] > p,
 .batch-view-switch button[aria-pressed="true"],
 :is(.filter-row, .quick-log-types) button[aria-pressed="true"],
 .toggle-row:is([aria-pressed="true"], [aria-checked="true"]),
@@ -409,7 +412,7 @@ input::file-selector-button,
 
 /* Type roles: the only place that sets font-size, weight, leading and tracking. Each rule applies one
    complete role from :root. Role colours (meta, figure) resolve through the surface's ink set. */
-.big-number > strong, .checks-summary strong { font-size: var(--type-display); font-weight: var(--type-display-weight); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); color: var(--ink-figure); }
+.big-number > strong { font-size: var(--type-display); font-weight: var(--type-display-weight); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); color: var(--ink-figure); }
 .design-stat-number, .upcoming-strip strong, .design-detail-metrics > strong, .small-card-value, .meas-value, .upcoming-date b { font-size: var(--type-figure); font-weight: var(--type-figure-weight); line-height: var(--type-figure-leading); letter-spacing: var(--type-figure-tracking); color: var(--ink-figure); }
 h1 { font-size: var(--type-headline); font-weight: var(--type-headline-weight); line-height: var(--type-headline-leading); letter-spacing: var(--type-headline-tracking); }
 .design-batch-copy h3, .design-empty-card > p:first-child, .design-detail-heading h3, .design-profile-copy h2, .profile-editor-title-input { font-size: var(--type-title); font-weight: var(--type-title-weight); line-height: var(--type-title-leading); letter-spacing: var(--type-title-tracking); }
@@ -419,7 +422,7 @@ h2, h3, h4, .brand strong { font-size: var(--type-heading); font-weight: var(--t
 .navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
 body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .guide-step p, .batch-guidance > p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
 button, .small-card-tag, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .calendar-day, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
-small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-summary span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-check-state, .design-detail-next p, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
+small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-check-state, .design-detail-next p, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
 strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(--type-title-weight); }
 
 /* Bowed outline (spec §2.3): the one silhouette for every large card. Straight sides, top and
@@ -488,12 +491,18 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
    keeps half the capsule inside its padding and half plus --card-action-reserve as margin below, so a scrolling
    pane scrolls the capsule into view instead of clipping it. Its DOM position (focus order) is unchanged. */
 .card-action { position: absolute; left: calc((100% - var(--card-action-width)) / 2); bottom: calc(var(--card-action-height) / -2); z-index: 1; width: var(--card-action-width); height: var(--card-action-height); min-height: var(--card-action-height); border-radius: var(--radius-control); }
-.bowed:has(.card-action) { padding-bottom: calc(var(--card-padding) + var(--card-action-height) / 2); margin-bottom: calc(var(--card-action-height) / 2 + var(--card-action-reserve)); }
+/* Foot placement ("card-action card-action-foot"): a sheet is a bowed-clip scroll container and clips anything
+   outside its edge, so there the same capsule sits in flow at the sheet's foot, centred, and needs no host. */
+.card-action-foot { position: static; flex: none; margin-inline: auto; }
+.bowed:has(.card-action:not(.card-action-foot)) { padding-bottom: calc(var(--card-padding) + var(--card-action-height) / 2); margin-bottom: calc(var(--card-action-height) / 2 + var(--card-action-reserve)); }
 .design-quiet, .profile-editor-text-button, .station-text-action, .component-remove { min-width: 44px; border-color: transparent; text-decoration: underline; text-underline-offset: 4px; padding-inline: var(--space-2); }
 .form-actions, .trash-item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
 /* A row whose only action moved onto the card edge (card-action) leaves no empty grid gap behind. */
 .form-actions:empty { display: none; }
-.notice, .storage-warning, [role="alert"] { padding: var(--space-4); border: 1px solid var(--colour-border); border-radius: var(--radius-small); background: var(--colour-surface); overflow-wrap: anywhere; }
+/* Notices and alerts (spec §3 "Toasts, notices, storage warning"): the toast's black capsule with white text.
+   --radius-line is a one-line capsule's end, so a wrapping notice keeps it instead of turning into a stadium
+   whose ends would cut its first and last lines. */
+.notice, .storage-warning, [role="alert"], .settings-live[role="alert"] > p { padding: var(--space-3) var(--space-6); border: var(--stroke-width) solid var(--colour-text-inverse); border-radius: var(--radius-line); background: var(--colour-surface-inverse); overflow-wrap: anywhere; }
 .field-error { display: block; padding: var(--space-2); border-left: 3px solid var(--colour-border); background: var(--colour-surface); overflow-wrap: anywhere; }
 .storage-warning { margin: var(--space-4); flex: none; max-height: 35svh; overflow: auto; }
 .storage-warning button { margin-top: var(--space-2); }
@@ -653,6 +662,10 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-batch-card.selected .design-batch-next::before { content: "✓ "; }
 .design-batch-card:hover:not(:disabled) { transform: translateY(-2px); --fill: var(--batch-colour); }
 .design-batch-copy { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+/* The title band holds two title lines (--batch-title-band), so a longer name ellipsizes on the second line; the
+   card's accessible name ("Open <name>") keeps it whole. The overhang padding keeps leading-1 glyphs unclipped
+   without moving the lines. */
+.design-batch-copy h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--batch-title-lines); line-clamp: var(--batch-title-lines); overflow: hidden; padding-block: var(--batch-title-overhang); margin-block: calc(-1 * var(--batch-title-overhang)); }
 .design-batch-copy > :not(.sr-only) { margin-inline: var(--batch-card-inset-x); max-width: calc(100% - 2 * var(--batch-card-inset-x)); }
 .design-batch-chips { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); }
 .design-batch-copy > .design-batch-chips { margin-inline-start: var(--batch-chip-inset-x); }
@@ -697,9 +710,6 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .done .design-check-copy strong { text-decoration: line-through; }
 .design-empty-checks { margin-top: var(--space-4); }
 .design-checks-view { padding: 0; background: transparent; }
-.checks-summary { display: flex; flex-wrap: wrap; gap: var(--space-6) var(--space-12); margin-bottom: var(--space-8); padding: var(--card-padding); --fill: var(--colour-action); }
-.checks-summary > div { display: grid; gap: var(--space-1); }
-.checks-summary strong { font-variant-numeric: tabular-nums; }
 .design-checks-view .queue-card { flex-wrap: nowrap; border: 1px solid transparent; }
 .design-checks-view .queue-card.overdue { background: var(--colour-surface); }
 .design-checks-view .queue-card.done { background: var(--colour-accent); }
@@ -843,8 +853,11 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 }
 
 /* One permanent observation dialog: static inline or native top-layer modal. */
-.activity-logger { order: 1; border-radius: var(--radius-card); padding: var(--card-padding); background: var(--colour-background); }
-.activity-logger:has(.station-dialog) { display: contents; }
+/* The section is never bowed; its card is the inner .activity-logger-card, which carries "bowed" only while the
+   logger is inline. While the modal logger is open both turn into display: contents (no box, no fill layer). */
+.activity-logger { order: 1; }
+.activity-logger-card { padding: var(--card-padding); --fill: var(--colour-background); }
+.activity-logger:has(.station-dialog), .activity-logger-card:has(.station-dialog) { display: contents; }
 .inline-logger { display: block; position: static; width: auto; max-width: none; height: auto; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; overflow: visible; }
 /* Sheet (spec §1.7; gap 8): every dialog is the board's black sheet. Bowed r 40 / bow 5.7, content and the
    close circle at inset 21, white text (ground ink list). Tablet and desktop: a centred modal, all four edges
@@ -875,8 +888,8 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .station-dialog-body dd { margin: 0; overflow-wrap: anywhere; }
 .station-field { display: grid; gap: var(--space-2); margin-top: var(--space-6); }
 .station-helper, .station-options { margin-top: var(--space-4); }
-.station-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-6); }
-.station-dialog-actions button { flex: 1; }
+/* The sheet's foot: secondary actions above, the lime card-action-foot capsule last (DOM order = visual order). */
+.station-dialog-actions { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); margin-top: var(--space-6); }
 .profile-overview { display: grid; gap: var(--space-4); }
 .profile-overview-intro { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(100px, 0.6fr); gap: var(--space-4); padding: var(--space-4); --fill: var(--colour-surface); }
 .profile-guidance-steps { display: grid; gap: var(--space-3); padding-left: var(--space-6); margin-block: var(--space-4); overflow-wrap: anywhere; }
@@ -1033,7 +1046,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .settings-recovery button { background: var(--colour-background); }
 .settings-live[role] { padding: 0; border: 0; background: transparent; }
 .settings-live:empty { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.settings-live[role="alert"] > p { padding: var(--space-4); border: 2px solid var(--colour-border); border-radius: var(--radius-small); background: var(--colour-surface); }
 .settings-card > button { justify-self: start; }
 .setting-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); padding-block: var(--space-4); border-bottom: 1px solid var(--colour-border); }
 .setting-row:last-child { border-bottom: 0; }
@@ -1176,7 +1188,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .queue-card { flex-wrap: wrap; }
   .queue-icon { width: 32px; height: 32px; }
   .queue-icon svg { width: 20px; height: 20px; }
-  .station-dialog-actions { flex-direction: column-reverse; }
   .station-dialog-body dl { grid-template-columns: minmax(0, 1fr); }
   .station-dialog-body dd { margin-bottom: var(--space-2); }
   .profile-editor-fields, .profile-editor-formula-row { grid-template-columns: minmax(0, 1fr); }

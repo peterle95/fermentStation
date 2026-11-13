@@ -6,6 +6,7 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 
 | Gap | State | Ticket |
 | --- | --- | --- |
+| Notices and alerts (spec §3, no gap number) | **closed**: `.notice`, `.storage-warning`, `[role="alert"]` and the Settings alert paragraph are the toast's black capsule (1 px white outline, white ink); `--radius-line` keeps a wrapping notice's ends at the one-line capsule radius | ticket 13 |
 | 1 Card silhouette | **closed** for the surfaces gap 1 lists (see "Bowed surfaces" below) | foundation |
 | 2 Ground and ink | **closed**: tokens are now `#000000` | foundation |
 | 14 Selection on cards | **closed** for the batch card: 3 px lime ring that follows the bow | foundation |
@@ -17,12 +18,12 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 15 Big numbers | **closed**: figures are coral wherever they sit on black; the Kitchen summary's hero count is the `big-number` (coral display figure, white circle d 118, white caption) beside or below the lime card; counts on lime (Checks summary) stay ink | type system, Kitchen summary (ticket 9) |
 | 7 Search field | **closed**: black capsule h 53, 1 px lime outline, lime caret, dark sort circle beside it | utility circles |
 | 8 Dialogs | **closed**: one black sheet (`.station-dialog`, r 40 / bow 5.7, inset 21), phone bottom sheet with flat bottom, centred `label` title on the close circle's line, `dark-field` controls | dialogs |
-| 9 Batch card anatomy | **closed**: H/W 0.94 from width tokens, full-width title pair, frosted chip, pill + black circle, 48–94 % photo slot (stand-ins clipped by the bow, user photos rectangular); the chip row stays one line (the next-check chip ellipsizes), so narrow cards keep the ratio unless a title runs to three lines | batch card (ticket 8), ticket 12 |
-| 11 Kitchen summary | **closed**: lime bowed card H/W 0.58 capped at 382, lilac emblem d 0.309 W 47 % above, yellow `summary-row` 0.916 × 0.252 W 49 % below with the `#fff6ce` count pill 79 × 49; the batch detail's next check uses the same `summary-row` | Kitchen summary (ticket 9) |
+| 9 Batch card anatomy | **closed**: H/W 0.94 from width tokens, full-width title pair, frosted chip, pill + black circle, 48–94 % photo slot (stand-ins clipped by the bow, user photos rectangular); the chip row stays one line (the next-check chip ellipsizes), so narrow cards keep the ratio; the title is clamped to the two lines of its band (ellipsis) | batch card (ticket 8), tickets 12, 13 |
+| 11 Kitchen summary | **closed**: lime bowed card H/W 0.58 capped at 382, lilac emblem d 0.309 W 47 % above, yellow `summary-row` 0.916 × 0.252 W 49 % below with the `#fff6ce` count pill 79 × 49; the batch detail's next check uses the same `summary-row`; the Checks summary is the same component (counts on lime/yellow in ink) | Kitchen summary (ticket 9), ticket 13 |
 | 10 Settings controls | **closed**: one `toggle-list` / `toggle-row` primitive (h 72, gap 8, inset 16, black selected row), lilac avatar d 63, switch 42 × 25 / knob 20; Suggestions is a real `role="switch"`, Units and Notifications are row choices | settings |
-| 12 Primary action | **closed** for the batch detail ("Add observation"), Settings "Export ZIP archive" and the first-run card ("Start your first batch"), all `card-action`; dialog submits stay inline (needs a decision, see ticket 12) | batch card (ticket 8), ticket 12 |
-| 13 Timeline | **closed**: one `small-card` (bowed at r = min(52, 0.16 W), bow = min(4.4, 0.0125 W) from its own width; lilac `#d9b4eb → #f6eafc` or blue `#b4dff9 → #e6f6ff` gradient; lime tag chip h 27; Light value; translucent time chip h 30; all ink black) for timeline entries, the latest readings, the calendar's upcoming/overdue items and the Checks upcoming strip; the white timeline panel is gone | small cards (ticket 10) |
-| Legacy rounded rectangles (gap 1 follow-up) | **closed** except `.activity-logger`: the `--radius-card` allowlist holds one entry; Settings heading icons are the row avatar | ticket 12 |
+| 12 Primary action | **closed** for the batch detail ("Add observation"), Settings "Export ZIP archive" and the first-run card ("Start your first batch"), all `card-action`; every sheet submit is `card-action card-action-foot` (in flow, centred at the sheet's foot) | batch card (ticket 8), tickets 12, 13 |
+| 13 Timeline | **closed**: one `small-card` (bowed at r = min(52, 0.16 W), bow = min(4.4, 0.0125 W) from its own width; lilac `#d9b4eb → #f6eafc` or blue `#b4dff9 → #e6f6ff` gradient; lime tag chip h 27; Light value; translucent time chip h 30; all ink black) for timeline entries, the latest readings, the calendar's upcoming/overdue items and the Checks upcoming strip; the white timeline panel is gone; pH and temperature entries show their number as the Light value | small cards (ticket 10), ticket 13 |
+| Legacy rounded rectangles (gap 1 follow-up) | **closed**: the `--radius-card` allowlist is empty; the inline logger's card is `.activity-logger-card bowed`; Settings heading icons are the row avatar | tickets 12, 13 |
 | Calendar month grid (spec §3, no gap number) | **closed**: day circles min(column, 60) ≥ 44, emblem event days, black selected day, `#3e3e40` today ring; Today / arrows / top-bar date chip on `utility-circle` / `utility-capsule`; no 320 overflow (the screen spans the pane below 380); strip days carry lime tag chips at 160 px; bowed focus rings follow the bow | calendar (ticket 11) |
 
 Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text inside the scroll panes was absolutely positioned against `.app-shell`, which made the whole document scroll in 49 of 60 captures. `.main-content`, `.design-dashboard` and `.design-detail` are now `position: relative`, so they contain it.
@@ -62,7 +63,7 @@ The other tokens are unchanged: `#ffffff`, `#ffec89`, `#b6f074`, `#b6e1fa`. If a
 
 ### Radii
 
-Outside the primitive, `border-radius` may only be `var(--radius-control)` (capsules), `var(--radius-small)`, `var(--radius-card)`, `50%` or `0`. Literal lengths and slash syntax fail the test. `--radius-card` is a **legacy, shrink-only allowlist** (`legacyCardRadius` in `styles.test.ts`) of rounded rectangles that predate the primitive. When your ticket bows or capsules one of them, delete it from the list. A new selector that uses `--radius-card` fails the test.
+Outside the primitive, `border-radius` may only be `var(--radius-control)` (capsules), `var(--radius-line)` (a capsule that may wrap, ticket 13), `var(--radius-small)`, `var(--radius-card)`, `50%` or `0`. Literal lengths and slash syntax fail the test. `--radius-card` is a **legacy, shrink-only allowlist** (`legacyCardRadius` in `styles.test.ts`) of rounded rectangles that predate the primitive. When your ticket bows or capsules one of them, delete it from the list. A new selector that uses `--radius-card` fails the test.
 
 The old literal radii were mapped to tokens: `2rem` → `--radius-card` (same 32px); `1.5rem` → `--radius-card` (24 → 32px on `.design-batch-next` and `.detail-readings > div`, both due for restyling in gaps 9 and 13); kbd `4px` → `--radius-small`.
 
@@ -524,11 +525,43 @@ Scope: the `--radius-card` allowlist, the gap 12 leftovers, the Settings card-he
 - `.activity-logger` (see Allowlist). Notices and alerts (`.notice`, `[role="alert"]`, `.storage-warning`) are still `--radius-small` boxes; the spec maps them to black capsules.
 - Batch card titles that need three lines at 320 still grow the card.
 
+## Ticket 13: dialog submits, notices, the inline logger card, timeline values, Checks summary, long titles — done
+
+Second leftover sweep. No accessible name, role or focus order changed; one token pair and one radius token were added, no component.
+
+### As built
+
+- **Sheet submits (`card-action-foot`).** The `card-action` primitive gained a foot placement: `.card-action-foot { position: static; flex: none; margin-inline: auto }`. Same capsule (60 % × 63, lime), in flow, so the `bowed-clip` sheet never clips it. The edge host rule is now `.bowed:has(.card-action:not(.card-action-foot))`. `.station-dialog-actions` is a centred column (Cancel above, capsule last, so DOM order = visual order); the phone `column-reverse` and `button { flex: 1 }` are gone. Users: profile overview "Start a batch", start sheet "Open Profiles" and "Start a batch" (submit), and the modal logger's submit in both modes ("Add observation" / "Save activity"). The modal logger in advanced mode now uses the sheet's actions row too (`loggerModal` instead of `basicObservation` picks `station-dialog-actions`, `observation-actions`, `station-secondary` and the capsule); the inline logger keeps `quick-log-actions` and `primary-action`.
+- **Notices and alerts.** `.notice, .storage-warning, [role="alert"], .settings-live[role="alert"] > p` share one rule: black fill, 1 px white outline (the toast's look), `padding: var(--space-3) var(--space-6)`, `border-radius: var(--radius-line)`, and they moved from the light-fill to the ground ink set. `--radius-line` (`calc(0.5lh + var(--space-3) + var(--stroke-width))`) is exactly half a one-line notice's height, so a one-line notice is a true capsule. A wrapping notice keeps that end radius instead of becoming a stadium whose ends cut its first and last lines (the storage warning, with heading, text and buttons, is ~200 px tall at 320). The separate Settings alert box rule is deleted. `.field-error` (yellow, left bar) is not a notice and is unchanged.
+- **Inline logger card.** `.activity-logger` is only `order: 1`. A new inner `div.activity-logger-card` wraps the heading and the `<dialog>`; it has `className="activity-logger-card bowed"` while the logger is inline and drops `bowed` while it is modal, so no fill layer exists that could escape. `.activity-logger:has(.station-dialog), .activity-logger-card:has(.station-dialog) { display: contents }`. `.activity-logger` itself is never bowed (still tested). **The `--radius-card` allowlist is empty.**
+- **Timeline readings as values.** `timelineReading(entry, units)` returns the number for pH ("4.31") and temperature ("21.5 °C", same format as the detail readings). A reading entry renders `<span className="sr-only">{timelineEntryText(…)}</span><span aria-hidden="true" className="small-card-value">…</span>`, so the kind stays in the lime tag, the number is the Light figure, and screen readers still hear "pH 4.31" / "Temperature 68°F" (the App tests that query those sentences pass unchanged). `timelineEntryText` and the text export are unchanged.
+- **Checks summary.** The two-count lime card is now the Kitchen summary component, same classes and no new rule: `section.design-summary-group[aria-label="Checks summary"]` > lilac emblem (StationLogo), `h2` "Checks summary" with "N paused batches" (meta), and the yellow `summary-row` with the cream pill "N" + "checks due or overdue". Both counts are ink on lime / yellow / cream. No big number on black (the Checks view has no hero figure). `.checks-summary` and its three rules, ink entry and display-role entry are deleted. Text change: the labels were "Due or overdue" / "Paused batches" (no App test referenced them); the view gains an `h2` before "Scheduled checks".
+- **Long titles.** `.design-batch-copy h3` is clamped to `--batch-title-lines` 2 (`-webkit-line-clamp` + `line-clamp`, `overflow: hidden`), which is the two lines `--batch-title-band` already reserves. `--batch-title-overhang` 0.2em of block padding, cancelled by an equal negative margin, keeps leading-1 glyphs unclipped without moving the lines. The card's name ("Open <name>") holds the full title. At 320 "Ginger bug with turmeric and lemon peel — second attempt" now ends "— seco…" and the card keeps its ratio.
+
+### Tests (`src/styles.test.ts`, 85)
+
+- New: notices/alerts capsule, ground ink and the `--radius-line` token; every sheet submit on `card-action-foot` and the foot column; the foot rule only changes placement; the Checks summary markup on the Kitchen anatomy and no Checks-scoped summary rule; the clamp declarations; the timeline reading split and its sr-only sentence.
+- Changed: `legacyCardRadius` is `[]`; `activity-logger-card` joined `bowedCards`, `checks-summary` left it; radius values may also be `var(--radius-line)`; the card-action rule list and use count; the logger `:has` rule; the Kitchen-summary tests anchor on `aria-label="Kitchen summary"` (the Checks view now comes first in the file) and count three `summary-row-count`s.
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 85 / 85; full `npm test` 15 files, 311 / 311.
+- Full harness (65 captures): 0 failed, 0 step-failed, 0 page errors, 0 document / vertical / surface overflow, 0 clippedControls, 0 smallTargets (the three Settings licence links stay `inline`, not counted).
+- Looked at: observation-logger, batch-creation (foot), batch-tools (inline logger card), batch-detail (timeline values) and checks at 390; overview at 320 (clamped title); checks at 1440.
+
+### Left by ticket 13
+
+- The foot capsule is in flow, not sticky: on a long sheet (start form) it is reached by scrolling, as the submit was before.
+- Cancel in a sheet foot is the generic outlined capsule at its natural width; the boards show no secondary sheet action to match.
+- The storage warning cannot be captured by the harness (it needs a failing store), so its capsule was checked only by the rule; at 320 it is a rounded block with capsule-radius ends, not a stadium.
+- The timeline's `.zone` chip is still the bordered status chip; measurement entries (`kind: "measurement"`) keep their text, since they have no single number.
+- Still open from ticket 12: `.start-batch-basics` legend, the short bowed boxes' default radius. Ticket 14 items unchanged (launch colours, `theme-color`, harness coverage for dialogs/trash/picker, desktop sidebar shape, type weights).
+
 ## Left for later tickets / known issues
 
 - ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).
 - ~~Timeout~~ fixed by ticket 2 with `testTimeout` in `vite.config.ts`. Was: `src/App.test.tsx` "reflects edited cadence and pauses and resumes checks with batch status" times out at the 5 s default (it takes 5.3–8 s). It fails the same way at `7133bca` with the foundation changes stashed, so it is a pre-existing slow test, not a regression. Full suite after foundation: 254 passed, 2 failed (these two), 228 s with `--maxWorkers=1`.
-- ~~Rounded-rectangle surfaces not bowed yet~~ settled by ticket 12; only `.activity-logger` keeps `--radius-card`. `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
+- ~~Rounded-rectangle surfaces not bowed yet~~ settled by tickets 12 and 13; the allowlist is empty (the inline logger's card is `.activity-logger-card bowed`). `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
 - ~~`timeline-entry` radius~~ settled by ticket 10 (small-card rule). Was: `timeline-entry` uses the default 52px radius, capped at 50 % of its height. Short entries therefore read as near-capsules. Gap 13 should give them their event-card size and the small-component rule (`--r` ≈ 0.16 W, `--bow` ≈ 0.0125 W below 300px).
 - ~~Calendar event days still use `--colour-action-alt` on tall capsules~~ settled by ticket 11 (`--colour-emblem` circles).
 - The native launch colours are still `#1c1c1c`: `android/app/src/main/res/values/colors.xml` `colorPrimary`/`colorPrimaryDark`, and `capacitor.config.ts` `iconColor`. `styles.test.ts` asserts them. Switch them to `#000000` together with that test if the launch screen should match the new ground.
