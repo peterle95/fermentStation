@@ -52,6 +52,7 @@ describe("Swipe-derived design contract", () => {
     for (const [name, value] of Object.entries({
       background: "#ffffff", surface: "#ffec89", "surface-inverse": "#000000", text: "#000000", "text-muted": "#000000", "text-inverse": "#ffffff",
       action: "#b6f074", "on-action": "#000000", "action-alt": "#dab8f1", emblem: "#c5b4ec", accent: "#b6e1fa", border: "#000000",
+      rail: "#3e3e40",
     })) expect(styles).toContain(`--colour-${name}: ${value};`);
     // The retired near-black must not come back as ground, ink or border.
     expect(styles).not.toMatch(/#1c1c1c/i);
@@ -530,6 +531,81 @@ describe("responsive workflow safeguards", () => {
     expect(rule(".design-skip-link:focus")).toContain("var(--safe-top)");
     const reduced = styles.slice(styles.indexOf("@media (prefers-reduced-motion: reduce)"));
     for (const declaration of ["animation: none !important", "transition: none !important", "scroll-behavior: auto !important", "transform: none !important"]) expect(reduced).toContain(declaration);
+  });
+});
+
+describe("navigation circles, capsule and rail (swipe-rework-log.md, ticket 3; spec §1.4, §1.5)", () => {
+  const mobile = styles.slice(styles.indexOf("@media (max-width: 599px) {"));
+  const singlePane = styles.slice(styles.indexOf("@media (max-width: 1023px) {"));
+  const railStart = styles.indexOf("@media (min-width: 600px) and (max-width: 1023px) {");
+  const railEnd = railStart + styles.slice(railStart).search(/\n\}\r?\n/);
+  const rail = styles.slice(railStart, railEnd);
+  const px = (token: string) => Number(rootTokens().get(token)!.match(/^(\d+(?:\.\d+)?)px$/)![1]);
+
+  it("carries the measured geometry and the ring colour in :root tokens", () => {
+    for (const declaration of [
+      "--nav-circle: 60px;", "--nav-gap: 6px;", "--nav-capsule: 107px;", "--nav-icon: 21px;", "--nav-ring: 6px;", "--nav-waist: 46px;",
+      "--nav-rail: calc(var(--nav-circle) + 2 * var(--nav-ring));", "--colour-rail: #3e3e40;",
+      "--mobile-nav-height: calc(var(--nav-circle) + 2 * var(--space-2));",
+    ]) expect(rule(":root")).toContain(declaration);
+    // Rail 72 (spec §1.4), the waist narrower than the rail, and a touch target in every circle.
+    expect(px("--nav-circle") + 2 * px("--nav-ring")).toBe(72);
+    expect(px("--nav-waist")).toBeLessThan(px("--nav-circle"));
+    expect(px("--nav-circle")).toBeGreaterThanOrEqual(44);
+  });
+
+  it("takes every navigation length from tokens, never a literal", () => {
+    const navigation = /\.navigation|\.nav-mark|\.nav-word|\.sidebar \.brand-mark|\.design-account|\.design-avatar/;
+    for (const entry of rules()) {
+      if (!entry.selectors.some((selector) => navigation.test(selector))) continue;
+      for (const [property, value] of entry.declarations) expect(value, `${entry.selector} { ${property}: ${value} }`).not.toMatch(/\d(?:px|r?em)\b/);
+    }
+  });
+
+  it("draws every destination as a white circle and the current one in lime at every width", () => {
+    const mark = rule(".nav-mark");
+    for (const declaration of ["width: var(--nav-circle)", "height: var(--nav-circle)", "border-radius: 50%", "background: var(--colour-background)"]) expect(mark).toContain(declaration);
+    expect(rule('.navigation button[aria-current="page"]')).toContain("background: var(--colour-action)");
+    expect(rule('.navigation button[aria-current="page"] .nav-mark')).toContain("background: none");
+    expect(rule(".navigation")).toContain("gap: var(--nav-gap)");
+    expect(rule(".navigation button")).toContain("min-height: var(--nav-circle)");
+    for (const selector of [".sidebar .brand-mark", ".design-avatar"]) expect(rule(selector)).toContain("width: var(--nav-circle)");
+    expect(rule(".navigation svg, .design-avatar svg")).toContain("width: var(--nav-icon)");
+  });
+
+  it("sets the phone row as bare circles beside one lime capsule, with no bar fill", () => {
+    const navigation = rule(".navigation", mobile);
+    for (const declaration of ["display: flex", "justify-content: center", "gap: var(--nav-gap)"]) expect(navigation).toContain(declaration);
+    // Only the tablet rail paints behind the circles; no .navigation rule outside it has a fill.
+    const fills = [...styles.matchAll(/(?:^|\n)\s*\.navigation \{([^}]+)\}/g)].filter(([, body]) => /background/.test(body));
+    expect(fills.length).toBeGreaterThan(0);
+    for (const fill of fills) expect(fill.index! > railStart && fill.index! < railEnd, fill[0]).toBe(true);
+    const button = rule(".navigation button", mobile);
+    for (const declaration of ["width: var(--nav-circle)", "min-height: var(--nav-circle)", "padding: 0"]) expect(button).toContain(declaration);
+    const current = rule('.navigation button[aria-current="page"]', mobile);
+    for (const declaration of ["width: auto", "min-width: var(--nav-capsule)"]) expect(current).toContain(declaration);
+    expect(rule('.navigation button[aria-current="page"] .nav-mark', mobile)).toContain("width: var(--nav-icon)");
+    expect(rule('.navigation button:not([aria-current="page"]) .nav-word', mobile)).toContain("display: none");
+    // Three circles, the capsule and three gaps fit the narrowest supported phone (320) without side padding.
+    expect(3 * px("--nav-circle") + px("--nav-capsule") + 3 * px("--nav-gap")).toBeLessThanOrEqual(320);
+  });
+
+  it("builds the tablet rail from ringed circles joined at the waist, and rings nothing else", () => {
+    expect(railStart).toBeGreaterThan(-1);
+    expect(rule(".app-shell", singlePane)).toContain("grid-template-columns: calc(var(--nav-rail) + 2 * var(--space-2))");
+    expect(rule(".nav-mark, .sidebar .brand-mark, .design-avatar", rail)).toContain("box-shadow: 0 0 0 var(--nav-ring) var(--colour-rail)");
+    for (const selector of [".navigation", ".brand"]) {
+      const band = rule(selector, rail);
+      expect(band).toContain("linear-gradient(var(--colour-rail), var(--colour-rail))");
+      expect(band).toContain("var(--nav-waist)");
+    }
+    expect(rule(".navigation button", rail)).toContain("width: var(--nav-circle)");
+    const outside = (styles.slice(0, railStart) + styles.slice(railEnd)).replace(/\/\*[\s\S]*?\*\//g, "").replace(/:root \{[^}]+\}/, "");
+    expect(outside).not.toContain("--colour-rail");
+  });
+
+  it("keeps the two-tone focus ring outside the circles and the rail ring", () => {
+    expect(rule(".navigation button:focus-visible, .design-account:focus-visible")).toContain("outline-offset: var(--stroke-focus)");
   });
 });
 

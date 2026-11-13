@@ -10,7 +10,9 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 2 Ground and ink | **closed**: tokens are now `#000000` | foundation |
 | 14 Selection on cards | **closed** for the batch card: 3 px lime ring that follows the bow | foundation |
 | 16 Lilac shade | **closed** for avatar and icon circles (`--colour-emblem`) | foundation |
-| 3, 4, 5 Navigation and utility circles | open | navigation |
+| 3 Phone bottom navigation | **closed**: white circles d 60, lime capsule, gap 6, no bar fill | navigation |
+| 4 Tablet rail | **closed**: ringed chain, logo on top, lime current circle | navigation |
+| 5 Utility circles (top bar) | open; `--nav-circle` / `--nav-icon` are ready for it | utility circles |
 | 6 Typography (D1 resolved by the user: readable sizes inside 1:1 geometry) | **closed** for the type system; components still pick their roles in their own tickets | type system |
 | 15 Big numbers (colour part) | **partly closed**: figures are coral Light/ExtraLight/Thin wherever they sit on black; the counts on the lime summary stay ink until gap 11 moves them onto black | type system |
 | 7, 8 Search field, dialogs | open (dialogs are already bowed via `bowed-clip`) | search and dialogs |
@@ -133,6 +135,48 @@ User decision on D1: component geometry stays 1:1 with the boards; type is sized
 - Text boxes that are wrong because the geometry is pre-rework (fix in the component tickets, not with smaller type): the Kitchen summary puts a 100 px Thin count in a 3-column lime grid (gap 11 moves it onto black next to a white circle, which also turns it coral); batch cards grow taller than H/W 0.94 because the 40 px title pair wraps in today's narrow copy column (gap 9 widens it); Settings segments are still bordered pills whose 22 px labels leave "On"/"Off" under 44 px wide (gap 10 replaces them with 72 px rows); dialog titles are `heading` on the blue band until gap 8 makes them a centred sheet header.
 - Unique has no `tnum` feature, so the existing `font-variant-numeric: tabular-nums` declarations do nothing; figures are proportional.
 - The pill label pair of the drink card (spec §1.1 "Swipe / Now") should use the `row` size with Light and Bold lines; there is no element for it yet (gap 9).
+
+## Ticket 3: navigation (gaps 3, 4) — done
+
+No markup change: destinations, `aria-label`s, `aria-current`, focus order and the harness selectors (`.navigation .nav-*`) are untouched. All work is in `src/styles.css`.
+
+As planned and built:
+
+- Tokens in `:root`: `--colour-rail` `#3e3e40` (spec §1.4 ring), `--nav-circle` 60, `--nav-gap` 6 (pitch 66), `--nav-capsule` 107, `--nav-icon` 21, `--nav-ring` 6, `--nav-rail` = circle + 2 rings (72), `--nav-waist` 46 (board 33/51 of the rail between circles). `--mobile-nav-height` becomes circle + 2 × `--space-2`.
+- One vocabulary at every width: `.nav-mark` is a white circle d 60 with the icon at 21; the current destination is lime and its mark turns transparent (icon straight on lime, as in the Scan pill).
+- Phone: centred flex row, gap 6, no bar fill; non-current buttons are bare circles (label hidden, `aria-label` unchanged); the current one is a lime capsule ≥ 107 × 60 with icon + `label`-role word.
+- Tablet: rail visuals live in their own `@media (min-width: 600px) and (max-width: 1023px)` block so the phone never inherits them. Logo circle on top, then the four destinations; every circle gets a 6 px `--colour-rail` ring (box-shadow on the mark) and a 46 px band joins the centres, so the column reads as one scalloped rail. Column = rail + 2 × `--space-2`.
+- Desktop: same circles in rows with their labels; current row = lime capsule; logo in a white circle; Home account = lilac circle d 60, no border.
+- Focus: nav buttons get `outline-offset: var(--stroke-focus)` so the two-tone ring sits outside the white circle and the rail ring.
+
+### How to use (later tickets)
+
+- A circle button anywhere (gap 5 top-bar utilities): `width/height: var(--nav-circle)`, `border-radius: 50%`, `background: var(--colour-background)`, icon `var(--nav-icon)`, and put it in the light-fill ink list. Do **not** ring it: `--colour-rail` is rail-only and the test fails if it is used outside the 600–1023 rail block.
+- The rail block is `@media (min-width: 600px) and (max-width: 1023px)`, between the `max-width: 1023px` block and the `min-width: 1024px` block. Rail-only visuals go there, never into the `max-width: 1023px` block, which also reaches phones.
+- `.nav-mark` is the circle; `button[aria-current="page"]` is the lime fill and makes its mark transparent. The phone capsule pads `(circle − icon) / 2` each side, so its icon sits exactly where it would in a circle.
+
+### Measured (harness, Chrome 157, pixel scan of the PNGs)
+
+- Phone 390: circles 60, pitch 66 (gap 6), capsule 130 × 60 for "My batches" (spec ≈ 107 for "Scan"; `--nav-capsule` is the minimum), row 31–359, centred, no fill. Calendar current: capsule ≈ 120.
+- Phone 320: row is 3 × 60 + 3 × 6 + capsule = 320 with no side padding. "My batches" wraps to two lines inside the 60 px capsule (≈ 122 wide); "Calendar" stays on one line. Readable; a later polish could shorten the phone label or drop the capsule padding at ≤ 379.
+- Tablet 768: ring outer width 72, waist 46, white/lime circles 60 at pitch 66, logo circle on top joined by the band, column 88 (`--nav-rail` + 2 × `--space-2`; was 80). The Home account button stays at the bottom as a separate ringed lilac circle.
+- Desktop 1440: logo in a white circle d 60, four rows of a white circle d 60 + `row`-role label on black, current row = lime capsule h 60 holding icon, label and the batch count; Home = lilac circle d 60 + label, border gone.
+
+### Tests
+
+`src/styles.test.ts` "navigation circles, capsule and rail": tokens and their arithmetic (rail = 72, waist < circle, 3 circles + capsule + 3 gaps ≤ 320), no px/rem/em literal in any navigation rule, white `.nav-mark` circle and lime current at every width, phone row = flex/centred/gap token, bare circles, capsule min-width token, non-current labels hidden, **no `.navigation` rule outside the rail block paints a background**, rail ring/band from tokens, `--colour-rail` only inside the rail block, focus `outline-offset`. `--colour-rail` joined the palette list. Existing tests are unchanged and green (`.navigation .nav-word` still `display: inline` on phones; only non-current words are hidden by a more specific rule).
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 43 / 43; plain `npm test` 269 / 269, 15 files, 184 s.
+- Harness full run, 60 captures: 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0. surfaceOverflow 1 (calendar 320, known), clippedControls 5 (`.batch-head-notifications`, known), smallTargets 8 (Settings On/Off/All and the inline licence links, known). No finding names the navigation.
+
+### Left by ticket 3
+
+- Spec §3 maps the desktop sidebar to "one white bowed card with destination rows, current = black row, icon in a pastel avatar circle". This ticket used the circle/capsule vocabulary instead, as the ticket asked, so the three widths read as one system. If the bowed toggle card is still wanted, it is a desktop-only restyle of `.navigation` at ≥ 1024.
+- The desktop batch count is plain `row` text in the lime capsule; spec suggests a count pill (§1.3 vocabulary).
+- The rail has no Settings circle (spec §3 lists one): Settings lives in the top bar, and adding it to the rail would change the focus order. Decide together with gap 5.
+- Desktop labels use `row` (28), the phone capsule `label` (22), the Home account `label`; harmonise if the desktop sidebar is restyled again.
 
 ## Left for later tickets / known issues
 

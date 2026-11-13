@@ -40,6 +40,7 @@
   --colour-border: #000000;
   --colour-scrim: rgb(0 0 0 / 56%);
   --colour-figure: #fc5659;
+  --colour-rail: #3e3e40;
   /* Text colour pairs. Each --ink-ground-* is a role colour on the black ground; --ink-fill is every role on
      white and pastel fills. src/styles.test.ts checks every pair's contrast from these tokens. */
   --ink-ground: var(--colour-text-inverse);
@@ -61,6 +62,16 @@
   --bowed-bow: 4.4px;
   --bowed-k: 0.64;
   --bowed-stroke: 3px;
+  /* Navigation circles (spec §1.4 utility stack, §1.5 bottom row): white circles d 60 at pitch 66, the
+     current destination as a lime capsule >= 107 wide, glyph 21. The tablet rail rings each circle in
+     --colour-rail (6 thick, so the rail is 72) and narrows to the waist between circles. */
+  --nav-circle: 60px;
+  --nav-gap: 6px;
+  --nav-capsule: 107px;
+  --nav-icon: 21px;
+  --nav-ring: 6px;
+  --nav-rail: calc(var(--nav-circle) + 2 * var(--nav-ring));
+  --nav-waist: 46px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -98,7 +109,7 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
-  --mobile-nav-height: 88px;
+  --mobile-nav-height: calc(var(--nav-circle) + 2 * var(--space-2));
   color-scheme: light;
   color: var(--ink);
   background: var(--colour-surface-inverse);
@@ -183,6 +194,7 @@ input::file-selector-button,
 .navigation button:hover:not(:disabled),
 .design-account:hover,
 .design-avatar,
+.nav-mark,
 .design-topbar .icon-button,
 .design-topbar .batch-fab,
 .design-skip-link,
@@ -375,24 +387,31 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 }
 .sidebar { display: flex; flex-direction: column; gap: var(--space-8); min-height: 0; padding: calc(var(--safe-top) + var(--space-6)) var(--space-3) var(--space-6); overflow: auto; background: var(--colour-surface-inverse); }
 .sidebar > * { flex-shrink: 0; }
-.brand { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding-inline: var(--space-3); }
+.brand { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
 .brand > div { min-width: 0; width: 100%; }
 .brand-mark { display: grid; place-items: center; width: 48px; height: 48px; flex: none; }
 .brand-mark img { width: 48px; height: 48px; object-fit: contain; }
 .brand strong { display: block; max-width: 100%; overflow-wrap: anywhere; }
-.navigation { display: grid; gap: var(--space-2); }
-.navigation button { display: flex; align-items: center; gap: var(--space-2); min-width: 0; height: auto; border-color: transparent; padding-inline: var(--space-3); text-align: left; white-space: normal; overflow-wrap: anywhere; }
+/* Navigation (spec §1.4, §1.5): one vocabulary at every width. Each destination's mark is a white
+   circle; the current destination is lime and its icon sits straight on the lime, as in the Scan pill.
+   Desktop rows keep their labels beside the circles; the rail and the phone row are set further down. */
+.sidebar .brand-mark { width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-background); }
+.navigation { display: grid; gap: var(--nav-gap); }
+.navigation button { display: flex; align-items: center; gap: var(--space-3); min-width: 0; min-height: var(--nav-circle); height: auto; border: 0; padding: 0 var(--space-4) 0 0; text-align: left; white-space: normal; overflow-wrap: anywhere; }
 .nav-word { min-width: 0; overflow-wrap: anywhere; }
-.navigation button[aria-current="page"] { background: var(--colour-background); }
-.nav-mark { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 24px; height: 24px; }
+.navigation button[aria-current="page"] { background: var(--colour-action); }
+.nav-mark { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-background); }
+.navigation button[aria-current="page"] .nav-mark { background: none; }
+.navigation svg, .design-avatar svg { width: var(--nav-icon); height: var(--nav-icon); }
+.navigation button:focus-visible, .design-account:focus-visible { outline-offset: var(--stroke-focus); }
 .design-nav-count { margin-left: auto; font-variant-numeric: tabular-nums; }
 .design-nav-profile-desktop { display: inline-flex; }
 .design-nav-profile-mobile, .design-mobile-avatar { display: none; }
 .design-sidebar-bottom { margin-top: auto; }
-.design-account { display: flex; align-items: center; gap: var(--space-2); width: 100%; border-color: var(--ink); margin-top: var(--space-4); padding: var(--space-2); text-align: left; }
+.design-account { display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: var(--nav-circle); border: 0; margin-top: var(--space-4); padding: 0 var(--space-4) 0 0; text-align: left; }
 .design-account > span:nth-child(2) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .design-account > span:last-child { margin-left: auto; }
-.design-avatar { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: var(--radius-control); background: var(--colour-emblem); }
+.design-avatar { display: grid; place-items: center; flex: none; width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-emblem); }
 .content-shell { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .main-content { position: relative; flex: 1; min-height: 0; padding: var(--space-8) var(--layout-edge) var(--space-12); overflow: auto; }
 .new-design .main-content:has(> .today-screen:not([hidden])) { padding: 0; overflow: hidden; }
@@ -865,15 +884,23 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 
 /* Width adaptations, not recovered artwork specifications. No DOM reparenting. */
 @media (max-width: 1023px) {
-  .app-shell { grid-template-columns: 80px minmax(0, 1fr); }
-  .brand { padding: 0; align-items: center; }
+  .app-shell { grid-template-columns: calc(var(--nav-rail) + 2 * var(--space-2)) minmax(0, 1fr); }
   .brand > div, .navigation .nav-word, .navigation .design-nav-count, .design-account > span:not(.design-avatar) { display: none; }
-  .navigation button { justify-content: center; padding-inline: 0; }
-  .design-account { justify-content: center; border-color: transparent; padding: 0; }
   .design-date-chip { display: none; }
   .batch-overview, .profile-list { grid-template-columns: minmax(0, 1fr); }
   .profile-editor-grid, .calendar-layout { grid-template-columns: minmax(0, 1fr); }
   .profile-editor-check-row { grid-template-columns: minmax(0, 1fr) 88px auto 44px; }
+}
+
+/* Tablet rail (spec §1.4): the logo circle and the four destinations form one chain. Each circle is
+   ringed in --colour-rail; a band of --nav-waist joins the centres, so the sides read scalloped. */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .sidebar { align-items: center; gap: 0; padding-inline: 0; }
+  .brand { align-items: center; padding-bottom: var(--nav-gap); background: linear-gradient(var(--colour-rail), var(--colour-rail)) center bottom / var(--nav-waist) calc(100% - var(--nav-circle) / 2) no-repeat; }
+  .navigation { background: linear-gradient(var(--colour-rail), var(--colour-rail)) center / var(--nav-waist) calc(100% - var(--nav-circle)) no-repeat; }
+  .navigation button { justify-content: center; width: var(--nav-circle); padding: 0; }
+  .nav-mark, .sidebar .brand-mark, .design-avatar { box-shadow: 0 0 0 var(--nav-ring) var(--colour-rail); }
+  .design-account { justify-content: center; width: auto; padding: 0; }
 }
 
 @media (min-width: 1024px) {
@@ -917,9 +944,14 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .app-shell { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; height: 100dvh; }
   .sidebar { display: contents; }
   .brand, .design-sidebar-bottom { display: none; }
-  .navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); height: auto; min-height: calc(var(--mobile-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); background: var(--colour-surface-inverse); color: var(--ink); }
-  .navigation button { display: flex; flex-direction: column; justify-content: center; gap: var(--space-1); min-width: 0; min-height: 64px; padding: var(--space-2) var(--space-1); text-align: center; }
+  /* Phone bottom row (spec §1.5): bare white circles on the ground, no bar fill; the current destination
+     is a lime capsule with icon and label, its icon where it would sit in a circle. */
+  .navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; gap: var(--nav-gap); height: auto; min-height: calc(var(--mobile-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); color: var(--ink); }
+  .navigation button { flex: none; justify-content: center; gap: var(--space-3); min-width: 0; width: var(--nav-circle); min-height: var(--nav-circle); padding: 0; text-align: left; }
+  .navigation button[aria-current="page"] { flex: 0 1 auto; width: auto; min-width: var(--nav-capsule); padding-inline: calc((var(--nav-circle) - var(--nav-icon)) / 2); }
+  .navigation button[aria-current="page"] .nav-mark { width: var(--nav-icon); height: var(--nav-icon); }
   .navigation .nav-word { display: inline; overflow-wrap: anywhere; word-break: normal; white-space: normal; }
+  .navigation button:not([aria-current="page"]) .nav-word { display: none; }
   .content-shell { grid-area: 1 / 1; height: 100%; }
   .design-topbar { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); padding-block: calc(var(--safe-top) + var(--space-3)) var(--space-4); }
   .station-identity { display: inline-flex; }
@@ -981,7 +1013,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .calendar-weekdays, .calendar-grid { gap: 0; }
   .calendar-week { gap: 0; }
   .calendar-head, .calendar-legend { padding-inline: 20px; }
-  .navigation { gap: 0; padding-inline: var(--safe-left) var(--safe-right); }
+  .navigation { padding-inline: var(--safe-left) var(--safe-right); }
 }
 
 @media (prefers-reduced-motion: reduce) {
