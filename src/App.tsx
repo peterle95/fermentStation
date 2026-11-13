@@ -1333,10 +1333,10 @@ function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string
             const date = new Date(`${event.date}T12:00:00`);
             const isFinish = event.kind === "finish";
             return (
-              <button aria-label={`Open ${event.batchName}: ${event.label}`} className="upcoming-item" key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
+              <button aria-label={`Open ${event.batchName}: ${event.label}`} className={isFinish ? "upcoming-item small-card bowed small-card-blue" : "upcoming-item small-card bowed"} key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
                 <time className="upcoming-date" dateTime={event.date}><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { month: "short" }).format(date)}</span></time>
                 <div className="upcoming-body"><b>{event.batchName}</b><p>{isFinish ? "Finish date" : event.label}</p></div>
-                <span className={`calendar-status ${isFinish ? "ready" : "attention"}`}>{isFinish ? "Finish" : "Check"}</span>
+                <span className="small-card-tag">{isFinish ? "Finish" : "Check"}</span>
               </button>
             );
             })}
@@ -1348,7 +1348,7 @@ function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string
             {overdue.length === 0 ? <p className="calendar-empty">No overdue checks.</p> : overdue.map((event) => {
               const date = new Date(`${event.date}T12:00:00`);
               return (
-                <button aria-label={`Open ${event.batchName}: ${event.label}`} className="upcoming-item overdue-item" key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
+                <button aria-label={`Open ${event.batchName}: ${event.label}`} className="upcoming-item overdue-item small-card bowed" key={`${event.batchId}-${event.kind}-${event.date}-${event.label}`} onClick={() => onOpen(event.batchId)} type="button">
                   <time className="upcoming-date" dateTime={event.date}><b>{date.getDate()}</b><span>{new Intl.DateTimeFormat("en-US", { month: "short" }).format(date)}</span></time>
                   <div className="upcoming-body"><b>{event.batchName}</b><p>{event.label} · overdue</p></div>
                   <span aria-hidden="true" className="calendar-overdue-mark">!</span>
@@ -1542,7 +1542,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
                   aria-expanded={canChooseBatch ? openUpcomingDate === dateValue : undefined}
                   aria-haspopup={canChooseBatch ? "dialog" : undefined}
                   aria-label={canChooseBatch ? `Choose a batch for ${dateValue}` : undefined}
-                  className={dateValue === today ? "today" : undefined}
+                  className={dateValue === today ? "small-card bowed small-card-current" : "small-card bowed"}
                   key={dateValue}
                   onClick={() => {
                     if (canChooseBatch) return setOpenUpcomingDate((openDate) => openDate === dateValue ? null : dateValue);
@@ -2025,7 +2025,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
         <div className="design-detail-heading"><span className="design-check-symbol"><DesignIcon name="jar" /></span><div><h3>{batch.name}</h3><p>{batch.profileSnapshot.name} batch</p></div><button aria-label="Add observation" className="primary-action card-action design-record-observation" onClick={showLogger} ref={observationTrigger} type="button"><DesignIcon name="plus" /><span>Add observation</span></button></div>
         <div className="design-detail-metrics"><span>Started {shortDate(batch.startDate)}</span><strong>Day {day}<small>{batch.finishDate ? ` / ${Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))}` : ""}</small></strong></div>
         <BatchPhoto batch={batch} detail />
-        <dl className="detail-readings" aria-label="Latest observed readings"><div><dt><DesignIcon name="drop" />pH</dt><dd>{latestPh ? latestPh.value : "Not recorded"}</dd>{latestPh && <time dateTime={latestPh.date}>{shortDate(latestPh.date)}</time>}</div><div><dt><DesignIcon name="temp" />Temperature</dt><dd>{latestTemperature ? `${displayTemperature(latestTemperature.value, units)} ${temperatureUnit}` : "Not recorded"}</dd>{latestTemperature && <time dateTime={latestTemperature.date}>{shortDate(latestTemperature.date)}</time>}</div></dl>
+        <dl className="detail-readings" aria-label="Latest observed readings"><div className="small-card bowed"><dt className="small-card-tag"><DesignIcon name="drop" />pH</dt><dd className="small-card-value">{latestPh ? latestPh.value : "Not recorded"}</dd>{latestPh && <time className="small-card-chip" dateTime={latestPh.date}>{shortDate(latestPh.date)}</time>}</div><div className="small-card bowed small-card-blue"><dt className="small-card-tag"><DesignIcon name="temp" />Temperature</dt><dd className="small-card-value">{latestTemperature ? `${displayTemperature(latestTemperature.value, units)} ${temperatureUnit}` : "Not recorded"}</dd>{latestTemperature && <time className="small-card-chip" dateTime={latestTemperature.date}>{shortDate(latestTemperature.date)}</time>}</div></dl>
         {batch.status === "active" && nextCheck && <section className="summary-row design-detail-next bowed" aria-label="Next batch check"><div><p>{dueCheck ? "Check due" : "Next check"}</p><strong>{dueCheck?.name ?? nextCheck.name}</strong><p>{dueCheck?.overdue ? "Overdue · " : "Due · "}{shortDate((dueCheck ?? nextCheck).nextDueDate)}</p></div>{dueCheck && <button aria-label={`Complete check: ${dueCheck.name} for this batch`} className="summary-row-count" onClick={(event) => { if (document.activeElement === event.currentTarget && dueBatchChecks(batch, localDate()).length === 1) observationTrigger.current?.focus({ preventScroll: true }); onComplete(batch.id, dueCheck.id); }} type="button"><DesignIcon name="check" /><span>Complete check</span></button>}</section>}
         {(!nextCheck || batch.status !== "active") && <p className="detail-check-state">{batch.status !== "active" ? "Recurring checks paused while this batch is not active." : "No recurring checks scheduled."}</p>}
       </div>
@@ -2228,10 +2228,9 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
             <section className="timeline">
               {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
               {[...batch.timeline].reverse().map((entry) => (
-                <div className={`timeline-entry bowed timeline-${entry.kind}`} key={entry.id}>
-                  <span className="timeline-dot" aria-hidden="true" />
-                  <span className="timeline-content"><strong>{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong><span className="timeline-description">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <span className="timeline-photo user-photo"><BatchImage key={entry.dataUrl} source={entry.dataUrl} description={entry.caption || entry.name} userPhoto retryable /></span>}</span></span>
-                  <time dateTime={entry.date}>{shortDate(entry.date)}</time>
+                <div className={`timeline-entry small-card bowed timeline-${entry.kind}${entry.kind === "ph" || entry.kind === "temperature" || entry.kind === "measurement" ? " small-card-blue" : ""}`} key={entry.id}>
+                  <span className="timeline-content"><strong className="small-card-tag">{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong><span className="timeline-description">{timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <span className="timeline-photo user-photo"><BatchImage key={entry.dataUrl} source={entry.dataUrl} description={entry.caption || entry.name} userPhoto retryable /></span>}</span></span>
+                  <time className="small-card-chip" dateTime={entry.date}>{shortDate(entry.date)}</time>
                   <div className="timeline-entry-actions" hidden={!managementOpen}>
                     {entry.kind !== "check" && entry.kind !== "measurement" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} onClick={() => editEntry(entry)} type="button">Edit</button>}
                     <button aria-label={`Delete ${entry.kind} from ${entry.date}`} onClick={() => { if (editing?.id === entry.id && !discardDraft()) return; onChange(deleteTimelineEntry(batch, entry.id, Date.now())); }} type="button">Delete</button>

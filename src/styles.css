@@ -13,8 +13,8 @@
   /* Type roles (docs/design/swipe-rework-log.md, ticket 2). Pick a role; never set a raw size or weight.
      Weight follows size: Unique's stems are 0.018 em (Thin) to 0.100 em (Bold), so each role keeps
      stems >= 1.4 CSS px. Light weights are display-only; small text gets heavier, not lighter. */
-  --type-display: 6.25rem; --type-display-weight: 100; --type-display-leading: 0.9; --type-display-tracking: 0; /* hero counts; spec 1.6 "64+" (figure 71 px) */
-  --type-figure: 3rem; --type-figure-weight: 200; --type-figure-leading: 1; --type-figure-tracking: 0.01em; /* values: day count, readings, metrics, dates; spec 1.7 "04" */
+  --type-display: 6.25rem; --type-display-weight: 300; --type-display-leading: 0.9; --type-display-tracking: 0; /* hero counts; spec 1.6 "64+" (figure 71 px, Light) */
+  --type-figure: 3rem; --type-figure-weight: 300; --type-figure-leading: 1; --type-figure-tracking: 0.01em; /* values: day count, readings, metrics, dates; spec 1.7 "04" (Light) */
   --type-headline: 3rem; --type-headline-weight: 700; --type-headline-leading: 1.05; --type-headline-tracking: 0.01em; /* page titles (h1) on the ground */
   --type-title: 2.5rem; --type-title-weight: 700; --type-title-leading: 1; --type-title-tracking: 0.015em; /* card title line 1; spec 1.1 "Orange" (line pitch 39 px) */
   --type-title-light: 2.5rem; --type-title-light-weight: 300; --type-title-light-leading: 1; --type-title-light-tracking: 0.02em; /* card title line 2; spec 1.1 "Drinks" */
@@ -48,6 +48,10 @@
   --colour-hairline: #f1f1f1;
   --colour-frost: rgb(255 255 255 / 60%);
   --colour-count: #fff6ce;
+  --colour-event-lilac: #d9b4eb;
+  --colour-event-lilac-end: #f6eafc;
+  --colour-event-sky: #b4dff9;
+  --colour-event-sky-end: #e6f6ff;
   /* Text colour pairs. Each --ink-ground-* is a role colour on the black ground; --ink-fill is every role on
      white and pastel fills. src/styles.test.ts checks every pair's contrast from these tokens. */
   --ink-ground: var(--colour-text-inverse);
@@ -161,6 +165,19 @@
   --big-number-circle: 118px;
   --big-number-glyph: 0.4;
   --big-number-gap: 10px;
+  /* Small card (spec §1.7 event card; gap 13): pastel -> 85 % white gradient, bowed by the small-component rule
+     r = 0.16 W, bow = 0.0125 W, capped at the large-card 52 / 4.4 (reached at W 325 / 352; the phone card measures
+     54 / 4.2 at 337). The card is its own inline-size container, so its fill layers read W as 100cqi. Insets, the
+     lime tag chip (110 x 27) and the translucent time chip (90 x 30) are the board's 9 / 12.6 / 13 / 14 board px x 2.11. */
+  --small-card-radius: 0.16;
+  --small-card-bow: 0.0125;
+  --small-card-inset: 19px;
+  --small-card-inset-top: 27px;
+  --small-card-gap: 12px;
+  --small-card-spacing: 16px;
+  --small-card-tag-height: 27px;
+  --small-card-chip-height: 30px;
+  --small-card-glyph: 16px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -302,7 +319,6 @@ input::file-selector-button,
 .batch-image-credit,
 .design-photo-label,
 .status,
-.calendar-status,
 .design-badge,
 .zone,
 .queue-card,
@@ -312,14 +328,12 @@ input::file-selector-button,
 .checks-summary,
 .checks-paused-row,
 .design-tip,
-.upcoming-strip button.today,
 .upcoming-strip [class^="event-"],
 .design-detail-card,
 .batch-photo-retry,
 .design-input-summary,
 .batch-guidance,
-.design-timeline-panel,
-.timeline-entry,
+.small-card,
 .timeline-photo,
 .batch-tools-shortcuts button,
 .batch-management > .next-action,
@@ -340,7 +354,6 @@ input::file-selector-button,
 .profile-editor-card,
 .calendar-panel,
 .calendar-day.selected .calendar-day-button:hover,
-.upcoming-item,
 .settings-card,
 .settings-recovery,
 .settings-live[role="alert"] > p,
@@ -368,8 +381,6 @@ input::file-selector-button,
 .queue-icon.overdue,
 .done .design-check-complete,
 .design-checks-view,
-.detail-readings > div,
-.timeline-status,
 .batch-management,
 .component-calculation-value,
 .start-batch-basics legend,
@@ -392,16 +403,16 @@ input::file-selector-button,
 /* Type roles: the only place that sets font-size, weight, leading and tracking. Each rule applies one
    complete role from :root. Role colours (meta, figure) resolve through the surface's ink set. */
 .big-number > strong, .checks-summary strong { font-size: var(--type-display); font-weight: var(--type-display-weight); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); color: var(--ink-figure); }
-.design-stat-number, .upcoming-strip strong, .design-detail-metrics > strong, .detail-readings dd, .meas-value, .upcoming-date b { font-size: var(--type-figure); font-weight: var(--type-figure-weight); line-height: var(--type-figure-leading); letter-spacing: var(--type-figure-tracking); color: var(--ink-figure); }
+.design-stat-number, .upcoming-strip strong, .design-detail-metrics > strong, .small-card-value, .meas-value, .upcoming-date b { font-size: var(--type-figure); font-weight: var(--type-figure-weight); line-height: var(--type-figure-leading); letter-spacing: var(--type-figure-tracking); color: var(--ink-figure); }
 h1 { font-size: var(--type-headline); font-weight: var(--type-headline-weight); line-height: var(--type-headline-leading); letter-spacing: var(--type-headline-tracking); }
 .design-batch-copy h3, .design-empty-card > p:first-child, .design-detail-heading h3, .design-profile-copy h2, .profile-editor-title-input { font-size: var(--type-title); font-weight: var(--type-title-weight); line-height: var(--type-title-leading); letter-spacing: var(--type-title-tracking); }
 .design-batch-profile, .design-detail-heading p, .meas-value-small { font-size: var(--type-title-light); font-weight: var(--type-title-light-weight); line-height: var(--type-title-light-leading); letter-spacing: var(--type-title-light-tracking); }
 h2, h3, h4, .brand strong { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); }
-.design-tip h3, .design-batch-bottom strong, .design-detail-top h2, .design-input-summary h3, .timeline-panel-heading h3, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .design-detail-next strong, .timeline-content > strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
+.design-tip h3, .design-batch-bottom strong, .design-detail-top h2, .design-input-summary h3, .timeline-panel-heading h3, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .design-detail-next strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 .navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .calendar-day, .calendar-day-button, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
 body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .guide-step p, .batch-guidance > p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
-button, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .design-date-chip, .design-toast, .profile-editor-toast, .status, .calendar-status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
-small, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-summary span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-readings dt, .detail-readings time, .detail-check-state, .design-detail-next p, .timeline-entry time, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
+button, .small-card-tag, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .design-date-chip, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-summary span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-check-state, .design-detail-next p, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
 strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(--type-title-weight); }
 
 /* Bowed outline (spec §2.3): the one silhouette for every large card. Straight sides, top and
@@ -604,6 +615,18 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-stat-row > div:first-child { display: flex; flex-direction: column-reverse; align-items: flex-start; gap: var(--space-1); }
 .design-stat-number { font-variant-numeric: tabular-nums; }
 .design-stat-number > span { margin-left: var(--space-1); }
+
+/* Small card (spec §1.7 event card; gap 13): the one card for timeline entries, the latest readings and the
+   upcoming items and days. Bowed by the small-component rule from its own width; lilac gradient by default,
+   blue with .small-card-blue, a lime ring with .small-card-current. Parts: the lime tag chip (kind), the Light
+   value (figure role) and the translucent chip (time). It joins the light-fill ink set: all text is black. */
+.small-card { container-type: inline-size; display: grid; align-content: start; gap: var(--small-card-gap); min-width: 0; padding: var(--small-card-inset-top) var(--small-card-inset) var(--small-card-inset); overflow-wrap: anywhere; --r: min(var(--bowed-radius), 100cqi * var(--small-card-radius)); --bow: min(var(--bowed-bow), 100cqi * var(--small-card-bow)); --small-card-from: var(--colour-event-lilac); --small-card-to: var(--colour-event-lilac-end); --fill: linear-gradient(90deg, var(--small-card-from), var(--small-card-to)); }
+.small-card-blue { --small-card-from: var(--colour-event-sky); --small-card-to: var(--colour-event-sky-end); }
+.small-card-current { --stroke: var(--colour-action); --stroke-w: var(--bowed-stroke); }
+.small-card-tag { display: inline-flex; align-items: center; justify-self: start; gap: var(--space-1); min-height: var(--small-card-tag-height); margin: 0; padding-inline: var(--space-3); border-radius: var(--radius-control); background: var(--colour-action); }
+.small-card-tag svg { flex: none; width: var(--small-card-glyph); height: var(--small-card-glyph); }
+.small-card-value { margin: 0; }
+.small-card-chip { display: inline-flex; align-items: center; justify-self: start; min-height: var(--small-card-chip-height); padding-inline: var(--space-3); border-radius: var(--radius-control); background: var(--colour-frost); }
 .design-stat-track { display: none; }
 .design-stat-track i { display: block; height: 100%; background: var(--colour-text); }
 .design-section-head, .section-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); margin-bottom: var(--space-4); }
@@ -653,8 +676,8 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .user-photo img { object-fit: contain; border-radius: var(--radius-small); }
 .design-batch-card:hover img { transform: scale(1.03); }
 .design-photo-label { position: absolute; bottom: var(--space-2); right: var(--space-2); max-width: calc(100% - 16px); border-radius: var(--radius-control); padding: var(--space-1) var(--space-2); background: var(--colour-background); text-align: center; }
-.status, .calendar-status, .design-badge, .zone { display: inline-flex; align-items: center; gap: var(--space-2); border: 1px solid var(--colour-border); border-radius: var(--radius-control); padding: var(--space-1) var(--space-3); background: var(--colour-surface); }
-.status-ready, .calendar-status.ready { background: var(--colour-action); }
+.status, .design-badge, .zone { display: inline-flex; align-items: center; gap: var(--space-2); border: 1px solid var(--colour-border); border-radius: var(--radius-control); padding: var(--space-1) var(--space-3); background: var(--colour-surface); }
+.status-ready { background: var(--colour-action); }
 .status-to-fridge { background: var(--colour-accent); }
 .status-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
 .action-queue { margin-top: var(--space-8); }
@@ -684,9 +707,8 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-tip h3 { margin-bottom: var(--space-2); }
 .design-more-actions { margin-top: var(--space-6); }
 .design-more-actions > div { display: grid; gap: var(--space-4); padding-block: var(--space-4); }
-.upcoming-strip { display: flex; gap: var(--space-3); overflow-x: auto; padding: var(--space-2) var(--space-2) var(--space-4); overscroll-behavior-inline: contain; }
-.upcoming-strip button { display: grid; align-content: start; gap: var(--space-3); flex: 0 0 112px; padding: var(--space-4) var(--space-2); border-radius: var(--radius-small); text-align: center; }
-.upcoming-strip button.today { background: var(--colour-action); }
+.upcoming-strip { display: flex; gap: var(--small-card-spacing); overflow-x: auto; padding: var(--space-2) var(--space-2) var(--space-4); overscroll-behavior-inline: contain; }
+.upcoming-strip button { flex: 0 0 112px; text-align: center; }
 .upcoming-strip time { display: grid; color: var(--ink-time); }
 .upcoming-strip button > div { display: grid; gap: var(--space-2); }
 .design-photo-credits { margin-top: var(--space-6); }
@@ -711,12 +733,7 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-detail-photo { position: relative; display: grid; place-items: center; flex: none; height: 320px; border-radius: var(--radius-card); overflow: hidden; }
 .design-detail-photo img { width: 100%; height: 100%; max-height: 320px; padding: var(--space-16) var(--space-3) var(--space-12); object-fit: contain; }
 .design-detail-photo.user-photo { background: var(--colour-background) !important; border: 1px solid var(--colour-border); }
-.detail-readings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); margin: var(--space-4) 0 0; }
-.detail-readings > div { min-width: 0; padding: var(--space-3); border-radius: var(--radius-card); background: var(--colour-surface-inverse); overflow-wrap: anywhere; }
-.detail-readings dt { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
-.detail-readings dt svg { width: 18px; height: 18px; }
-.detail-readings time { color: var(--ink-time); }
-.detail-readings dd { margin: var(--space-2) 0 0; }
+.detail-readings { display: grid; gap: var(--small-card-spacing); margin: var(--space-4) 0 0; }
 .detail-check-state { margin-top: var(--space-4); }
 .batch-photo-retry { position: absolute; bottom: var(--space-12); z-index: 1; background: var(--colour-background); padding: var(--space-2) var(--space-3); }
 .design-detail-photo > svg { width: 80px; height: 112px; }
@@ -735,26 +752,20 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-guidance-title > svg { width: 20px; height: 20px; }
 .guide-step { margin-top: var(--space-3); }
 button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6); background: var(--colour-background); }
-.design-timeline-panel { order: 2; padding: var(--card-padding); border-radius: var(--radius-card); background: var(--colour-background); }
+.design-timeline-panel { order: 2; }
 .timeline-panel-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-4); }
 .timeline-panel-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.timeline { display: grid; gap: var(--space-3); }
-.timeline-entry { display: grid; align-items: start; grid-template-columns: 8px minmax(0, 1fr); gap: var(--space-2); padding: var(--space-4) var(--space-3); --fill: var(--colour-accent); }
-.timeline-note { --fill: var(--colour-surface); }
-.timeline-check { --fill: var(--colour-action); }
-.timeline-status { --fill: var(--colour-surface-inverse); }
-.timeline-dot { grid-column: 1; grid-row: 1; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--colour-text); }
-.timeline-content { grid-column: 2; grid-row: 1; display: grid; gap: var(--space-1); min-width: 0; overflow-wrap: anywhere; }
-.timeline-entry time { grid-column: 2; grid-row: 2; font-variant-numeric: tabular-nums; color: var(--ink-time); }
+.timeline { display: grid; gap: var(--small-card-spacing); }
+.timeline-content { display: contents; }
 .timeline-description { display: grid; gap: var(--space-2); }
 .timeline-description img { display: block; width: 100%; height: auto; max-height: 240px; object-fit: contain; border-radius: var(--radius-small); }
 .timeline-photo { position: relative; display: grid; place-items: center; min-height: 180px; border-radius: var(--radius-small); background: var(--colour-background); }
 .timeline-photo .batch-photo-retry { bottom: var(--space-2); }
 .warning { text-decoration: underline; }
 .zone { justify-self: start; background: var(--colour-action); }
-.timeline-entry-actions { grid-column: 2 / -1; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
-.timeline-entry-actions button { min-height: 44px; padding: var(--space-2) var(--space-4); }
-.timeline-trash { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--colour-border); border-radius: var(--radius-small); }
+.timeline-entry-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
+.timeline-entry-actions button { min-height: 44px; padding: var(--space-2) var(--space-4); border-color: transparent; background: var(--colour-frost); }
+.timeline-trash { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px solid currentColor; border-radius: var(--radius-small); }
 .design-detail-footer { order: 6; display: flex; align-items: center; gap: var(--space-2); }
 .detail-photo-credits { order: 7; }
 .detail-photo-credits .design-photo-credits { margin: 0; }
@@ -995,10 +1006,9 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .calendar-helper { margin-top: var(--space-4); }
 .calendar-lists { display: grid; gap: var(--space-8); }
 .calendar-section-label { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4); }
-.upcoming-list { display: grid; gap: var(--space-4); }
-.upcoming-item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); width: 100%; text-align: left; border: 0; border-radius: var(--radius-card); padding: var(--space-4); background: var(--colour-background); }
+.upcoming-list { display: grid; gap: var(--small-card-spacing); }
+.upcoming-item { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); width: 100%; text-align: left; }
 .upcoming-item:hover { transform: translateY(-2px); }
-.overdue-item { background: var(--colour-surface); }
 .calendar-overdue-mark { display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--radius-control); background: var(--colour-surface-inverse); color: var(--ink-attention); }
 .upcoming-date { display: grid; justify-items: center; flex: none; min-width: 44px; }
 .upcoming-body { flex: 1; min-width: 112px; }
@@ -1183,7 +1193,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .calendar-head, .calendar-legend, .calendar-helper { padding-inline: var(--space-4); }
   .calendar-day { padding-inline: var(--space-1); }
   .calendar-day-button { padding-inline: 0; }
-  .upcoming-item .calendar-status { margin-left: auto; }
+  .upcoming-item .small-card-tag { margin-left: auto; }
   .calendar-screen, .settings-screen, .profiles-screen, .design-checks-view { padding: var(--space-4); }
   .calendar-screen, .design-checks-view, .settings-screen, .profiles-screen { padding: 0; }
   /* Bottom sheet: full width, anchored to the bottom edge, bowed top and a flat bottom; the scrim stays

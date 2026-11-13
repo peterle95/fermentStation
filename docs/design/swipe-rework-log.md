@@ -21,7 +21,7 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 11 Kitchen summary | **closed**: lime bowed card H/W 0.58 capped at 382, lilac emblem d 0.309 W 47 % above, yellow `summary-row` 0.916 × 0.252 W 49 % below with the `#fff6ce` count pill 79 × 49; the batch detail's next check uses the same `summary-row` | Kitchen summary (ticket 9) |
 | 10 Settings controls | **closed**: one `toggle-list` / `toggle-row` primitive (h 72, gap 8, inset 16, black selected row), lilac avatar d 63, switch 42 × 25 / knob 20; Suggestions is a real `role="switch"`, Units and Notifications are row choices | settings |
 | 12 Primary action | **closed** for the batch detail ("Add observation" is the `card-action` capsule); Settings export and dialog submits remain | batch card (ticket 8) |
-| 13 Timeline | open (timeline entries are already bowed) | timeline |
+| 13 Timeline | **closed**: one `small-card` (bowed at r = min(52, 0.16 W), bow = min(4.4, 0.0125 W) from its own width; lilac `#d9b4eb → #f6eafc` or blue `#b4dff9 → #e6f6ff` gradient; lime tag chip h 27; Light value; translucent time chip h 30; all ink black) for timeline entries, the latest readings, the calendar's upcoming/overdue items and the Checks upcoming strip; the white timeline panel is gone | small cards (ticket 10) |
 
 Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text inside the scroll panes was absolutely positioned against `.app-shell`, which made the whole document scroll in 49 of 60 captures. `.main-content`, `.design-dashboard` and `.design-detail` are now `position: relative`, so they contain it.
 
@@ -41,7 +41,7 @@ The primitive is defined once, in `src/styles.css` directly after `.sr-only`. It
 - **Fallback:** without `shape()` support (Firefox and older WebKitGTK were not verified), every layer becomes a rounded rectangle at `--r`. The scratchpad demo was checked with shape support forced off: fill, ring, media and overhang all stayed intact.
 - **Fidelity:** a 382×359 `bowed` box rendered in Chrome 157 against the ui-board drink card measures 0.25 board px rms and 1.2 board px max, including the ill-conditioned corner tips. The top-edge bow is 2.96 against the board's 3.0.
 
-Bowed surfaces today (enforced by `src/styles.test.ts`): `design-batch-card`, `design-summary`, `checks-summary`, `design-detail-card`, `profile-card`, `profile-editor-section`, `profile-editor-head`, `calendar-panel`, `settings-card`, `batch-component-card`, `timeline-entry` (`bowed`) and `station-dialog` (`bowed-clip`). The retired `::before` black-notch bars and the asymmetric `2rem 2rem 2.5rem 2.5rem / …` radii are gone.
+Bowed surfaces today (enforced by `src/styles.test.ts`): `design-batch-card`, `design-summary`, `checks-summary`, `design-detail-card`, `profile-card`, `profile-editor-section`, `profile-editor-head`, `calendar-panel`, `settings-card`, `batch-component-card`, `timeline-entry`, `summary-row`, `small-card` (`bowed`) and `station-dialog` (`bowed-clip`). The retired `::before` black-notch bars and the asymmetric `2rem 2rem 2.5rem 2.5rem / …` radii are gone.
 
 ### Colour tokens
 
@@ -90,8 +90,8 @@ User decision on D1: component geometry stays 1:1 with the boards; type is sized
 
 | Role | Size | Weight | Leading | Tracking | Job / measured box it fits |
 | --- | --- | --- | --- | --- | --- |
-| display | 6.25rem (100) | 100 Thin | 0.9 | 0 | hero counts (spec §1.6 "64+", figure 71 px) — colour `--ink-figure` |
-| figure | 3rem (48) | 200 ExtraLight | 1 | 0.01em | values: day count, readings, metrics, dates ("04" role ≈ 42) — `--ink-figure` |
+| display | 6.25rem (100) | 300 Light (was 100 Thin; ticket 10) | 0.9 | 0 | hero counts (spec §1.6 "64+", figure 71 px) — colour `--ink-figure` |
+| figure | 3rem (48) | 300 Light (was 200 ExtraLight; ticket 10) | 1 | 0.01em | values: day count, readings, metrics, dates ("04" role ≈ 42) — `--ink-figure` |
 | headline | 3rem (48) | 700 Bold | 1.05 | 0.01em | page titles (h1) on the ground |
 | title | 2.5rem (40) | 700 Bold | 1 | 0.015em | card title line 1 (drink card "Orange": pitch 39 px) |
 | title-light | 2.5rem (40) | 300 Light | 1 | 0.02em | card title line 2 ("Drinks") |
@@ -399,12 +399,52 @@ At 320 the card is 272 wide: emblem d 84, sub-row 249 × 69, pill 79 × 49.
 - The sub-row's avatar is a lilac check circle where the board has a photo. The pill shows only the count, without the board's glyph.
 - Out of scope, noticed: none new in timeline, calendar, batch cards or Settings.
 
+## Ticket 10: small cards and Light figures (gap 13, display weight) — done
+
+No text, accessible name, role or focus order changed. The timeline entries keep their kind in a `<strong>` (the App test queries `.timeline-entry strong`), the readings keep `dl[aria-label="Latest observed readings"]` with `dt`/`dd`/`time`, and the upcoming items and strip days stay the same buttons with the same names. The removed `timeline-dot` was `aria-hidden`.
+
+### As built
+
+- **One component, `small-card`** (`src/styles.css`, after the big-number block; used with `bowed`). The card is its own `container-type: inline-size`, so its fill and stroke layers (pseudo-elements query their originating element; checked in headless Chrome) read W as `100cqi`: `--r: min(var(--bowed-radius), 100cqi * var(--small-card-radius))`, `--bow: min(var(--bowed-bow), 100cqi * var(--small-card-bow))`. That is the §2.3 small-component rule below ≈ 325 px and the large-card 52 / 4.4 above it, with no per-instance tuning. k stays 0.64 (§2.3: the phone card's 0.86 is a blur artefact). Fill: `linear-gradient(90deg, var(--small-card-from), var(--small-card-to))`, lilac by default; `.small-card-blue` swaps the two stops; `.small-card-current` adds the lime ring (`--stroke`, gap 14 vocabulary). Parts: `small-card-tag` (lime capsule h 27, `label` role, optional 16 px glyph), `small-card-value` (`figure` role), `small-card-chip` (translucent `--colour-frost` capsule h 30, `meta` role). `.small-card` is in the light-fill ink set, so every word on it is black.
+- **Instances.** Timeline entries (`timeline-entry small-card bowed`, blue for pH / temperature / measurement, lilac otherwise; kind = tag, date = chip, Edit/Delete as frosted capsules; `.timeline-content` is `display: contents`). Batch-detail readings (pH lilac, temperature blue; `dt` = tag with its icon, `dd` = value, `time` = chip), now **stacked** like the board's two event cards: side by side they were 139 px wide and "Temperature" broke inside its tag. Calendar upcoming items (finish blue, check lilac; "Finish"/"Check" moved from the bordered `calendar-status` chip to the tag) and overdue items (lilac, "!" mark unchanged). Checks upcoming strip days (lilac, today = lime ring instead of a lime tile). The three lists and the readings stack at `--small-card-spacing` 16 (board: 7.8 board px at the midpoint).
+- **Retired:** the white `.design-timeline-panel` card (the timeline now sits on black like the board's event cards; the heading and text actions turn white through the ground ink), `.timeline-note/check/status` flat fills, `.timeline-dot`, `.overdue-item`'s yellow fill, the black `.detail-readings > div` boxes and their `dt`/`dd`/`time` rules, `.upcoming-strip button.today`, and the now unused `.calendar-status` selectors. `.timeline-trash` draws its outline in `currentColor` so it stays visible on black.
+- **Display weight (item 2).** Spec §1.6 measures "64+" as **Light**, and §1.7 measures the "04" value as Light too. `--type-display-weight` and `--type-figure-weight` are now 300 (stems 4.6 / 2.2 px, above the 1.4 floor). Both are still single definitions in `:root`. Consequence: no role uses Thin (100) or ExtraLight (200) any more, so the ticket 2 note "uses all seven Unique weights" (D1) no longer holds. The boards use neither weight; **the user should confirm this** (revert = put the two tokens back to 100 / 200 and the weight test's list back to seven).
+
+Tokens added: `--colour-event-lilac` `#d9b4eb`, `--colour-event-lilac-end` `#f6eafc`, `--colour-event-sky` `#b4dff9`, `--colour-event-sky-end` `#e6f6ff` (named "sky" because the palette test rejects colour words in values), `--small-card-radius` 0.16, `--small-card-bow` 0.0125, `--small-card-inset` 19px, `--small-card-inset-top` 27px, `--small-card-gap` 12px, `--small-card-spacing` 16px, `--small-card-tag-height` 27px, `--small-card-chip-height` 30px, `--small-card-glyph` 16px. Ink on every gradient stop ≥ 11:1.
+
+### Measured (pixel scan of the harness PNGs; spec §1.7 at 337: r 54, bow 4.2, tag 110 × 27 at inset 19 / 27, time chip 90 × 30, gap 16)
+
+| Viewport | Instance | Card W | r / bow (from the rule) | Tag | Chip inset |
+| --- | --- | --- | --- | --- | --- |
+| 390 | reading | 294 × 168 | 47 / 3.7 | h 27 (pH 56 wide, Temperature 108) | 19 left, 24 below the bowed midpoint (27 from the tangent) |
+| 390 | timeline entry | 342 | 52 / 4.3 | h 27 | 19 |
+| 1440 | reading (detail column) | ≈ 318 | 51 / 4.0 | h 27 | 19 |
+| — | strip day | 112 | 18 / 1.4 | — | 19 |
+
+### Tests
+
+- New describe block "small cards" (5 tests): token values and the §2.3 arithmetic (160 px → r 25.6 / bow 2.0; 337 px → capped 52 / 4.2), contrast of every gradient stop; one definition with the exact geometry/fill declarations, single-purpose variant rules, no length literal in any part (only `100cqi`), one rule per part; no instance rule sets fill, outline, stroke, padding, background or border, the upcoming item only lays out its row, the three lists use the spacing token; the retired selectors and `timeline-dot`/`calendar-status` are gone; markup: every `small-card` literal includes `bowed`, the timeline/readings/upcoming/strip class lists, tag/value/chip in the readings, roles label/figure(Light)/meta and that the label and meta lines fit the 27 / 30 chips; ink: `.small-card` is light-fill, no instance is in either ink list, and `--ink-figure` is coral only in ground sets.
+- Changed: the weight test is now "applies every role and sets every figure in Light" (display, figure, title-light = 300; weights in use 300–700). The palette list gained the four event colours. `small-card` joined the required bowed surfaces; `.detail-readings > div`, `.design-timeline-panel` and `.upcoming-item` left the legacy radius allowlist. The logger test's `.timeline-entry time` placement assertion now checks the time chip markup.
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 74 / 74; plain `npm test` 300 / 300, 15 files.
+- Harness, full run (60 captures): 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0, clippedControls 0, smallTargets 0, surfaceOverflow 1 (calendar 320, known). No capture step needed changes.
+
+### Left by ticket 10
+
+- Timeline readings still read "pH 4.31" in the body role inside the description; the board's large Light value would need the reading split out of `timelineEntryText` (tests query that text).
+- The `.zone` chip inside a pH entry is still the bordered 44 px status chip; the strip day's event chips keep their yellow/lime fills; the board's bookmark circle (d 57) is not used (entry actions are frosted text capsules, shown only with Tools open).
+- The `.bowed` element's own `border-radius` (focus outline only) reads `100cqi` against the nearest ancestor container, so a strip day's focus ring is rounder than its fill.
+- The harness has no capture of the Checks upcoming strip (it sits in a collapsed section).
+- D1: confirm that Thin and ExtraLight may stay unused (see above).
+
 ## Left for later tickets / known issues
 
 - ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).
 - ~~Timeout~~ fixed by ticket 2 with `testTimeout` in `vite.config.ts`. Was: `src/App.test.tsx` "reflects edited cadence and pauses and resumes checks with batch status" times out at the 5 s default (it takes 5.3–8 s). It fails the same way at `7133bca` with the foundation changes stashed, so it is a pre-existing slow test, not a regression. Full suite after foundation: 254 passed, 2 failed (these two), 228 s with `--maxWorkers=1`.
-- These rounded-rectangle surfaces are not bowed yet, though they are large cards on the ground: `.design-timeline-panel`, `.batch-guidance`, `.design-input-summary`, `.batch-management > .wb-panel`, `.next-action`, `.design-detail-next` (yellow sub-row → a bowed row with `--r` = H/2, gap 11), `.design-tip`, `.empty-state`, `.profile-editor-card` and `.batch-tools-danger`. Bow them in the ticket that owns them. `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
-- `timeline-entry` uses the default 52px radius, capped at 50 % of its height. Short entries therefore read as near-capsules. Gap 13 should give them their event-card size and the small-component rule (`--r` ≈ 0.16 W, `--bow` ≈ 0.0125 W below 300px).
+- These rounded-rectangle surfaces are not bowed yet, though they are large cards on the ground (ticket 10 retired `.design-timeline-panel`): `.batch-guidance`, `.design-input-summary`, `.batch-management > .wb-panel`, `.next-action`, `.design-detail-next` (yellow sub-row → a bowed row with `--r` = H/2, gap 11), `.design-tip`, `.empty-state`, `.profile-editor-card` and `.batch-tools-danger`. Bow them in the ticket that owns them. `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
+- ~~`timeline-entry` radius~~ settled by ticket 10 (small-card rule). Was: `timeline-entry` uses the default 52px radius, capped at 50 % of its height. Short entries therefore read as near-capsules. Gap 13 should give them their event-card size and the small-component rule (`--r` ≈ 0.16 W, `--bow` ≈ 0.0125 W below 300px).
 - Calendar event days still use `--colour-action-alt` on tall capsules. The spec wants `--colour-emblem` circles there (calendar restyle).
 - The native launch colours are still `#1c1c1c`: `android/app/src/main/res/values/colors.xml` `colorPrimary`/`colorPrimaryDark`, and `capacitor.config.ts` `iconColor`. `styles.test.ts` asserts them. Switch them to `#000000` together with that test if the launch screen should match the new ground.
 - `index.html` `theme-color` is `#ffffff`.

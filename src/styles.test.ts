@@ -53,6 +53,7 @@ describe("Swipe-derived design contract", () => {
       background: "#ffffff", surface: "#ffec89", "surface-inverse": "#000000", text: "#000000", "text-muted": "#000000", "text-inverse": "#ffffff",
       action: "#b6f074", "on-action": "#000000", "action-alt": "#dab8f1", emblem: "#c5b4ec", accent: "#b6e1fa", border: "#000000",
       rail: "#3e3e40", "sheet-control": "#1b1b1b", row: "#f6f8fa", "switch-on": "#2089fd", "switch-off": "#eceef0", count: "#fff6ce",
+      "event-lilac": "#d9b4eb", "event-lilac-end": "#f6eafc", "event-sky": "#b4dff9", "event-sky-end": "#e6f6ff",
     })) expect(styles).toContain(`--colour-${name}: ${value};`);
     // The retired near-black must not come back as ground, ink or border.
     expect(styles).not.toMatch(/#1c1c1c/i);
@@ -231,14 +232,18 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
     }
   });
 
-  it("applies every role and so puts all seven Unique weights, Thin to Bold, to work", () => {
+  it("applies every role and sets every figure in Light, as the boards do", () => {
     const applied = new Set<string>();
     for (const entry of rules()) {
       const size = new Map(entry.declarations).get("font-size")?.match(/^var\(--type-([\w-]+)\)$/)?.[1];
       if (size && entry.selector !== ":root") applied.add(size);
     }
     expect([...applied].sort()).toEqual([...roleNames].sort());
-    expect([...new Set(roleTokens().map((role) => role.weight))].sort()).toEqual([100, 200, 300, 400, 500, 600, 700]);
+    // Ticket 10: the boards set "64+" (spec §1.6) and "04" (§1.7) in Light, so display and figure are Light (300);
+    // Thin and ExtraLight have no role. Light at 48 px keeps a 2.2 px stem, at 100 px 4.6 px.
+    const tokens = rootTokens();
+    for (const role of ["display", "figure", "title-light"]) expect(tokens.get(`--type-${role}-weight`), role).toBe("300");
+    expect([...new Set(roleTokens().map((role) => role.weight))].sort()).toEqual([300, 400, 500, 600, 700]);
   });
 
   it("guards the hierarchy anchors that later component tickets build on", () => {
@@ -311,7 +316,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
   // Gap 1 of the spec: every large card takes its silhouette from the primitive.
   const bowedCards = [
     "design-batch-card", "design-summary", "checks-summary", "design-detail-card", "profile-card", "profile-editor-section",
-    "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "timeline-entry", "summary-row",
+    "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "timeline-entry", "summary-row", "small-card",
   ];
   const clippedScrollers = ["station-dialog"];
   // Rounded rectangles that predate the primitive. Shrink only: when a ticket bows one of these
@@ -319,9 +324,9 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
   const legacyCardRadius = [
     ".storage-warning", ".app-loading", ".empty-state, .design-empty-checks, .calendar-empty", ".calendar-screen, .profiles-screen, .design-checks-view",
     ".design-detail", ".ios-install-guide", ".batch-view-switch", ".queue-card", ".design-checks-view .queue-card", ".design-tip",
-    ".design-detail-photo", ".detail-readings > div", ".design-detail-next", ".design-input-summary", ".batch-guidance", ".design-timeline-panel",
+    ".design-detail-photo", ".design-detail-next", ".design-input-summary", ".batch-guidance",
     ".batch-management > .wb-panel", ".batch-tools-danger", ".next-action", ".activity-logger", ".profile-overview-intro",
-    ".start-batch-basics", ".start-profile-summary", ".profile-card-actions", ".profile-editor-card", ".upcoming-item",
+    ".start-batch-basics", ".start-profile-summary", ".profile-card-actions", ".profile-editor-card",
   ];
 
   it("carries the measured outline in tokens and defines the shape exactly once", () => {
@@ -522,7 +527,7 @@ describe("responsive workflow safeguards", () => {
     const inline = rule(".inline-logger");
     for (const declaration of ["position: static", "width: auto", "margin: 0", "padding: 0", "overflow: visible"]) expect(inline).toContain(declaration);
     expect(rule(".observation-fields, .observation-actions")).toContain("display: contents");
-    expect(rule(".timeline-entry time")).toContain("grid-column: 2; grid-row: 2");
+    expect(app).toContain('<time className="small-card-chip" dateTime={entry.date}>');
     expect(app.match(/id="batch-activity-form"/g)).toHaveLength(1);
     expect(app).not.toContain('key={editing?.id ?? "new"}');
     expect(app).toContain("else dialog.open = true;");
@@ -1160,5 +1165,122 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
     expect(app).toMatch(/aria-label=\{`Complete check: \$\{dueCheck\.name\} for this batch`\} className="summary-row-count"/);
     expect(app.match(/summary-row-count/g)).toHaveLength(2);
     expect(rule("button.summary-row-count:hover:not(:disabled)")).toContain("background: var(--colour-background)");
+  });
+});
+
+describe("small cards (swipe-rework-log.md, ticket 10; spec §1.7 event card, §2.3 small components, gap 13)", () => {
+  const tokens = () => rootTokens();
+  const number = (token: string) => Number(tokens().get(token));
+  const px = (token: string) => Number(tokens().get(token)!.match(/^(\d+(?:\.\d+)?)px$/)![1]);
+  const isPart = (selector: string) => /^\.small-card(?:-[\w-]+)?(?:[\s:]|$)/.test(selector);
+  /** Every className literal in App.tsx that makes an element a small card, as its list of classes. */
+  const cards = () => [...app.matchAll(/["`]([^"`]*\bsmall-card\b(?!-)[^"`]*)["`]/g)].map(([, literal]) => literal.split(/\s+/));
+  /** Selectors outside the component that address a small card instance. */
+  const instances = [".timeline-entry", ".upcoming-item", ".overdue-item", ".upcoming-strip button", ".detail-readings > div"];
+  const addresses = (selector: string) => instances.some((instance) => selector === instance || selector.startsWith(`${instance}:`) || selector.startsWith(`${instance}.`));
+  const roleOf = (selector: string) => rules().find((entry) => entry.selectors.includes(selector) && new Map(entry.declarations).has("font-size"))
+    ?.declarations.find(([property]) => property === "font-size")?.[1].match(/^var\(--type-([\w-]+)\)$/)?.[1];
+
+  it("carries the measured event-card geometry and gradients in :root tokens", () => {
+    for (const declaration of [
+      "--small-card-radius: 0.16;", "--small-card-bow: 0.0125;", "--small-card-inset: 19px;", "--small-card-inset-top: 27px;", "--small-card-gap: 12px;",
+      "--small-card-spacing: 16px;", "--small-card-tag-height: 27px;", "--small-card-chip-height: 30px;", "--small-card-glyph: 16px;",
+    ]) expect(rule(":root")).toContain(declaration);
+    // Small-component rule (§2.3): a 160 px tile gets r ≈ 25 / bow 2; at the phone card's 337 px the ratios pass the
+    // large-card 52 / 4.4 that the cap keeps (the board measures 54 / 4.2 there).
+    expect(160 * number("--small-card-radius")).toBeCloseTo(25.6, 1);
+    expect(160 * number("--small-card-bow")).toBeCloseTo(2, 1);
+    expect(Math.min(px("--bowed-radius"), 337 * number("--small-card-radius"))).toBe(52);
+    expect(Math.min(4.4, 337 * number("--small-card-bow"))).toBeCloseTo(4.2, 1);
+    // Every gradient stop holds black ink at 7:1.
+    for (const stop of ["--colour-event-lilac", "--colour-event-lilac-end", "--colour-event-sky", "--colour-event-sky-end"]) {
+      expect(contrast(hex("--ink-fill"), hex(stop)), stop).toBeGreaterThanOrEqual(7);
+    }
+  });
+
+  it("defines the card once: bowed from its own width, gradient fill, inset from tokens", () => {
+    // The definition and its membership of the light-fill ink set.
+    expect(rules().filter((entry) => entry.selectors.includes(".small-card"))).toHaveLength(2);
+    const definition = rule(".small-card");
+    for (const declaration of [
+      "container-type: inline-size", "display: grid", "gap: var(--small-card-gap)",
+      "padding: var(--small-card-inset-top) var(--small-card-inset) var(--small-card-inset)",
+      "--r: min(var(--bowed-radius), 100cqi * var(--small-card-radius))", "--bow: min(var(--bowed-bow), 100cqi * var(--small-card-bow))",
+      "--small-card-from: var(--colour-event-lilac)", "--small-card-to: var(--colour-event-lilac-end)",
+      "--fill: linear-gradient(90deg, var(--small-card-from), var(--small-card-to))",
+    ]) expect(definition).toContain(declaration);
+    expect(rule(".small-card-blue").trim()).toBe("--small-card-from: var(--colour-event-sky); --small-card-to: var(--colour-event-sky-end);");
+    expect(rule(".small-card-current").trim()).toBe("--stroke: var(--colour-action); --stroke-w: var(--bowed-stroke);");
+    for (const declaration of ["min-height: var(--small-card-tag-height)", "border-radius: var(--radius-control)", "background: var(--colour-action)"]) expect(rule(".small-card-tag")).toContain(declaration);
+    for (const declaration of ["min-height: var(--small-card-chip-height)", "border-radius: var(--radius-control)", "background: var(--colour-frost)"]) expect(rule(".small-card-chip")).toContain(declaration);
+    // Sizes come from tokens: no length literal in any part (100cqi is the card's own width W).
+    const owned = rules().filter((entry) => entry.selectors.some(isPart) && !entry.declarations.some(([property]) => property === "--ink" || property === "font-size"));
+    for (const entry of owned) {
+      expect(entry.selectors.every(isPart), `${entry.selector} mixes small-card parts with other selectors`).toBe(true);
+      for (const [property, value] of entry.declarations) expect(value.replace(/100cqi/g, ""), `${entry.selector} { ${property} }`).not.toMatch(/\d(?:px|rem|em|%|vw|vh|cqi)\b/);
+    }
+    // One rule per part.
+    const subjects = owned.flatMap((entry) => entry.selectors);
+    expect(new Set(subjects).size).toBe(subjects.length);
+  });
+
+  it("leaves the outline, fill, inset and stacking of every instance to the component", () => {
+    const owned = /^(?:--fill|--r|--bow|--k|--stroke(?:-w)?|--small-card-[\w-]+|padding(?:-[\w-]+)?|background(?:-[\w-]+)?|border(?:-[\w-]+)?)$/;
+    for (const entry of rules()) {
+      if (entry.selectors.some(isPart) || isPrimitive(entry)) continue;
+      for (const selector of entry.selectors) {
+        if (!addresses(selector)) continue;
+        for (const [property] of entry.declarations) expect(property, `${selector} { ${property} } belongs to .small-card`).not.toMatch(owned);
+      }
+    }
+    // The upcoming item lays its date, text and tag out in a row and sets nothing else of the card.
+    expect(rule(".upcoming-item").trim()).toBe("display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); width: 100%; text-align: left;");
+    for (const list of [".timeline", ".upcoming-list", ".upcoming-strip", ".detail-readings"]) expect(rule(list), list).toContain("gap: var(--small-card-spacing)");
+    // Retired: the white timeline panel, the per-kind flat fills, the dot, the yellow overdue fill, the black readings, the lime today tile.
+    expect(rule(".design-timeline-panel").trim()).toBe("order: 2;");
+    expect(styles).not.toMatch(/\.timeline-(?:note|check|status|dot)\b|\.overdue-item \{|\.detail-readings (?:dt|dd|time)\b|\.upcoming-strip button\.today|\.calendar-status/);
+    expect(app).not.toMatch(/timeline-dot|calendar-status/);
+  });
+
+  it("makes the timeline, readings and upcoming items small cards with a lime tag, a Light value and a time chip", () => {
+    const literals = cards();
+    for (const classes of literals) expect(classes, classes.join(" ")).toContain("bowed");
+    const joined = literals.map((classes) => classes.join(" "));
+    for (const expected of [
+      "small-card bowed", "small-card bowed small-card-blue", "upcoming-item small-card bowed small-card-blue", "upcoming-item small-card bowed",
+      "upcoming-item overdue-item small-card bowed", "small-card bowed small-card-current",
+    ]) expect(joined).toContain(expected);
+    expect(app).toContain('className={`timeline-entry small-card bowed timeline-${entry.kind}${entry.kind === "ph" || entry.kind === "temperature" || entry.kind === "measurement" ? " small-card-blue" : ""}`}');
+    // Readings: pH lilac, temperature blue, each with the kind in the tag, the value and its date chip.
+    const start = app.indexOf('<dl className="detail-readings"');
+    const readings = app.slice(start, app.indexOf("</dl>", start));
+    expect(readings.match(/<dt className="small-card-tag">/g)).toHaveLength(2);
+    expect(readings.match(/<dd className="small-card-value">/g)).toHaveLength(2);
+    expect(readings.match(/<time className="small-card-chip"/g)).toHaveLength(2);
+    expect(app).toContain('<span className="timeline-content"><strong className="small-card-tag">');
+    expect(app).toContain('<span className="small-card-tag">{isFinish ? "Finish" : "Check"}</span>');
+    // Type roles: the tag is a label, the value the Light figure, the time chip meta.
+    expect(roleOf(".small-card-tag")).toBe("label");
+    expect(roleOf(".small-card-value")).toBe("figure");
+    expect(roleOf(".small-card-chip")).toBe("meta");
+    expect(tokens().get("--type-figure-weight")).toBe("300");
+    // The label line (22 x 1.2) fits the 27 px tag, the meta line (20 x 1.3) the 30 px chip.
+    const line = (name: string) => roleTokens().find((role) => role.name === name)!.px * Number(tokens().get(`--type-${name}-leading`));
+    expect(line("label")).toBeLessThanOrEqual(px("--small-card-tag-height"));
+    expect(line("meta")).toBeLessThanOrEqual(px("--small-card-chip-height"));
+  });
+
+  it("puts black ink on every small card, so coral stays on black only", () => {
+    const groups = inkGroups();
+    const fill = groups.filter(({ kind }) => kind === "fill").flatMap(({ selectors }) => selectors);
+    const ground = groups.filter(({ kind }) => kind === "ground").flatMap(({ selectors }) => selectors);
+    expect(fill).toContain(".small-card");
+    for (const selector of [...instances, ".timeline-status", ".design-timeline-panel"]) {
+      expect(ground, selector).not.toContain(selector);
+      expect(fill, `${selector} takes its ink from .small-card`).not.toContain(selector);
+    }
+    // The figure role reads --ink-figure: black in every light-fill set, coral only in the ground set.
+    expect(groups.every(({ kind, values }) => values.get("--ink-figure") === (kind === "fill" ? "var(--ink-fill)" : "var(--ink-ground-figure)"))).toBe(true);
+    for (const entry of rules()) if (entry.selectors.every(isPart)) expect(entry.declarations.map(([property]) => property), entry.selector).not.toContain("color");
   });
 });
