@@ -469,20 +469,24 @@ describe("responsive workflow safeguards", () => {
     expect(rule(".workbench, .wb-rail, .wb-main")).toContain("display: contents");
   });
 
-  it("keeps narrow calendar targets inside a full-width grid rather than clipping their hit areas", () => {
-    expect(rule(".calendar-day.has-events")).toContain("border: 0");
-    expect(rule(".calendar-day-button")).toContain("min-height: 88px");
+  it("keeps narrow calendar targets inside the calendar screen's own box rather than overflowing it", () => {
     const narrow = styles.slice(styles.indexOf("@media (max-width: 379px)"));
-    expect(rule(".calendar-panel", narrow)).toContain("width: calc(100% + 48px)");
-    expect(rule(".calendar-weekdays, .calendar-grid", narrow)).toContain("gap: 0");
+    // The screen spans the pane edge to edge (no child is wider than the section), its text takes the edge back.
+    expect(rule(".calendar-screen", narrow)).toBe(" margin-inline: calc(-1 * var(--layout-edge)); ");
+    expect(rule(".calendar-screen .screen-head, .calendar-lists", narrow)).toContain("padding-inline: var(--layout-edge)");
+    expect(rule(".calendar-panel", narrow)).toContain("padding-inline: var(--space-1)");
+    expect(rule(".calendar-weekdays, .calendar-grid, .calendar-week", narrow)).toContain("gap: 0");
+    expect(styles).not.toMatch(/\.calendar-panel \{[^}]*width: calc\(100% \+/);
   });
 
-  it.each([360, 361, 379, 380])("retains at least 44px calendar columns at %ipx", (width) => {
-    const breakpoint = styles.match(/@media \(max-width: (\d+)px\) \{\s*\.calendar-panel \{ width: calc\(100% \+ 48px\)/);
+  it.each([320, 360, 361, 379, 380, 390])("retains at least 44px calendar columns at %ipx", (width) => {
+    const breakpoint = styles.match(/@media \(max-width: (\d+)px\) \{\s*(?:\/\*[\s\S]*?\*\/\s*)?\.calendar-screen \{ margin-inline: calc\(-1 \* var\(--layout-edge\)\)/);
     expect(breakpoint).not.toBeNull();
     const edge = Number(styles.match(/--layout-edge: (\d+)px;/)![1]);
     const gap = Number(styles.match(/--space-1: (\d+)px;/)![1]);
-    const column = width <= Number(breakpoint![1]) ? (width - 8) / 7 : (width - edge * 2 - gap * 6) / 7;
+    // Narrow: the full width less the panel's --space-1 padding, no gaps. Phone: inside the page edges (the panel has
+    // no inline padding on phones), with --space-1 gaps.
+    const column = width <= Number(breakpoint![1]) ? (width - 2 * gap) / 7 : (width - edge * 2 - gap * 6) / 7;
     expect(column).toBeGreaterThanOrEqual(44);
   });
 
@@ -609,7 +613,9 @@ describe("navigation circles, capsule and rail (swipe-rework-log.md, ticket 3; s
       expect(band).toContain("var(--nav-waist)");
     }
     expect(rule(".navigation button", rail)).toContain("width: var(--nav-circle)");
-    const outside = (styles.slice(0, railStart) + styles.slice(railEnd)).replace(/\/\*[\s\S]*?\*\//g, "").replace(/:root \{[^}]+\}/, "");
+    // Outside the rail only the calendar's today ring borrows the stack-ring colour (spec §3 calendar month grid).
+    const outside = (styles.slice(0, railStart) + styles.slice(railEnd)).replace(/\/\*[\s\S]*?\*\//g, "").replace(/:root \{[^}]+\}/, "")
+      .replace(".calendar-day.today { border-color: var(--colour-rail); }", "");
     expect(outside).not.toContain("--colour-rail");
   });
 
@@ -1282,5 +1288,86 @@ describe("small cards (swipe-rework-log.md, ticket 10; spec §1.7 event card, §
     // The figure role reads --ink-figure: black in every light-fill set, coral only in the ground set.
     expect(groups.every(({ kind, values }) => values.get("--ink-figure") === (kind === "fill" ? "var(--ink-fill)" : "var(--ink-ground-figure)"))).toBe(true);
     for (const entry of rules()) if (entry.selectors.every(isPart)) expect(entry.declarations.map(([property]) => property), entry.selector).not.toContain("color");
+  });
+});
+
+describe("calendar and upcoming strip (swipe-rework-log.md, ticket 11; spec §3 calendar month grid, §1.7 event card)", () => {
+  const roleOf = (selector: string) => rules().find((entry) => entry.selectors.includes(selector) && new Map(entry.declarations).has("font-size"))
+    ?.declarations.find(([property]) => property === "font-size")?.[1].match(/^var\(--type-([\w-]+)\)$/)?.[1];
+
+  it("sizes day circles from tokens: the bottom-row circle at most, the stack-ring colour for today", () => {
+    for (const declaration of ["--calendar-day: var(--nav-circle);", "--calendar-ring: var(--bowed-stroke);", "--calendar-marker: 10px;", "--strip-day: 160px;"]) {
+      expect(rule(":root")).toContain(declaration);
+    }
+    const day = rule(".calendar-day");
+    for (const declaration of [
+      "width: min(100%, var(--calendar-day))", "aspect-ratio: 1", "border: var(--calendar-ring) solid transparent", "border-radius: 50%", "padding: 0", "position: relative",
+    ]) expect(day).toContain(declaration);
+    expect(rule(".calendar-day.has-events").trim()).toBe("background: var(--colour-emblem);");
+    expect(rule(".calendar-day.today").trim()).toBe("border-color: var(--colour-rail);");
+    expect(rule(".calendar-day.selected").trim()).toBe("background: var(--colour-surface-inverse);");
+    // An event day's button covers the whole circle, ring included, so its target is the circle (>= 44 on every width).
+    const button = rule(".calendar-day-button");
+    for (const declaration of ["position: absolute", "inset: calc(-1 * var(--calendar-ring))", "max-width: none", "min-height: 0", "border: 0", "border-radius: 50%", "padding: 0"]) {
+      expect(button).toContain(declaration);
+    }
+    expect(rule(".calendar-day-button:hover:not(:disabled)").trim()).toBe("background: var(--colour-action);");
+    // Retired: the tall lilac capsules, the black-bordered today cell and the lime-bordered selected day.
+    const calendarRules = rules().filter((entry) => entry.selectors.some((selector) => /\.calendar-day/.test(selector)));
+    for (const entry of calendarRules) {
+      for (const [property, value] of entry.declarations) {
+        expect(`${property}: ${value}`, entry.selector).not.toMatch(/88px|--colour-action-alt|--radius-control|--colour-border/);
+      }
+    }
+  });
+
+  it("reads the day number in the label role, ink on the emblem fill and white on the selected black", () => {
+    expect(roleOf(".calendar-day")).toBe("label");
+    expect(roleOf(".calendar-day-button")).toBeUndefined();
+    const membership = inkMembership();
+    expect(membership.get(".calendar-panel")).toBe("fill");
+    expect(membership.get(".calendar-day.selected")).toBe("ground");
+    expect(contrast(hex("--ink-fill"), hex("--colour-emblem"))).toBeGreaterThanOrEqual(7);
+    expect(contrast(hex("--ink-ground"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(7);
+    // The markers and the legend share one size and one pair of fills.
+    expect(rule(".calendar-markers i, .calendar-legend i")).toContain("width: var(--calendar-marker)");
+    expect(rule(".calendar-markers .event-check, .legend-check i").trim()).toBe("background: var(--colour-surface);");
+    expect(rule(".calendar-markers .event-finish, .legend-ready i").trim()).toBe("background: var(--colour-action);");
+    expect(styles).not.toMatch(/(?:^|\n)\.event-(?:check|finish) \{/);
+  });
+
+  it("puts Today, the month arrows and the top-bar date chip on the utility primitive", () => {
+    expect(app).toContain('className="utility-circle utility-circle-dark utility-capsule calendar-today"');
+    expect(app.match(/aria-label="(?:Previous|Next) month" className="utility-circle utility-circle-dark"/g)).toHaveLength(2);
+    expect(app).toContain('className="utility-circle utility-capsule design-date-chip"');
+    // Nothing re-sizes or re-paints them; the date chip is only hidden on phones.
+    for (const entry of rules()) {
+      if (!entry.selectors.some((selector) => /\.(?:calendar-today|design-date-chip)\b/.test(selector))) continue;
+      expect(entry.selector).toBe(".design-date-chip");
+      expect(entry.declarations).toEqual([["display", "none"]]);
+    }
+  });
+
+  it("gives strip days the lime tag chip and a fixed small-card width", () => {
+    const strip = app.slice(app.indexOf('<div className="upcoming-strip">'), app.indexOf("{openUpcomingDate && <BatchPicker"));
+    expect(strip).toContain('<span className="small-card-tag" key=');
+    expect(strip).not.toMatch(/event-\$\{/);
+    expect(rule(".upcoming-strip button")).toContain("flex: 0 0 var(--strip-day)");
+    expect(rule(".upcoming-strip .small-card-tag").trim()).toBe("justify-self: center;");
+    expect(styles).not.toMatch(/\.upcoming-strip \[class\^="event-"\]/);
+    // The strip may scroll inside its section, so the actions panel's column cannot grow to the strip's width.
+    expect(rule(".design-more-actions > div")).toContain("grid-template-columns: minmax(0, 1fr)");
+    expect(rule(".section-label a")).toContain("min-height: 44px");
+  });
+
+  it("draws a focused bowed control's ring with the stroke layer, so it follows the bow", () => {
+    expect(rule(".bowed:focus-visible").trim()).toBe("outline-color: transparent; box-shadow: none;");
+    expect(rule(".bowed:focus-visible::before").trim()).toBe("background: var(--colour-text-inverse);");
+    const fill = rule(".bowed:focus-visible::after");
+    for (const declaration of ["inset: max(var(--stroke-w), var(--stroke-focus))", "--rr: max(0px, min(var(--r), 50%) - max(var(--stroke-w), var(--stroke-focus)))"]) {
+      expect(fill).toContain(declaration);
+    }
+    // White on the black ground around every focusable bowed card.
+    expect(contrast(hex("--colour-text-inverse"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(3);
   });
 });

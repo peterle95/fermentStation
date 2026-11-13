@@ -178,6 +178,15 @@
   --small-card-tag-height: 27px;
   --small-card-chip-height: 30px;
   --small-card-glyph: 16px;
+  /* A strip day is a small card of fixed width (its inline-size containment ignores content): wide enough for a
+     three-word event label on one line in the lime tag chip. */
+  --strip-day: 160px;
+  /* Calendar day circles (spec §3 calendar month grid): the bottom-row circle d 60 at most, otherwise the
+     column (>= 44 on every supported width); today is ringed in --colour-rail at the selected-ring width;
+     the check / finish markers inside a day and in the legend. */
+  --calendar-day: var(--nav-circle);
+  --calendar-ring: var(--bowed-stroke);
+  --calendar-marker: 10px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -328,7 +337,6 @@ input::file-selector-button,
 .checks-summary,
 .checks-paused-row,
 .design-tip,
-.upcoming-strip [class^="event-"],
 .design-detail-card,
 .batch-photo-retry,
 .design-input-summary,
@@ -353,7 +361,6 @@ input::file-selector-button,
 .profile-editor-section,
 .profile-editor-card,
 .calendar-panel,
-.calendar-day.selected .calendar-day-button:hover,
 .settings-card,
 .settings-recovery,
 .settings-live[role="alert"] > p,
@@ -387,7 +394,7 @@ input::file-selector-button,
 .profiles-screen,
 .profile-card-actions button:first-child,
 .calendar-screen,
-.calendar-day.selected .calendar-day-button,
+.calendar-day.selected,
 .calendar-overdue-mark,
 .settings-screen,
 .settings-state-label,
@@ -409,9 +416,9 @@ h1 { font-size: var(--type-headline); font-weight: var(--type-headline-weight); 
 .design-batch-profile, .design-detail-heading p, .meas-value-small { font-size: var(--type-title-light); font-weight: var(--type-title-light-weight); line-height: var(--type-title-light-leading); letter-spacing: var(--type-title-light-tracking); }
 h2, h3, h4, .brand strong { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); }
 .design-tip h3, .design-batch-bottom strong, .design-detail-top h2, .design-input-summary h3, .timeline-panel-heading h3, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .design-detail-next strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
-.navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .calendar-day, .calendar-day-button, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
+.navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
 body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .guide-step p, .batch-guidance > p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
-button, .small-card-tag, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .design-date-chip, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+button, .small-card-tag, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .calendar-day, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
 small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-summary span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-check-state, .design-detail-next p, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
 strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(--type-title-weight); }
 
@@ -457,6 +464,13 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 .bowed::before { inset: 0; z-index: -3; background: var(--stroke); }
 .bowed::after { inset: var(--stroke-w); z-index: -2; background: var(--fill); --rr: max(0px, min(var(--r), 50%) - var(--stroke-w)); --rr-end: max(0px, min(var(--r-end), 50%) - var(--stroke-w)); }
 .bowed > .bowed-media { position: absolute; inset: 0; z-index: -1; overflow: hidden; clip-path: var(--bowed-shape); }
+/* Focus ring: an outline follows border-radius, and a small card's --r reads 100cqi against its ancestor, not its
+   own width. A focused bowed control therefore draws a white --stroke-focus ring with its stroke layer, inside the
+   outline like the selected ring (it replaces that ring while focused), so it follows the bow at every size and
+   adds no overflow. The transparent outline still shows in forced colours. */
+.bowed:focus-visible { outline-color: transparent; box-shadow: none; }
+.bowed:focus-visible::before { background: var(--colour-text-inverse); }
+.bowed:focus-visible::after { inset: max(var(--stroke-w), var(--stroke-focus)); --rr: max(0px, min(var(--r), 50%) - max(var(--stroke-w), var(--stroke-focus))); --rr-end: max(0px, min(var(--r-end), 50%) - max(var(--stroke-w), var(--stroke-focus))); }
 .bowed-clip { border: 0; border-radius: var(--r) var(--r) var(--r-end) var(--r-end); background: var(--fill); clip-path: var(--bowed-shape); }
 @supports not (clip-path: shape(from 0 0, line to 1px 1px)) {
   .bowed::before, .bowed > .bowed-media { clip-path: none; border-radius: var(--r) var(--r) var(--r-end) var(--r-end); }
@@ -554,7 +568,6 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 .station-identity { display: none; }
 .design-topbar-copy { flex: 1; min-width: 160px; }
 .design-topbar-copy p { color: var(--ink-time); }
-.design-date-chip { display: flex; align-items: center; gap: var(--space-2); padding-inline: var(--space-4); color: var(--ink-time); }
 .design-chevron { width: 16px; height: 16px; }
 .design-topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
 .batch-fab { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); }
@@ -706,11 +719,13 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-tip { display: flex; align-items: flex-start; gap: var(--space-4); margin-top: var(--space-8); padding: var(--card-padding); border-radius: var(--radius-card); background: var(--colour-accent); }
 .design-tip h3 { margin-bottom: var(--space-2); }
 .design-more-actions { margin-top: var(--space-6); }
-.design-more-actions > div { display: grid; gap: var(--space-4); padding-block: var(--space-4); }
+.design-more-actions > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); padding-block: var(--space-4); }
+.section-label a { display: inline-flex; align-items: center; min-height: 44px; }
 .upcoming-strip { display: flex; gap: var(--small-card-spacing); overflow-x: auto; padding: var(--space-2) var(--space-2) var(--space-4); overscroll-behavior-inline: contain; }
-.upcoming-strip button { flex: 0 0 112px; text-align: center; }
+.upcoming-strip button { flex: 0 0 var(--strip-day); text-align: center; }
 .upcoming-strip time { display: grid; color: var(--ink-time); }
 .upcoming-strip button > div { display: grid; gap: var(--space-2); }
+.upcoming-strip .small-card-tag { justify-self: center; }
 .design-photo-credits { margin-top: var(--space-6); }
 .design-photo-credits ul { padding-left: var(--space-6); }
 .design-photo-credits li { margin-block: var(--space-3); overflow-wrap: anywhere; }
@@ -981,28 +996,26 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .calendar-panel { min-width: 0; padding: var(--card-padding); }
 .calendar-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-3); margin-bottom: var(--space-6); }
 .calendar-nav { display: flex; align-items: center; gap: var(--space-2); }
-.calendar-nav .calendar-today { display: grid; place-items: center; height: 44px; min-height: 44px; padding: 0 var(--space-3); }
 .calendar-weekdays, .calendar-grid { display: grid; gap: var(--space-1); }
 .calendar-week, .calendar-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--space-1); }
 .calendar-weekdays { margin-bottom: var(--space-2); text-align: center; }
-.calendar-day { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-width: 0; min-height: 88px; border: 1px solid transparent; border-radius: var(--radius-control); padding: var(--space-2); }
-.calendar-day.other { border-color: transparent; }
-.calendar-day.today { border-color: var(--colour-border); }
-.calendar-day.has-events { padding: 0; border: 0; }
-.calendar-day-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); flex: 1; width: 100%; min-width: 0; min-height: 88px; border: 1px solid transparent; border-radius: var(--radius-control); padding: var(--space-2); background: var(--colour-action-alt); }
-.calendar-day.today .calendar-day-button { border-color: var(--colour-border); }
-.calendar-day.selected .calendar-day-button { background: var(--colour-surface-inverse); border: 3px solid var(--colour-action); }
-.calendar-day-button:hover { background: var(--colour-surface); }
+/* Day circles (spec §3 calendar: §1.4/§1.5 circle geometry, >= 44): as wide as the column up to --calendar-day.
+   Event days take the emblem fill, the selected day is black like a selected row, today gets the stack-ring
+   colour as a border (a border, so the focus ring stays free). An event day's button covers the whole circle,
+   ring included, so the target is the circle's full width. */
+.calendar-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; justify-self: center; width: min(100%, var(--calendar-day)); min-width: 0; aspect-ratio: 1; border: var(--calendar-ring) solid transparent; border-radius: 50%; padding: 0; }
+.calendar-day.has-events { background: var(--colour-emblem); }
+.calendar-day.today { border-color: var(--colour-rail); }
+.calendar-day.selected { background: var(--colour-surface-inverse); }
+.calendar-day-button { position: absolute; inset: calc(-1 * var(--calendar-ring)); display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; max-width: none; min-height: 0; border: 0; border-radius: 50%; padding: 0; }
+.calendar-day-button:hover:not(:disabled) { background: var(--colour-action); }
 .calendar-day-number { font-variant-numeric: tabular-nums; }
 .calendar-markers { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-1); }
-.calendar-markers i { display: block; width: 10px; height: 10px; border: 1px solid var(--colour-border); border-radius: 50%; }
-.event-check { background: var(--colour-surface); }
-.event-finish { background: var(--colour-action); }
+.calendar-markers i, .calendar-legend i { display: block; width: var(--calendar-marker); height: var(--calendar-marker); border: var(--stroke-width) solid var(--colour-border); border-radius: 50%; }
+.calendar-markers .event-check, .legend-check i { background: var(--colour-surface); }
+.calendar-markers .event-finish, .legend-ready i { background: var(--colour-action); }
 .calendar-legend { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
 .calendar-legend > span { display: inline-flex; align-items: center; gap: var(--space-2); }
-.calendar-legend i { width: 12px; height: 12px; border: 1px solid var(--colour-border); border-radius: 50%; }
-.legend-check i { background: var(--colour-surface); }
-.legend-ready i { background: var(--colour-action); }
 .calendar-helper { margin-top: var(--space-4); }
 .calendar-lists { display: grid; gap: var(--space-8); }
 .calendar-section-label { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4); }
@@ -1191,8 +1204,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .settings-card > button { justify-self: stretch; }
   .calendar-panel { padding: var(--space-4) 0; }
   .calendar-head, .calendar-legend, .calendar-helper { padding-inline: var(--space-4); }
-  .calendar-day { padding-inline: var(--space-1); }
-  .calendar-day-button { padding-inline: 0; }
   .upcoming-item .small-card-tag { margin-left: auto; }
   .calendar-screen, .settings-screen, .profiles-screen, .design-checks-view { padding: var(--space-4); }
   .calendar-screen, .design-checks-view, .settings-screen, .profiles-screen { padding: 0; }
@@ -1203,12 +1214,15 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .calendar-head h2 { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 }
 
-/* Seven 44px calendar targets still fit on the narrowest supported screen. */
+/* Seven 44 px day circles need 308 px, more than the pane leaves inside its page edges below 380 px (272 at 320).
+   There the whole calendar screen spans the pane edge to edge, so its box holds the grid, and its text takes the
+   page edge back as padding. */
 @media (max-width: 379px) {
-  .calendar-panel { width: calc(100% + 48px); margin-inline: -24px; padding-inline: 4px; }
-  .calendar-weekdays, .calendar-grid { gap: 0; }
-  .calendar-week { gap: 0; }
-  .calendar-head, .calendar-legend { padding-inline: 20px; }
+  .calendar-screen { margin-inline: calc(-1 * var(--layout-edge)); }
+  .calendar-screen .screen-head, .calendar-lists { padding-inline: var(--layout-edge); }
+  .calendar-panel { padding-inline: var(--space-1); }
+  .calendar-weekdays, .calendar-grid, .calendar-week { gap: 0; }
+  .calendar-head, .calendar-legend, .calendar-helper { padding-inline: calc(var(--layout-edge) - var(--space-1)); }
   .navigation { padding-inline: var(--safe-left) var(--safe-right); }
 }
 

@@ -22,6 +22,7 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 10 Settings controls | **closed**: one `toggle-list` / `toggle-row` primitive (h 72, gap 8, inset 16, black selected row), lilac avatar d 63, switch 42 × 25 / knob 20; Suggestions is a real `role="switch"`, Units and Notifications are row choices | settings |
 | 12 Primary action | **closed** for the batch detail ("Add observation" is the `card-action` capsule); Settings export and dialog submits remain | batch card (ticket 8) |
 | 13 Timeline | **closed**: one `small-card` (bowed at r = min(52, 0.16 W), bow = min(4.4, 0.0125 W) from its own width; lilac `#d9b4eb → #f6eafc` or blue `#b4dff9 → #e6f6ff` gradient; lime tag chip h 27; Light value; translucent time chip h 30; all ink black) for timeline entries, the latest readings, the calendar's upcoming/overdue items and the Checks upcoming strip; the white timeline panel is gone | small cards (ticket 10) |
+| Calendar month grid (spec §3, no gap number) | **closed**: day circles min(column, 60) ≥ 44, emblem event days, black selected day, `#3e3e40` today ring; Today / arrows / top-bar date chip on `utility-circle` / `utility-capsule`; no 320 overflow (the screen spans the pane below 380); strip days carry lime tag chips at 160 px; bowed focus rings follow the bow | calendar (ticket 11) |
 
 Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text inside the scroll panes was absolutely positioned against `.app-shell`, which made the whole document scroll in 49 of 60 captures. `.main-content`, `.design-dashboard` and `.design-detail` are now `position: relative`, so they contain it.
 
@@ -35,6 +36,7 @@ The primitive is defined once, in `src/styles.css` directly after `.sr-only`. It
 - **Tune** a surface with `--r` (corner radius, default `--bowed-radius` 52px; a bowed row uses half its height), `--bow` (default `--bowed-bow` 4.4px) and `--k` (default `--bowed-k` 0.64). The defaults are declared with `:where()`, so any surface rule overrides them regardless of order. `--r-end` / `--bow-end` (ticket 5) tune the bottom corners and bottom edge on their own; they default to `--r` / `--bow`, and `0px` for both gives a flat, square bottom (phone bottom sheet).
 - **Selected ring:** set `--stroke: var(--colour-action); --stroke-w: var(--bowed-stroke);`. See `.design-batch-card.selected`.
 - **Clipped media:** a *direct child* with class `bowed-media` fills the box (`inset: 0`) and is clipped by the outline, like the glass running into the drink card's bottom edge. It sits under all other content. Since ticket 8 the batch card and the batch empty card use it for stand-in photographs (`.design-batch-photo bowed-media`).
+- **Focus ring** (ticket 11): a focused bowed control draws a white `--stroke-focus` band with its stroke layer, inside the outline, instead of the outline (which followed `border-radius`, not the bow). Do not add a `:focus-visible` outline to a bowed surface.
 - **Overhang:** content is not clipped. A circle above the top edge or a button half below the bottom edge simply overflows the box. Only the fill, stroke and media layers are clipped.
 - **Scroll containers** (the `<dialog>`s) use `bowed-clip` instead. It clips the element itself with `background: var(--fill)`, because a pseudo-element fill would scroll away. It cannot have overhang or a stroke.
 - **Never** give a bowed surface `background`, `border*`, `border-radius`, `box-shadow`, or its own `::before`/`::after`. The primitive owns all of them. `.bowed` forces `background: none !important`, so the generic `button:hover` background cannot paint the rectangle.
@@ -439,12 +441,56 @@ Tokens added: `--colour-event-lilac` `#d9b4eb`, `--colour-event-lilac-end` `#f6e
 - The harness has no capture of the Checks upcoming strip (it sits in a collapsed section).
 - D1: confirm that Thin and ExtraLight may stay unused (see above).
 
+## Ticket 11: calendar month grid, its controls and the upcoming strip — done
+
+No text, accessible name, role, focus order or grid keyboard behaviour changed. Day cells keep `role="gridcell"`, `aria-current`, `aria-selected`, roving `tabIndex` and the event-day buttons with their names and descriptions; the strip days keep their buttons and text (the event chips changed class only).
+
+### As built
+
+- **320 overflow, by rule.** Seven 44 px circles need 308 px; inside the 24 px page edges a 320 screen leaves 272. The old fix pulled `.calendar-panel` 24 px out on each side, so the panel was wider than `section.calendar-screen` (the harness's last surfaceOverflow). Below 380 the **screen** now spans the pane edge to edge (`margin-inline: calc(-1 * var(--layout-edge))`): its box holds the grid, and its head and lists take the edge back as padding (the panel keeps `--space-1`, its head/legend/helper `--layout-edge - --space-1`). Columns: (W − 8) / 7 below 380, (W − 72) / 7 from 380; ≥ 44 at every width (tested at 320, 360, 361, 379, 380, 390).
+- **Day circles** (spec §3 "Calendar month grid"). `.calendar-day` is the circle: `width: min(100%, var(--calendar-day))` (the bottom-row circle d 60, else the column), `aspect-ratio: 1`, centred in its column. Event days take `--colour-emblem`; the selected day is black (`.calendar-day.selected` joined the ground ink set, so its number and the event button inside it are white); today is ringed in `--colour-rail` (the stack ring) at `--calendar-ring` = `--bowed-stroke` 3 px. The ring is a border on the cell (every cell carries a transparent one), so neither the focus outline nor its box-shadow is taken. The event button is `position: absolute; inset: calc(-1 * var(--calendar-ring))`, so it covers the whole circle, ring included: its target is the full circle (the first attempt filled only the content box and the harness reported 14 targets of 38.6–39.4 px). Hover is lime, like every circle. The number moved from the `row` role (32 px line, did not fit a 44 px circle with its markers) to `label`; markers and legend dots share `--calendar-marker` 10 px and one pair of fill rules scoped to `.calendar-markers` / the legend.
+- **Controls.** "Today" is `utility-circle utility-circle-dark utility-capsule` (dark capsule h 57 beside the two dark arrow circles, which were already the primitive); the desktop/tablet top-bar date chip is `utility-circle utility-capsule` (white capsule h 60, calendar glyph 21 + "18 Mar" in ink, beside the white bell and settings circles). `.calendar-nav .calendar-today` and the chip's own rule are gone; the chip keeps only its phone `display: none`. The spec's "white circle buttons" for month navigation would vanish on the white card, so the ticket 4 decision (dark circles inside the card) stands.
+- **Upcoming strip.** Event chips are `small-card-tag` (lime capsule h 27, `label`), centred in the card; the `event-${kind}` classes, their global yellow/lime fill rules and the `.upcoming-strip [class^="event-"]` ink entry are gone. A strip day is a fixed `--strip-day` 160 px small card (r 25.6 / bow 2.0 by the §2.3 rule): `container-type: inline-size` ignores content, so the card cannot size to its labels, and at 112 px every two-word label broke into a round three-line blob. At 160 px "Check brine level" fits one line; "Feed ginger and sugar" takes two.
+- **Focus ring follows the bow (primitive).** `.bowed:focus-visible` drops the outline colour (transparent, so forced colours still draw it) and the box-shadow; the stroke layer turns white and the fill shrinks by `max(--stroke-w, --stroke-focus)`, so the ring is a 3 px white band inside the outline, like the selected ring (it replaces a lime ring while focused). An outward ring was tried first: the grown `::before` added 3 px of scrollable overflow to the focused card and its section. Applies to every focusable bowed control (batch cards, upcoming/overdue items, strip days); checked on a keyboard-focused strip day and upcoming item at 390.
+- **Found by the new capture.** With "More batch actions" open, the strip's 920 px content widened the actions grid column and the dashboard (surfaceOverflow at every viewport): `.design-more-actions > div` now has `grid-template-columns: minmax(0, 1fr)`. The "Open calendar" link was 26 px tall: `.section-label a` is an inline-flex box with `min-height: 44px`.
+- **Harness.** New surface `upcoming-strip` (overview → tap "More batch actions" → scroll to `.upcoming`), all five viewports; no baseline (documented in `visual-verification.md`).
+
+Tokens added: `--calendar-day: var(--nav-circle)`, `--calendar-ring: var(--bowed-stroke)`, `--calendar-marker: 10px`, `--strip-day: 160px`. No colour added.
+
+### Measured (harness DOM boxes; spec: circles ≥ 44, §1.4/§1.5 d 60)
+
+| Viewport | Column | Day circle | Event target | Today ring |
+| --- | --- | --- | --- | --- |
+| 320 | 44.6 | 44.6 | 44.6 (full circle) | 3 px `#3e3e40` |
+| 390 | 45.4 | 45.4 | 45.4 | 3 px |
+| 1440 | ≈ 78 | 60 (cap) | 60 | 3 px |
+
+Controls: Today capsule h 57 (dark, like the arrows d 57); date chip h 60 (white, like the bell and settings circles). Strip day 160 wide, tag h 27.
+
+### Tests
+
+- New describe block "calendar and upcoming strip" (5 tests): tokens; the circle, emblem, rail ring, black selected day, full-circle button and lime hover declarations, and no 88 px / action-alt / capsule radius / black border left in any `.calendar-day` rule; label role, ink sets and contrast on emblem and black; markers and legend share size and fills, no global `.event-check/finish` rule; Today, arrows and date chip markup on the primitive and no rule re-styling them (only the phone `display: none`); strip tags are `small-card-tag`, the strip day width token, the actions grid column and the 44 px link; the bowed focus ring rules.
+- Changed: the narrow-calendar test now asserts the screen bleed instead of the panel's `width: calc(100% + 48px)`; the column test covers 320 and 390 too. The rail test allows `--colour-rail` outside the rail only in `.calendar-day.today`.
+
+### Results
+
+- `npm run typecheck` clean; `npx vitest run src/styles.test.ts` 81 / 81; plain `npm test` 307 / 307, 15 files.
+- Harness, full run (**65 captures**, 13 surfaces): 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0, **surfaceOverflow 0** (was 1: calendar 320), clippedControls 0, smallTargets 0 (`uniqueSmallTargets` empty; Settings' three inline licence links are recorded as `inline` and not counted, as before). The new `upcoming-strip` captures are clean at all five viewports.
+- Visual check: calendar at 320 (full), 390, 768 and 1440; strip at 390; a temporary copy of the harness that Tab-focused a strip day and an upcoming item at 390 (not committed) showed the white ring following the bow.
+
+### Left by ticket 11
+
+- The 160 px strip day is a judgement, not a board measurement (the boards have no strip); long check names still wrap inside the tag.
+- A focused card that is also selected/current shows the white focus ring instead of its lime ring until focus leaves.
+- `.calendar-overdue-mark` is still a 44 px literal black capsule; `.upcoming-date` keeps `min-width: 44px`.
+- The calendar head wraps to two lines at 320 (month label above Today and the arrows); readable, but a later polish could put the month between the arrows.
+
 ## Left for later tickets / known issues
 
 - ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).
 - ~~Timeout~~ fixed by ticket 2 with `testTimeout` in `vite.config.ts`. Was: `src/App.test.tsx` "reflects edited cadence and pauses and resumes checks with batch status" times out at the 5 s default (it takes 5.3–8 s). It fails the same way at `7133bca` with the foundation changes stashed, so it is a pre-existing slow test, not a regression. Full suite after foundation: 254 passed, 2 failed (these two), 228 s with `--maxWorkers=1`.
 - These rounded-rectangle surfaces are not bowed yet, though they are large cards on the ground (ticket 10 retired `.design-timeline-panel`): `.batch-guidance`, `.design-input-summary`, `.batch-management > .wb-panel`, `.next-action`, `.design-detail-next` (yellow sub-row → a bowed row with `--r` = H/2, gap 11), `.design-tip`, `.empty-state`, `.profile-editor-card` and `.batch-tools-danger`. Bow them in the ticket that owns them. `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
 - ~~`timeline-entry` radius~~ settled by ticket 10 (small-card rule). Was: `timeline-entry` uses the default 52px radius, capped at 50 % of its height. Short entries therefore read as near-capsules. Gap 13 should give them their event-card size and the small-component rule (`--r` ≈ 0.16 W, `--bow` ≈ 0.0125 W below 300px).
-- Calendar event days still use `--colour-action-alt` on tall capsules. The spec wants `--colour-emblem` circles there (calendar restyle).
+- ~~Calendar event days still use `--colour-action-alt` on tall capsules~~ settled by ticket 11 (`--colour-emblem` circles).
 - The native launch colours are still `#1c1c1c`: `android/app/src/main/res/values/colors.xml` `colorPrimary`/`colorPrimaryDark`, and `capacitor.config.ts` `iconColor`. `styles.test.ts` asserts them. Switch them to `#000000` together with that test if the launch screen should match the new ground.
 - `index.html` `theme-color` is `#ffffff`.

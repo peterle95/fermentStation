@@ -37,6 +37,7 @@ const surfaces = [
   { name: "batch-detail", description: `Batch detail (${detailBatch})`, steps: openDetail },
   { name: "observation-logger", description: "Batch detail with the Add observation logger open", steps: [...openDetail, { tap: ".design-detail .design-record-observation" }, { waitFor: "dialog.observation-logger.station-dialog[open]" }] },
   { name: "batch-tools", description: "Batch detail with Batch tools open, scrolled to the tools", steps: [...openDetail, { tap: '.design-detail button[aria-label="More batch tools"]' }, { waitFor: "#batch-management" }, { scrollTo: "#batch-management" }] },
+  { name: "upcoming-strip", description: "Batch overview with More batch actions open, scrolled to the upcoming strip", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-more-actions > summary" }, { waitFor: ".upcoming-strip .small-card" }, { scrollTo: ".upcoming" }] },
   { name: "checks", description: "Checks view", steps: [{ tap: ".navigation .nav-checks" }, { waitFor: ".design-checks-view" }] },
   { name: "calendar", description: "Calendar", steps: [{ tap: ".navigation .nav-calendar" }, { waitFor: ".calendar-screen" }] },
   { name: "profiles", description: "Fermentation profiles", steps: [{ tap: ".navigation .nav-profiles" }, { waitFor: ".profiles-screen .profile-card" }] },

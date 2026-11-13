@@ -21,7 +21,7 @@ Timings on this machine (Chrome 157, 4 parallel pages):
 
 | Run | Time |
 | --- | --- |
-| Full run, 12 surfaces x 5 viewports, with full-height captures | 90-110 s |
+| Full run, 13 surfaces x 5 viewports, with full-height captures | 95-120 s |
 | One surface x one viewport, script starts its own server | about 20 s |
 | One surface x one viewport against a running dev server (`--url`), `--no-full` | about 6 s |
 
@@ -56,6 +56,7 @@ Surfaces (`-s`):
 | `batch-detail` | Batch detail for "Napa cabbage kimchi" | tap its card |
 | `observation-logger` | Batch detail with the Add observation logger open | tap "Add observation" |
 | `batch-tools` | Batch tools, scrolled into view | tap "More batch tools" |
+| `upcoming-strip` | Batch overview with "More batch actions" open, scrolled to the Upcoming · next 7 days strip (added in ticket 11; no baseline capture, the pre-rework baseline predates it) | tap "More batch actions" |
 | `checks` | Checks view | navigation |
 | `calendar` | Calendar | navigation |
 | `profiles` | Fermentation profiles | navigation |
@@ -136,6 +137,8 @@ Findings on the baseline (60 captures, 0 failed):
 - Clipped controls: the batch-tools Notifications button (`.batch-head-notifications`) has text wider than its 50 px box at every viewport.
 - Small targets: Settings segmented buttons, "On"/"Off" (39-41 px wide) at 768 px and wider, and the notification "All"/"Off" segment at 320 px.
 - Page errors: none.
+
+Surfaces added after the baseline have no baseline captures: `upcoming-strip` (ticket 11). The index shows only the current capture for them, and the end-of-run comparison skips them. Do not recapture the baseline to fill the gap.
 
 ## Git
 

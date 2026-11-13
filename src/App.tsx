@@ -702,7 +702,7 @@ export function App() {
         <header className="design-topbar">
           <button aria-label="Open station information" className="utility-circle station-identity" onClick={() => showDialog({ kind: "info" })} type="button"><StationLogo /></button>
           <div className="design-topbar-copy"><p>{formatToday()}</p></div>
-          <button aria-label="Open calendar" className="design-date-chip" onClick={() => navigate("calendar")} type="button"><NavIcon destination="calendar" /><span>{shortDate(localDate())}</span></button>
+          <button aria-label="Open calendar" className="utility-circle utility-capsule design-date-chip" onClick={() => navigate("calendar")} type="button"><NavIcon destination="calendar" /><span>{shortDate(localDate())}</span></button>
           <div className="design-topbar-actions">
             <button aria-label="View batch checks" className="utility-circle" onClick={openChecks} type="button"><DesignIcon name="bell" /></button>
             <button aria-label="Settings" aria-current={shell.destination === "settings" ? "page" : undefined} className="utility-circle" onClick={() => navigate("settings")} type="button"><DesignIcon name="settings" /></button>
@@ -1255,7 +1255,7 @@ function CalendarView({ batches, onOpen }: { batches: Batch[]; onOpen(id: string
         <div className="calendar-head">
           <h2 aria-live="polite" aria-atomic="true">{monthLabel}</h2>
           <div className="calendar-nav">
-            <button className="calendar-today" onClick={() => { setViewDate(new Date(`${today}T12:00:00`)); setFocusDate(today); }} type="button">Today</button>
+            <button className="utility-circle utility-circle-dark utility-capsule calendar-today" onClick={() => { setViewDate(new Date(`${today}T12:00:00`)); setFocusDate(today); }} type="button">Today</button>
             <button aria-label="Previous month" className="utility-circle utility-circle-dark" onClick={() => shiftMonth(-1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button>
             <button aria-label="Next month" className="utility-circle utility-circle-dark" onClick={() => shiftMonth(1)} type="button"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg></button>
           </div>
@@ -1552,7 +1552,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
                   type="button"
                 >
                   <time dateTime={dateValue}><strong>{date.getDate()}</strong>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</time>
-                  <div>{events.map((event) => <span className={`event-${event.kind}`} key={`${event.batchId}-${event.kind}-${event.label}`}>{event.label}</span>)}</div>
+                  <div>{events.map((event) => <span className="small-card-tag" key={`${event.batchId}-${event.kind}-${event.label}`}>{event.label}</span>)}</div>
                 </button>
               );
             })}
