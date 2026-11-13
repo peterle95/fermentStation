@@ -27,7 +27,8 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     watch: {
-      ignored: ["**/src-tauri/target/**"],
+      // screenshots/: output of `npm run screenshots`; its index.html would otherwise trigger full reloads.
+      ignored: ["**/src-tauri/target/**", "**/screenshots/**"],
     },
   },
   test: {

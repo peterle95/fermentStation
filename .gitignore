@@ -13,3 +13,7 @@ src-tauri/icons/*
 .stversions/
 *.sync-conflict-*
 migration-backup/
+
+# Visual verification output from `npm run screenshots` (docs/design/visual-verification.md).
+# Bulk PNGs and machine-local reports; the scripts and docs that produce them are tracked.
+/screenshots/

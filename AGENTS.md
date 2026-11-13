@@ -12,6 +12,10 @@ Use the default triage label vocabulary documented in `docs/agents/triage-labels
 
 This is a single-context repository. See `docs/agents/domain.md`.
 
+### Visual verification
+
+For any UI change, run `npm run screenshots` (or `npm run screenshots -- -s <surface> -v <viewport>` while iterating) and inspect `screenshots/current/index.html` and `report.json` against the pre-rework baseline in `screenshots/baseline/`. Do not recapture the baseline. See `docs/design/visual-verification.md`.
+
 ### Android debugging
 
 Always give ADB commands a short tool timeout (5 seconds is enough for `adb devices`). On this machine, Windows `portproxy` may own `127.0.0.1:5555` and forward it to a stale WSL address. ADB then reports `emulator-5554 offline` and retries the dead transport about every 22 seconds even when no emulator is running.
