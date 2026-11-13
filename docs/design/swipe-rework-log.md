@@ -11,7 +11,8 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 14 Selection on cards | **closed** for the batch card: 3 px lime ring that follows the bow | foundation |
 | 16 Lilac shade | **closed** for avatar and icon circles (`--colour-emblem`) | foundation |
 | 3, 4, 5 Navigation and utility circles | open | navigation |
-| 6 Typography (blocked by D1) | open | type system |
+| 6 Typography (D1 resolved by the user: readable sizes inside 1:1 geometry) | **closed** for the type system; components still pick their roles in their own tickets | type system |
+| 15 Big numbers (colour part) | **partly closed**: figures are coral Light/ExtraLight/Thin wherever they sit on black; the counts on the lime summary stay ink until gap 11 moves them onto black | type system |
 | 7, 8 Search field, dialogs | open (dialogs are already bowed via `bowed-clip`) | search and dialogs |
 | 9, 11, 15 Batch card anatomy, Kitchen summary, big numbers | open | batch card and Kitchen summary |
 | 10, 12, 13 Settings rows, primary action, timeline | open (timeline entries are already bowed) | settings / action / timeline |
@@ -68,10 +69,75 @@ The old literal radii were mapped to tokens: `2rem` → `--radius-card` (same 32
 - Every other finding is identical to the baseline and was already known: surfaceOverflow 1 (`section.calendar-screen` at 320), clippedControls 5 (`.batch-head-notifications`), smallTargets 8 (Settings "On"/"Off"/"All" segments; inline credit links).
 - Visual check: overview, batch-detail, calendar and settings at 1440, 768 and 390, compared against ui-board crops scaled ×1.406. The corners and bow of every bowed card match the drink and lime-profile cards. The selected batch card's lime ring follows the bow. The Kitchen summary at 726 px wide keeps r 52 / bow 4.4 and reads flatter, as the spec predicts for wide surfaces. On phones the dialogs are bowed top and bottom through `bowed-clip`.
 
+## Ticket 2: type system (gap 6, D1 resolved) — done
+
+User decision on D1: component geometry stays 1:1 with the boards; type is sized for readability inside each measured text box, uses all seven Unique weights, and text gets colour from the Swipe palette.
+
+### Unique specimen findings (fontTools on `public/fonts/unique/*.woff2`)
+
+- All weights: cap 0.70 em, x-height 0.57 em, hhea ascent 0.73 / descent 0.16 / gap 0.10. No `tnum` feature (`font-variant-numeric: tabular-nums` does nothing).
+- Extremely condensed: mean lowercase advance 0.14 em (Thin) … 0.22 em (Bold); a normal sans is ≈ 0.5 em. Width is never the constraint in a measured box; **height is**.
+- Vertical stem width (em): Thin 0.018, ExtraLight 0.032, Light 0.046, Regular 0.060, Medium 0.073, SemiBold 0.087, Bold 0.100. Readability floor used: stem ≥ 1.4 CSS px at 1×, so minimum size per weight is Thin ≥ 78 px, ExtraLight ≥ 44, Light ≥ 30, Regular ≥ 23, Medium ≥ 19, SemiBold ≥ 16, Bold any. Light weights are therefore display-only and small text must get heavier, not lighter.
+- Rendered specimens: 18 px Medium and 24 px Regular read as too small in this face; 20 px Medium with 0.06 em tracking is the floor.
+
+### Role tokens (`--type-<role>`, `-weight`, `-leading`, `-tracking` in `:root`, sizes in rem)
+
+| Role | Size | Weight | Leading | Tracking | Job / measured box it fits |
+| --- | --- | --- | --- | --- | --- |
+| display | 6.25rem (100) | 100 Thin | 0.9 | 0 | hero counts (spec §1.6 "64+", figure 71 px) — colour `--ink-figure` |
+| figure | 3rem (48) | 200 ExtraLight | 1 | 0.01em | values: day count, readings, metrics, dates ("04" role ≈ 42) — `--ink-figure` |
+| headline | 3rem (48) | 700 Bold | 1.05 | 0.01em | page titles (h1) on the ground |
+| title | 2.5rem (40) | 700 Bold | 1 | 0.015em | card title line 1 (drink card "Orange": pitch 39 px) |
+| title-light | 2.5rem (40) | 300 Light | 1 | 0.02em | card title line 2 ("Drinks") |
+| heading | 2rem (32) | 700 Bold | 1.1 | 0.02em | section / card headings; centred card title (§1.3 ≈ 31) |
+| subheading | 1.75rem (28) | 700 Bold | 1.15 | 0.025em | small card headers, row titles |
+| row | 1.75rem (28) | 400 Regular | 1.15 | 0.03em | list / row text: two lines = 64 px fit the 72 px row (§1.2) |
+| body | 1.625rem (26) | 400 Regular | 1.35 | 0.035em | running text, inputs |
+| label | 1.375rem (22) | 600 SemiBold | 1.2 | 0.05em | buttons, chips, tags, nav labels (42 px chip, 60 px pill) |
+| meta | 1.25rem (20) | 500 Medium | 1.3 | 0.06em | captions, timestamps, hints (§1.3 meta line) — `--ink-meta` |
+
+### Text colour (ink sets)
+
+- `:root` declares pairs: `--ink-ground` white, `--ink-ground-meta` lilac `#dab8f1`, `--ink-ground-figure` coral `#fc5659` (new `--colour-figure`), `--ink-ground-accent` lime, `--ink-ground-attention` yellow, `--ink-ground-time` blue `#b6e1fa`; `--ink-fill` black for every role on pastel/white fills.
+- Context properties `--ink`, `--ink-meta`, `--ink-figure`, `--ink-accent`, `--ink-attention`, `--ink-time`: `:root` and a dark-surface group set the ground set; a light-fill group sets all of them to `--ink-fill`. Every former `color: var(--colour-text|on-action)` becomes light-group membership, every `color: var(--colour-text-inverse)` dark-group membership. Role rules colour meta/figure/display via the context properties, so a meta line is lilac on black and ink on lime automatically.
+- Semantic accents (on black only; ink on fills): lime = current / done / kicker (eyebrow), yellow = due / overdue (next-check chip, "!" marks), blue = time and dates, lilac = secondary text, coral = figures.
+- Contrast thresholds (test computes WCAG ratio from the hex tokens): 7:1 for every text pair, 4.5:1 for the figure pair (only used at ≥ 3rem). Coral on black 6.6, lilac 12.1, blue 15.1, lime 15.7, yellow 17.6, ink on every pastel ≥ 11.
+
+### Enforcement in `src/styles.test.ts` ("type system" describe block)
+
+- Outside `:root`, `font-size` / `line-height` / `letter-spacing` appear only as a complete role application (all four longhands of one role); `font-weight` alone only as `var(--type-*-weight)`; `font` only as `inherit`.
+- Every weight 100–700 is used by an applied role; each role satisfies the stem floor; role sizes are rem.
+- `color:` outside `:root` and the ink groups is only `inherit`, `currentColor` or `var(--ink*)`.
+
+- Also checked: role sizes are rem (reflow at 200 % root), the retired `--type-h1…h4/lead/small` tokens are gone, `var(--ink-figure)` is only used by the display/figure roles, every ink-group surface that paints a solid token fill reads at 7:1 with its set, and the hierarchy anchors (`h1` = headline, `h2`–`h4` = heading, `button` = label, inputs = body, `.design-batch-profile` = title-light, …). The old `.design-section-head h1` assertion (rule gone since `e6e8389`) is replaced by "`h1` uses the headline role".
+
+### How to choose a role (later tickets)
+
+- Name or title of a card → `title`, with its second line (profile, kind) in `title-light`. A centred card title or a section head → `heading`; a small card header or the bold first line of a row → `subheading`.
+- Anything in a list row → `row`. Paragraphs and inputs → `body`. Anything you can press or that reads as a chip/tag/field label → `label`. Dates, counts in captions, hints → `meta`.
+- A number that is the point of the component → `figure` (48 px); the one hero number of a screen → `display` (100 px). Both turn coral on black by themselves.
+- Apply a role by adding the selector to that role's rule in the "Type roles" block after `.sr-only` in `src/styles.css` (or a complete four-longhand role rule inside a media query). Never write a size, weight, leading or tracking anywhere else; the test fails.
+- Colour: put a new surface in the light-fill or dark-fill ink list (the "Text colour" block) instead of setting `color`. Semantic accents on black: `color: var(--ink-accent)` (lime: current, done, kicker), `var(--ink-attention)` (yellow: due, overdue), `var(--ink-time)` (blue: dates, timestamps). They fall back to ink on fills automatically.
+
+### As built
+
+- `src/styles.css`: role tokens and ink tokens in `:root`, one ink-set block per kind (light fill / dark ground, plus a late light block for disabled Settings controls that were ordered after the pressed rule), the role layer after `.sr-only`, phone overrides (`.navigation button` = label, `.calendar-head h2` = subheading) at the end of the `< 600px` block. Every per-rule `font-size`/`font-weight`/`line-height`/`letter-spacing` was removed; every `color: var(--colour-text|on-action|text-inverse)` became ink-set membership. Accents placed: blue date in the top bar and date chip, timeline/readings/upcoming times; lime eyebrows, start-batch legend, done check circle; yellow next-check chip on batch cards and the overdue "!" marks.
+- Geometry touched only where the type change made a regression: `.design-quiet` and the other text actions got `min-width: 44px` ("More batch tools" had shrunk to 43 px). The never-visible white background on `.calendar-screen, .profiles-screen, .design-checks-view` (always overridden by `transparent`) was removed so the contrast check reads true.
+- `vite.config.ts`: `test.testTimeout: 30_000`. The App integration tests drive the whole UI; the slow one took 5–8 s alone and longer in parallel, so the 5 s default failed a plain `npm test` on timing alone.
+- Tests: `npm run typecheck` clean; plain `npm test` 263 passed / 263, 15 files, 190 s.
+- Harness (full run, 60 captures): 0 failed, 0 step-failed, 0 page errors, document overflow 0 / vertical 0. surfaceOverflow 1 (calendar 320, known), clippedControls 5 (`.batch-head-notifications`, known), smallTargets back to the known Settings "On/Off/All" segments after the min-width fix (they are 38–43 px wide now, were 39–41).
+- Visual check (overview 1440, overview/batch-detail/checks 390, settings/calendar 768): titles, Light second lines, coral Day/pH/°C figures on black, lilac meta, blue dates and lime kickers all read clearly; nothing clips.
+
+### Left by ticket 2
+
+- Text boxes that are wrong because the geometry is pre-rework (fix in the component tickets, not with smaller type): the Kitchen summary puts a 100 px Thin count in a 3-column lime grid (gap 11 moves it onto black next to a white circle, which also turns it coral); batch cards grow taller than H/W 0.94 because the 40 px title pair wraps in today's narrow copy column (gap 9 widens it); Settings segments are still bordered pills whose 22 px labels leave "On"/"Off" under 44 px wide (gap 10 replaces them with 72 px rows); dialog titles are `heading` on the blue band until gap 8 makes them a centred sheet header.
+- Unique has no `tnum` feature, so the existing `font-variant-numeric: tabular-nums` declarations do nothing; figures are proportional.
+- The pill label pair of the drink card (spec §1.1 "Swipe / Now") should use the `row` size with Light and Bold lines; there is no element for it yet (gap 9).
+
 ## Left for later tickets / known issues
 
-- `src/styles.test.ts` "opens condensed lettering…" already failed at `e6e8389`. It looks for `.design-section-head h1`, a rule that no longer exists. That is typography (gap 6), so it was left as is.
-- `src/App.test.tsx` "reflects edited cadence and pauses and resumes checks with batch status" times out at the 5 s default (it takes 5.3–8 s). It fails the same way at `7133bca` with the foundation changes stashed, so it is a pre-existing slow test, not a regression. Full suite after foundation: 254 passed, 2 failed (these two), 228 s with `--maxWorkers=1`.
+- ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).
+- ~~Timeout~~ fixed by ticket 2 with `testTimeout` in `vite.config.ts`. Was: `src/App.test.tsx` "reflects edited cadence and pauses and resumes checks with batch status" times out at the 5 s default (it takes 5.3–8 s). It fails the same way at `7133bca` with the foundation changes stashed, so it is a pre-existing slow test, not a regression. Full suite after foundation: 254 passed, 2 failed (these two), 228 s with `--maxWorkers=1`.
 - These rounded-rectangle surfaces are not bowed yet, though they are large cards on the ground: `.design-timeline-panel`, `.batch-guidance`, `.design-input-summary`, `.batch-management > .wb-panel`, `.next-action`, `.design-detail-next` (yellow sub-row → a bowed row with `--r` = H/2, gap 11), `.design-tip`, `.empty-state`, `.profile-editor-card` and `.batch-tools-danger`. Bow them in the ticket that owns them. `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
 - `timeline-entry` uses the default 52px radius, capped at 50 % of its height. Short entries therefore read as near-capsules. Gap 13 should give them their event-card size and the small-component rule (`--r` ≈ 0.16 W, `--bow` ≈ 0.0125 W below 300px).
 - Calendar event days still use `--colour-action-alt` on tall capsules. The spec wants `--colour-emblem` circles there (calendar restyle).

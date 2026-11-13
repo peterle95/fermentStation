@@ -33,6 +33,10 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    // The App integration tests drive the whole UI through many awaited interactions; the slowest
+    // ("reflects edited cadence and pauses and resumes checks…") takes 5-8 s alone and longer when the
+    // files run in parallel, so vitest's 5 s default made a plain `npm test` fail on timing alone.
+    testTimeout: 30_000,
     exclude: [...configDefaults.exclude, "tools/**"],
   },
 });

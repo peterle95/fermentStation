@@ -82,24 +82,18 @@ describe("Swipe-derived design contract", () => {
     }
   });
 
-  it("uses genuine offline Unique throughout with readable relative sizing and no synthesis", () => {
+  it("uses genuine offline Unique throughout with relative sizing and no synthesis", () => {
     expect(styles).toContain('--font-family: "Unique", system-ui, sans-serif;');
-    for (const declaration of [
-      "--type-body: 2rem;", "--type-small: 1.75rem;", "font-synthesis: none;",
-    ]) expect(styles).toContain(declaration);
+    expect(rule(":root")).toContain("font-size: 100%");
+    expect(styles).toContain("font-synthesis: none;");
     expect(styles.match(/@font-face/g)).toHaveLength(7);
     expect(styles).not.toMatch(/Circular Std|Outfit|Sofia|Georgia|text-transform: uppercase/);
     expect(read("../index.html")).not.toMatch(/rel="preload"[^>]+\.ttf/);
     expect(rule(".station-dialog")).toContain("var(--font-family)");
   });
 
-  it("opens condensed lettering without distorting the font or losing control tracking", () => {
-    expect(rule(":root")).toContain("letter-spacing: var(--type-body-tracking)");
-    expect(styles).toContain("--type-body-tracking: 0.045em;");
-    expect(styles).toContain("--type-small-leading: 1.25;");
-    expect(rule("button, input, select, textarea")).toContain("letter-spacing: inherit");
-    expect(rule(".design-section-head h1")).toContain("font-size: var(--type-h2)");
-    expect(rule(".batch-view-switch button")).toContain("font-size: var(--type-small)");
+  it("keeps the condensed face undistorted and lets controls inherit their role", () => {
+    expect(rule("button, input, select, textarea")).toContain("font: inherit; letter-spacing: inherit");
     expect(styles).not.toMatch(/scale[XY]\(|font-stretch:|size-adjust:/);
   });
 
@@ -121,7 +115,6 @@ describe("Swipe-derived design contract", () => {
     expect(rule("button")).toContain("min-height: var(--button-height)");
     expect(rule("button")).toContain("border-radius: var(--radius-control)");
     expect(rule("input, select, textarea")).toContain("min-height: var(--input-height)");
-    expect(rule("input, select, textarea")).toContain("font-size: var(--type-body)");
     expect(rule("textarea")).toContain("border-radius: var(--radius-small)");
     for (const selector of [".batch-component-card", ".settings-card", ".station-dialog", ".profile-card", ".profile-editor-section"]) {
       expect(rule(selector)).toContain("var(--card-padding)");
@@ -138,7 +131,178 @@ describe("Swipe-derived design contract", () => {
     expect(app).not.toContain('strokeDasharray={`${batches.length ? 76');
     expect(app).toContain("{dueChecks.length} checks due");
     expect(app.replaceAll("©", "")).not.toMatch(/\p{Extended_Pictographic}/u);
-    expect(rule(".primary-action, .station-primary, .profile-add, .component-button-primary, .profile-editor-button.primary")).toContain("color: var(--colour-on-action)");
+    const lightInk = inkGroups().find(({ kind }) => kind === "fill")!.selectors;
+    for (const selector of [".primary-action", ".station-primary", ".profile-add", ".component-button-primary", ".profile-editor-button.primary"]) expect(lightInk).toContain(selector);
+  });
+});
+
+/* Type system (docs/design/swipe-rework-log.md, ticket 2). */
+const roleNames = ["display", "figure", "headline", "title", "title-light", "heading", "subheading", "row", "body", "label", "meta"] as const;
+/** Vertical stem width of each Unique weight in em, measured with fontTools from public/fonts/unique/*.woff2. */
+const stemEm: Record<number, number> = { 100: 0.018, 200: 0.032, 300: 0.046, 400: 0.06, 500: 0.073, 600: 0.087, 700: 0.1 };
+/** A stem thinner than this (CSS px at 1x) breaks up on screen; light weights are therefore display-only. */
+const minimumStemPx = 1.4;
+const typographic = ["font-size", "font-weight", "line-height", "letter-spacing"] as const;
+
+function rootTokens() {
+  const tokens = new Map<string, string>();
+  for (const entry of rules()) if (entry.selector === ":root") for (const [property, value] of entry.declarations) tokens.set(property, value);
+  return tokens;
+}
+
+function roleTokens() {
+  const tokens = rootTokens();
+  return roleNames.map((name) => {
+    const size = tokens.get(`--type-${name}`) ?? "";
+    return { name, size, px: Number.parseFloat(size) * 16, weight: Number(tokens.get(`--type-${name}-weight`)), leading: tokens.get(`--type-${name}-leading`), tracking: tokens.get(`--type-${name}-tracking`) };
+  });
+}
+
+/** Resolve a :root colour token through var() aliases to its hex value. */
+function hex(token: string): string {
+  const value = rootTokens().get(token);
+  expect(value, `missing token ${token}`).toBeDefined();
+  const alias = value!.match(/^var\((--[\w-]+)\)$/);
+  return alias ? hex(alias[1]) : value!;
+}
+
+function contrast(foreground: string, background: string) {
+  const luminance = (value: string) => {
+    const [r, g, b] = [1, 3, 5].map((index) => Number.parseInt(value.slice(index, index + 2), 16) / 255)
+      .map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const [light, dark] = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+  return (light + 0.05) / (dark + 0.05);
+}
+
+const inkSet = ["--ink", "--ink-meta", "--ink-figure", "--ink-accent", "--ink-attention", "--ink-time"];
+/** Rules that switch a surface's ink set: "fill" (ink on light fills) or "ground" (the black ground's colours). */
+function inkGroups() {
+  return rules().filter((entry) => entry.selector !== ":root" && entry.declarations.some(([property]) => property === "--ink")).map((entry) => {
+    const values = new Map(entry.declarations);
+    const kind = values.get("--ink") === "var(--ink-fill)" ? "fill" : "ground";
+    return { ...entry, kind, values };
+  });
+}
+
+describe("type system: roles, weights and text colour (swipe-rework-log.md, ticket 2)", () => {
+  it("defines every role once in :root as rem size, weight, leading and tracking", () => {
+    const roles = roleTokens();
+    for (const role of roles) {
+      expect(role.size, `--type-${role.name} must be rem so text reflows at 200 % root size`).toMatch(/^\d+(?:\.\d+)?rem$/);
+      expect(Object.keys(stemEm).map(Number), `--type-${role.name}-weight`).toContain(role.weight);
+      expect(role.leading, `--type-${role.name}-leading`).toMatch(/^\d+(?:\.\d+)?$/);
+      expect(role.tracking, `--type-${role.name}-tracking`).toMatch(/^(?:0|-?\d*\.?\d+em)$/);
+    }
+    // No retired scale tokens linger next to the roles.
+    const declared = [...rootTokens().keys()].filter((name) => name.startsWith("--type-")).map((name) => name.replace(/^--type-/, "").replace(/-(?:weight|leading|tracking)$/, ""));
+    expect([...new Set(declared)].sort()).toEqual([...roleNames].sort());
+  });
+
+  it("keeps every role's stems at least 1.4 CSS px, so light weights stay at display sizes", () => {
+    for (const role of roleTokens()) expect(role.px * stemEm[role.weight], `${role.name}: ${role.px}px at weight ${role.weight}`).toBeGreaterThanOrEqual(minimumStemPx);
+    // Hierarchy: the meta floor is 20 px, and no role is larger than the 100 px hero figure.
+    const sizes = roleTokens().map((role) => role.px);
+    expect(Math.min(...sizes)).toBe(20);
+    expect(Math.max(...sizes)).toBe(100);
+  });
+
+  it("sets type only by applying a complete role, never a raw size, weight, leading or tracking", () => {
+    for (const entry of rules()) {
+      if (entry.selector === ":root" || entry.selector.startsWith("@font-face")) continue;
+      const values = new Map(entry.declarations);
+      const font = values.get("font");
+      if (font !== undefined) expect(font, `${entry.selector} { font } may only inherit`).toBe("inherit");
+      const size = values.get("font-size");
+      if (size === undefined) {
+        // Outside a role application: emphasis may borrow a role's weight; controls inherit tracking.
+        for (const property of ["line-height"] as const) expect(values.has(property), `${entry.selector} { ${property} } outside a role`).toBe(false);
+        if (values.has("letter-spacing")) expect(values.get("letter-spacing"), entry.selector).toBe("inherit");
+        if (values.has("font-weight")) expect(values.get("font-weight"), entry.selector).toMatch(/^var\(--type-[\w-]+-weight\)$/);
+        continue;
+      }
+      const role = size.match(/^var\(--type-([\w-]+)\)$/)?.[1];
+      expect(roleNames, `${entry.selector} { font-size: ${size} } must be a role`).toContain(role);
+      expect(values.get("font-weight"), entry.selector).toBe(`var(--type-${role}-weight)`);
+      expect(values.get("line-height"), entry.selector).toBe(`var(--type-${role}-leading)`);
+      expect(values.get("letter-spacing"), entry.selector).toBe(`var(--type-${role}-tracking)`);
+    }
+  });
+
+  it("applies every role and so puts all seven Unique weights, Thin to Bold, to work", () => {
+    const applied = new Set<string>();
+    for (const entry of rules()) {
+      const size = new Map(entry.declarations).get("font-size")?.match(/^var\(--type-([\w-]+)\)$/)?.[1];
+      if (size && entry.selector !== ":root") applied.add(size);
+    }
+    expect([...applied].sort()).toEqual([...roleNames].sort());
+    expect([...new Set(roleTokens().map((role) => role.weight))].sort()).toEqual([100, 200, 300, 400, 500, 600, 700]);
+  });
+
+  it("guards the hierarchy anchors that later component tickets build on", () => {
+    // Page titles (formerly the missing `.design-section-head h1`) take the headline role; sections the heading role.
+    const roleOf = (selector: string) => rules().find((entry) => entry.selectors.includes(selector) && new Map(entry.declarations).has("font-size"))
+      ?.declarations.find(([property]) => property === "font-size")?.[1].match(/^var\(--type-([\w-]+)\)$/)?.[1];
+    for (const [selector, role] of [
+      ["h1", "headline"], ["h2", "heading"], ["h3", "heading"], ["button", "label"], ["body", "body"], ["input", "body"], [".design-gauge strong", "display"],
+      [".checks-summary strong", "display"], [".design-batch-copy h3", "title"], [".design-batch-profile", "title-light"], ["small", "meta"], [".eyebrow", "meta"],
+    ]) expect(roleOf(selector), selector).toBe(role);
+    // Two-line card titles pair Bold with Light at one size, as on the drink card (spec §1.1).
+    const tokens = rootTokens();
+    expect(tokens.get("--type-title")).toBe(tokens.get("--type-title-light"));
+  });
+
+  it("declares text-on-ground colour pairs that hold 7:1 (4.5:1 for figures at 3rem and above)", () => {
+    const ground = hex("--colour-surface-inverse");
+    const pairs: [token: string, minimum: number][] = [
+      ["--ink-ground", 7], ["--ink-ground-meta", 7], ["--ink-ground-accent", 7], ["--ink-ground-attention", 7], ["--ink-ground-time", 7], ["--ink-ground-figure", 4.5],
+    ];
+    for (const [token, minimum] of pairs) expect(contrast(hex(token), ground), `${token} on the ground`).toBeGreaterThanOrEqual(minimum);
+    for (const fill of ["--colour-background", "--colour-surface", "--colour-action", "--colour-action-alt", "--colour-emblem", "--colour-accent"]) {
+      expect(contrast(hex("--ink-fill"), hex(fill)), `--ink-fill on ${fill}`).toBeGreaterThanOrEqual(7);
+    }
+    expect(hex("--colour-figure")).toBe("#fc5659");
+    // Coral is reserved for the figure roles, which are at least 3rem.
+    for (const entry of rules()) {
+      if (!entry.declarations.some(([, value]) => value === "var(--ink-figure)")) continue;
+      expect(new Map(entry.declarations).get("font-size"), entry.selector).toMatch(/^var\(--type-(?:display|figure)\)$/);
+    }
+  });
+
+  it("colours text only through the ink sets, and every ink set is complete and readable on its surfaces", () => {
+    for (const entry of rules()) {
+      if (entry.selector === ":root") continue;
+      for (const [property, value] of entry.declarations) {
+        if (property === "color") expect(value, `${entry.selector} { color }`).toMatch(/^(?:inherit|currentColor|var\(--ink(?:-[a-z]+)?\))$/);
+      }
+    }
+    const groups = inkGroups();
+    expect(groups.filter(({ kind }) => kind === "fill").length).toBeGreaterThan(0);
+    expect(groups.filter(({ kind }) => kind === "ground").length).toBeGreaterThan(0);
+    const membership = new Map<string, string>();
+    for (const group of groups) {
+      expect(group.values.get("color"), group.selector).toBe("var(--ink)");
+      for (const name of inkSet) {
+        expect(group.values.get(name), `${group.selector} { ${name} }`).toBe(group.kind === "fill" ? "var(--ink-fill)" : `var(${name.replace("--ink", "--ink-ground")})`);
+      }
+      for (const selector of group.selectors) membership.set(selector, group.kind);
+    }
+    expect(membership.get(".app-shell")).toBe("ground");
+    expect(membership.get(".design-batch-card.selected")).toBe("ground");
+    expect(membership.get(".design-batch-card")).toBe("fill");
+    // A surface that paints a solid token fill must read with the ink set it joined.
+    for (const entry of rules()) {
+      const values = new Map(entry.declarations);
+      const paint = (values.get("--fill") ?? values.get("background") ?? "").match(/^var\((--colour-[\w-]+)\)$/)?.[1];
+      if (!paint || paint === "--colour-scrim") continue;
+      for (const selector of entry.selectors) {
+        const kind = membership.get(selector);
+        if (!kind) continue;
+        const inks = kind === "fill" ? ["--ink-fill"] : ["--ink-ground", "--ink-ground-meta", "--ink-ground-accent", "--ink-ground-attention", "--ink-ground-time"];
+        for (const ink of inks) expect(contrast(hex(ink), hex(paint)), `${selector}: ${ink} on ${paint}`).toBeGreaterThanOrEqual(7);
+      }
+    }
   });
 });
 
