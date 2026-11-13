@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1c1c1c</color>
-    <color name="colorPrimaryDark">#1c1c1c</color>
+    <!-- The Swipe ground (CSS --colour-surface-inverse), so launch, splash and bars match the first paint. -->
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#b6f074</color>
-    <color name="stationBackground">#ffffff</color>
+    <color name="stationBackground">#000000</color>
 </resources>

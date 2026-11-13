@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { pwaManifest } from "./platform/pwa";
 
 const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const app = readFileSync(new URL("./App.tsx", import.meta.url), "utf8");
@@ -1122,9 +1123,8 @@ describe("installed appearance and provenance", () => {
   });
 
   it("reuses the unchanged real logo for the Android launch rather than the Capacitor placeholder", () => {
-    expect(read("../capacitor.config.ts")).toContain('iconColor: "#1c1c1c"');
     const colors = read("../android/app/src/main/res/values/colors.xml");
-    for (const value of ["#1c1c1c", "#b6f074", "#ffffff"]) expect(colors).toContain(value);
+    expect(colors).toContain("#b6f074");
     const launch = read("../android/app/src/main/res/values/styles.xml");
     expect(launch).not.toContain("@drawable/splash");
     expect(launch).toContain("@drawable/station_launch_background");
@@ -1132,6 +1132,26 @@ describe("installed appearance and provenance", () => {
     expect(launch).toContain('name="postSplashScreenTheme">@style/AppTheme.NoActionBar');
     const original = readFileSync(new URL("../public/new-design/new_app_logo/FermentStation_Logo_Asset_Pack/transparent/logo-transparent-432.png", import.meta.url));
     expect(readFileSync(new URL("../android/app/src/main/res/drawable-nodpi/station_launch_logo.png", import.meta.url))).toEqual(original);
+  });
+
+  it("paints every launch, splash, bar and window colour in the Swipe ground before the UI loads (ticket 14)", () => {
+    const root = rootTokens();
+    const ground = root.get("--colour-surface-inverse");
+    expect(ground).toBe("#000000");
+    expect(root.get("background")).toBe("var(--colour-surface-inverse)");
+    expect(read("../capacitor.config.ts")).toContain(`iconColor: "${ground}"`);
+    const colors = read("../android/app/src/main/res/values/colors.xml");
+    for (const name of ["colorPrimary", "colorPrimaryDark", "stationBackground"]) expect(colors).toContain(`<color name="${name}">${ground}</color>`);
+    expect(colors).not.toMatch(/#1c1c1c|#ffffff/i);
+    const launch = read("../android/app/src/main/res/values/styles.xml");
+    expect(launch).toContain('name="windowSplashScreenBackground">@color/stationBackground');
+    for (const bar of ["windowBackground", "statusBarColor", "navigationBarColor"]) expect(launch).toContain(`name="android:${bar}">@color/stationBackground`);
+    expect(read("../android/app/src/main/res/drawable/station_launch_background.xml")).toContain('android:drawable="@color/stationBackground"');
+    expect(read("../index.html")).toContain(`<meta name="theme-color" content="${ground}" />`);
+    expect(pwaManifest.theme_color).toBe(ground);
+    expect(pwaManifest.background_color).toBe(ground);
+    const windows = JSON.parse(read("../src-tauri/tauri.conf.json")).app.windows as Array<{ backgroundColor?: string }>;
+    for (const window of windows) expect(window.backgroundColor).toBe(ground);
   });
 });
 

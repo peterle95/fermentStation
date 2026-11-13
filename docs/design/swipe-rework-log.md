@@ -24,6 +24,7 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 12 Primary action | **closed** for the batch detail ("Add observation"), Settings "Export ZIP archive" and the first-run card ("Start your first batch"), all `card-action`; every sheet submit is `card-action card-action-foot` (in flow, centred at the sheet's foot) | batch card (ticket 8), tickets 12, 13 |
 | 13 Timeline | **closed**: one `small-card` (bowed at r = min(52, 0.16 W), bow = min(4.4, 0.0125 W) from its own width; lilac `#d9b4eb → #f6eafc` or blue `#b4dff9 → #e6f6ff` gradient; lime tag chip h 27; Light value; translucent time chip h 30; all ink black) for timeline entries, the latest readings, the calendar's upcoming/overdue items and the Checks upcoming strip; the white timeline panel is gone; pH and temperature entries show their number as the Light value | small cards (ticket 10), ticket 13 |
 | Legacy rounded rectangles (gap 1 follow-up) | **closed**: the `--radius-card` allowlist is empty; the inline logger's card is `.activity-logger-card bowed`; Settings heading icons are the row avatar | tickets 12, 13 |
+| Launch colours (gap 2 follow-up) | **closed**: Android launch/splash/window/status/navigation bars, the notification tint, `theme-color`, the web manifest and the Tauri window are `#000000`, the ground | ticket 14 |
 | Calendar month grid (spec §3, no gap number) | **closed**: day circles min(column, 60) ≥ 44, emblem event days, black selected day, `#3e3e40` today ring; Today / arrows / top-bar date chip on `utility-circle` / `utility-capsule`; no 320 overflow (the screen spans the pane below 380); strip days carry lime tag chips at 160 px; bowed focus rings follow the bow | calendar (ticket 11) |
 
 Also fixed: the page-scroll defect from the harness baseline. `.sr-only` text inside the scroll panes was absolutely positioned against `.app-shell`, which made the whole document scroll in 49 of 60 captures. `.main-content`, `.design-dashboard` and `.design-detail` are now `position: relative`, so they contain it.
@@ -557,6 +558,49 @@ Second leftover sweep. No accessible name, role or focus order changed; one toke
 - The timeline's `.zone` chip is still the bordered status chip; measurement entries (`kind: "measurement"`) keep their text, since they have no single number.
 - Still open from ticket 12: `.start-batch-basics` legend, the short bowed boxes' default radius. Ticket 14 items unchanged (launch colours, `theme-color`, harness coverage for dialogs/trash/picker, desktop sidebar shape, type weights).
 
+## Ticket 14: launch colours and harness coverage — done
+
+Config, tests and harness only. `src/App.tsx` and `src/styles.css` are untouched.
+
+### As built
+
+- **Launch colours = the ground `#000000`** (`--colour-surface-inverse`, which `:root` paints as the page background), so nothing grey or white shows before the first paint:
+  - `android/app/src/main/res/values/colors.xml`: `colorPrimary`, `colorPrimaryDark` (were `#1c1c1c`) and `stationBackground` (was `#ffffff`). `stationBackground` feeds the splash background (`windowSplashScreenBackground`), the pre-splash `station_launch_background` layer and the post-splash `windowBackground`.
+  - `styles.xml` `AppTheme.NoActionBar` sets `android:statusBarColor` and `android:navigationBarColor` to `@color/stationBackground`. On Android 15 edge-to-edge these are ignored and the black window background shows through instead.
+  - `capacitor.config.ts` LocalNotifications `iconColor` `#000000`. This is the source; the generated `android/app/src/main/assets/capacitor.config.json` is not in the repo and is written by `cap sync`.
+  - `index.html` `theme-color` `#000000`; `src/platform/pwa.ts` (the manifest source that `vite.config.ts` uses) `theme_color` / `background_color` `#000000`.
+  - `src-tauri/tauri.conf.json` window `backgroundColor` `#000000` (Tauri 2.11 window and webview background).
+- **Harness**: six new surfaces, all five viewports, no baseline. `seed.ts` needed no change because it already holds the deleted batch "Jun tea (abandoned)".
+  - `trash`: Settings → "Open recently deleted batches" → scrolled to the toggle and the trash row.
+  - `batch-picker`: overview → "More batch actions" → the first upcoming-strip day with several batches → "Choose a batch" sheet. This is the picker earlier tickets meant. The start form's profile chooser is a native `<select>` (already in `batch-creation`); its open list cannot be captured.
+  - `profile-overview`: Profiles → "View Kimchi guidance".
+  - `batch-dates`: Kimchi detail → "View batch dates".
+  - `profile-inputs`: Kimchi detail → "See all" under Profile inputs.
+  - `station-info`: station logo (phone, tablet) or sidebar "Home" (desktop).
+- The harness now covers 19 surfaces: overview, all-batches, batch-detail, observation-logger, batch-tools, upcoming-strip, checks, calendar, profiles, profile-editor, batch-creation, settings, first-run, trash, batch-picker, profile-overview, batch-dates, profile-inputs, station-info.
+
+### Tests
+
+- `styles.test.ts`: the launch-logo test no longer pins `#1c1c1c` / `#ffffff`. A new test reads the ground from the `:root` token and asserts that every value above (Android colours and bar items, the splash and launch-layer references, `theme-color`, the manifest and the Tauri windows) equals it, and that `colors.xml` holds no `#1c1c1c` / `#ffffff`.
+- `pwa.test.ts`: theme and background `#000000`.
+
+### Results
+
+- `npm run typecheck` clean; full `npm test` 15 files, 312 / 312.
+- Full harness (**95 captures**, 19 surfaces): 0 failed, 0 step-failed, 0 page errors, 0 document / vertical / surface overflow, 0 clippedControls, 0 smallTargets (`uniqueSmallTargets` empty). The new surfaces report no findings, so this ticket fixed nothing in CSS.
+- Looked at all six new surfaces at 390 and 1440.
+
+### What the new captures show that still differs from the Swipe components (not changed, decide later)
+
+- **Trash toggle**: at 390 the expanded "Close recently deleted batches" toggle is a yellow capsule, but at 1440 it is black. The same state takes different fills per viewport. The trash row itself (grey `--colour-row` capsule with a white "Restore" capsule) matches the row vocabulary.
+- **Batch picker**: the choices (`.upcoming-batch-choice`) are light-blue capsules with a subheading and a meta line. They are not `toggle-row`s or small cards, and a two-line batch name makes a tall stadium (390, "Ginger bug…").
+- **Profile overview**: the yellow intro box is the short bowed box with the default r 52, as ticket 12 noted. Below it, the `dl` facts are lilac labels with lilac values on black, and "pH conditions" is a plain bulleted list. Neither is a Swipe component.
+- **Batch dates**: the same lilac-on-lilac `dl`. Values could take the Light figure or white ink.
+- **Station info**: the inline "Settings" text button keeps its 44 px minimum width, which leaves a visible gap before the full stop ("Settings ."). Dropping it would need a small-target exemption for inline actions; decide with the target rule.
+- **Long sheets** (profile overview at 390 and 1440): the native scrollbar is light grey (`color-scheme: light`) and draws at the sheet's right edge, outside the bow. It is the same in the existing `batch-creation` capture.
+- **Android launch**: `station_launch_logo.png` (the transparent logo, unchanged) now sits on black. The jar's dark lid has little contrast against black; the orange cat and jar read. The unused Capacitor placeholder `drawable*/splash.png` files (white ground, blue mark) are not referenced (tested) and were not edited. The adaptive app icon background `ic_launcher_background` stays `#fff`; it is an icon, not a launch surface.
+- Not verified on a device or emulator (out of scope): status-bar icon contrast and whether the splash-to-WebView handover has a frame of another colour.
+
 ## Left for later tickets / known issues
 
 - ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).
@@ -564,5 +608,4 @@ Second leftover sweep. No accessible name, role or focus order changed; one toke
 - ~~Rounded-rectangle surfaces not bowed yet~~ settled by tickets 12 and 13; the allowlist is empty (the inline logger's card is `.activity-logger-card bowed`). `.activity-logger` must **not** get `bowed`: it switches to `display: contents` while the modal logger is open, and an absolutely positioned fill layer would then escape to the pane.
 - ~~`timeline-entry` radius~~ settled by ticket 10 (small-card rule). Was: `timeline-entry` uses the default 52px radius, capped at 50 % of its height. Short entries therefore read as near-capsules. Gap 13 should give them their event-card size and the small-component rule (`--r` ≈ 0.16 W, `--bow` ≈ 0.0125 W below 300px).
 - ~~Calendar event days still use `--colour-action-alt` on tall capsules~~ settled by ticket 11 (`--colour-emblem` circles).
-- The native launch colours are still `#1c1c1c`: `android/app/src/main/res/values/colors.xml` `colorPrimary`/`colorPrimaryDark`, and `capacitor.config.ts` `iconColor`. `styles.test.ts` asserts them. Switch them to `#000000` together with that test if the launch screen should match the new ground.
-- `index.html` `theme-color` is `#ffffff`.
+- ~~The native launch colours are still `#1c1c1c`~~ and ~~`index.html` `theme-color` is `#ffffff`~~ settled by ticket 14 (all `#000000`).

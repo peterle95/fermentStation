@@ -45,6 +45,13 @@ const surfaces = [
   { name: "batch-creation", description: "Start a batch dialog", steps: [{ tap: ".design-topbar .batch-fab" }, { waitFor: "dialog.station-dialog[open]" }] },
   { name: "settings", description: "Settings", steps: [{ tap: '.design-topbar button[aria-label="Settings"]' }, { waitFor: ".settings-screen" }] },
   { name: "first-run", description: "Empty first-run state (no saved data)", scenario: "empty", steps: [{ waitFor: ".design-dashboard" }] },
+  // Ticket 14: states styled before the harness could reach them. No baseline exists for these.
+  { name: "trash", description: "Settings with Recently deleted batches open, scrolled to the trash rows", steps: [{ tap: '.design-topbar button[aria-label="Settings"]' }, { waitFor: ".settings-screen" }, { tap: ".settings-trash-toggle" }, { waitFor: ".deleted-batches-panel .trash-item" }, { scrollTo: ".settings-trash-toggle" }] },
+  { name: "batch-picker", description: "Choose a batch sheet from an upcoming-strip day with several batches", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-more-actions > summary" }, { waitFor: '.upcoming-strip button[aria-haspopup="dialog"]' }, { tap: '.upcoming-strip button[aria-haspopup="dialog"]' }, { waitFor: "dialog.upcoming-batch-picker[open]" }] },
+  { name: "profile-overview", description: "Profile overview dialog (Kimchi)", steps: [{ tap: ".navigation .nav-profiles" }, { tap: 'button[aria-label="View Kimchi guidance"]' }, { waitFor: "dialog.station-dialog[open]" }] },
+  { name: "batch-dates", description: `Batch dates dialog (${detailBatch})`, steps: [...openDetail, { tap: '.design-detail button[aria-label="View batch dates"]' }, { waitFor: "dialog.station-dialog[open]" }] },
+  { name: "profile-inputs", description: `Profile inputs dialog (${detailBatch})`, steps: [...openDetail, { tap: ".design-detail .design-input-summary .design-quiet" }, { waitFor: "dialog.station-dialog[open]" }] },
+  { name: "station-info", description: "Station information dialog", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-account, .station-identity" }, { waitFor: "dialog.station-dialog[open]" }] },
 ];
 
 // ---------------------------------------------------------------------------------------------

@@ -20,7 +20,8 @@ export interface PwaManifest {
 /**
  * Single source for install metadata shared by tests and vite.config.ts.
  * Relative id/start_url/scope resolve to the Pages subpath on Pages and to
- * the dev-server root locally. Background matches CSS --colour-background.
+ * the dev-server root locally. Theme and background match the
+ * Swipe ground, CSS --colour-surface-inverse (#000000).
  */
 export const pwaManifest: PwaManifest = {
   name: "FermentStation",
@@ -29,8 +30,8 @@ export const pwaManifest: PwaManifest = {
   start_url: "./",
   scope: "./",
   display: "standalone",
-  theme_color: "#ffffff",
-  background_color: "#ffffff",
+  theme_color: "#000000",
+  background_color: "#000000",
   icons: [
     { src: "icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
     { src: "icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },

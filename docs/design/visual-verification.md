@@ -21,7 +21,7 @@ Timings on this machine (Chrome 157, 4 parallel pages):
 
 | Run | Time |
 | --- | --- |
-| Full run, 13 surfaces x 5 viewports, with full-height captures | 95-120 s |
+| Full run, 19 surfaces x 5 viewports, with full-height captures | about 180-200 s |
 | One surface x one viewport, script starts its own server | about 20 s |
 | One surface x one viewport against a running dev server (`--url`), `--no-full` | about 6 s |
 
@@ -64,6 +64,12 @@ Surfaces (`-s`):
 | `batch-creation` | Start a batch dialog | tap "Start a batch" |
 | `settings` | Settings | tap the settings button |
 | `first-run` | Empty first-run state, no saved data | app start with an empty store |
+| `trash` | Settings with "Recently deleted batches" open, scrolled to the trash row for the seeded deleted batch "Jun tea (abandoned)" (ticket 14; no baseline) | Settings, tap "Open recently deleted batches" |
+| `batch-picker` | "Choose a batch" sheet for the first upcoming-strip day that has several batches (ticket 14; no baseline) | tap "More batch actions", then that day |
+| `profile-overview` | Kimchi profile overview dialog (ticket 14; no baseline) | Profiles, tap "View Kimchi guidance" |
+| `batch-dates` | "Batch dates" dialog for "Napa cabbage kimchi" (ticket 14; no baseline) | its card, then "View batch dates" |
+| `profile-inputs` | "Profile inputs" dialog for "Napa cabbage kimchi" (ticket 14; no baseline) | its card, then "See all" under Profile inputs |
+| `station-info` | "Your fermentation station" information dialog (ticket 14; no baseline) | the station logo (phone, tablet) or "Home" (desktop sidebar) |
 
 Each capture starts from a fresh browser context: seed, load the app, then reach the surface with real taps and clicks. Surfaces and their steps are declared at the top of `scripts/visual/screenshots.mjs`; add one there when a new surface appears. A step selector that stops matching after a redesign does not abort the run: the capture is marked `step-failed`, the screenshot shows where the flow stopped, and the error names the selector.
 
@@ -138,7 +144,7 @@ Findings on the baseline (60 captures, 0 failed):
 - Small targets: Settings segmented buttons, "On"/"Off" (39-41 px wide) at 768 px and wider, and the notification "All"/"Off" segment at 320 px.
 - Page errors: none.
 
-Surfaces added after the baseline have no baseline captures: `upcoming-strip` (ticket 11). The index shows only the current capture for them, and the end-of-run comparison skips them. Do not recapture the baseline to fill the gap.
+Surfaces added after the baseline have no baseline captures: `upcoming-strip` (ticket 11) and `trash`, `batch-picker`, `profile-overview`, `batch-dates`, `profile-inputs`, `station-info` (ticket 14). The index shows only the current capture for them, and the end-of-run comparison skips them. Do not recapture the baseline to fill the gap.
 
 ## Git
 
