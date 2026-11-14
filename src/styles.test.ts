@@ -53,7 +53,7 @@ describe("Swipe-derived design contract", () => {
     for (const [name, value] of Object.entries({
       background: "#ffffff", surface: "#ffec89", "surface-inverse": "#000000", text: "#000000", "text-muted": "#000000", "text-inverse": "#ffffff",
       action: "#b6f074", "on-action": "#000000", "action-alt": "#dab8f1", emblem: "#c5b4ec", accent: "#b6e1fa", border: "#000000",
-      rail: "#3e3e40", "sheet-control": "#1b1b1b", row: "#f6f8fa", "switch-on": "#2089fd", "switch-off": "#eceef0", count: "#fff6ce",
+      rail: "#3e3e40", "sheet-control": "#1b1b1b", row: "#f6f8fa", "switch-on": "#2089fd", "switch-off": "#eceef0",
       "event-lilac": "#d9b4eb", "event-lilac-end": "#f6eafc", "event-sky": "#b4dff9", "event-sky-end": "#e6f6ff",
     })) expect(styles).toContain(`--colour-${name}: ${value};`);
     // The retired near-black must not come back as ground, ink or border.
@@ -132,7 +132,7 @@ describe("Swipe-derived design contract", () => {
     expect(app).toContain('className="design-batch-profile"');
     expect(app).toContain('className="design-batch-next"');
     expect(app).not.toContain('strokeDasharray={`${batches.length ? 76');
-    expect(app).toContain('<span className="summary-row-count">{dueChecks.length}</span>{" "}<span className="summary-row-label">checks due</span>');
+    expect(app).toContain('<span className="summary-row-count glass">{dueChecks.length}</span>{" "}<span className="summary-row-label">checks due</span>');
     expect(app.replaceAll("©", "")).not.toMatch(/\p{Extended_Pictographic}/u);
     const lightInk = inkGroups().find(({ kind }) => kind === "fill")!.selectors;
     for (const selector of [".primary-action", ".station-primary", ".profile-add", ".component-button-primary", ".profile-editor-button.primary"]) expect(lightInk).toContain(selector);
@@ -557,7 +557,7 @@ describe("responsive workflow safeguards", () => {
     const inline = rule(".inline-logger");
     for (const declaration of ["position: static", "width: auto", "margin: 0", "padding: 0", "overflow: visible"]) expect(inline).toContain(declaration);
     expect(rule(".observation-fields, .observation-actions")).toContain("display: contents");
-    expect(app).toContain('<time className="small-card-chip" dateTime={entry.date}>');
+    expect(app).toContain('<time className="small-card-chip glass" dateTime={entry.date}>');
     expect(app.match(/id="batch-activity-form"/g)).toHaveLength(1);
     expect(app).not.toContain('key={editing?.id ?? "new"}');
     expect(app).toContain("else dialog.open = true;");
@@ -784,7 +784,7 @@ describe("sheet and field on black (swipe-rework-log.md, ticket 5; spec §1.7, g
       for (const [property, value] of entry.declarations) {
         expect(property, `${entry.selector} re-shapes the sheet`).not.toMatch(/^--(?:r|bow|k|fill)$/);
         if (/^--(?:r|bow)-end$/.test(property)) expect(value).toBe("0px");
-        if (/^(?:background|border|border-radius)$/.test(property)) expect([".station-dialog::backdrop", '.station-dialog .quick-log-types button[aria-pressed="true"]'], `${entry.selector} paints the sheet`).toContain(entry.selector);
+        if (/^(?:background|border|border-radius)$/.test(property)) expect([".station-dialog::backdrop", ".glass, .station-dialog::backdrop, .glass.bowed::after", '.station-dialog .quick-log-types button[aria-pressed="true"]'], `${entry.selector} paints the sheet`).toContain(entry.selector);
       }
     }
     // Every dialog in the app is that sheet; the observation logger becomes it while it is modal.
@@ -957,7 +957,7 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
       "--batch-pill-ratio: 212 / 77;", "--batch-pill-height: 20.2%;", "--batch-pill-inset-x: 4.3%;", "--batch-pill-inset-bottom: 3.3%;",
       "--batch-pill-circle: 16.5%;", "--batch-go-inset-y: 8%;", "--batch-go-inset-x: 3.3%;", "--batch-pill-text: 7%;", "--batch-photo-left: 48%;",
       "--batch-photo-width: 46%;", "--batch-chip-height: 42px;", "--batch-chip-inset-x: 6.2%;", "--colour-hairline: #f1f1f1;",
-      "--colour-frost: rgb(255 255 255 / 60%);", "--card-action-width: 60%;", "--card-action-height: 63px;", "--card-action-reserve: 32px;",
+      "--colour-glass: rgb(255 255 255 / 60%);", "--card-action-width: 60%;", "--card-action-height: 63px;", "--card-action-reserve: 32px;",
     ]) expect(rule(":root")).toContain(declaration);
     expect(1 / ratio("--batch-card-ratio")).toBeCloseTo(0.94, 2);
     // The pill's aspect gives the measured height; the photo slot spans 48-94 % of the width.
@@ -993,13 +993,13 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     expect(tokens().get("--batch-pill-foot")).toBe("calc(var(--batch-pill-inset-bottom) + var(--batch-pill-reserve) + var(--space-3))");
     expect(rule(".design-batch-copy > :not(.sr-only)")).toContain("margin-inline: var(--batch-card-inset-x)");
     expect(rule(".design-batch-copy > .design-batch-chips")).toContain("margin-inline-start: var(--batch-chip-inset-x)");
-    const chip = rule(".design-batch-card .status");
-    for (const declaration of ["min-height: var(--batch-chip-height)", "background: var(--colour-frost)", "backdrop-filter: blur(var(--batch-chip-blur))"]) expect(chip).toContain(declaration);
+    expect(rule(".design-batch-card .status")).toContain("min-height: var(--batch-chip-height)");
+    expect(app).toContain('<span className={`status status-${batch.status} glass`}>');
     expect(rule(".design-batch-next")).toContain("border-radius: var(--radius-control)");
     // Ticket 12: the chip row stays one line at every card width, so narrow cards keep the card ratio. The status chip
     // keeps its size; the next-check chip shortens with an ellipsis (the card's sr-only line still reads the full next step).
     expect(rule(".design-batch-chips")).not.toContain("flex-wrap: wrap");
-    expect(chip).toContain("flex: none");
+    expect(rule(".design-batch-card .status")).toContain("flex: none");
     for (const declaration of ["min-width: 0", "overflow: hidden", "text-overflow: ellipsis", "white-space: nowrap"]) expect(rule(".design-batch-next")).toContain(declaration);
     const pill = rule(".design-batch-pill");
     for (const declaration of [
@@ -1040,9 +1040,7 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     expect(membership.get(".design-batch-pill")).toBe("fill");
     expect(membership.get(".design-batch-go")).toBe("ground");
     expect(membership.get(".design-empty-card")).toBe("fill");
-    // The frosted chip holds ink at 7:1 even where it lies over the selected card's black (60 % white on black).
-    const frost = Math.round(0.6 * 255).toString(16).padStart(2, "0");
-    expect(contrast(hex("--ink-fill"), `#${frost.repeat(3)}`)).toBeGreaterThanOrEqual(7);
+    // The glass chip's contrast over the selected card's black is covered by the glass primitive's tests.
   });
 
   it("builds the card from title pair, meta, chips, pill and photo, and keeps it one button", () => {
@@ -1173,7 +1171,7 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
     for (const declaration of [
       "--summary-max: 382px;", "--summary-w: min(100cqi, var(--summary-max));", "--summary-ratio: 382 / 221;", "--summary-emblem: 0.309;",
       "--summary-emblem-above: 0.47;", "--summary-glyph: 0.45;", "--summary-row-width: 0.916;", "--summary-row-height: 0.252;", "--summary-row-below: 0.49;",
-      "--summary-row-k: 0.54;", "--summary-row-avatar: 0.167;", "--count-pill-width: 79px;", "--count-pill-height: 49px;", "--colour-count: #fff6ce;",
+      "--summary-row-k: 0.54;", "--summary-row-avatar: 0.167;", "--count-pill-width: 79px;", "--count-pill-height: 49px;",
       "--big-number-circle: 118px;", "--big-number-glyph: 0.4;",
     ]) expect(rule(":root")).toContain(declaration);
     const [w, h] = tokens().get("--summary-ratio")!.split("/").map(Number);
@@ -1185,7 +1183,6 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
     expect(px("--big-number-circle")).toBe(118);
     // The pill can hold a button (batch detail "Complete check"), so it is a target.
     expect(px("--count-pill-height")).toBeGreaterThanOrEqual(44);
-    expect(contrast(hex("--ink-fill"), hex("--colour-count"))).toBeGreaterThanOrEqual(7);
     expect(contrast(hex("--ink-fill"), hex("--colour-surface"))).toBeGreaterThanOrEqual(7);
   });
 
@@ -1215,7 +1212,7 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
       `width: calc(${W} * var(--summary-row-width))`, `height: calc(${W} * var(--summary-row-height))`, `--r: calc(${W} * var(--summary-row-height) / 2)`,
     ]) expect(row).toContain(declaration);
     for (const declaration of ["--fill: var(--colour-surface)", "--k: var(--summary-row-k)"]) expect(rule(".summary-row")).toContain(declaration);
-    for (const declaration of ["min-width: var(--count-pill-width)", "height: var(--count-pill-height)", "min-height: var(--count-pill-height)", "background: var(--colour-count)", "border-radius: var(--radius-control)", "order: 1"]) {
+    for (const declaration of ["min-width: var(--count-pill-width)", "height: var(--count-pill-height)", "min-height: var(--count-pill-height)", "border-radius: var(--radius-control)", "order: 1"]) {
       expect(rule(".summary-row-count")).toContain(declaration);
     }
     for (const declaration of ["width: var(--big-number-circle)", "height: var(--big-number-circle)", "background: var(--colour-background)", "border-radius: 50%"]) expect(rule(".big-number-circle")).toContain(declaration);
@@ -1251,13 +1248,13 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
     expect(markup).not.toMatch(/<button|tabIndex/);
     // The batch detail's next check is the same sub-row; its "Complete check" button is the count pill.
     expect(app).toContain('<section className="summary-row design-detail-next bowed" aria-label="Next batch check">');
-    expect(app).toMatch(/aria-label=\{`Complete check: \$\{dueCheck\.name\} for this batch`\} className="summary-row-count"/);
+    expect(app).toMatch(/aria-label=\{`Complete check: \$\{dueCheck\.name\} for this batch`\} className="summary-row-count glass"/);
     expect(app.match(/summary-row-count/g)).toHaveLength(3);
-    expect(rule("button.summary-row-count:hover:not(:disabled)")).toContain("background: var(--colour-background)");
+    expect(rule("button.summary-row-count:hover:not(:disabled)")).toContain("--glass: var(--colour-background)");
   });
 
   it("gives the Checks summary the same component, with both counts on lime and yellow in ink (ticket 13)", () => {
-    expect(app).toContain('<section className="design-summary-group" aria-label="Checks summary"><div className="design-summary bowed"><span className="design-summary-emblem"><StationLogo /></span><div className="design-summary-label"><h2>Checks summary</h2><p>{paused.length} paused batches</p></div><p className="summary-row design-summary-next bowed"><span className="summary-row-avatar" aria-hidden="true"><DesignIcon name="check" /></span><span className="summary-row-count">{due.length}</span>{" "}<span className="summary-row-label">checks due or overdue</span></p></div></section>');
+    expect(app).toContain('<section className="design-summary-group" aria-label="Checks summary"><div className="design-summary bowed"><span className="design-summary-emblem"><StationLogo /></span><div className="design-summary-label"><h2>Checks summary</h2><p>{paused.length} paused batches</p></div><p className="summary-row design-summary-next bowed"><span className="summary-row-avatar" aria-hidden="true"><DesignIcon name="check" /></span><span className="summary-row-count glass">{due.length}</span>{" "}<span className="summary-row-label">checks due or overdue</span></p></div></section>');
     // No rule is scoped to the Checks view's summary: it is the Kitchen summary's anatomy unchanged.
     expect(styles).not.toMatch(/design-checks-view[^{]*design-summary|design-checks-view[^{]*summary-row/);
   });
@@ -1307,7 +1304,7 @@ describe("small cards (swipe-rework-log.md, ticket 10; spec §1.7 event card, §
     expect(rule(".small-card-blue").trim()).toBe("--small-card-from: var(--colour-event-sky); --small-card-to: var(--colour-event-sky-end);");
     expect(rule(".small-card-current").trim()).toBe("--stroke: var(--colour-action); --stroke-w: var(--bowed-stroke);");
     for (const declaration of ["min-height: var(--small-card-tag-height)", "border-radius: var(--radius-control)", "background: var(--colour-action)"]) expect(rule(".small-card-tag")).toContain(declaration);
-    for (const declaration of ["min-height: var(--small-card-chip-height)", "border-radius: var(--radius-control)", "background: var(--colour-frost)"]) expect(rule(".small-card-chip")).toContain(declaration);
+    for (const declaration of ["min-height: var(--small-card-chip-height)", "border-radius: var(--radius-control)"]) expect(rule(".small-card-chip")).toContain(declaration);
     // Sizes come from tokens: no length literal in any part (100cqi is the card's own width W).
     const owned = rules().filter((entry) => entry.selectors.some(isPart) && !entry.declarations.some(([property]) => property === "--ink" || property === "font-size"));
     for (const entry of owned) {
@@ -1351,7 +1348,7 @@ describe("small cards (swipe-rework-log.md, ticket 10; spec §1.7 event card, §
     const readings = app.slice(start, app.indexOf("</dl>", start));
     expect(readings.match(/<dt className="small-card-tag">/g)).toHaveLength(2);
     expect(readings.match(/<dd className="small-card-value">/g)).toHaveLength(2);
-    expect(readings.match(/<time className="small-card-chip"/g)).toHaveLength(2);
+    expect(readings.match(/<time className="small-card-chip glass"/g)).toHaveLength(2);
     expect(app).toContain('<span className="timeline-content"><strong className="small-card-tag">');
     // Ticket 13: a reading entry shows its number in the value part; screen readers keep the full sentence.
     expect(app).toContain('{timelineReading(entry, units) ? <><span className="sr-only">{timelineEntryText(entry, units)}</span><span aria-hidden="true" className="small-card-value">{timelineReading(entry, units)}</span></> : timelineEntryText(entry, units)}');
@@ -1488,9 +1485,10 @@ describe("final 1:1 audit (ticket 15)", () => {
     expect(ground!.selectors.some((selector) => selector.includes(".filter-row"))).toBe(false);
   });
 
-  it("gives profile facts the batch card's frosted chip", () => {
+  it("gives profile facts the batch card's glass chip", () => {
     const chip = rule(".profile-facts > span");
-    for (const declaration of ["min-height: var(--batch-chip-height)", "background: var(--colour-frost)", "backdrop-filter: blur(var(--batch-chip-blur))"]) expect(chip).toContain(declaration);
+    expect(chip).toContain("min-height: var(--batch-chip-height)");
+    expect(app).toContain('<span className="profile-facts"><span className="glass">');
     expect(chip).not.toContain("border:");
   });
 
@@ -1573,5 +1571,82 @@ describe("profile card foot and fields on white (ticket 16; spec §1.1, §3 prof
     expect(styles).not.toContain(".settings input:disabled {");
     // Invalid fields carry their linked message (not colour alone).
     expect(app).toContain('"aria-invalid": errors[id] ? true as const : undefined, "aria-describedby": errors[id] ? `${id}-error` : undefined');
+  });
+});
+
+/* Glass primitive (docs/design/swipe-component-spec.md "Glass surfaces", ticket 17). */
+describe("glass primitive (ticket 17)", () => {
+  /** A `rgb(r g b / a%)` token composited over an opaque hex ground, as hex. */
+  function over(token: string, ground: string) {
+    const match = rootTokens().get(token)!.match(/^rgb\((\d+) (\d+) (\d+) \/ (\d+)%\)$/);
+    expect(match, `${token} is rgb(r g b / a%)`).not.toBeNull();
+    const alpha = Number(match![4]) / 100;
+    return `#${[1, 2, 3].map((index) => Math.round(Number(match![index]) * alpha + Number.parseInt(ground.slice(index * 2 - 1, index * 2 + 1), 16) * (1 - alpha)).toString(16).padStart(2, "0")).join("")}`;
+  }
+  const alpha = (token: string) => Number(rootTokens().get(token)!.match(/\/ (\d+)%\)$/)![1]);
+  const isGlassPrimitive = (selector: string) => /\.glass\b/.test(selector) || selector === ".station-dialog::backdrop";
+  const glassMarkup = [
+    '<span className="design-photo-label glass">', '<span className="batch-image-credit glass">Stand-in</span>', '<span className={`status status-${batch.status} glass`}>',
+    '<span className="summary-row-count glass">', 'className="summary-row-count glass" onClick', '<time className="small-card-chip glass"',
+    'className="glass" onClick={() => editEntry(entry)}', '<span className="profile-facts"><span className="glass">',
+  ];
+
+  it("carries the measured glass values in :root tokens", () => {
+    for (const declaration of [
+      "--colour-glass: rgb(255 255 255 / 60%);", "--colour-glass-solid: rgb(255 255 255 / 85%);", "--colour-glass-edge: rgb(255 255 255 / 40%);",
+      "--colour-scrim: rgb(0 0 0 / 32%);", "--colour-scrim-solid: rgb(0 0 0 / 56%);", "--glass-blur: 8px;", "--glass-edge: 2px;",
+    ]) expect(rule(":root")).toContain(declaration);
+    // The board's count pill #fff6ce is the glass fill over the yellow row (spec "Glass surfaces" G5).
+    expect(over("--colour-glass", hex("--colour-surface"))).toBe("#fff7d0");
+    // The retired one-off frost, count colour and chip blur do not come back.
+    expect(styles).not.toMatch(/--colour-frost|--colour-count|--batch-chip-blur/);
+  });
+
+  it("is defined once and applies its fill, blur and rim from tokens only", () => {
+    const applying = rules().filter((entry) => entry.declarations.some(([property, value]) => property === "backdrop-filter" && value !== "none"));
+    expect(applying.map((entry) => entry.selector)).toEqual([".glass, .station-dialog::backdrop, .glass.bowed::after"]);
+    const values = new Map(applying[0].declarations);
+    expect(values.get("background")).toBe("var(--glass) !important");
+    expect(values.get("backdrop-filter")).toBe("blur(var(--glass-blur))");
+    expect(values.get("-webkit-backdrop-filter")).toBe("blur(var(--glass-blur))");
+    expect(rule(":where(.glass)")).toContain("--glass: var(--colour-glass); box-shadow: inset 0 0 0 var(--glass-edge) var(--colour-glass-edge)");
+    expect(rule(".station-dialog::backdrop")).toContain("--glass: var(--colour-scrim)");
+  });
+
+  it("composes with the bowed primitive by moving the fill and blur to its ::after layer", () => {
+    const bowed = rule(".glass.bowed");
+    for (const declaration of ["background: none !important", "-webkit-backdrop-filter: none", "backdrop-filter: none", "box-shadow: none"]) expect(bowed).toContain(declaration);
+  });
+
+  it("falls back to a more opaque fill where backdrop-filter is unsupported", () => {
+    const fallback = styles.match(/@supports not \(\(backdrop-filter: blur\(1px\)\) or \(-webkit-backdrop-filter: blur\(1px\)\)\) \{([\s\S]*?)\n\}/);
+    expect(fallback, "glass fallback").not.toBeNull();
+    expect(fallback![1]).toContain(":where(.glass) { --glass: var(--colour-glass-solid); }");
+    expect(fallback![1]).toContain(".station-dialog::backdrop { --glass: var(--colour-scrim-solid); }");
+    expect(alpha("--colour-glass-solid")).toBeGreaterThan(alpha("--colour-glass"));
+    expect(alpha("--colour-scrim-solid")).toBeGreaterThan(alpha("--colour-scrim"));
+  });
+
+  it("sets text on glass in ink, readable over the darkest ground with and without blur", () => {
+    expect(inkGroups().find((group) => group.selectors.includes(".glass"))?.kind).toBe("fill");
+    // Glass is light, so its text follows the fill rule; the darkest ground it lies over is the selected card's black.
+    for (const fill of ["--colour-glass", "--colour-glass-solid"]) {
+      for (const ground of ["--colour-surface-inverse", "--colour-surface", "--colour-event-lilac", "--colour-event-sky"]) {
+        expect(contrast(hex("--ink-fill"), over(fill, hex(ground))), `${fill} over ${ground}`).toBeGreaterThanOrEqual(7);
+      }
+    }
+  });
+
+  it("is the only place that uses backdrop-filter, and glass surfaces paint no fill of their own", () => {
+    for (const entry of rules()) {
+      for (const [property] of entry.declarations) {
+        if (!/^(?:-webkit-)?backdrop-filter$/.test(property)) continue;
+        for (const selector of entry.selectors) expect(isGlassPrimitive(selector), `${selector} uses ${property}`).toBe(true);
+      }
+    }
+    for (const markup of glassMarkup) expect(app).toContain(markup);
+    for (const selector of [".design-batch-card .status", ".design-photo-label", ".batch-image-credit", ".summary-row-count", ".small-card-chip", ".timeline-entry-actions button", ".profile-facts > span"]) {
+      for (const entry of rules()) if (entry.selectors.includes(selector)) expect(new Map(entry.declarations).has("background"), `${entry.selector} paints a glass surface`).toBe(false);
+    }
   });
 });

@@ -38,7 +38,10 @@
   --colour-emblem: #c5b4ec;
   --colour-accent: #b6e1fa;
   --colour-border: #000000;
-  --colour-scrim: rgb(0 0 0 / 56%);
+  /* Sheet scrim (spec "Glass surfaces" G4): the drinks board dims the page behind its sheet to #adadad, black at
+     32 %, and blurs it. Without backdrop-filter the scrim falls back to the darker -solid fill. */
+  --colour-scrim: rgb(0 0 0 / 32%);
+  --colour-scrim-solid: rgb(0 0 0 / 56%);
   --colour-figure: #fc5659;
   --colour-rail: #3e3e40;
   --colour-sheet-control: #1b1b1b;
@@ -46,8 +49,12 @@
   --colour-switch-on: #2089fd;
   --colour-switch-off: #eceef0;
   --colour-hairline: #f1f1f1;
-  --colour-frost: rgb(255 255 255 / 60%);
-  --colour-count: #fff6ce;
+  /* Glass (spec "Glass surfaces"): white at 60 % over a blurred backdrop, with a 40 % white rim. The drink card's
+     chip measures 0.5–0.7 over the photo, and the board's count pill #fff6ce is this fill over the yellow row.
+     Without backdrop-filter the fill turns to -solid, so text keeps its contrast over any ground. */
+  --colour-glass: rgb(255 255 255 / 60%);
+  --colour-glass-solid: rgb(255 255 255 / 85%);
+  --colour-glass-edge: rgb(255 255 255 / 40%);
   --colour-event-lilac: #d9b4eb;
   --colour-event-lilac-end: #f6eafc;
   --colour-event-sky: #b4dff9;
@@ -131,7 +138,6 @@
   --batch-title-band: calc(var(--batch-card-inset-y) + 2 * var(--type-title) * var(--type-title-leading) + var(--space-2) + var(--type-meta) * var(--type-meta-leading));
   --batch-chip-height: 42px;
   --batch-chip-inset-x: 6.2%;
-  --batch-chip-blur: 12px;
   --batch-card-max: 382px;
   --batch-card-min: 300px;
   /* The pill label is two 28 px lines (Bold + Regular; Light at 28 would break the stem floor). Where the card is
@@ -223,6 +229,10 @@
   --nav-height: 76px;
   --stroke-width: 1px;
   --stroke-focus: 3px;
+  /* Glass primitive: backdrop blur (the sheet scrim's page blur measures σ ≈ 7.4 CSS px) and the rim width
+     (≈ 1.5 board px on the drink card's chip, 2 CSS px). */
+  --glass-blur: 8px;
+  --glass-edge: 2px;
   --motion-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
   --motion-duration: 650ms;
   --motion-photo-duration: 240ms;
@@ -379,7 +389,8 @@ input::file-selector-button,
 .toggle-row,
 .toggle-avatar,
 .settings-count,
-.trash-item {
+.trash-item,
+.glass {
   --ink: var(--ink-fill); --ink-meta: var(--ink-fill); --ink-figure: var(--ink-fill); --ink-accent: var(--ink-fill); --ink-attention: var(--ink-fill); --ink-time: var(--ink-fill); color: var(--ink);
 }
 .app-shell,
@@ -490,6 +501,25 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
   .bowed::before, .bowed > .bowed-media { clip-path: none; border-radius: var(--r) var(--r) var(--r-end) var(--r-end); }
   .bowed::after { clip-path: none; border-radius: max(0px, var(--r) - var(--stroke-w)) max(0px, var(--r) - var(--stroke-w)) max(0px, var(--r-end) - var(--stroke-w)) max(0px, var(--r-end) - var(--stroke-w)); }
   .bowed-clip { clip-path: none; }
+}
+/* Glass (spec "Glass surfaces"): a translucent white fill over a blurred backdrop, with a light rim. It is the
+   boards' chip over a photo or gradient, the bookmark circle on the event card and the count pill on the yellow row;
+   the sheet's ::backdrop is the same material with the dark scrim fill and no rim.
+   - Add class "glass" in the markup. Never give a glass surface its own background or backdrop-filter; the fill is
+     --glass (default --colour-glass), and the text on it is ink (it joins the fill ink set).
+   - Shape comes from the component: a capsule or circle clips the blur to its border-radius. With "bowed", the fill
+     and the blur move to the primitive's ::after layer, so they follow the bow instead of the rectangle.
+   - Without backdrop-filter the fill turns to the more opaque -solid token, so text contrast holds without blur.
+   - The rim is an inset shadow at zero specificity, so a focus ring replaces it. */
+:where(.glass) { --glass: var(--colour-glass); box-shadow: inset 0 0 0 var(--glass-edge) var(--colour-glass-edge); }
+.station-dialog::backdrop { --glass: var(--colour-scrim); }
+.glass, .station-dialog::backdrop, .glass.bowed::after { background: var(--glass) !important; -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+/* Hover keeps the generic button's yellow, through --glass (the fill is !important). */
+button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
+.glass.bowed { background: none !important; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :where(.glass) { --glass: var(--colour-glass-solid); }
+  .station-dialog::backdrop { --glass: var(--colour-scrim-solid); }
 }
 .primary-action, .station-primary, .profile-add, .component-button-primary, .profile-editor-button.primary {
   background: var(--colour-action);
@@ -630,8 +660,8 @@ strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(
 .summary-row-avatar { display: grid; place-items: center; flex: none; width: calc(var(--summary-w) * var(--summary-row-avatar)); height: calc(var(--summary-w) * var(--summary-row-avatar)); border-radius: 50%; background: var(--colour-emblem); }
 .summary-row-avatar svg { width: var(--nav-icon); height: var(--nav-icon); }
 .summary-row-label { min-width: 0; overflow-wrap: anywhere; }
-.summary-row-count { order: 1; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); flex: none; min-width: var(--count-pill-width); height: var(--count-pill-height); min-height: var(--count-pill-height); margin-left: auto; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-control); background: var(--colour-count); }
-button.summary-row-count:hover:not(:disabled) { background: var(--colour-background); }
+.summary-row-count { order: 1; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); flex: none; min-width: var(--count-pill-width); height: var(--count-pill-height); min-height: var(--count-pill-height); margin-left: auto; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-control); }
+button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background); }
 /* Big number (gap 15): the figure sits on black, so the display role turns it coral through the ground ink. */
 .design-summary-figures { display: flex; flex: 1 1 var(--summary-figures-min); flex-wrap: wrap; align-items: end; gap: var(--space-6) var(--space-8); min-width: 0; }
 .big-number { display: grid; grid-template-columns: auto var(--big-number-circle); grid-template-rows: var(--big-number-circle) auto; justify-content: start; column-gap: var(--big-number-gap); row-gap: var(--space-3); }
@@ -655,7 +685,7 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .small-card-tag { display: inline-flex; align-items: center; justify-self: start; gap: var(--space-1); min-height: var(--small-card-tag-height); margin: 0; padding-inline: var(--space-3); border-radius: var(--radius-control); background: var(--colour-action); }
 .small-card-tag svg { flex: none; width: var(--small-card-glyph); height: var(--small-card-glyph); }
 .small-card-value { margin: 0; }
-.small-card-chip { display: inline-flex; align-items: center; justify-self: start; min-height: var(--small-card-chip-height); padding-inline: var(--space-3); border-radius: var(--radius-control); background: var(--colour-frost); }
+.small-card-chip { display: inline-flex; align-items: center; justify-self: start; min-height: var(--small-card-chip-height); padding-inline: var(--space-3); border-radius: var(--radius-control); }
 .design-stat-track { display: none; }
 .design-stat-track i { display: block; height: 100%; background: var(--colour-text); }
 .design-section-head, .section-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); margin-bottom: var(--space-4); }
@@ -670,7 +700,7 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .batch-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--batch-card-min)), 1fr)); gap: var(--layout-gutter); }
 /* Batch card (spec §1.1 drink card; gap 9). The card is a full-width grid item, so its percentage padding and
    its children's percentage margins and horizontal offsets are fractions of the card's width. Title pair at the
-   insets across the full width; frosted status chip and the black next-check capsule; meta; the day-progress
+   insets across the full width; glass status chip and the black next-check capsule; meta; the day-progress
    pill with its black circle at bottom-left; the photo slot at 48-94 % of the width from 8 % of the height down.
    A stand-in is .bowed-media (clipped by the bow); a user photo stays a rectangle inside the content box (#53). */
 .design-batch-card { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; width: 100%; min-width: 0; min-height: auto; aspect-ratio: var(--batch-card-ratio); padding: var(--batch-card-inset-y) 0 var(--batch-pill-foot); --fill: var(--batch-colour, var(--colour-background)); text-align: left; }
@@ -685,7 +715,7 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-batch-copy > :not(.sr-only) { margin-inline: var(--batch-card-inset-x); max-width: calc(100% - 2 * var(--batch-card-inset-x)); }
 .design-batch-chips { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); }
 .design-batch-copy > .design-batch-chips { margin-inline-start: var(--batch-chip-inset-x); }
-.design-batch-card .status { flex: none; min-height: var(--batch-chip-height); padding-inline: var(--space-4); border-color: transparent; background: var(--colour-frost); backdrop-filter: blur(var(--batch-chip-blur)); }
+.design-batch-card .status { flex: none; min-height: var(--batch-chip-height); padding-inline: var(--space-4); border-color: transparent; }
 .design-batch-next { min-width: 0; min-height: var(--batch-chip-height); padding: calc((var(--batch-chip-height) - 1lh) / 2) var(--space-4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: var(--radius-control); background: var(--colour-surface-inverse); color: var(--ink-attention); }
 .design-batch-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin-top: var(--space-2); }
 .design-batch-meta > span { display: inline-flex; align-items: center; gap: var(--space-1); }
@@ -706,10 +736,10 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-empty-card { aspect-ratio: var(--batch-card-ratio); padding: var(--batch-card-inset-y) calc(100% - var(--batch-photo-left)) var(--batch-card-inset-y) var(--batch-card-inset-x); --fill: var(--colour-action-alt); }
 .batch-photo-fallback { position: absolute; inset: 0; display: grid; place-items: center; }
 .batch-photo-fallback svg { width: 64px; height: 80px; }
-.batch-image-credit { position: absolute; top: var(--space-2); right: 0; border-radius: var(--radius-control); padding: var(--space-1) var(--space-2); background: var(--colour-background); }
+.batch-image-credit { position: absolute; top: var(--space-2); right: 0; border-radius: var(--radius-control); padding: var(--space-1) var(--space-2); }
 .user-photo img { object-fit: contain; border-radius: var(--radius-small); }
 .design-batch-card:hover img { transform: scale(1.03); }
-.design-photo-label { position: absolute; bottom: var(--space-2); right: var(--space-2); max-width: calc(100% - 16px); border-radius: var(--radius-control); padding: var(--space-1) var(--space-2); background: var(--colour-background); text-align: center; }
+.design-photo-label { position: absolute; bottom: var(--space-2); right: var(--space-2); max-width: calc(100% - 16px); border-radius: var(--radius-control); padding: var(--space-1) var(--space-2); text-align: center; }
 .status, .design-badge, .zone { display: inline-flex; align-items: center; gap: var(--space-2); border: 1px solid var(--colour-border); border-radius: var(--radius-control); padding: var(--space-1) var(--space-3); background: var(--colour-surface); }
 .status-ready { background: var(--colour-action); }
 .status-to-fridge { background: var(--colour-accent); }
@@ -797,7 +827,7 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
 .warning { text-decoration: underline; }
 .zone { justify-self: start; background: var(--colour-action); }
 .timeline-entry-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
-.timeline-entry-actions button { min-height: var(--target-min); padding: var(--space-2) var(--space-4); border-color: transparent; background: var(--colour-frost); }
+.timeline-entry-actions button { min-height: var(--target-min); padding: var(--space-2) var(--space-4); border-color: transparent; }
 .timeline-trash { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px solid currentColor; border-radius: var(--radius-small); }
 .design-detail-footer { order: 6; display: flex; align-items: center; gap: var(--space-2); }
 .detail-photo-credits { order: 7; }
@@ -893,7 +923,6 @@ button.design-snapshot { display: block; width: 100%; margin-top: var(--space-6)
   scroll-padding: var(--space-6);
 }
 .station-dialog:not([open]) { display: none; }
-.station-dialog::backdrop { background: var(--colour-scrim); backdrop-filter: blur(4px); }
 /* Sheet header: centred title between two close-circle-wide columns, so the title's centre line is the
    circle's and the circle sits at the sheet's right inset. */
 .station-dialog-heading { display: grid; grid-template-columns: var(--utility-circle-dark) minmax(0, 1fr) var(--utility-circle-dark); align-items: center; gap: var(--space-2); margin-bottom: var(--space-6); }
@@ -949,8 +978,8 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .design-profile-visual .batch-photo-retry { bottom: 0; }
 .design-profile-copy { display: grid; gap: var(--space-4); min-width: 0; }
 .profile-facts { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-/* Profile facts are the drink card's frosted chip (spec §1.1, §3), like the batch card's status chip. */
-.profile-facts > span { display: inline-flex; align-items: center; min-height: var(--batch-chip-height); border-radius: var(--radius-control); padding-inline: var(--space-4); background: var(--colour-frost); backdrop-filter: blur(var(--batch-chip-blur)); }
+/* Profile facts are the drink card's glass chip (spec §1.1, §3), like the batch card's status chip. */
+.profile-facts > span { display: inline-flex; align-items: center; min-height: var(--batch-chip-height); border-radius: var(--radius-control); padding-inline: var(--space-4); }
 .profile-card-guidance { overflow-wrap: anywhere; }
 .profile-card-link { display: flex; justify-content: space-between; gap: var(--space-2); }
 /* The card's foot is the drink card's (spec §1.1, §3): Edit is the batch card's pill with its black circle, placed

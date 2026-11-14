@@ -159,6 +159,28 @@ Board fidelity note [M]: the phone board is a photographed device mockup. Edge s
 
 `type-board.png` swatches are plain rounded rectangles: 199×113 board px, `#ffec88`, `#b7f075`, `#d9b8f1`, `#b6e2fa`, and the black `#1c1c1c` (labelled "#FFEC89", a labelling error). Each has a white circular icon button in its top-right corner. This board fixes the palette hexes and the 18 px body size. It is not a component reference. `home-*.png`, `target-*.png` and `page-*.png` are page context. They were not measured for this spec.
 
+### 1.9 Glass surfaces — `ui-board.png`, `drinks-board.png`
+
+Glass here means a translucent fill over a photo, gradient or coloured ground, with what lies behind it visible and blurred. Every surface on the two boards was checked; the ones below are glass. Alpha is estimated per channel as `(inside − behind) / (fill − behind)`, from pixel runs that cross the surface's edge [M]. Where the ground behind is flat, glass and a flat tint look the same; the confidence column says which case applies.
+
+| # | Component | Shape and size | Fill and alpha [M] | Edge | Text on it | Confidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| G1 | Drink card chip "Swipedrinks Festival ↗" (§1.1) | Capsule, 138 × 30 board px (h 42 CSS) | White. On the white card it is `#fdfdfd` (no visible edge). Over the photo, the orange slice behind it (`#ffb800` / `#fea917` just outside) turns to `#fdcbb6` / `#feb889` inside: alpha 0.5–0.7 (blue channel), and the slice's sharp edges are smeared flat for 6 px, so the backdrop is blurred (σ ≥ 4 board px ≈ 6 CSS px). | A light rim, about 1.5 board px (≈ 2 CSS px), where it lies over the photo: `#fddfd1` against the `#fdcbb6` fill, which is white at about 40 % over the fill. No shadow. | Black (`#151515` darkest) | High: translucent, blurred, rimmed |
+| G2 | Event card city chip "New York city" (§1.7), both cards | Capsule, 43 × 14 board px (90 × 30 CSS) | White over the gradient: lilac `#debdf3` → `#e3caf8`, blue `#b8e2fb` → `#cce9fa`, alpha ≈ 0.2–0.3. The card gradient runs on through it. Blur cannot be seen (the ground is a smooth gradient). | Soft, no rim resolved (photographed screen) | Black | Medium: translucent; blur inferred from G1 |
+| G3 | Event card bookmark button (§1.7), both cards | Circle, d ≈ 27 board px (57 CSS) | White: lilac `#f0ddfb` → `#f7ebfc`, blue `#ceebfc` → `#e4f3fe`, alpha ≈ 0.4. Blur cannot be seen. | Soft, no rim resolved | Black outline glyph | Medium: translucent; blur inferred from G1 |
+| G4 | Sheet scrim (§1.7) | The page behind the sheet, full screen | Black over the page: white `#ffffff` → `#adadad`, so black at 32 %. The page's text ("… profile") and back circle are blurred: a cap of ≈ 6 board px spreads to a 10 px FWHM, σ ≈ 3.5 board px ≈ 7.4 CSS px, while the phone's own island stays sharp. | None | None | High: dimmed and blurred |
+| G5 | Profile card count pill "8x" (§1.3) | Capsule, 56 × 35 board px (79 × 49 CSS) | `#fff6ce` / `#fff8d0` on the yellow row `#ffec85`. White at 60 % over `#ffec89` gives `#fff7d0`, the measured centre, so it is the G1 fill over yellow. The ground behind is flat, so blur cannot be seen. | None resolved | Black | Medium: the same fill as G1 by value |
+
+Not glass (opaque or flat on a flat ground): the "Swipe Now" pill (white, nothing behind it), the toggle rows `#f6f8fa` on the white card, the lime tag chip `#b6f179` (no lilac tint through it), the sheet's filter circle `#1b1b1b` on black, the utility rings `#3e3e40`, the bottom-row circles and Scan pill on black, the avatar and emblem circles, the 64+ circle, the black sheet itself.
+
+**Reconstruction [R].** One material: white at **60 %** (`--colour-glass`, the middle of G1's range and exactly G5), backdrop blur **8 CSS px** (`--glass-blur`, from G4's σ 7.4; G1's ≥ 6 agrees), rim **2 CSS px** of white at **40 %** (`--glass-edge`, `--colour-glass-edge`). No saturation boost was measured: the colour under G1 is paler and less saturated than plain white-over-orange would give, so none is applied. G2 and G3 read lighter (alpha 0.2–0.4) on a photographed screen; the ui-board value is the primary reference (§1.7 fidelity note), so they take the same 60 %. The scrim is the same material with a dark fill: black at **32 %** (`--colour-scrim`) and the same blur, no rim.
+
+**Text on glass.** Glass is always a light fill (white at 60 % or more), so its text follows the fill rule: all text is black ink, whatever lies behind. The darkest ground any glass surface lies over is the selected batch card's black: 60 % white over black is `#999999`, black ink on it is 7.4 : 1.
+
+**Without backdrop-filter** the fill becomes white at 85 % (`--colour-glass-solid`; black ink on it over black reads 14.9 : 1) and the scrim black at 56 % (`--colour-scrim-solid`), so text contrast and sheet separation hold without the blur.
+
+**App mapping.** G1 → the batch card's status chip, the "Stand-in" credit and the finish / ready label over the photo, the profile card's fact chips. G2 → the small card's time chip (readings, timeline). G3 → the timeline entry's Edit / Delete actions (the event card's actions). G4 → the sheet's `::backdrop`. G5 → the summary row's count pill (Kitchen summary, Checks summary, the detail's "Complete check"). The bottom navigation, utility circles and card pills stay opaque, as on the boards.
+
 ---
 
 ## 2. The outline shape

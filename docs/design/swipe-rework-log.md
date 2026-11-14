@@ -25,6 +25,7 @@ Running record of the 1:1 Swipe rework. Read this before you start a ticket, the
 | 13 Timeline | **closed**: one `small-card` (bowed at r = min(52, 0.16 W), bow = min(4.4, 0.0125 W) from its own width; lilac `#d9b4eb → #f6eafc` or blue `#b4dff9 → #e6f6ff` gradient; lime tag chip h 27; Light value; translucent time chip h 30; all ink black) for timeline entries, the latest readings, the calendar's upcoming/overdue items and the Checks upcoming strip; the white timeline panel is gone; pH and temperature entries show their number as the Light value | small cards (ticket 10), ticket 13 |
 | Legacy rounded rectangles (gap 1 follow-up) | **closed**: the `--radius-card` allowlist is empty; the inline logger's card is `.activity-logger-card bowed`; Settings heading icons are the row avatar | tickets 12, 13 |
 | Launch colours (gap 2 follow-up) | **closed**: Android launch/splash/window/status/navigation bars, the notification tint, `theme-color`, the web manifest and the Tauri window are `#000000`, the ground | ticket 14 |
+| Glass surfaces (spec §1.9, no gap number) | **closed**: one `glass` primitive (white 60 %, blur 8, 2 px 40 % rim, 85 % fallback); on the card chips over photos, profile facts, small-card time chips, timeline actions, count pill and the sheet scrim (black 32 % + blur) | ticket 17 |
 | Final 1:1 audit | **done**: 26 components / surfaces, 15 match, 6 minor, 5 differ; cheap fixes applied, the rest in "Needs a decision" | ticket 15 |
 | Calendar month grid (spec §3, no gap number) | **closed**: day circles min(column, 60) ≥ 44, emblem event days, black selected day, `#3e3e40` today ring; Today / arrows / top-bar date chip on `utility-circle` / `utility-capsule`; no 320 overflow (the screen spans the pane below 380); strip days carry lime tag chips at 160 px; bowed focus rings follow the bow | calendar (ticket 11) |
 
@@ -59,7 +60,8 @@ All colour literals live in `:root` as `--colour-*` tokens. The test fails on an
 | `--colour-text`, `--colour-text-muted`, `--colour-on-action`, `--colour-border` | `#000000` | ink on light fills |
 | `--colour-emblem` | `#c5b4ec` | avatar, emblem and icon circles (ui-board lilac) |
 | `--colour-action-alt` | `#dab8f1` | lilac card fills and gradient starts |
-| `--colour-scrim` | `rgb(0 0 0 / 56%)` | dialog backdrop |
+| `--colour-scrim` | `rgb(0 0 0 / 32%)` (ticket 17; `--colour-scrim-solid` 56 % without blur) | dialog backdrop, through the glass primitive |
+| `--colour-glass`, `-solid`, `-edge` | white at 60 % / 85 % / 40 % | the glass primitive only (ticket 17); `--colour-frost` and `--colour-count` are retired |
 
 The other tokens are unchanged: `#ffffff`, `#ffec89`, `#b6f074`, `#b6e1fa`. If a ticket needs a new colour (for example coral `#fc5659` for gap 15, or the switch blue `#2089fd` for gap 10), add it to the `:root` token layer and to the expected list in the palette test.
 
@@ -696,6 +698,38 @@ The two "differs" rows from ticket 15 where the spec needs no decision. Everythi
 - A borderless `#f6f8fa` field on white is about 1.07 : 1 against the card; the field is identified by its label, fill and placeholder rather than a 3 : 1 boundary (WCAG 1.4.11). The spec asks for it; flagged here in case the user wants a hairline.
 - At 1440 the profile cards are about 555 px wide, so the pill scales with them (≈ 308 × 112, circle ≈ 92), as the batch card's pill does at that width.
 - The inline logger has no invalid-field path in the harness; the invalid ring is covered by the CSS tests only.
+
+## Ticket 17: glass surfaces — done
+
+The user's ask: "focus on the glassmorphism. Some components have that."
+
+### Measured (spec §1.9)
+
+Five glass surfaces on the two boards: G1 the drink card chip (translucent white 0.5–0.7 over the photo, blurred, 2 px light rim; high confidence), G2 the event card's city chip and G3 its bookmark circle (translucent white over the gradient, alpha 0.2–0.4 on the photographed phone; blur not visible; medium), G4 the sheet scrim (page dimmed to `#adadad` = black 32 % and blurred, σ ≈ 7.4 CSS px; high), G5 the profile card's count pill (`#fff6ce` is exactly white 60 % over the yellow row; medium). Everything else on the boards is opaque, including the Swipe pill, the bottom row, the utility circles and rings, the lime tag chip and the toggle rows.
+
+### As built
+
+- `src/styles.css` `:root`: `--colour-glass` (white 60 %), `--colour-glass-solid` (85 %), `--colour-glass-edge` (40 %), `--glass-blur: 8px`, `--glass-edge: 2px`; `--colour-scrim` 56 % → 32 % (measured), `--colour-scrim-solid` 56 %. Retired `--colour-frost`, `--colour-count`, `--batch-chip-blur`.
+- `src/styles.css`, directly after the bowed primitive: the `glass` primitive. `:where(.glass)` sets `--glass` and the rim (inset shadow at zero specificity, so focus rings replace it); one rule `.glass, .station-dialog::backdrop, .glass.bowed::after` applies `background: var(--glass) !important` and `(-webkit-)backdrop-filter: blur(var(--glass-blur))`; `.glass.bowed` moves fill and blur to the bowed `::after` layer (checked in Chrome: the blur follows the bow; capsules and circles clip it to their radius); `@supports not ((backdrop-filter: …) or (-webkit-backdrop-filter: …))` swaps in the -solid fills. States change the fill through `--glass` (`button.glass:hover` yellow as before; the count pill button's hover stays white). `.glass` joined the fill ink set.
+- Component rules lost their own fills: `.design-batch-card .status`, `.batch-image-credit`, `.design-photo-label`, `.small-card-chip`, `.timeline-entry-actions button`, `.summary-row-count`, `.profile-facts > span`, and the old `.station-dialog::backdrop` rule.
+- `src/App.tsx` (11 lines, endings preserved): `glass` on the batch card status chip, the "Stand-in" credit, the finish / ready label, the profile fact chips, the three small-card time chips, the timeline Edit / Delete buttons and the three count pills.
+
+### Tests (`src/styles.test.ts`, 101)
+
+- New block "glass primitive (ticket 17)", 6 tests: measured tokens (and `#fff7d0` = glass over yellow, retired tokens gone); one applying rule from tokens with both prefixes; bowed composition; fallback block and opacity order; `.glass` in the fill ink set, black ink ≥ 7 : 1 on glass and on the fallback over black, yellow, lilac and sky; `backdrop-filter` only in the primitive, the glass markup present, no glass surface paints its own background.
+- Updated: palette list (no `count`), batch card and profile-fact chip assertions, small-card chip, count pill (`--glass` hover), the summary markup literals, the sheet-paint allowlist.
+
+### Results
+
+- `npm run typecheck` clean; full `npm test` 15 files, 327 / 327.
+- Harness for overview, all-batches, batch-detail, observation-logger, profiles, checks, batch-creation and profile-overview at 390, 768 and 1440: 0 failed, every finding count 0. Looked at the "Stand-in" and "Ready today" chips over the kombucha jar (390: the jar edge is blurred behind them, rim visible), the time chips and the "Complete check" pill (768), the sheet scrim (390 and 1440: the page behind is dimmed and blurred, as on the drinks board), and a scratch page with a bowed, a capsule and a circle glass over stripes.
+
+### Left by ticket 17
+
+- The phone board's G2 / G3 read lighter (alpha 0.2–0.4) than the ui-board chip; one material at 60 % was chosen (ui-board is primary). Say if the small-card chips should be lighter.
+- The scrim is now lighter (32 %); the sheet's black still separates from the page, but the blurred page shows more.
+- The detail photo frame's "Active" badge stays a bordered yellow `.status`: it sits on the white frame, which belongs to the remaining `--radius-small` boxes.
+- The `@supports` fallback was not rendered (no browser here lacks `backdrop-filter`); it is covered by the CSS tests only.
 
 ## Left for later tickets / known issues
 
