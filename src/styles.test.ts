@@ -455,7 +455,11 @@ describe("responsive workflow safeguards", () => {
   it("aligns phone, rail and sidebar boundaries with detail focus behavior", () => {
     for (const breakpoint of ["@media (max-width: 599px)", "@media (min-width: 1024px)", "@media (max-width: 1023px)"]) expect(styles).toContain(breakpoint);
     expect(app).toContain('window.matchMedia?.("(min-width: 1024px)")');
-    expect(rule(".profile-editor-shell .sidebar", styles.slice(styles.indexOf("@media (min-width: 1024px)")))).toContain("display: flex");
+    // From 1024 the desktop menu replaces the sidebar (rail and phone row below).
+    const desktop = styles.slice(styles.indexOf("@media (min-width: 1024px)"));
+    expect(rule(".sidebar", desktop)).toBe(" display: none; ");
+    expect(rule(".app-menu", desktop)).toBe(" display: block; ");
+    expect(rule(".app-menu")).toBe(" display: none; ");
     expect(rule(".profile-editor-shell .navigation", mobile)).toContain("display: none");
     expect(rule(".profile-editor-actions, .profile-editor-actions > div", mobile)).toContain("flex-direction: column");
   });
@@ -520,8 +524,10 @@ describe("responsive workflow safeguards", () => {
     expect(rule(".profile-editor-shell .design-dashboard", singlePane)).toContain("var(--safe-bottom)");
     expect(rule(".profile-editor-shell .navigation", mobile)).toContain("display: none");
     expect(rule(".profile-editor-shell .content-shell", singlePane)).toContain("height: 100%");
-    const desktop = styles.slice(styles.indexOf("@media (min-width: 1024px)"), styles.lastIndexOf("@media (max-width: 1023px)"));
-    expect(rule(".profile-editor-shell .navigation", desktop)).toContain("display: grid");
+    // Desktop keeps the menu in the editor (no profile-editor rule hides it) and starts the editor below its header.
+    const desktop = styles.slice(styles.indexOf("@media (min-width: 1024px)"));
+    expect(desktop).not.toMatch(/\.profile-editor-shell \.app-menu/);
+    expect(rule(".profile-editor-shell .design-dashboard", desktop)).toContain("var(--nav-circle)");
   });
 
   it("retains source 24px profile and settings card padding on phones", () => {
@@ -529,14 +535,14 @@ describe("responsive workflow safeguards", () => {
     expect(mobile).not.toMatch(/\.(?:profile-editor-section|settings-card) \{ padding: var\(--space-4\)/);
   });
 
-  it("wraps enlarged desktop sidebar text without shrinking controls or clipping their vertical content", () => {
+  it("scrolls a tall tablet rail without shrinking its circles, and wraps an enlarged phone capsule label", () => {
     expect(rule(".sidebar")).toContain("overflow: auto");
     expect(rule(".sidebar > *")).toContain("flex-shrink: 0");
-    expect(rule(".brand strong")).toContain("overflow-wrap: anywhere");
-    expect(rule(".navigation button")).toContain("height: auto");
-    expect(rule(".navigation button")).toContain("white-space: normal");
     expect(rule(".nav-word")).toContain("min-width: 0");
-    expect(rule(".design-account > span:nth-child(2)")).toContain("overflow-wrap: anywhere");
+    expect(rule(".nav-word")).toContain("overflow-wrap: anywhere");
+    // The desktop sidebar's wordmark and "Home" row went with it (2026-11-14, StaggeredMenu).
+    expect(styles).not.toMatch(/\.brand strong|\.design-account > span/);
+    expect(app).not.toContain("<strong>FermentStation</strong></div>");
   });
 
   it("preserves native top-layer dialogs with viewport-bounded internal overflow", () => {
@@ -603,7 +609,7 @@ describe("navigation circles, capsule and rail (swipe-rework-log.md, ticket 3; s
     }
   });
 
-  it("draws every destination as a white circle and the current one in lime below 1024 (the desktop sidebar is the toggle card, ticket 18)", () => {
+  it("draws every destination as a white circle and the current one in lime below 1024 (desktop uses the StaggeredMenu)", () => {
     const mark = rule(".nav-mark", singlePane);
     for (const declaration of ["width: var(--nav-circle)", "height: var(--nav-circle)", "border-radius: 50%", "background: var(--colour-background)"]) expect(mark).toContain(declaration);
     // The row primitive paints var(--row-fill); below 1024 it is lime for the current destination and clear for the others.
@@ -612,8 +618,6 @@ describe("navigation circles, capsule and rail (swipe-rework-log.md, ticket 3; s
     expect(rule('.navigation button[aria-current="page"] .nav-mark', singlePane)).toContain("background: none");
     expect(rule(".navigation", singlePane)).toContain("gap: var(--nav-gap)");
     expect(rule(".navigation button", singlePane)).toContain("min-height: var(--nav-circle)");
-    // The circles' rules follow the toggle primitive, so they win below 1024 at equal specificity.
-    expect(styles.indexOf("  .nav-mark {")).toBeGreaterThan(styles.indexOf(".toggle-avatar {"));
     for (const selector of [".sidebar .brand-mark", ".design-avatar"]) expect(rule(selector)).toContain("width: var(--nav-circle)");
     expect(rule(".navigation svg, .design-avatar svg")).toContain("width: var(--nav-icon)");
   });
@@ -866,7 +870,7 @@ describe("settings toggle rows and switch (swipe-rework-log.md, ticket 7; spec �
   };
   const state = '.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"])';
   const isRoleRule = (entry: Rule) => entry.declarations.some(([property]) => property === "font-size");
-  // Rules of the primitive itself; the navigation's width adaptations (hiding the count below 1024) are not part of it.
+  // Rules of the primitive itself; the navigation's width adaptations are not part of it.
   const toggleRules = () => rules().filter((entry) => entry.selectors.some((selector) => /\.toggle-(?:list|card|row|avatar|label|switch|count)\b/.test(selector) && !selector.startsWith(".navigation"))
     && !entry.declarations.some(([property]) => property === "--ink") && !isRoleRule(entry));
 
@@ -887,7 +891,7 @@ describe("settings toggle rows and switch (swipe-rework-log.md, ticket 7; spec �
     expect(toggleRules().map((entry) => entry.selector).sort()).toEqual([
       ".toggle-list", ".toggle-card", ".toggle-row", state, ".toggle-row:hover:not(:disabled)", ".toggle-row:where(:has(> .toggle-avatar))", ".toggle-avatar", ".toggle-label",
       ":where(.toggle-row:nth-child(4n + 2)) > .toggle-avatar", ":where(.toggle-row:nth-child(4n + 3)) > .toggle-avatar", ":where(.toggle-row:nth-child(4n + 4)) > .toggle-avatar",
-      ".toggle-count", '.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]) > .toggle-count', ".toggle-switch", ".toggle-switch::after", '[aria-checked="true"] > .toggle-switch', '[aria-checked="true"] > .toggle-switch::after',
+      ".toggle-switch", ".toggle-switch::after", '[aria-checked="true"] > .toggle-switch', '[aria-checked="true"] > .toggle-switch::after',
     ].sort());
     for (const entry of toggleRules()) {
       for (const [property, value] of entry.declarations) expect(value, `${entry.selector} { ${property} } must use a token`).not.toMatch(/(?<![\w-])\d*\.?\d+(?:px|rem|em)\b/);
@@ -1663,7 +1667,7 @@ describe("glass primitive (ticket 17)", () => {
   });
 });
 
-describe("toggle card: desktop sidebar and batch picker (ticket 18; spec §1.2, §3 desktop sidebar and batch picker)", () => {
+describe("toggle card: batch picker, and the navigation it no longer draws (ticket 18; spec §1.2, §3 batch picker; StaggeredMenu 2026-11-14)", () => {
   const px = (token: string): number => {
     const value = rootTokens().get(token)!;
     const alias = value.match(/^var\((--[\w-]+)\)$/);
@@ -1674,19 +1678,16 @@ describe("toggle card: desktop sidebar and batch picker (ticket 18; spec §1.2, 
   const navigation = app.slice(app.indexOf('<nav aria-label="Primary navigation"'), app.indexOf("</nav>"));
   const picker = app.slice(app.indexOf("function BatchPicker"), app.indexOf("</dialog>", app.indexOf("function BatchPicker")));
 
-  it("carries the board's avatar pastels and a sidebar wide enough for the row, from tokens", () => {
+  it("carries the board's avatar pastels, and gives desktop no sidebar column", () => {
     for (const declaration of ["--colour-avatar-peach: #ebcbb2;", "--colour-avatar-mint: #c3ecb4;", "--colour-avatar-sky: #b5dced;"]) expect(rule(":root")).toContain(declaration);
-    expect(rule(".app-shell")).toContain("grid-template-columns: var(--sidebar-width) minmax(0, 1fr)");
+    // The fixed StaggeredMenu overlays the app on desktop, so the shell is one column there (the rail adds its own below 1024).
+    expect(rule(".app-shell")).toContain("grid-template-columns: minmax(0, 1fr)");
+    expect(styles).not.toContain("--sidebar-width");
     expect(styles).not.toMatch(/grid-template-columns: \d+px minmax/);
-    // Sidebar padding, the card's insets, the avatar row's start, avatar, the label gap, the slot gap, the count and the
-    // switch inset leave a label column for "My batches" on one line (it sets about 57 px wide; ticket 19).
-    const label = px("--sidebar-width") - 2 * px("--space-3") - 2 * px("--toggle-inset") - (px("--toggle-row") - px("--toggle-avatar")) / 2
-      - px("--toggle-avatar") - px("--toggle-label-gap") - px("--toggle-slot-gap") - px("--switch-width") - px("--switch-inset");
-    expect(label).toBeGreaterThanOrEqual(58);
     expect(rule(".sidebar")).toContain("padding: calc(var(--safe-top) + var(--space-6)) var(--space-3) var(--space-6)");
   });
 
-  it("defines the toggle card, the avatar order and the count pill once, from tokens", () => {
+  it("defines the toggle card and the avatar order once, from tokens", () => {
     const card = rule(".toggle-card");
     for (const declaration of ["display: grid", "gap: var(--toggle-gap)", "padding: calc(var(--card-padding) + var(--bow)) var(--toggle-inset)"]) expect(card).toContain(declaration);
     for (const [child, token] of [[2, "peach"], [3, "mint"], [4, "sky"]] as const) {
@@ -1694,31 +1695,27 @@ describe("toggle card: desktop sidebar and batch picker (ticket 18; spec §1.2, 
       expect(rule(`:where(.toggle-row:nth-child(4n + ${child})) > .toggle-avatar`)).toBe(` background: var(--colour-avatar-${token}); `);
       expect(contrast(hex("--ink-fill"), hex(`--colour-avatar-${token}`))).toBeGreaterThanOrEqual(7);
     }
-    const count = rule(".toggle-count");
-    for (const declaration of ["min-width: var(--switch-width)", "min-height: var(--switch-height)", "margin-inline-start: auto", "border-radius: var(--radius-control)"]) expect(count).toContain(declaration);
-    expect(count).not.toContain("background");
-    expect(inkMembership().get(".toggle-count")).toBe("fill");
-    expect(rules().some((entry) => entry.declarations.some(([property]) => property === "font-size") && entry.selectors.includes(".toggle-count") && entry.declarations.some(([, value]) => value === "var(--type-label)"))).toBe(true);
-    // A row's avatar padding has the row's specificity, so the circles' own padding wins below 1024.
+    // The count pill in the switch slot existed only for the desktop sidebar's "My batches" row; it went with it.
+    expect(styles).not.toContain(".toggle-count");
+    expect(app).not.toContain("toggle-count");
     expect(rule(".toggle-row:where(:has(> .toggle-avatar))")).toContain("padding-inline-start");
   });
 
-  it("builds the desktop sidebar from the toggle card and its rows, keeping the landmark, names and current page", () => {
-    expect(navigation).toContain('<nav aria-label="Primary navigation" className="navigation toggle-card bowed">');
+  it("keeps the rail and phone row's landmark, names and current page, painted by the row primitive below 1024", () => {
+    // The rail band is the bowed nav's fill; the lime capsule is the row primitive's --row-fill. No toggle card, avatar or count.
+    expect(navigation).toContain('<nav aria-label="Primary navigation" className="navigation bowed">');
     expect(navigation).toContain("className={`toggle-row nav-${destination}`}");
-    expect(navigation).toContain('<span className="nav-mark toggle-avatar" aria-hidden="true">');
-    expect(navigation).toContain('<span className="toggle-count glass">{batchState.batches.length}</span>');
+    expect(navigation).toContain('<span className="nav-mark" aria-hidden="true">');
+    expect(navigation).not.toMatch(/toggle-card|toggle-avatar|toggle-count/);
     expect(navigation).toContain('aria-label={destination === "checks" ? "Checks" : labels[destination]}');
     expect(navigation).toMatch(/aria-current=\{[^\n]+\? "page" : undefined\}/);
     expect(app).not.toContain("design-nav-count");
-    // The current page is the board's selected row: black, white text, regular weight (bold only in the phone capsule).
-    expect(inkMembership().get('.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"])')).toBe("ground");
     expect(rule("strong, b, .warning")).toBe(" font-weight: var(--type-title-weight); ");
     expect(rule('.navigation button[aria-current="page"]', mobile.slice(mobile.indexOf(".navigation button { font-size")))).toContain("font-weight: var(--type-title-weight)");
-    // Below 1024 the lime capsule keeps ink, the count is hidden and the card has no fill and no padding.
+    // Below 1024 the lime capsule keeps ink, the label is hidden on the rail and the nav has no fill and no padding.
     expect(inkMembership().get('.navigation button[aria-current="page"]')).toBe("fill");
     expect(rule(".navigation", singlePane)).toContain("padding: 0");
-    expect(singlePane).toMatch(/\.navigation \.toggle-count[^{]*\{ display: none; \}/);
+    expect(rule(".navigation .nav-word", singlePane)).toBe(" display: none; ");
   });
 
   it("lists the picker's batches as toggle rows on a white bowed card inside the black sheet", () => {
@@ -1791,16 +1788,50 @@ describe("last small boxes on board primitives, one-line sidebar label, selected
   it("keeps the label beside the avatar at the spec gap and lets it run up to the switch slot", () => {
     expect(rule(".toggle-avatar")).toContain("margin-inline-end: calc(var(--toggle-label-gap) - var(--toggle-slot-gap))");
     expect(rule(".toggle-row")).toContain("gap: var(--toggle-slot-gap)");
-    // Below 1024 the same mark is a navigation circle and drops the row spacing.
-    expect(rule(".nav-mark", singlePane)).toContain("margin: 0");
+    // The navigation circles are not avatars, so they carry no row spacing to undo.
+    expect(rule(".nav-mark", singlePane)).not.toContain("margin");
+  });
+});
+
+describe("desktop navigation: React Bits StaggeredMenu (user request 2026-11-14; do not restore the toggle-card sidebar)", () => {
+  const component = read("./components/StaggeredMenu.tsx");
+  const menu = app.slice(app.indexOf("<StaggeredMenu"), app.indexOf("/>", app.indexOf("<StaggeredMenu")));
+  const desktop = styles.slice(styles.indexOf("@media (min-width: 1024px)"));
+
+  it("vendors the TS-CSS registry source with its local changes marked, and its stylesheet unchanged", () => {
+    expect(component).toContain("https://reactbits.dev/r/StaggeredMenu-TS-CSS.json");
+    expect(component).toContain("import './StaggeredMenu.css';");
+    for (const prop of ["onItemSelect?: (link: string) => void;", "activeLink?: string;", "onLogoClick?: () => void;"]) expect(component).toContain(prop);
+    expect(component.match(/FermentStation:/g)!.length).toBeGreaterThanOrEqual(8);
+    expect(read("./components/StaggeredMenu.css")).not.toContain("FermentStation");
   });
 
-  it("gives the selected row's count the board's ON switch: blue, no rim, black ink", () => {
-    const selected = rule('.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]) > .toggle-count');
-    expect(selected).toContain("--glass: var(--colour-switch-on)");
-    expect(selected).toContain("box-shadow: none");
-    expect(selected).not.toContain("background");
-    expect(inkMembership().get(".glass")).toBe("fill");
-    expect(contrast(hex("--ink-fill"), hex("--colour-switch-on"))).toBeGreaterThanOrEqual(4.5);
+  it("is configured as the user asked: left, numbered, socials, four destinations, their colours as tokens", () => {
+    for (const item of [
+      "{ label: \"Batches\", ariaLabel: \"Go to batches\", link: \"/\" }",
+      "{ label: \"Checks\", ariaLabel: \"Check the status of the batches\", link: \"/checks\" }",
+      "{ label: \"Calendar\", ariaLabel: \"View the calendar\", link: \"/calendar\" }",
+      "{ label: \"Profiles\", ariaLabel: \"View the profiles\", link: \"/profiles\" }",
+    ]) expect(app).toContain(item);
+    expect(app).toContain("const socialItems = menuItems.map(({ label, link }) => ({ label, link }));");
+    for (const prop of ['position="left"', "isFixed", "displaySocials={true}", "displayItemNumbering={true}", "changeMenuColorOnOpen={true}", "logoUrl={stationLogoUrl}"]) expect(menu).toContain(prop);
+    for (const [token, value] of [["menu-button", "#ef4444"], ["menu-button-open", "#ffffff"], ["menu-layer", "#b497cf"], ["menu-layer-end", "#5227ff"], ["menu-accent", "#ff6b6b"]]) {
+      expect(rule(":root")).toContain(`--colour-${token}: ${value};`);
+      expect(menu).toContain(`var(--colour-${token})`);
+    }
+  });
+
+  it("shows only from 1024, overlays the app, and keeps the topbar clear of its logo and toggle", () => {
+    expect(rule(".app-menu")).toBe(" display: none; ");
+    expect(rule(".app-menu", desktop)).toBe(" display: block; ");
+    expect(rule(".sidebar", desktop)).toBe(" display: none; ");
+    const topbar = rule(".design-topbar", desktop);
+    for (const token of ["var(--nav-circle)", "var(--menu-toggle-width)"]) expect(topbar).toContain(token);
+    expect(rule(".app-menu .sm-toggle", desktop)).toContain("width: var(--menu-toggle-width)");
+    expect(rule(".app-menu .sm-socials-link", desktop)).toContain("min-height: var(--target-min)");
+    expect(rule(".app-menu .sm-logo-button", desktop)).toContain("width: var(--nav-circle)");
+    // The closed panel is hidden after the close slide, at once under reduced motion (transitions are off there).
+    expect(rule(".app-menu .staggered-menu-panel", desktop)).toContain("visibility: hidden");
+    expect(rule(".app-menu[data-open] .staggered-menu-panel", desktop)).toContain("visibility: visible");
   });
 });

@@ -111,6 +111,44 @@ describe("batch workflow", () => {
     expect(screen.getByRole("dialog", { name: "Start a batch" })).toBeTruthy();
   });
 
+  it("navigates through the desktop StaggeredMenu: choosing an item changes the view, marks it current and closes the menu", () => {
+    render(<App />);
+    const toggle = screen.getByRole("button", { name: "Open menu" });
+    // Closed, the panel is hidden from assistive technology and inert.
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("link", { name: "View the calendar" })).toBeNull();
+    expect(document.getElementById("staggered-menu-panel")!.hasAttribute("inert")).toBe(true);
+
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    const batches = screen.getByRole("link", { name: "Go to batches" });
+    expect(batches.getAttribute("aria-current")).toBe("page");
+    expect(document.activeElement).toBe(batches);
+
+    fireEvent.click(screen.getByRole("link", { name: "View the calendar" }));
+    expect(screen.getByRole("heading", { name: "Calendar" })).toBeTruthy();
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(toggle);
+
+    fireEvent.click(toggle);
+    expect(screen.getByRole("link", { name: "View the calendar" }).getAttribute("aria-current")).toBe("page");
+    // The social row repeats the destinations and navigates the same way.
+    fireEvent.click(within(screen.getByLabelText("Social links")).getByRole("link", { name: "Checks" }));
+    expect(document.querySelector(".design-checks-view")).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Calendar" })).toBeNull();
+
+    // Escape closes the menu and returns focus to its toggle.
+    fireEvent.click(toggle);
+    expect(screen.getByRole("link", { name: "Check the status of the batches" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(toggle);
+
+    // The logo takes over the old sidebar's "Home" row: station information.
+    fireEvent.click(document.querySelector<HTMLButtonElement>(".app-menu .sm-logo-button")!);
+    expect(screen.getByRole("dialog", { name: "Your fermentation station" })).toBeTruthy();
+  });
+
   it("shows real dated readings without opening tools and explains paused checks", () => {
     const today = localDateForTest();
     const batch = createBatch(createProfileState().profiles[0], { id: "jar", name: "Measured jar", startDate: today });

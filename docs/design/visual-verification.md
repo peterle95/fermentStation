@@ -57,9 +57,9 @@ Surfaces (`-s`):
 | `observation-logger` | Batch detail with the Add observation logger open | tap "Add observation" |
 | `batch-tools` | Batch tools, scrolled into view | tap "More batch tools" |
 | `upcoming-strip` | Batch overview with "More batch actions" open, scrolled to the Upcoming · next 7 days strip (added in ticket 11; no baseline capture, the pre-rework baseline predates it) | tap "More batch actions" |
-| `checks` | Checks view | navigation |
-| `calendar` | Calendar | navigation |
-| `profiles` | Fermentation profiles | navigation |
+| `checks` | Checks view | navigation (desktop: open the StaggeredMenu, choose the item; below 1024: rail or phone row) |
+| `calendar` | Calendar | navigation (as `checks`) |
+| `profiles` | Fermentation profiles | navigation (as `checks`) |
 | `profile-editor` | Profile editor for Kimchi | tap "Edit Kimchi" |
 | `batch-creation` | Start a batch dialog | tap "Start a batch" |
 | `settings` | Settings | tap the settings button |
@@ -69,11 +69,12 @@ Surfaces (`-s`):
 | `profile-overview` | Kimchi profile overview dialog (ticket 14; no baseline) | Profiles, tap "View Kimchi guidance" |
 | `batch-dates` | "Batch dates" dialog for "Napa cabbage kimchi" (ticket 14; no baseline) | its card, then "View batch dates" |
 | `profile-inputs` | "Profile inputs" dialog for "Napa cabbage kimchi" (ticket 14; no baseline) | its card, then "See all" under Profile inputs |
-| `station-info` | "Your fermentation station" information dialog (ticket 14; no baseline) | the station logo (phone, tablet) or "Home" (desktop sidebar) |
+| `station-info` | "Your fermentation station" information dialog (ticket 14; no baseline) | the station logo: topbar (phone), rail avatar (tablet), the StaggeredMenu logo (desktop) |
+| `menu-open` | Desktop React Bits StaggeredMenu open, with full motion, after its GSAP animation has settled (2026-11-14; desktop viewports only; no baseline) | tap "Menu", wait until no inline style in `.app-menu` changes for 300 ms |
 
-Each capture starts from a fresh browser context: seed, load the app, then reach the surface with real taps and clicks. Surfaces and their steps are declared at the top of `scripts/visual/screenshots.mjs`; add one there when a new surface appears. A step selector that stops matching after a redesign does not abort the run: the capture is marked `step-failed`, the screenshot shows where the flow stopped, and the error names the selector.
+Each capture starts from a fresh browser context: seed, load the app, then reach the surface with real taps and clicks. Surfaces and their steps are declared at the top of `scripts/visual/screenshots.mjs`; add one there when a new surface appears. A surface may limit itself to some `viewports` and set `motion: true` to run without the reduced-motion emulation; a step may be `optional` (a tap skipped when nothing visible matches, used for the desktop menu toggle) or `waitForStill` (wait until script-driven animation under a selector has settled). A step selector that stops matching after a redesign does not abort the run: the capture is marked `step-failed`, the screenshot shows where the flow stopped, and the error names the selector.
 
-The run is deterministic: the app clock is frozen at `2026-03-18T10:00` Europe/Berlin (`--date`, `--timezone`), locale `en-GB`, light colour scheme, reduced motion, device pixel ratio 1 (`--scale 2` for retina captures). Repeated runs on the same code produce byte-identical PNGs for about 95% of captures; the rest differ only by anti-aliasing noise.
+The run is deterministic: the app clock is frozen at `2026-03-18T10:00` Europe/Berlin (`--date`, `--timezone`), locale `en-GB`, light colour scheme, reduced motion (except surfaces with `motion: true`), device pixel ratio 1 (`--scale 2` for retina captures). Repeated runs on the same code produce byte-identical PNGs for about 95% of captures; the rest differ only by anti-aliasing noise.
 
 ## Seed data
 
@@ -144,7 +145,7 @@ Findings on the baseline (60 captures, 0 failed):
 - Small targets: Settings segmented buttons, "On"/"Off" (39-41 px wide) at 768 px and wider, and the notification "All"/"Off" segment at 320 px.
 - Page errors: none.
 
-Surfaces added after the baseline have no baseline captures: `upcoming-strip` (ticket 11) and `trash`, `batch-picker`, `profile-overview`, `batch-dates`, `profile-inputs`, `station-info` (ticket 14). The index shows only the current capture for them, and the end-of-run comparison skips them. Do not recapture the baseline to fill the gap.
+Surfaces added after the baseline have no baseline captures: `upcoming-strip` (ticket 11) and `trash`, `batch-picker`, `profile-overview`, `batch-dates`, `profile-inputs`, `station-info` (ticket 14), and `menu-open` (2026-11-14). The index shows only the current capture for them, and the end-of-run comparison skips them. Do not recapture the baseline to fill the gap.
 
 ## Git
 

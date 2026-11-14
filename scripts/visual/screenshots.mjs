@@ -30,7 +30,18 @@ const openDetail = [
   { waitFor: ".design-detail .batch-workspace" },
 ];
 
-// Each surface is reached through real taps from a fresh load of the seeded app.
+// Primary navigation. Desktop (>= 1024) navigates through the StaggeredMenu: open it, then choose the item (its
+// link is an in-app destination). Below 1024 the menu toggle is hidden, so that optional tap is skipped and the
+// rail or phone row button is tapped instead.
+const menuLinks = { today: "/", checks: "/checks", calendar: "/calendar", profiles: "/profiles" };
+const navigateTo = (destination) => [
+  { tap: ".app-menu .sm-toggle", optional: true },
+  { tap: `.navigation .nav-${destination}, .app-menu .sm-panel-item[href="${menuLinks[destination]}"]` },
+];
+const desktopViewports = ["1440x900", "1024x768"];
+
+// Each surface is reached through real taps from a fresh load of the seeded app. Optional fields: scenario
+// (seed), viewports (names; default all), motion: true (no reduced-motion emulation, for animated states).
 const surfaces = [
   { name: "overview", description: "Batch overview (My batches)", steps: [{ waitFor: ".design-batch-card" }] },
   { name: "all-batches", description: "All batches list", steps: [{ tap: ".batch-view-switch button:nth-child(2)" }, { waitFor: '.batch-view-switch button:nth-child(2)[aria-pressed="true"]' }] },
@@ -38,20 +49,22 @@ const surfaces = [
   { name: "observation-logger", description: "Batch detail with the Add observation logger open", steps: [...openDetail, { tap: ".design-detail .design-record-observation" }, { waitFor: "dialog.observation-logger.station-dialog[open]" }] },
   { name: "batch-tools", description: "Batch detail with Batch tools open, scrolled to the tools", steps: [...openDetail, { tap: '.design-detail button[aria-label="More batch tools"]' }, { waitFor: "#batch-management" }, { scrollTo: "#batch-management" }] },
   { name: "upcoming-strip", description: "Batch overview with More batch actions open, scrolled to the upcoming strip", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-more-actions > summary" }, { waitFor: ".upcoming-strip .small-card" }, { scrollTo: ".upcoming" }] },
-  { name: "checks", description: "Checks view", steps: [{ tap: ".navigation .nav-checks" }, { waitFor: ".design-checks-view" }] },
-  { name: "calendar", description: "Calendar", steps: [{ tap: ".navigation .nav-calendar" }, { waitFor: ".calendar-screen" }] },
-  { name: "profiles", description: "Fermentation profiles", steps: [{ tap: ".navigation .nav-profiles" }, { waitFor: ".profiles-screen .profile-card" }] },
-  { name: "profile-editor", description: "Profile editor (Kimchi)", steps: [{ tap: ".navigation .nav-profiles" }, { tap: 'button[aria-label="Edit Kimchi"]' }, { waitFor: ".app-shell.profile-editor-shell" }] },
+  { name: "checks", description: "Checks view", steps: [...navigateTo("checks"), { waitFor: ".design-checks-view" }] },
+  { name: "calendar", description: "Calendar", steps: [...navigateTo("calendar"), { waitFor: ".calendar-screen" }] },
+  { name: "profiles", description: "Fermentation profiles", steps: [...navigateTo("profiles"), { waitFor: ".profiles-screen .profile-card" }] },
+  { name: "profile-editor", description: "Profile editor (Kimchi)", steps: [...navigateTo("profiles"), { tap: 'button[aria-label="Edit Kimchi"]' }, { waitFor: ".app-shell.profile-editor-shell" }] },
   { name: "batch-creation", description: "Start a batch dialog", steps: [{ tap: ".design-topbar .batch-fab" }, { waitFor: "dialog.station-dialog[open]" }] },
   { name: "settings", description: "Settings", steps: [{ tap: '.design-topbar button[aria-label="Settings"]' }, { waitFor: ".settings-screen" }] },
   { name: "first-run", description: "Empty first-run state (no saved data)", scenario: "empty", steps: [{ waitFor: ".design-dashboard" }] },
   // Ticket 14: states styled before the harness could reach them. No baseline exists for these.
   { name: "trash", description: "Settings with Recently deleted batches open, scrolled to the trash rows", steps: [{ tap: '.design-topbar button[aria-label="Settings"]' }, { waitFor: ".settings-screen" }, { tap: ".settings-trash-toggle" }, { waitFor: ".deleted-batches-panel .trash-item" }, { scrollTo: ".settings-trash-toggle" }] },
   { name: "batch-picker", description: "Choose a batch sheet from an upcoming-strip day with several batches", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-more-actions > summary" }, { waitFor: '.upcoming-strip button[aria-haspopup="dialog"]' }, { tap: '.upcoming-strip button[aria-haspopup="dialog"]' }, { waitFor: "dialog.upcoming-batch-picker[open]" }] },
-  { name: "profile-overview", description: "Profile overview dialog (Kimchi)", steps: [{ tap: ".navigation .nav-profiles" }, { tap: 'button[aria-label="View Kimchi guidance"]' }, { waitFor: "dialog.station-dialog[open]" }] },
+  { name: "profile-overview", description: "Profile overview dialog (Kimchi)", steps: [...navigateTo("profiles"), { tap: 'button[aria-label="View Kimchi guidance"]' }, { waitFor: "dialog.station-dialog[open]" }] },
   { name: "batch-dates", description: `Batch dates dialog (${detailBatch})`, steps: [...openDetail, { tap: '.design-detail button[aria-label="View batch dates"]' }, { waitFor: "dialog.station-dialog[open]" }] },
   { name: "profile-inputs", description: `Profile inputs dialog (${detailBatch})`, steps: [...openDetail, { tap: ".design-detail .design-input-summary .design-quiet" }, { waitFor: "dialog.station-dialog[open]" }] },
-  { name: "station-info", description: "Station information dialog", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-account, .station-identity" }, { waitFor: "dialog.station-dialog[open]" }] },
+  { name: "station-info", description: "Station information dialog", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-account, .station-identity, .app-menu .sm-logo-button" }, { waitFor: "dialog.station-dialog[open]" }] },
+  // 2026-11-14: the desktop StaggeredMenu open, with full motion, captured once its GSAP animation has settled.
+  { name: "menu-open", description: "Desktop StaggeredMenu open, after its animation settled", viewports: desktopViewports, motion: true, steps: [{ waitFor: ".design-batch-card" }, { tap: ".app-menu .sm-toggle" }, { waitFor: ".app-menu[data-open] .sm-socials-link" }, { waitForStill: ".app-menu" }] },
 ];
 
 // ---------------------------------------------------------------------------------------------
@@ -317,6 +330,25 @@ async function waitForVisible(selector, timeout) {
   while (performance.now() < end) {
     if ([...document.querySelectorAll(selector)].some(shown)) return true;
     await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return false;
+}
+
+// Resolves once no inline style under the selector has changed for 300 ms (script-driven animation has settled).
+async function waitForStill(selector, timeout) {
+  const snapshot = () => {
+    const root = document.querySelector(selector);
+    return root ? [root, ...root.querySelectorAll("*")].map((element) => element.getAttribute("style") ?? "").join("|") : null;
+  };
+  const end = performance.now() + timeout;
+  let previous = snapshot();
+  let stillSince = performance.now();
+  while (performance.now() < end) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const current = snapshot();
+    if (current === null) return false;
+    if (current !== previous) { previous = current; stillSince = performance.now(); }
+    else if (performance.now() - stillSince >= 300) return true;
   }
   return false;
 }
@@ -587,7 +619,7 @@ async function capture(browser, base, surface, viewport, full = captureFull) {
     await cdp.send("Emulation.setTimezoneOverride", { timezoneId: args.timezone }, sessionId);
     await cdp.send("Emulation.setLocaleOverride", { locale: args.locale }, sessionId);
     await cdp.send("Emulation.setEmulatedMedia", { features: [
-      { name: "prefers-reduced-motion", value: "reduce" },
+      { name: "prefers-reduced-motion", value: surface.motion ? "no-preference" : "reduce" },
       { name: "prefers-color-scheme", value: "light" },
     ] }, sessionId);
     if (viewport.mobile) await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 }, sessionId);
@@ -603,7 +635,12 @@ async function capture(browser, base, surface, viewport, full = captureFull) {
 
     try {
       for (const step of surface.steps) {
-        if (step.tap) await tap(cdp, sessionId, viewport, step.tap);
+        // An optional tap is skipped when nothing visible matches (a control that exists only at some widths).
+        if (step.tap && step.optional) await tap(cdp, sessionId, viewport, step.tap).catch(() => undefined);
+        else if (step.tap) await tap(cdp, sessionId, viewport, step.tap);
+        if (step.waitForStill && !await evaluate(cdp, sessionId, call(waitForStill, step.waitForStill, 10_000), `wait for ${step.waitForStill} to settle`)) {
+          throw new Error(`${step.waitForStill} did not settle`);
+        }
         if (step.waitFor && !await evaluate(cdp, sessionId, call(waitForVisible, step.waitFor, 10_000), `wait for ${step.waitFor}`)) {
           throw new Error(`${step.waitFor} did not become visible`);
         }
@@ -794,7 +831,9 @@ async function main() {
     await rm(path.join(outDir, "_warmup"), { recursive: true, force: true });
     if (warmUp.status === "failed") throw new Error(`App did not load: ${warmUp.error}`);
 
-    const queue = selectedSurfaces.flatMap((surface) => selectedViewports.map((viewport) => ({ surface, viewport })));
+    const queue = selectedSurfaces.flatMap((surface) => selectedViewports
+      .filter((viewport) => !surface.viewports || surface.viewports.includes(viewport.name))
+      .map((viewport) => ({ surface, viewport })));
     await Promise.all(Array.from({ length: Math.min(jobs, queue.length) }, async () => {
       for (let job = queue.shift(); job; job = queue.shift()) {
         const record = await capture(browser, server.url, job.surface, job.viewport);

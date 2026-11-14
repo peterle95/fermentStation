@@ -63,6 +63,14 @@
   --colour-event-lilac-end: #f6eafc;
   --colour-event-sky: #b4dff9;
   --colour-event-sky-end: #e6f6ff;
+  /* Desktop menu (React Bits StaggeredMenu, 2026-11-14): the user's configuration, not Swipe board colours.
+     Toggle red when closed and white when open, the two staggered layers, and the accent (numbers, Socials title,
+     hover, the current item's underline). App.tsx passes them to the component as var() values. */
+  --colour-menu-button: #ef4444;
+  --colour-menu-button-open: #ffffff;
+  --colour-menu-layer: #b497cf;
+  --colour-menu-layer-end: #5227ff;
+  --colour-menu-accent: #ff6b6b;
   /* Text colour pairs. Each --ink-ground-* is a role colour on the black ground; --ink-fill is every role on
      white and pastel fills. src/styles.test.ts checks every pair's contrast from these tokens. */
   --ink-ground: var(--colour-text-inverse);
@@ -94,6 +102,10 @@
   --nav-ring: 6px;
   --nav-rail: calc(var(--nav-circle) + 2 * var(--nav-ring));
   --nav-waist: 46px;
+  /* Desktop menu (React Bits StaggeredMenu, 2026-11-14): the fox in a white nav circle, and the room the
+     "Menu"/"Close" toggle takes at the topbar's end. */
+  --menu-logo: 48px;
+  --menu-toggle-width: 112px;
   /* Utility circles (spec §1.4, §1.5, §1.7; gap 5): the one icon-only button. White d 60 on the ground,
      glyph stroke 2; inside dark panes and sheets a --colour-sheet-control circle d 57, stroke 1.6. Glyph 21.
      Strokes are CSS px at the 21 px glyph size. */
@@ -217,8 +229,6 @@
   --layout-gutter: 24px;
   --layout-columns: 12;
   --layout-edge: 24px;
-  /* Desktop sidebar: wide enough for the spec §1.2 row (avatar 63, a two-line label, the count pill in the switch slot). */
-  --sidebar-width: 272px;
   --layout-breakpoint-1: 600px;
   --layout-breakpoint-2: 1024px;
   --radius-card: 32px;
@@ -392,7 +402,6 @@ input::file-selector-button,
 .settings-recovery,
 .toggle-row,
 .toggle-avatar,
-.toggle-count,
 .settings-count,
 .trash-item,
 .glass {
@@ -444,11 +453,11 @@ input::file-selector-button,
 h1 { font-size: var(--type-headline); font-weight: var(--type-headline-weight); line-height: var(--type-headline-leading); letter-spacing: var(--type-headline-tracking); }
 .design-batch-copy h3, .design-empty-card > p:first-child, .design-detail-heading h3, .design-profile-copy h2, .profile-editor-title-input { font-size: var(--type-title); font-weight: var(--type-title-weight); line-height: var(--type-title-leading); letter-spacing: var(--type-title-tracking); }
 .design-batch-profile, .design-detail-heading p, .meas-value-small { font-size: var(--type-title-light); font-weight: var(--type-title-light-weight); line-height: var(--type-title-light-leading); letter-spacing: var(--type-title-light-tracking); }
-h2, h3, h4, .brand strong { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); }
+h2, h3, h4 { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); }
 .design-tip h3, .design-batch-bottom strong, .design-detail-top h2, .design-input-summary h3, .timeline-panel-heading h3, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .design-detail-next strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 .navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
 body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .guide-step p, .batch-guidance > p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
-button, .small-card-tag, summary, .summary-row-count, .toggle-count, .station-dialog-heading h2, .section-label a, .field-error, .calendar-day, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+button, .small-card-tag, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .calendar-day, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
 small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-check-state, .design-detail-next p, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
 strong, b, .warning { font-weight: var(--type-title-weight); }
 
@@ -563,7 +572,7 @@ button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
 .app-shell {
   position: relative;
   display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   width: 100%;
   max-width: var(--layout-container);
   height: 100dvh;
@@ -572,26 +581,19 @@ button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
 }
 .sidebar { display: flex; flex-direction: column; gap: var(--space-8); min-height: 0; padding: calc(var(--safe-top) + var(--space-6)) var(--space-3) var(--space-6); overflow: auto; background: var(--colour-surface-inverse); }
 .sidebar > * { flex-shrink: 0; }
-.brand { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
-.brand > div { min-width: 0; width: 100%; }
+.brand { display: flex; flex-direction: column; }
 .brand-mark { display: grid; place-items: center; width: 48px; height: 48px; flex: none; }
 .brand-mark img { width: 48px; height: 48px; object-fit: contain; }
-.brand strong { display: block; max-width: 100%; overflow-wrap: anywhere; }
-/* Navigation. Desktop (spec §3, toggle card §1.2): the nav is a toggle card, each destination a toggle row with
-   its avatar, the current one the black selected row and the batch count in the switch slot; all of that comes
-   from the toggle primitive's classes in the markup. Below 1024 the same elements are the circles of spec §1.4
-   and §1.5 (set in the width adaptations further down). */
+/* Navigation below 1024 (spec §1.4, §1.5): the sidebar is the tablet rail and the phone bottom row of circles, set in
+   the width adaptations further down. On desktop the sidebar is hidden and the React Bits StaggeredMenu navigates
+   (the user's request of 2026-11-14; see "Desktop menu" below). The nav keeps the row primitive's class for the
+   lime current capsule's fill and "bowed" for the rail band. */
 .sidebar .brand-mark { width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-background); }
-.navigation button { min-width: 0; height: auto; white-space: normal; overflow-wrap: anywhere; }
 .nav-word { min-width: 0; overflow-wrap: anywhere; }
 .navigation svg, .design-avatar svg { width: var(--nav-icon); height: var(--nav-icon); }
 .navigation button:focus-visible, .design-account:focus-visible { outline-offset: var(--stroke-focus); }
-.design-nav-profile-desktop { display: inline-flex; }
-.design-nav-profile-mobile, .design-mobile-avatar { display: none; }
 .design-sidebar-bottom { margin-top: auto; }
-.design-account { display: flex; align-items: center; gap: var(--space-3); width: 100%; min-height: var(--nav-circle); border: 0; margin-top: var(--space-4); padding: 0 var(--space-4) 0 0; text-align: left; }
-.design-account > span:nth-child(2) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.design-account > span:last-child { margin-left: auto; }
+.design-account { display: flex; align-items: center; justify-content: center; min-height: var(--nav-circle); border: 0; margin-top: var(--space-4); padding: 0; }
 .design-avatar { display: grid; place-items: center; flex: none; width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-emblem); }
 .content-shell { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .main-content { position: relative; flex: 1; min-height: 0; padding: var(--space-8) var(--layout-edge) var(--space-12); overflow: auto; }
@@ -1132,10 +1134,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 :where(.toggle-row:nth-child(4n + 3)) > .toggle-avatar { background: var(--colour-avatar-mint); }
 :where(.toggle-row:nth-child(4n + 4)) > .toggle-avatar { background: var(--colour-avatar-sky); }
 .toggle-label { flex: 1; min-width: 0; }
-/* A count in the switch slot: the count pill (spec §1.3, glass in the markup) at the switch's size. */
-.toggle-count { display: grid; place-items: center; flex: none; min-width: var(--switch-width); min-height: var(--switch-height); margin-inline-start: auto; padding-inline: var(--space-2); border-radius: var(--radius-control); font-variant-numeric: tabular-nums; }
-/* On the selected row the count takes the board's ON switch: the blue track, no rim (spec §1.2; black ink, 6 : 1). */
-.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]) > .toggle-count { --glass: var(--colour-switch-on); box-shadow: none; }
 .toggle-switch { position: relative; flex: none; width: var(--switch-width); height: var(--switch-height); margin-inline-start: auto; border-radius: var(--radius-control); background: var(--colour-switch-off); }
 .toggle-switch::after {
   content: "";
@@ -1167,14 +1165,14 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 /* Width adaptations, not recovered artwork specifications. No DOM reparenting. */
 @media (max-width: 1023px) {
   .app-shell { grid-template-columns: calc(var(--nav-rail) + 2 * var(--space-2)) minmax(0, 1fr); }
-  .brand > div, .navigation .nav-word, .navigation .toggle-count, .design-account > span:not(.design-avatar) { display: none; }
+  .navigation .nav-word { display: none; }
   /* Navigation circles (spec §1.4, §1.5): each destination's mark is a white circle; the current destination is
-     lime and its icon sits straight on the lime, as in the Scan pill. The toggle card's white fill and the rows'
-     fills give way here (the rail band is the card's fill on tablets). */
+     lime and its icon sits straight on the lime, as in the Scan pill. The bowed nav's white fill and the rows'
+     fills give way here (the rail band is the nav's fill on tablets). */
   .navigation { --fill: transparent; display: grid; gap: var(--nav-gap); padding: 0; }
   .navigation button { --row-fill: transparent; display: flex; align-items: center; gap: var(--space-3); min-height: var(--nav-circle); border: 0; padding: 0; text-align: left; }
   .navigation button[aria-current="page"] { --row-fill: var(--colour-action); --ink: var(--ink-fill); --ink-meta: var(--ink-fill); --ink-figure: var(--ink-fill); --ink-accent: var(--ink-fill); --ink-attention: var(--ink-fill); --ink-time: var(--ink-fill); color: var(--ink); }
-  .nav-mark { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--nav-circle); height: var(--nav-circle); margin: 0; border-radius: 50%; background: var(--colour-background); }
+  .nav-mark { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-background); }
   .navigation button[aria-current="page"] .nav-mark { background: none; }
   .design-date-chip { display: none; }
   .batch-overview, .profile-list { grid-template-columns: minmax(0, 1fr); }
@@ -1190,17 +1188,9 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .navigation { --fill: linear-gradient(var(--colour-rail), var(--colour-rail)) center / var(--nav-waist) calc(100% - var(--nav-circle)) no-repeat; }
   .navigation button { justify-content: center; width: var(--nav-circle); padding: 0; }
   .nav-mark, .sidebar .brand-mark, .design-avatar { box-shadow: 0 0 0 var(--nav-ring) var(--colour-rail); }
-  .design-account { justify-content: center; width: auto; padding: 0; }
-}
-
-@media (min-width: 1024px) {
-  .profile-editor-shell .sidebar { display: flex; }
-  .profile-editor-shell .navigation { display: grid; }
 }
 
 @media (max-width: 1023px) {
-  .design-nav-profile-desktop { display: none; }
-  .design-nav-profile-mobile { display: inline-flex; }
   .main-content { padding: calc(var(--safe-top) + var(--space-6)) calc(var(--layout-edge) + var(--safe-right)) var(--space-24) calc(var(--layout-edge) + var(--safe-left)); }
   .design-workspace { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); padding-right: 0; }
   .design-topbar { gap: var(--space-3); padding: calc(var(--safe-top) + var(--space-6)) calc(var(--layout-edge) + var(--safe-right)) var(--space-6) calc(var(--layout-edge) + var(--safe-left)); }
@@ -1297,6 +1287,34 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .calendar-weekdays, .calendar-grid, .calendar-week { gap: 0; }
   .calendar-head, .calendar-legend, .calendar-helper { padding-inline: calc(var(--layout-edge) - var(--space-1)); }
   .navigation { padding-inline: var(--safe-left) var(--safe-right); }
+}
+
+/* Desktop menu (>= 1024): the React Bits StaggeredMenu (src/components/StaggeredMenu.tsx). On 2026-11-14 the user
+   asked for it in place of the Swipe toggle-card sidebar; do not restore that sidebar as a fidelity fix. The menu's
+   own stylesheet stays as upstream ships it; these rules only seat it in the app: hidden below 1024 (the rail and the
+   phone row navigate there), the logo and the toggle on the topbar's line, the topbar's ends kept clear of them, and
+   upstream's 1024px full-width panel kept at its desktop width (its breakpoint overlaps ours by one pixel). */
+.app-menu { display: none; }
+@media (min-width: 1024px) {
+  .sidebar { display: none; }
+  .app-menu { display: block; }
+  .app-menu .staggered-menu-header { padding: calc(var(--safe-top) + var(--space-6)) var(--layout-edge) 0; }
+  .app-menu :is(.staggered-menu-panel, .sm-prelayers) { width: clamp(260px, 38vw, 420px); }
+  .app-menu .sm-logo-button { justify-content: center; width: var(--nav-circle); height: var(--nav-circle); min-height: var(--nav-circle); padding: 0; border: 0; border-radius: 50%; background: var(--colour-background); }
+  .app-menu .sm-logo-button:hover:not(:disabled) { background: var(--colour-action); }
+  .app-menu .sm-logo-img, .app-menu[data-open] .sm-logo-img { width: var(--menu-logo); height: var(--menu-logo); filter: none; }
+  /* The end padding holds the plus icon's corners while it spins to the cross. */
+  .app-menu .sm-toggle { justify-content: flex-end; width: var(--menu-toggle-width); min-height: var(--nav-circle); padding: 0 var(--space-1) 0 0; }
+  .app-menu .sm-toggle:hover:not(:disabled) { background: transparent; }
+  /* The current destination (aria-current) is underlined in the accent: a shape, not only a colour. */
+  .app-menu .sm-panel-item[aria-current="page"] .sm-panel-itemLabel { text-decoration: underline var(--colour-menu-accent) 0.08em; text-underline-offset: 0.06em; }
+  .app-menu .sm-socials-link { display: inline-flex; align-items: center; min-width: var(--target-min); min-height: var(--target-min); }
+  /* Closed and slid away, the panel is hidden too (out of the tab order and the layout audit); it hides only after
+     the 0.32 s close slide. Reduced motion drops the transition, so it hides at once. */
+  .app-menu .staggered-menu-panel { visibility: hidden; transition: visibility 0s linear 0.32s; }
+  .app-menu[data-open] .staggered-menu-panel { visibility: visible; transition-delay: 0s; }
+  .design-topbar { padding-inline: calc(var(--layout-edge) + var(--nav-circle) + var(--space-4)) calc(var(--layout-edge) + var(--menu-toggle-width) + var(--space-4)); }
+  .profile-editor-shell .design-dashboard { padding-top: calc(var(--safe-top) + var(--space-6) + var(--nav-circle) + var(--space-6)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -72,6 +72,7 @@ import { iosGuideDismissedKey, shouldShowIosInstallGuide } from "./platform/ios-
 import { isNativeTransferAvailable, pickNativeArchive, shareNativeFile } from "./platform/native-transfer";
 import { requestReminderPermission, reconcileReminders } from "./platform/reminders";
 import { captureNativePhoto, isNativeCameraAvailable, listenForRestoredCameraPhoto, type CapturedPhoto } from "./platform/camera";
+import { StaggeredMenu } from "./components/StaggeredMenu";
 import {
   sharedDataStore,
   type SharedSnapshot,
@@ -105,7 +106,7 @@ function NavIcon({ destination }: { destination: Destination }) {
   if (destination === "today") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z" /></svg>;
   if (destination === "batches") return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3h8M9 3v3l-3 9a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3l-3-9V3M7 14h10" /></svg>;
   if (destination === "calendar") return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="5" width="16" height="16" rx="3" /><path d="M8 3v5m8-5v5M4 11h16m-12 4h1m3 0h1m3 0h1m-9 3h1m3 0h1" /></svg>;
-  if (destination === "profiles") return <><span className="design-nav-profile-desktop"><DesignIcon name="book" /></span><span className="design-nav-profile-mobile"><DesignIcon name="jar" /></span></>;
+  if (destination === "profiles") return <DesignIcon name="jar" />;
   return <DesignIcon name="user" />;
 }
 
@@ -131,9 +132,22 @@ function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{name === "jar" && <rect x="6" y="3" width="12" height="4" rx="1.5" />}<path d={paths[name]} />{name === "temp" && <circle cx="12" cy="18" r="1" />}</svg>;
 }
 
+const stationLogoUrl = `${import.meta.env.BASE_URL}new-design/new_app_logo/FermentStation_Logo_Asset_Pack/transparent/logo-transparent-96.png`;
+
 function StationLogo() {
-  return <span className="brand-mark" aria-hidden="true"><img alt="" src={`${import.meta.env.BASE_URL}new-design/new_app_logo/FermentStation_Logo_Asset_Pack/transparent/logo-transparent-96.png`} /></span>;
+  return <span className="brand-mark" aria-hidden="true"><img alt="" src={stationLogoUrl} /></span>;
 }
+
+// Desktop navigation (>= 1024 px): the React Bits StaggeredMenu the user asked for on 2026-11-14, configured as
+// they specified. Its links are in-app destinations, not URLs; its onItemSelect in App maps them onto navigate().
+// Below 1024 px the rail and the phone bottom row (.navigation in the sidebar) stay.
+const menuItems = [
+  { label: "Batches", ariaLabel: "Go to batches", link: "/" },
+  { label: "Checks", ariaLabel: "Check the status of the batches", link: "/checks" },
+  { label: "Calendar", ariaLabel: "View the calendar", link: "/calendar" },
+  { label: "Profiles", ariaLabel: "View the profiles", link: "/profiles" },
+];
+const socialItems = menuItems.map(({ label, link }) => ({ label, link }));
 
 type FieldErrors = Record<string, string>;
 
@@ -672,12 +686,31 @@ export function App() {
   return (
     <div className={`app-shell new-design${openBatchId && showPhoneDetail ? " has-open-batch" : ""}${editingProfileId && shell.destination === "profiles" ? " profile-editor-shell" : ""}`}>
       <a className="design-skip-link" href="#main-content">Skip to content</a>
+      <StaggeredMenu
+        className="app-menu"
+        isFixed
+        position="left"
+        items={menuItems}
+        socialItems={socialItems}
+        displaySocials={true}
+        displayItemNumbering={true}
+        menuButtonColor="var(--colour-menu-button)"
+        openMenuButtonColor="var(--colour-menu-button-open)"
+        changeMenuColorOnOpen={true}
+        colors={["var(--colour-menu-layer)", "var(--colour-menu-layer-end)"]}
+        logoUrl={stationLogoUrl}
+        accentColor="var(--colour-menu-accent)"
+        activeLink={showChecks ? "/checks" : shell.destination === "calendar" ? "/calendar" : shell.destination === "profiles" ? "/profiles" : shell.destination === "settings" ? undefined : "/"}
+        onItemSelect={(link) => link === "/checks" ? openChecks() : navigate(link === "/calendar" ? "calendar" : link === "/profiles" ? "profiles" : "today")}
+        onLogoClick={() => showDialog({ kind: "info" })}
+        logoAriaLabel="Home — station information"
+      />
+      {/* Below 1024 px: the tablet rail and the phone bottom row. Hidden on desktop, where the menu above navigates. */}
       <aside className="sidebar">
         <div className="brand">
           <StationLogo />
-          <div><strong>FermentStation</strong></div>
         </div>
-        <nav aria-label="Primary navigation" className="navigation toggle-card bowed">
+        <nav aria-label="Primary navigation" className="navigation bowed">
           {(["today", "checks", "calendar", "profiles"] as const).map((destination) => (
             <button
               aria-label={destination === "checks" ? "Checks" : labels[destination]}
@@ -687,14 +720,13 @@ export function App() {
               onClick={() => destination === "checks" ? openChecks() : navigate(destination)}
               type="button"
             >
-              <span className="nav-mark toggle-avatar" aria-hidden="true">{destination === "checks" ? <DesignIcon name="check" /> : <NavIcon destination={destination} />}</span>
+              <span className="nav-mark" aria-hidden="true">{destination === "checks" ? <DesignIcon name="check" /> : <NavIcon destination={destination} />}</span>
               <span className="nav-word">{destination === "checks" ? "Checks" : labels[destination]}</span>
-              {destination === "today" && <span className="toggle-count glass">{batchState.batches.length}</span>}
             </button>
           ))}
         </nav>
         <div className="design-sidebar-bottom">
-          <button aria-label="Home — station information" className="design-account" onClick={() => showDialog({ kind: "info" })} type="button"><span className="design-avatar"><DesignIcon name="user" /></span><span>Home</span><span aria-hidden="true">›</span></button>
+          <button aria-label="Home — station information" className="design-account" onClick={() => showDialog({ kind: "info" })} type="button"><span className="design-avatar"><DesignIcon name="user" /></span></button>
         </div>
       </aside>
 
