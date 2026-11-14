@@ -108,16 +108,16 @@ describe("Swipe-derived design contract", () => {
     expect(app).toContain('<div className="design-summary-label"><h2>Kitchen summary</h2>');
   });
 
-  it("shares the 32/12/999 geometry, 24px spacing and 52px control baseline", () => {
+  it("shares the 32/999 geometry, 24px spacing and 52px control baseline", () => {
     for (const declaration of [
-      "--radius-card: 32px;", "--radius-small: 12px;", "--radius-control: 999px;",
+      "--radius-card: 32px;", "--radius-control: 999px;",
       "--card-padding: 24px;", "--layout-edge: 24px;", "--layout-gutter: 24px;",
       "--layout-container: 1680px;", "--button-height: 52px;", "--input-height: 52px;",
     ]) expect(styles).toContain(declaration);
     expect(rule("button")).toContain("min-height: var(--button-height)");
     expect(rule("button")).toContain("border-radius: var(--radius-control)");
     expect(rule("input, select, textarea")).toContain("min-height: var(--input-height)");
-    expect(rule("textarea")).toContain("border-radius: var(--radius-small)");
+    expect(rule("textarea")).toContain("border-radius: var(--radius-line)");
     // The dialog sheet takes the measured sheet inset instead (see "sheet and field on black").
     for (const selector of [".batch-component-card", ".settings-card", ".profile-card", ".profile-editor-section"]) {
       expect(rule(selector)).toContain("var(--card-padding)");
@@ -334,7 +334,9 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
   it("moves the last legacy rounded rectangles onto the bowed card, the small card, the capsule or a photo frame", () => {
     for (const name of ["design-empty-checks", "calendar-empty"]) expect(app).toContain(`className="${name} small-card bowed"`);
     for (const selector of [".batch-view-switch", ".queue-card"]) expect(rule(selector)).toContain("border-radius: var(--radius-control)");
-    expect(rule(".design-detail-photo")).toContain("border-radius: var(--radius-small)");
+    // The detail photo frame is bowed (ticket 19): its colour is --fill, never a box of its own.
+    expect(app).toContain('style={detail && !photo ? { "--fill": visual.color } as CSSProperties : undefined}');
+    expect(rule(".design-detail-photo")).not.toMatch(/border|background/);
     expect(rule(".batch-tools-danger")).toContain("--stroke-w: var(--stroke-width)");
     expect(app).not.toMatch(/className="[^"]*\bactivity-logger\b[^"]*\bbowed\b/);
   });
@@ -419,7 +421,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
   it("keeps the retired notch imitation and one-off radii out of the stylesheet", () => {
     expect(styles).not.toMatch(/border-radius: 0 0 50% 50%/);
     expect(styles).not.toMatch(/border-radius:[^;]*\//);
-    const allowed = /^(?:var\(--radius-(?:control|small|card|line)\)|50%|0)$/;
+    const allowed = /^(?:var\(--radius-(?:control|card|line)\)|50%|0)$/;
     const cardRadius: string[] = [];
     for (const entry of rules()) {
       if (isPrimitive(entry)) continue;
@@ -869,9 +871,9 @@ describe("settings toggle rows and switch (swipe-rework-log.md, ticket 7; spec �
     && !entry.declarations.some(([property]) => property === "--ink") && !isRoleRule(entry));
 
   it("carries the measured row and switch geometry and the three new colours in :root tokens", () => {
-    expect(Object.fromEntries(["--toggle-row", "--toggle-gap", "--toggle-inset", "--toggle-avatar", "--toggle-label-gap", "--switch-width", "--switch-height", "--switch-knob", "--switch-inset"]
+    expect(Object.fromEntries(["--toggle-row", "--toggle-gap", "--toggle-inset", "--toggle-avatar", "--toggle-label-gap", "--toggle-slot-gap", "--switch-width", "--switch-height", "--switch-knob", "--switch-inset"]
       .map((token) => [token, px(token)]))).toEqual({
-      "--toggle-row": 72, "--toggle-gap": 8, "--toggle-inset": 16, "--toggle-avatar": 63, "--toggle-label-gap": 18,
+      "--toggle-row": 72, "--toggle-gap": 8, "--toggle-inset": 16, "--toggle-avatar": 63, "--toggle-label-gap": 18, "--toggle-slot-gap": 8,
       "--switch-width": 42, "--switch-height": 25, "--switch-knob": 20, "--switch-inset": 21,
     });
     for (const declaration of ["--colour-row: #f6f8fa;", "--colour-switch-on: #2089fd;", "--colour-switch-off: #eceef0;"]) expect(rule(":root")).toContain(declaration);
@@ -885,7 +887,7 @@ describe("settings toggle rows and switch (swipe-rework-log.md, ticket 7; spec �
     expect(toggleRules().map((entry) => entry.selector).sort()).toEqual([
       ".toggle-list", ".toggle-card", ".toggle-row", state, ".toggle-row:hover:not(:disabled)", ".toggle-row:where(:has(> .toggle-avatar))", ".toggle-avatar", ".toggle-label",
       ":where(.toggle-row:nth-child(4n + 2)) > .toggle-avatar", ":where(.toggle-row:nth-child(4n + 3)) > .toggle-avatar", ":where(.toggle-row:nth-child(4n + 4)) > .toggle-avatar",
-      ".toggle-count", ".toggle-switch", ".toggle-switch::after", '[aria-checked="true"] > .toggle-switch', '[aria-checked="true"] > .toggle-switch::after',
+      ".toggle-count", '.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]) > .toggle-count', ".toggle-switch", ".toggle-switch::after", '[aria-checked="true"] > .toggle-switch', '[aria-checked="true"] > .toggle-switch::after',
     ].sort());
     for (const entry of toggleRules()) {
       for (const [property, value] of entry.declarations) expect(value, `${entry.selector} { ${property} } must use a token`).not.toMatch(/(?<![\w-])\d*\.?\d+(?:px|rem|em)\b/);
@@ -894,7 +896,7 @@ describe("settings toggle rows and switch (swipe-rework-log.md, ticket 7; spec �
     for (const declaration of ["display: grid", "gap: var(--toggle-gap)", "margin-inline: calc(var(--toggle-inset) - var(--card-padding))"]) expect(list).toContain(declaration);
     const row = rule(".toggle-row");
     for (const declaration of [
-      "--row-fill: var(--colour-row)", "min-height: var(--toggle-row)", "padding: 0 var(--switch-inset)", "gap: var(--toggle-label-gap)",
+      "--row-fill: var(--colour-row)", "min-height: var(--toggle-row)", "padding: 0 var(--switch-inset)", "gap: var(--toggle-slot-gap)",
       "border: 0", "border-radius: var(--radius-control)", "background: var(--row-fill)", "align-items: center",
     ]) expect(row).toContain(declaration);
     expect(rule(state)).toContain("--row-fill: var(--colour-surface-inverse)");
@@ -1003,13 +1005,13 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     expect(tokens().get("--batch-pill-foot")).toBe("calc(var(--batch-pill-inset-bottom) + var(--batch-pill-reserve) + var(--space-3))");
     expect(rule(".design-batch-copy > :not(.sr-only)")).toContain("margin-inline: var(--batch-card-inset-x)");
     expect(rule(".design-batch-copy > .design-batch-chips")).toContain("margin-inline-start: var(--batch-chip-inset-x)");
-    expect(rule(".design-batch-card .status")).toContain("min-height: var(--batch-chip-height)");
+    expect(rule(":is(.design-batch-card, .design-detail-photo) .status")).toContain("min-height: var(--batch-chip-height)");
     expect(app).toContain('<span className={`status status-${batch.status} glass`}>');
     expect(rule(".design-batch-next")).toContain("border-radius: var(--radius-control)");
     // Ticket 12: the chip row stays one line at every card width, so narrow cards keep the card ratio. The status chip
     // keeps its size; the next-check chip shortens with an ellipsis (the card's sr-only line still reads the full next step).
     expect(rule(".design-batch-chips")).not.toContain("flex-wrap: wrap");
-    expect(rule(".design-batch-card .status")).toContain("flex: none");
+    expect(rule(":is(.design-batch-card, .design-detail-photo) .status")).toContain("flex: none");
     for (const declaration of ["min-width: 0", "overflow: hidden", "text-overflow: ellipsis", "white-space: nowrap"]) expect(rule(".design-batch-next")).toContain(declaration);
     const pill = rule(".design-batch-pill");
     for (const declaration of [
@@ -1070,7 +1072,7 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
 
   it("clips stand-ins by the outline but never a user photo, and puts the new cutouts only on pastel cards", () => {
     const photo = component("BatchPhoto");
-    expect(photo).toContain('const card = detail ? "" : photo ? "" : ` bowed-media${visual.pastelOnly ? " pastel-only" : ""}`;');
+    expect(photo).toContain('const card = detail ? " bowed" : photo ? "" : ` bowed-media${visual.pastelOnly ? " pastel-only" : ""}`;');
     const visuals = app.slice(app.indexOf("function profileVisual"), app.indexOf("function BatchPhoto"));
     for (const [cutout, colour] of [["grapefruit-spritz", "accent"], ["fruit-still-life", "action"]]) {
       expect(visuals).toContain(`{ photo: "${cutout}", color: "var(--colour-${colour})", pastelOnly: true }`);
@@ -1276,7 +1278,7 @@ describe("small cards (swipe-rework-log.md, ticket 10; spec §1.7 event card, §
   const px = (token: string) => Number(tokens().get(token)!.match(/^(\d+(?:\.\d+)?)px$/)![1]);
   const isPart = (selector: string) => /^\.small-card(?:-[\w-]+)?(?:[\s:]|$)/.test(selector);
   /** Every className literal in App.tsx that makes an element a small card, as its list of classes. */
-  const cards = () => [...app.matchAll(/["`]([^"`]*\bsmall-card\b(?!-)[^"`]*)["`]/g)].map(([, literal]) => literal.split(/\s+/));
+  const cards = () => [...app.matchAll(/["`]([^"`]*\bsmall-card\b(?!-)[^"`]*)["`]/g)].map(([, literal]) => literal.split(/\s+/).map((name) => name.replace(/\$\{.*$/, "")));
   /** Selectors outside the component that address a small card instance. */
   const instances = [".timeline-entry", ".upcoming-item", ".overdue-item", ".upcoming-strip button", ".detail-readings > div"];
   const addresses = (selector: string) => instances.some((instance) => selector === instance || selector.startsWith(`${instance}:`) || selector.startsWith(`${instance}.`));
@@ -1655,7 +1657,7 @@ describe("glass primitive (ticket 17)", () => {
       }
     }
     for (const markup of glassMarkup) expect(app).toContain(markup);
-    for (const selector of [".design-batch-card .status", ".design-photo-label", ".batch-image-credit", ".summary-row-count", ".small-card-chip", ".timeline-entry-actions button", ".profile-facts > span"]) {
+    for (const selector of [":is(.design-batch-card, .design-detail-photo) .status", ".design-photo-label", ".batch-image-credit", ".summary-row-count", ".small-card-chip", ".timeline-entry-actions button", ".profile-facts > span"]) {
       for (const entry of rules()) if (entry.selectors.includes(selector)) expect(new Map(entry.declarations).has("background"), `${entry.selector} paints a glass surface`).toBe(false);
     }
   });
@@ -1676,11 +1678,11 @@ describe("toggle card: desktop sidebar and batch picker (ticket 18; spec §1.2, 
     for (const declaration of ["--colour-avatar-peach: #ebcbb2;", "--colour-avatar-mint: #c3ecb4;", "--colour-avatar-sky: #b5dced;"]) expect(rule(":root")).toContain(declaration);
     expect(rule(".app-shell")).toContain("grid-template-columns: var(--sidebar-width) minmax(0, 1fr)");
     expect(styles).not.toMatch(/grid-template-columns: \d+px minmax/);
-    // Sidebar padding, the card's insets, the avatar row's start, avatar, two label gaps, the count and the switch inset
-    // leave at least a 44 px label column (a two-line "My batches").
+    // Sidebar padding, the card's insets, the avatar row's start, avatar, the label gap, the slot gap, the count and the
+    // switch inset leave a label column for "My batches" on one line (it sets about 57 px wide; ticket 19).
     const label = px("--sidebar-width") - 2 * px("--space-3") - 2 * px("--toggle-inset") - (px("--toggle-row") - px("--toggle-avatar")) / 2
-      - px("--toggle-avatar") - 2 * px("--toggle-label-gap") - px("--switch-width") - px("--switch-inset");
-    expect(label).toBeGreaterThanOrEqual(44);
+      - px("--toggle-avatar") - px("--toggle-label-gap") - px("--toggle-slot-gap") - px("--switch-width") - px("--switch-inset");
+    expect(label).toBeGreaterThanOrEqual(58);
     expect(rule(".sidebar")).toContain("padding: calc(var(--safe-top) + var(--space-6)) var(--space-3) var(--space-6)");
   });
 
@@ -1729,5 +1731,76 @@ describe("toggle card: desktop sidebar and batch picker (ticket 18; spec §1.2, 
     // The light-blue capsule is gone: the row primitive paints the choice.
     expect(rule(".upcoming-batch-choice small")).toBe(" display: block; ");
     expect(rules().some((entry) => entry.selectors.includes(".upcoming-batch-choice") && entry.declarations.length > 0)).toBe(false);
+  });
+});
+
+describe("last small boxes on board primitives, one-line sidebar label, selected-row count (ticket 19; spec §1.2, §1.7, §1.9)", () => {
+  const singlePane = styles.slice(styles.indexOf("@media (max-width: 1023px) {"));
+  const bowedOwned = /^(?:background(?:-[\w-]+)?|border(?:-[\w-]+)?|box-shadow)$/;
+
+  it("retires --radius-small: no token, no use, and user photos keep their rectangular framing (#53)", () => {
+    expect(styles).not.toContain("--radius-small");
+    expect(app).not.toContain("--radius-small");
+    for (const selector of [".user-photo img", ".timeline-description img"]) expect(rule(selector), selector).not.toContain("border-radius");
+    // Multi-line fields and wrapping text targets take the one-line capsule's end; one-line links and keys are capsules.
+    for (const selector of ["textarea", 'input[type="file"]', '.dark-field:is(textarea, [type="file"])', ".design-check-copy", ".profile-card-main", ".component-check-state"]) {
+      expect(rule(selector), selector).toContain("border-radius: var(--radius-line)");
+    }
+    for (const selector of [".design-skip-link", "kbd"]) expect(rule(selector), selector).toContain("border-radius: var(--radius-control)");
+  });
+
+  it("makes the measurement tiles, formula rows and legacy formulas small cards", () => {
+    expect(app).toContain('<div className={`meas small-card bowed${phOutsideZone ? " meas-alert" : ""}`}>');
+    expect(app).toContain('<div className={`meas small-card bowed${temperatureAlert}`}>');
+    expect(app).toContain('" meas-cool small-card-blue"');
+    expect(app).toContain('return <div className="meas small-card bowed" key={calculation.name}>');
+    expect(app).not.toMatch(/className="meas"/);
+    expect(rule(".meas-alert")).toBe(" --fill: var(--colour-surface); ");
+    expect(rules().some((entry) => entry.selectors.some((selector) => /^\.meas(?:-cool)?$/.test(selector)))).toBe(false);
+    expect(rule(".meas-grid")).toContain("gap: var(--small-card-spacing)");
+    expect(app).toContain('<div className="legacy-formula small-card bowed" key={row.id}>');
+    expect(app).toContain('<div className="profile-editor-formula-row small-card bowed" key={row.id}>');
+    expect(rule(".profile-editor-formula-row")).toBe(" grid-template-columns: repeat(2, minmax(0, 1fr)); ");
+    // Only its type role names .legacy-formula now; the small card paints it.
+    for (const entry of rules()) if (entry.selectors.includes(".legacy-formula")) for (const [property] of entry.declarations) expect(property).not.toMatch(/^(?:background|border|padding|display)/);
+  });
+
+  it("frames photos in bowed boxes and puts the detail status on the glass chip", () => {
+    expect(app).toContain('const card = detail ? " bowed" : photo ? "" :');
+    expect(app).toContain('{detail && <span className={`status status-${batch.status} glass`}>');
+    expect(rule(".design-detail-photo.user-photo")).toBe(" --fill: var(--colour-row); ");
+    // A photo entry's frame has its own class; .timeline-photo is the entry (timeline-${kind}) and stays a small card.
+    expect(app).toContain('<span className="timeline-photo-frame user-photo bowed">');
+    expect(rules().some((entry) => entry.selectors.some((selector) => /\.timeline-photo(?![\w-])/.test(selector)))).toBe(false);
+    for (const declaration of ["--r: inherit", "--bow: inherit", "--fill: var(--colour-background)"]) expect(rule(".timeline-photo-frame")).toContain(declaration);
+    for (const entry of rules()) if (entry.selectors.includes(":is(.design-batch-card, .design-detail-photo) .status")) expect(new Map(entry.declarations).has("background")).toBe(false);
+    for (const selector of [".design-detail-photo", ".design-detail-photo.user-photo", ".timeline-photo-frame"]) {
+      for (const entry of rules()) if (entry.selectors.includes(selector)) for (const [property] of entry.declarations) expect(property, `${selector} { ${property} }`).not.toMatch(bowedOwned);
+    }
+  });
+
+  it("makes the timeline trash and storage recovery bowed boxes with their colour as --fill", () => {
+    expect(app).toContain('<div className="timeline-trash bowed" hidden={!managementOpen}>');
+    expect(app.match(/className="settings-recovery bowed"/g)).toHaveLength(3);
+    expect(app).not.toMatch(/className="settings-recovery"/);
+    for (const declaration of ["--fill: var(--colour-surface-inverse)", "--stroke: currentColor", "--stroke-w: var(--stroke-width)"]) expect(rule(".timeline-trash")).toContain(declaration);
+    expect(rule(".settings-recovery")).toContain("--fill: var(--colour-surface)");
+    for (const selector of [".timeline-trash", ".settings-recovery"]) for (const [property] of rules().find((entry) => entry.selectors.includes(selector))!.declarations) expect(property, selector).not.toMatch(bowedOwned);
+  });
+
+  it("keeps the label beside the avatar at the spec gap and lets it run up to the switch slot", () => {
+    expect(rule(".toggle-avatar")).toContain("margin-inline-end: calc(var(--toggle-label-gap) - var(--toggle-slot-gap))");
+    expect(rule(".toggle-row")).toContain("gap: var(--toggle-slot-gap)");
+    // Below 1024 the same mark is a navigation circle and drops the row spacing.
+    expect(rule(".nav-mark", singlePane)).toContain("margin: 0");
+  });
+
+  it("gives the selected row's count the board's ON switch: blue, no rim, black ink", () => {
+    const selected = rule('.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]) > .toggle-count');
+    expect(selected).toContain("--glass: var(--colour-switch-on)");
+    expect(selected).toContain("box-shadow: none");
+    expect(selected).not.toContain("background");
+    expect(inkMembership().get(".glass")).toBe("fill");
+    expect(contrast(hex("--ink-fill"), hex("--colour-switch-on"))).toBeGreaterThanOrEqual(4.5);
   });
 });

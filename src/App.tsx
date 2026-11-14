@@ -184,11 +184,11 @@ function BatchPhoto({ batch, detail = false }: { batch: Batch; detail?: boolean 
   const photo = batch.timeline.filter((entry) => entry.kind === "photo").at(-1);
   const source = photo?.dataUrl ?? (visual.photo ? `${import.meta.env.BASE_URL}new-design/${visual.photo}.webp` : null);
   // On the batch card a stand-in is a cutout clipped by the card outline; a user photo stays a rectangle (#53).
-  const card = detail ? "" : photo ? "" : ` bowed-media${visual.pastelOnly ? " pastel-only" : ""}`;
-  return <div className={`${detail ? "design-detail-photo" : "design-batch-photo"}${photo ? " user-photo" : ""}${card}`} style={detail ? { background: visual.color } : undefined}>
+  const card = detail ? " bowed" : photo ? "" : ` bowed-media${visual.pastelOnly ? " pastel-only" : ""}`;
+  return <div className={`${detail ? "design-detail-photo" : "design-batch-photo"}${photo ? " user-photo" : ""}${card}`} style={detail && !photo ? { "--fill": visual.color } as CSSProperties : undefined}>
     {source ? <BatchImage key={source} source={source} userPhoto={!!photo} retryable={detail} description={photo ? `Batch photograph: ${photo.caption || photo.name}` : `${batch.profileSnapshot.name} stand-in photograph`} />
       : <DesignIcon name="jar" />}
-    {detail && <span className={`status status-${batch.status}`}>{statusLabel(batch.status)}</span>}
+    {detail && <span className={`status status-${batch.status} glass`}>{statusLabel(batch.status)}</span>}
     <span className="design-photo-label glass">{batch.status === "to-fridge" ? "In the fridge" : batch.status === "ready" && !detail ? batch.finishDate === localDate() ? "Ready today" : "Ready to enjoy" : batch.finishDate ? `Finish ${shortDate(batch.finishDate)}` : "No finish date"}</span>
   </div>;
 }
@@ -1056,7 +1056,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
           {storageStatus.state !== "unavailable" && <button className="primary-action" disabled={dataChoicePending} onClick={() => void runOperation("storage", "Opening folder selection…", onChooseStorage)} type="button">Choose folder</button>}
           {storageStatus.location && <button disabled={dataChoicePending} onClick={() => void runOperation("storage", "Reloading shared folder…", onReloadStorage)} type="button">Reload from shared folder</button>}
         </div>
-        {storageStatus.state === "migration" && <div className="settings-recovery">
+        {storageStatus.state === "migration" && <div className="settings-recovery bowed">
           <h3>Choose which data to keep</h3>
           <p>Both this device and the folder contain data. Export a ZIP backup before choosing; these copies will not be merged.</p>
           <p>Use shared folder data replaces this device's current records and preferences. Use this device's data replaces the folder's records; its previous files are backed up in that folder.</p>
@@ -1065,7 +1065,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
             <button disabled={dataChoicePending} onClick={() => void runOperation("storage", "Using this device's data…", () => onResolveStorage("device"))} type="button">Use this device's data</button>
           </div>
         </div>}
-        {storageStatus.conflicts.length > 0 && <div className="settings-recovery">
+        {storageStatus.conflicts.length > 0 && <div className="settings-recovery bowed">
           <h3>Preserved conflict files</h3>
           <p>Review these files in your shared folder before removing any copy. Reload after resolving them outside the app.</p>
           <ul>{storageStatus.conflicts.map((path) => <li key={path}>{path}</li>)}</ul>
@@ -1085,7 +1085,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         <label>Import ZIP archive <input accept=".zip,application/zip" disabled={dataChoicePending} onChange={uploadArchive} ref={importInput} type="file" /></label>
         <div aria-atomic="true" className="settings-live" role="status">{(operation?.area === "exchange" ? operation.label : message) && <p className="notice">{operation?.area === "exchange" ? operation.label : message}</p>}</div>
         <div aria-atomic="true" aria-live="assertive" className="settings-live" role={exchangeError ? "alert" : undefined}>{exchangeError && <p>{exchangeError}</p>}</div>
-        {currentImport && <section className="settings-recovery" aria-labelledby="import-collisions-heading">
+        {currentImport && <section className="settings-recovery bowed" aria-labelledby="import-collisions-heading">
           <h3 id="import-collisions-heading" ref={collisionHeading} tabIndex={-1}>Identifier collisions</h3>
           <p>{currentImport.collisions.length > 0 ? "These identifiers already exist on this device." : "No matching identifiers remain on this device."} Keep local versions to retain your records, or use archive versions to replace the matching records. Other records from the archive will be added with either choice.</p>
           <ul aria-live="polite" aria-relevant="additions removals">{currentImport.collisions.map((collision) => <li key={`${collision.kind}-${collision.id}`}>{collision.kind}: {collision.id}</li>)}</ul>
@@ -1992,7 +1992,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
     ? `${displayTemperature(temperatureRange.min, units)}–${displayTemperature(temperatureRange.max, units)}${temperatureUnit}`
     : "range not set";
   const temperatureAlert = latestTemperature && temperatureRange
-    ? latestTemperature.value < temperatureRange.min ? " meas-cool" : latestTemperature.value > temperatureRange.max ? " meas-alert" : ""
+    ? latestTemperature.value < temperatureRange.min ? " meas-cool small-card-blue" : latestTemperature.value > temperatureRange.max ? " meas-alert" : ""
     : "";
   const phZone = latestPh ? batch.profileSnapshot.phZones.find((zone) => latestPh.value >= zone.min && latestPh.value <= zone.max) : undefined;
   const phBounds = batch.profileSnapshot.phZones.length > 0
@@ -2072,30 +2072,30 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
           <section className="wb-panel bowed" aria-labelledby="measurements-heading">
             <h4 id="measurements-heading">Key measurements <span>live batch data</span></h4>
             <div className="meas-grid">
-              <div className={`meas${phOutsideZone ? " meas-alert" : ""}`}>
+              <div className={`meas small-card bowed${phOutsideZone ? " meas-alert" : ""}`}>
                 <div className="meas-label"><span>pH</span><span>zone {phRange}</span></div>
                 <strong className="meas-value">{latestPh?.value ?? "—"}<small>{latestPh ? ` · ${phZoneLabel(batch, latestPh.value) ?? "outside zone"}` : " · optional read"}</small></strong>
                 <div className="measurement-zone" aria-hidden="true"><span /><i className={phOutsideZone ? "out" : undefined} style={{ left: `${phPosition}%` }} /></div>
                 <p className="meas-note">{latestPh ? `Latest read ${latestPh.date}` : "Add a pH reading in the log below."}</p>
               </div>
-              <div className={`meas${temperatureAlert}`}>
+              <div className={`meas small-card bowed${temperatureAlert}`}>
                 <div className="meas-label"><span>Temperature</span><span>range {temperatureRangeLabel}</span></div>
                 <strong className="meas-value">{latestTemperature ? displayTemperature(latestTemperature.value, units) : "—"}<small>{latestTemperature ? ` ${temperatureUnit}` : " not recorded"}</small></strong>
                 <p className="meas-note">{latestTemperature ? `Latest read ${latestTemperature.date}` : "Record temperature in the log below."}</p>
               </div>
-              <div className="meas">
+              <div className="meas small-card bowed">
                 <div className="meas-label"><span>Days elapsed</span></div>
                 <strong className="meas-value">{day}</strong>
                 <p className="meas-note">{nextCheck ? `Check cadence · every ${nextCheck.intervalDays} days` : "No recurring check set"}</p>
               </div>
               {batch.profileSnapshot.calculations.length > 0 ? batch.profileSnapshot.calculations.map((calculation) => {
                 const value = batch.calculationValues[calculation.name];
-                return <div className="meas" key={calculation.name}>
+                return <div className="meas small-card bowed" key={calculation.name}>
                   <div className="meas-label"><span>Profile calculation</span></div>
                   <strong className="meas-value meas-value-small">{formatCalculationValue(value?.override ?? value?.suggested)}<small>{calculation.unit}</small></strong>
                   <p className="meas-note">{calculation.name}</p>
                 </div>;
-              }) : <div className="meas">
+              }) : <div className="meas small-card bowed">
                 <div className="meas-label"><span>Profile calculation</span></div>
                 <strong className="meas-value meas-value-small">—<small>incomplete</small></strong>
                 <p className="meas-note">No calculation defined</p>
@@ -2232,7 +2232,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
               {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
               {[...batch.timeline].reverse().map((entry) => (
                 <div className={`timeline-entry small-card bowed timeline-${entry.kind}${entry.kind === "ph" || entry.kind === "temperature" || entry.kind === "measurement" ? " small-card-blue" : ""}`} key={entry.id}>
-                  <span className="timeline-content"><strong className="small-card-tag">{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong><span className="timeline-description">{timelineReading(entry, units) ? <><span className="sr-only">{timelineEntryText(entry, units)}</span><span aria-hidden="true" className="small-card-value">{timelineReading(entry, units)}</span></> : timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <span className="timeline-photo user-photo"><BatchImage key={entry.dataUrl} source={entry.dataUrl} description={entry.caption || entry.name} userPhoto retryable /></span>}</span></span>
+                  <span className="timeline-content"><strong className="small-card-tag">{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong><span className="timeline-description">{timelineReading(entry, units) ? <><span className="sr-only">{timelineEntryText(entry, units)}</span><span aria-hidden="true" className="small-card-value">{timelineReading(entry, units)}</span></> : timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <span className="timeline-photo-frame user-photo bowed"><BatchImage key={entry.dataUrl} source={entry.dataUrl} description={entry.caption || entry.name} userPhoto retryable /></span>}</span></span>
                   <time className="small-card-chip glass" dateTime={entry.date}>{shortDate(entry.date)}</time>
                   <div className="timeline-entry-actions" hidden={!managementOpen}>
                     {entry.kind !== "check" && entry.kind !== "measurement" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} className="glass" onClick={() => editEntry(entry)} type="button">Edit</button>}
@@ -2240,7 +2240,7 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
                   </div>
                 </div>
               ))}
-              {batch.timelineTrash.length > 0 && <div className="timeline-trash" hidden={!managementOpen}><strong>Recently deleted activity</strong>{batch.timelineTrash.map((entry) => <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">Restore {entry.kind} from {entry.date}</button>)}</div>}
+              {batch.timelineTrash.length > 0 && <div className="timeline-trash bowed" hidden={!managementOpen}><strong>Recently deleted activity</strong>{batch.timelineTrash.map((entry) => <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">Restore {entry.kind} from {entry.date}</button>)}</div>}
             </section>
           </section>
 
@@ -2636,9 +2636,9 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
                   <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">03 / Calculations</p><h2>Formulas</h2></div></div>
                   <fieldset className="profile-editor-formula"><legend className="sr-only">Formulas</legend>
                     {calculations.map((row, index) => row.kind === "legacy" ? (
-                      <div className="legacy-formula" key={row.id}><p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p><p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p><button onClick={() => removeFormula(row.id)} type="button">Remove calculation {index + 1}</button></div>
+                      <div className="legacy-formula small-card bowed" key={row.id}><p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p><p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p><button onClick={() => removeFormula(row.id)} type="button">Remove calculation {index + 1}</button></div>
                     ) : (
-                      <div className="profile-editor-formula-row" key={row.id}>
+                      <div className="profile-editor-formula-row small-card bowed" key={row.id}>
                         <label>Source term row {index + 1}<select {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-source`)} aria-label={`Source term row ${index + 1}`} onChange={(event) => { const source = event.target.value; const matchingSource = calculations.find((candidate): candidate is StructuredFormulaRow => candidate.kind === "structured" && candidate.source === source); updateFormula(row.id, { source, sourceUnit: matchingSource?.sourceUnit ?? currentInputs().find(({ name }) => name === source)?.unit ?? row.sourceUnit, sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false }); }} value={row.source}>{availableSourceTerms(formulaTerms, calculations, currentInputs()).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-source`} /></label>
                         <label>Source unit row {index + 1}<select onChange={(event) => updateSourceUnit(row.source, event.target.value as MetricUnit)} value={row.sourceUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
                         <label>Operator row {index + 1}<select onChange={(event) => updateFormula(row.id, { operator: event.target.value as StructuredFormulaRow["operator"] })} value={row.operator}><option value="+">+</option><option value="-">-</option><option value="*">×</option><option value="/">/</option></select></label>

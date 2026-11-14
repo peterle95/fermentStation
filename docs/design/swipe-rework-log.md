@@ -67,9 +67,9 @@ The other tokens are unchanged: `#ffffff`, `#ffec89`, `#b6f074`, `#b6e1fa`. If a
 
 ### Radii
 
-Outside the primitive, `border-radius` may only be `var(--radius-control)` (capsules), `var(--radius-line)` (a capsule that may wrap, ticket 13), `var(--radius-small)`, `var(--radius-card)`, `50%` or `0`. Literal lengths and slash syntax fail the test. `--radius-card` is a **legacy, shrink-only allowlist** (`legacyCardRadius` in `styles.test.ts`) of rounded rectangles that predate the primitive. When your ticket bows or capsules one of them, delete it from the list. A new selector that uses `--radius-card` fails the test.
+Outside the primitive, `border-radius` may only be `var(--radius-control)` (capsules), `var(--radius-line)` (a capsule that may wrap, ticket 13; since ticket 19 also multi-line fields), `var(--radius-card)`, `50%` or `0`. Literal lengths and slash syntax fail the test. `--radius-card` is a **legacy, shrink-only allowlist** (`legacyCardRadius` in `styles.test.ts`) of rounded rectangles that predate the primitive. When your ticket bows or capsules one of them, delete it from the list. A new selector that uses `--radius-card` fails the test.
 
-The old literal radii were mapped to tokens: `2rem` → `--radius-card` (same 32px); `1.5rem` → `--radius-card` (24 → 32px on `.design-batch-next` and `.detail-readings > div`, both due for restyling in gaps 9 and 13); kbd `4px` → `--radius-small`.
+The old literal radii were mapped to tokens: `2rem` → `--radius-card` (same 32px); `1.5rem` → `--radius-card` (24 → 32px on `.design-batch-next` and `.detail-readings > div`, both due for restyling in gaps 9 and 13); kbd `4px` → `--radius-small` (retired by ticket 19: kbd is a capsule).
 
 ## Harness
 
@@ -616,12 +616,12 @@ Full harness at `60dc406` first: 95 captures, 0 failed, every finding count 0. E
 | Drink card | ui §1.1 | profile card (profiles) | differs | Facts were outlined capsules → **fixed**, now the frosted chip. Actions are still a white capsule holding a black "Edit profile" capsule and an outlined "Delete" capsule; §3 asks for the Swipe pill with the black circle (= Edit) and Delete as a text action. Needs markup, not cheap. |
 | Toggle list | ui §1.2 | Settings preference cards | match | Rows h 72, black selected row, blue switch, avatar d 63 on Suggestions. Units and Notifications rows carry no avatar (minor, content). |
 | Toggle list | ui §1.2 | Checks list (checks, overview "A little care today") | minor difference | Separate white capsule rows on black, no enclosing white bowed card; avatar 44 (`--target-min`), board 63; overdue is a yellow row (ink rule: yellow = due/overdue), §3 says black selected row. |
-| Toggle list | ui §1.2 | desktop sidebar | match (was differs) | Was white circles + labels on black with a lime current capsule → **fixed by ticket 18**: one white bowed toggle card, rows h 72, pastel avatars d 63 (lilac, peach, mint, sky), current = black row, batch count as a glass pill in the switch slot. "My batches" wraps to two lines beside the count (minor). |
+| Toggle list | ui §1.2 | desktop sidebar | match (was differs) | Was white circles + labels on black with a lime current capsule → **fixed by ticket 18**: one white bowed toggle card, rows h 72, pastel avatars d 63 (lilac, peach, mint, sky), current = black row, batch count as a glass pill in the switch slot. Ticket 19: "My batches" on one line (label runs up to the switch slot), and the count on the current row is the board's blue ON switch. |
 | Toggle list | ui §1.2 | batch picker sheet | match (was differs) | Was light-blue capsules → **fixed by ticket 18**: toggle rows with jar avatars in a white bowed card on the black sheet. Its date eyebrow was lime → **fixed**, blue (`time`). |
 | Toggle list | ui §1.2 | trash ("Open recently deleted batches", trash row) | match | The toggle is black in both states. The yellow at 390 is the generic `button:hover` fill: the harness's pointer stays on the toggle after its click; at 1440 the scroll moves the toggle away from it. Touch browsers keep that hover after a tap (decision below). Trash row = grey row + white Restore capsule. |
 | Lime button | ui §1.2 | `card-action` (detail "Add observation", Export ZIP, first-run, sheet submits) | match | |
 | Profile card | ui §1.3 | Kitchen summary, Checks summary | match | Summary-row avatar is a check icon, board a photo (decision below). Count pill holds the number only (board "8x" + glyph). |
-| Profile card | ui §1.3 | batch detail head | minor difference | Title and meta left-aligned, no emblem; "Day 5 / 5" as the Light figure top right. The photo frame is a 1 px bordered `--radius-small` box, its "Active" badge a bordered yellow `.status`, not the frosted chip. |
+| Profile card | ui §1.3 | batch detail head | minor difference | Title and meta left-aligned, no emblem; "Day 5 / 5" as the Light figure top right. Ticket 19: the photo frame is a bowed box (profile colour, or the row fill behind a user photo) and its "Active" badge the glass chip. |
 | Profile card | ui §1.3 | profile editor head | match | Lime bowed head; name field focused (black ring). |
 | Utility stack | ui §1.4 | tablet rail | match | Ringed chain, logo on top, lime current circle. |
 | Utility circles | ui §1.4/§1.5/§1.7 | top bar, detail top, sheet close, sort, calendar arrows | match | |
@@ -637,7 +637,7 @@ Full harness at `60dc406` first: 95 captures, 0 failed, every finding count 0. E
 | Inline text action | §3 (ink rules) | station info, start-batch notice | match (was minor) | "Settings ." gap → **fixed**: no side padding; the 44 minimum width now only adds ≈ 1 px a side. |
 | Profile overview intro | §1.1 vocabulary | profile overview | minor difference | Yellow bowed box at the default r 52 on a tall box (ticket 12 note). |
 | Form fields on white | §3 profile editor form | profile editor, inline logger | differs | White fields with a 1 px black border; §3 asks for `#f6f8fa` fill, no border, black focus ring. Touches every editor and logger state (error, focus, disabled), not cheap. |
-| Legacy small boxes | gap 1 follow-up | batch tools, detail, settings, editor | differs | `--radius-small` boxes remain: `.meas` tiles (1 px bordered, in "Key measurements"), `.design-detail-photo`, `.component-check-state`, `.timeline-trash`, `.settings-recovery`, `.legacy-formula`, `.profile-editor-formula-row`. Decision below. |
+| Legacy small boxes | gap 1 follow-up | batch tools, detail, settings, editor | match (was differs; ticket 19) | Moved onto board primitives and the token deleted; see ticket 19. Was: `--radius-small` boxes remain: `.meas` tiles (1 px bordered, in "Key measurements"), `.design-detail-photo`, `.component-check-state`, `.timeline-trash`, `.settings-recovery`, `.legacy-formula`, `.profile-editor-formula-row`. Decision below. |
 
 Totals (26 rows): **15 match** (3 of them after this ticket's fixes), **6 minor difference**, **5 differs**.
 
@@ -662,7 +662,7 @@ Totals (26 rows): **15 match** (3 of them after this ticket's fixes), **6 minor 
 - **`splash.png` placeholders and the `#fff` adaptive-icon background**: leave; delete the unreferenced `drawable*/splash.png`; make the icon background the black ground.
 - **Calendar head at 320**: accept the two-line head; hide "Today" below 380 (the date chip in the top bar already jumps to today); or smaller dark circles below 380 (needs a token below 57).
 - **Sticky hover on touch**: gate the generic yellow `button:hover` fills behind `@media (hover: hover)` (touches every hover rule and its tests); or keep.
-- **Remaining `--radius-small` boxes** (list above): bowed small card; `--colour-row` capsule; or flat with no box.
+- ~~**Remaining `--radius-small` boxes**~~ settled by ticket 19 (small cards, bowed boxes, capsules).
 - **Profile card actions** and **form fields on white**: the spec is clear on both; they are listed here only because each needs a markup or state pass that is larger than this ticket.
 
 ### Results
@@ -761,6 +761,41 @@ The two "differs" rows of the ticket 15 audit (Toggle list, spec §1.2), matched
 - The count pill is glass (60 % white) on the black current row, so it reads grey with black ink, like the status chip on the selected batch card.
 - The board's selected row carries a blue switch; navigation rows have no switch, only "My batches" has a count.
 - Focus rings on the rows were not captured (the harness has no focus state); they use the shared two-tone `:focus-visible` ring with the existing navigation offset.
+
+## Ticket 19: the last `--radius-small` boxes, sidebar label, selected-row count — done
+
+The "Legacy small boxes" row of the ticket 15 audit and two follow-ups from ticket 18.
+
+### As built
+
+- **Measurement tiles** ("Key measurements"): `meas small-card bowed` (event card §1.7: label, Light value, note). Below the temperature range `small-card-blue` (the `meas-cool` class stays for the behaviour tests); outside the pH zone or above the range `.meas-alert { --fill: var(--colour-surface); }` (yellow). `.meas-grid` gap is `--small-card-spacing`. The `.meas` / `.meas-cool` paint rules are gone.
+- **Formula rows and legacy formulas** (profile editor): `small-card bowed`; `.profile-editor-formula-row` keeps only its two columns, `.legacy-formula` only its type role.
+- **Detail photo frame**: `bowed` (`BatchPhoto` passes `" bowed"` for detail); the profile colour is now `--fill` in the inline style (only without a user photo), a user photo sits on `--colour-row`. The 1 px border and radius are gone. The "Active" badge is `status … glass`, and the batch card's chip rule became `:is(.design-batch-card, .design-detail-photo) .status`.
+- **Timeline photo frame**: the frame span was `timeline-photo`, the same class the entry gets from `timeline-${entry.kind}`, so its rule also hit the card. It is now `timeline-photo-frame user-photo bowed`, white, with `--r` / `--bow` inherited from its small card.
+- **Timeline trash**: `timeline-trash bowed`, black `--fill` with a `--stroke-width` currentColor stroke (the `batch-tools-danger` convention).
+- **Storage recovery** (Settings, 3 places): `settings-recovery bowed`, yellow `--fill`, no border, `--card-padding`.
+- **Recurring-checks state line**: `--radius-line` capsule (the notice convention), padding `--space-3 --space-6`.
+- **Other `--radius-small` users**: `.user-photo img` and `.timeline-description img` have no radius (rectangular, #53); `textarea`, `input[type="file"]`, the `.dark-field` textarea / file rule, `.design-check-copy` and `.profile-card-main` take `--radius-line`; `.design-skip-link` and `kbd` are capsules. `--radius-small` is deleted.
+- **Sidebar label**: new token `--toggle-slot-gap: 8px`. The row's flex gap is the slot gap (the board's label runs up to the switch), and `.toggle-avatar` adds `--toggle-label-gap − --toggle-slot-gap` after itself, so avatar → label stays 18. Label column at 272 px: 59.5 px; "My batches" sets ≈ 57 px, one line at 1440 and 1024. Below 1024 `.nav-mark` clears the margin (`margin: 0`). `--sidebar-width` unchanged.
+- **Selected-row count**: `.toggle-row:is(pressed, checked, current) > .toggle-count { --glass: var(--colour-switch-on); box-shadow: none; }`: the board's selected row carries the blue ON switch in that slot. Black ink on `#2089fd` is 6.1 : 1 (white would be 3.5).
+- `src/App.tsx`: 16 lines, endings preserved (`git diff --stat` 16 / 16).
+
+### Tests (`src/styles.test.ts`, 111)
+
+- New block "last small boxes on board primitives … (ticket 19 …)", 6 tests: token gone and no use, photos without radius, the `--radius-line` / capsule users; measurement, formula and legacy markup and rules; photo frames and the glass status chip (no box paint on bowed frames, `.timeline-photo` no longer styled); trash and recovery markup and `--fill`; avatar margin, row gap and the below-1024 reset; selected count fill, no rim, ink contrast.
+- Updated: geometry test (no `--radius-small`, textarea `--radius-line`); radius allowlist without `small`; detail photo assertion; toggle tokens (`--toggle-slot-gap`), row gap and the single-definition list (selected count); batch card status selector (3 places); `BatchPhoto` card string; sidebar label budget (now ≥ 58 px, one line); the small-card literal parser drops a glued `${…` so template class strings are read correctly.
+- No behaviour test changed.
+
+### Results
+
+- `npm run typecheck` clean; full `npm test` 15 files, 337 / 337.
+- Harness: batch-detail, batch-tools, settings, profile-editor, checks, overview at 390, 768 and 1440: 0 failed, every finding count 0. Looked at: the sidebar at 1440 ("My batches" one line, blue count pill), the rail at 768, the detail frame and glass "Active" chip (390, 1440), the photo entry (390: lilac card, white bowed frame, rectangular photo), the measurement small cards and the state capsule (batch-tools 390), the formula small cards and textareas (profile-editor 390), the file input capsule (settings 390).
+
+### Left by ticket 19
+
+- Not on any harness surface: `.timeline-trash` (needs deleted timeline entries and the tools open) and `.settings-recovery` (needs a storage migration or conflict). Covered by the CSS tests only.
+- The glass "Active" chip over the light row fill (user photo) shows little more than its rim; it is clearer over the profile colour.
+- The label budget is about 2.5 px above "My batches"; a longer destination name or a fallback font would wrap again (wrapping is still allowed, nothing clips).
 
 ## Left for later tickets / known issues
 
