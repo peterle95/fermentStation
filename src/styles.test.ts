@@ -333,7 +333,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
 
   it("moves the last legacy rounded rectangles onto the bowed card, the small card, the capsule or a photo frame", () => {
     for (const name of ["design-empty-checks", "calendar-empty"]) expect(app).toContain(`className="${name} small-card bowed"`);
-    for (const selector of [".batch-view-switch", ".queue-card", ".profile-card-actions"]) expect(rule(selector)).toContain("border-radius: var(--radius-control)");
+    for (const selector of [".batch-view-switch", ".queue-card"]) expect(rule(selector)).toContain("border-radius: var(--radius-control)");
     expect(rule(".design-detail-photo")).toContain("border-radius: var(--radius-small)");
     expect(rule(".batch-tools-danger")).toContain("--stroke-w: var(--stroke-width)");
     expect(app).not.toMatch(/className="[^"]*\bactivity-logger\b[^"]*\bbowed\b/);
@@ -817,7 +817,8 @@ describe("sheet and field on black (swipe-rework-log.md, ticket 5; spec §1.7, g
   });
 
   it("uses one field definition for the search box and every control in a sheet", () => {
-    const definitions = rules().filter((entry) => /dark-field/.test(entry.selector) && !entry.declarations.some(([property]) => property === "--ink"));
+    // A rule that only excludes dark fields (`:not(.dark-field)`, ticket 16's field states on white) is not a definition.
+    const definitions = rules().filter((entry) => /dark-field/.test(entry.selector.replace(/:not\(\.dark-field\)/g, "")) && !entry.declarations.some(([property]) => property === "--ink"));
     expect(definitions.map((entry) => entry.selector).sort()).toEqual([".dark-field", '.dark-field:is(textarea, [type="file"])'].sort());
     expect(rule('.dark-field:is(textarea, [type="file"])')).not.toMatch(/border:|background|caret/);
     expect(inkMembership().get(".dark-field")).toBe("ground");
@@ -987,8 +988,9 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     const card = rule(".design-batch-card");
     for (const declaration of [
       "aspect-ratio: var(--batch-card-ratio)", "min-height: auto", "width: 100%",
-      "padding: var(--batch-card-inset-y) 0 calc(var(--batch-pill-inset-bottom) + var(--batch-pill-reserve) + var(--space-3))",
+      "padding: var(--batch-card-inset-y) 0 var(--batch-pill-foot)",
     ]) expect(card).toContain(declaration);
+    expect(tokens().get("--batch-pill-foot")).toBe("calc(var(--batch-pill-inset-bottom) + var(--batch-pill-reserve) + var(--space-3))");
     expect(rule(".design-batch-copy > :not(.sr-only)")).toContain("margin-inline: var(--batch-card-inset-x)");
     expect(rule(".design-batch-copy > .design-batch-chips")).toContain("margin-inline-start: var(--batch-chip-inset-x)");
     const chip = rule(".design-batch-card .status");
@@ -1504,5 +1506,72 @@ describe("final 1:1 audit (ticket 15)", () => {
   it("colours a date in an eyebrow as a date (blue on black), not an accent", () => {
     expect(rule(".eyebrow time")).toContain("color: var(--ink-time)");
     expect(app).toContain('<p className="eyebrow"><time dateTime={date}>{shortDate(date)}</time></p><h2>Choose a batch</h2>');
+  });
+});
+
+describe("profile card foot and fields on white (ticket 16; spec §1.1, §3 profile card and profile editor form)", () => {
+  const card = () => {
+    const start = app.indexOf('<article className="profile-card bowed"');
+    return app.slice(start, app.indexOf("</article>", start));
+  };
+
+  it("ends the profile card in the batch card's pill (Edit) and a text action (Delete), in that focus order", () => {
+    const markup = card();
+    const edit = markup.indexOf('<button aria-label={`Edit ${profile.name}`} className="design-batch-pill"');
+    const go = markup.indexOf('<span className="design-batch-go" aria-hidden="true"><DesignIcon name="back" /></span></button>');
+    const remove = markup.indexOf('<button aria-label={`Delete ${profile.name}`} className="design-quiet profile-card-delete"');
+    expect([edit, go, remove].every((position) => position >= 0)).toBe(true);
+    expect(edit).toBeLessThan(go);
+    expect(go).toBeLessThan(remove);
+    expect(markup).toContain('<span className="design-batch-bottom"><strong>Edit</strong><span>profile</span></span>');
+    // The old white capsule and its black / outlined buttons are gone; no second pill primitive appears.
+    expect(app).not.toContain("profile-card-actions");
+    expect(styles).not.toContain("profile-card-actions");
+    expect(rules().filter((entry) => entry.selector === ".design-batch-pill")).toHaveLength(1);
+    // The card keeps the batch card's foot band for the pill at every width.
+    expect(rule(".profile-card")).toContain("padding: var(--card-padding) var(--card-padding) var(--batch-pill-foot)");
+    expect(styles).toContain(".profile-card { grid-template-columns: minmax(0, 1.2fr) minmax(80px, 0.8fr); padding: var(--space-4) var(--space-4) var(--batch-pill-foot); }");
+    const remover = rule(".profile-card-delete");
+    for (const declaration of ["position: absolute", "right: var(--batch-card-inset-x)", "bottom: 0", "margin-bottom: calc(var(--batch-pill-inset-bottom) + (var(--batch-pill-reserve) - var(--button-height)) / 2)"]) {
+      expect(remover).toContain(declaration);
+    }
+    expect(rule(".design-batch-pill")).toContain("text-align: start");
+    // Ink: black on the pastel card and the white pill; white glyph in the black circle.
+    const membership = inkMembership();
+    expect(membership.get(".profile-card")).toBe("fill");
+    expect(membership.get(".design-batch-pill")).toBe("fill");
+    expect(membership.get(".design-batch-go")).toBe("ground");
+  });
+
+  it("fills fields on white with the row token, no border, and keeps the shared black focus ring", () => {
+    const field = rule("input, select, textarea");
+    for (const declaration of ["border: var(--stroke-width) solid transparent", "background: var(--colour-row)", "border-radius: var(--radius-control)"]) expect(field).toContain(declaration);
+    expect(field).not.toContain("var(--colour-border)");
+    expect(rule(":focus-visible")).toContain("box-shadow: 0 0 0 calc(var(--stroke-focus) * 2) var(--colour-text)");
+    // Ink on the fill, and the black ring and state borders on the white, pastel and row grounds.
+    expect(contrast(hex("--ink-fill"), hex("--colour-row"))).toBeGreaterThanOrEqual(7);
+    for (const ground of ["--colour-background", "--colour-row"]) {
+      expect(contrast(hex("--colour-text"), hex(ground)), ground).toBeGreaterThanOrEqual(3);
+      expect(contrast(hex("--colour-border"), hex(ground)), ground).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("marks invalid, disabled and read-only fields with shape as well as colour, and leaves fields on black alone", () => {
+    const invalid = rule(':where(input, select, textarea):where(:not(.dark-field))[aria-invalid="true"]');
+    expect(invalid).toContain("border-color: var(--colour-border)");
+    expect(invalid).toContain("box-shadow: inset 0 0 0 calc(var(--stroke-focus) - var(--stroke-width)) var(--colour-border)");
+    const locked = rule(":where(input, select, textarea):where(:not(.dark-field)):is(:disabled, [readonly])");
+    for (const declaration of ["border-color: var(--colour-border)", "border-style: dashed", "background: var(--colour-background)"]) expect(locked).toContain(declaration);
+    expect(rule(":where(input, select, textarea):disabled")).toContain("cursor: not-allowed");
+    // The field states sit before the shared focus ring, so focus wins the box-shadow on an invalid field.
+    expect(styles.indexOf('[aria-invalid="true"] {')).toBeLessThan(styles.indexOf(":focus-visible {"));
+    // Fields on black keep the sheet's look: their own border and fill, after the shared field rule.
+    const dark = rule(".dark-field");
+    for (const declaration of ["border: var(--stroke-width) solid var(--colour-action)", "background: var(--colour-surface-inverse)"]) expect(dark).toContain(declaration);
+    expect(styles.indexOf(".dark-field {")).toBeGreaterThan(styles.indexOf("input, select, textarea {"));
+    // The settings disabled-input special case folded into the shared state.
+    expect(styles).not.toContain(".settings input:disabled {");
+    // Invalid fields carry their linked message (not colour alone).
+    expect(app).toContain('"aria-invalid": errors[id] ? true as const : undefined, "aria-describedby": errors[id] ? `${id}-error` : undefined');
   });
 });

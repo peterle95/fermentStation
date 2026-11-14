@@ -2678,7 +2678,7 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
                 <span className="profile-card-link">View guidance <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="m7 17 10-10M7 7h10v10" /></svg></span>
               </button>
               <ProfilePhoto profile={profile} />
-              <div className="profile-card-actions"><button aria-label={`Edit ${profile.name}`} ref={(button) => { editButtons.current[profile.id] = button; }} onClick={() => edit(profile)} type="button">Edit profile</button><button aria-label={`Delete ${profile.name}`} onClick={() => { if (window.confirm(`Delete ${profile.name}? This cannot be undone. Existing batches keep their profile snapshot.`)) { onDelete(profile.id); setMessage(`${profile.name} profile deleted. Existing batches are unchanged.`); addProfileRef.current?.focus(); } }} type="button">Delete</button></div>
+              <button aria-label={`Edit ${profile.name}`} className="design-batch-pill" ref={(button) => { editButtons.current[profile.id] = button; }} onClick={() => edit(profile)} type="button"><span className="design-batch-bottom"><strong>Edit</strong><span>profile</span></span><span className="design-batch-go" aria-hidden="true"><DesignIcon name="back" /></span></button><button aria-label={`Delete ${profile.name}`} className="design-quiet profile-card-delete" onClick={() => { if (window.confirm(`Delete ${profile.name}? This cannot be undone. Existing batches keep their profile snapshot.`)) { onDelete(profile.id); setMessage(`${profile.name} profile deleted. Existing batches are unchanged.`); addProfileRef.current?.focus(); } }} type="button">Delete</button>
             </article>
           );
         })}

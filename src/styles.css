@@ -138,6 +138,8 @@
      narrower than the board, the pill grows to hold them and the card reserves that height. */
   --batch-pill-label: calc(var(--type-subheading) * var(--type-subheading-leading) + var(--type-row) * var(--type-row-leading) + 2 * var(--stroke-width));
   --batch-pill-reserve: max(var(--batch-pill-height), var(--batch-pill-label));
+  /* The band a card keeps below its content for the pill (batch card, profile card): inset, pill, breathing room. */
+  --batch-pill-foot: calc(var(--batch-pill-inset-bottom) + var(--batch-pill-reserve) + var(--space-3));
   /* A card's single primary action (spec §1.2 lime button; gap 12): 60 % of the card, h 63, centred on the
      card's bottom edge and half outside it; the host keeps 32 free below the capsule. */
   --card-action-width: 60%;
@@ -267,11 +269,20 @@ input, select, textarea {
   min-width: 0;
   max-width: 100%;
   min-height: var(--input-height);
-  border: var(--stroke-width) solid var(--colour-border);
+  border: var(--stroke-width) solid transparent;
   border-radius: var(--radius-control);
   padding: var(--space-3) var(--input-padding);
-  background: var(--colour-background);
+  background: var(--colour-row);
 }
+/* Fields on white and pastel (spec §3 profile editor form): the unselected-row fill, no visible border, and the
+   shared :focus-visible ring (black on these grounds). The border slot stays transparent so the states below draw
+   in it without moving the text. Invalid: a black ring of --stroke-focus inside the field (a shape, not a colour;
+   the message is linked by aria-describedby); focus replaces the inner ring with the outer one and keeps the
+   border. Disabled and read-only: the white ground and a dashed border instead of the fill, so they read as not
+   editable. Fields on black (.dark-field) are excluded and keep their own look. */
+:where(input, select, textarea):where(:not(.dark-field))[aria-invalid="true"] { border-color: var(--colour-border); box-shadow: inset 0 0 0 calc(var(--stroke-focus) - var(--stroke-width)) var(--colour-border); }
+:where(input, select, textarea):where(:not(.dark-field)):is(:disabled, [readonly]) { border-color: var(--colour-border); border-style: dashed; background: var(--colour-background); }
+:where(input, select, textarea):disabled { cursor: not-allowed; }
 input::placeholder, textarea::placeholder { color: var(--ink-meta); opacity: 1; }
 input[type="file"] { border-radius: var(--radius-small); overflow: hidden; }
 input::file-selector-button { min-height: var(--target-min); margin-right: var(--space-2); border: 0; border-radius: var(--radius-control); padding: var(--space-2) var(--space-4); background: var(--colour-action); font: inherit; cursor: pointer; }
@@ -397,7 +408,6 @@ input::file-selector-button,
 .component-calculation-value,
 .start-batch-basics legend,
 .profiles-screen,
-.profile-card-actions button:first-child,
 .calendar-screen,
 .calendar-day.selected,
 .calendar-overdue-mark,
@@ -407,8 +417,7 @@ input::file-selector-button,
   --ink: var(--ink-ground); --ink-meta: var(--ink-ground-meta); --ink-figure: var(--ink-ground-figure); --ink-accent: var(--ink-ground-accent); --ink-attention: var(--ink-ground-attention); --ink-time: var(--ink-ground-time); color: var(--ink);
 }
 /* Disabled settings controls are white even when pressed (was ordered after the pressed rule). */
-.settings button:disabled,
-.settings input:disabled {
+.settings button:disabled {
   --ink: var(--ink-fill); --ink-meta: var(--ink-fill); --ink-figure: var(--ink-fill); --ink-accent: var(--ink-fill); --ink-attention: var(--ink-fill); --ink-time: var(--ink-fill); color: var(--ink);
 }
 
@@ -664,7 +673,7 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
    insets across the full width; frosted status chip and the black next-check capsule; meta; the day-progress
    pill with its black circle at bottom-left; the photo slot at 48-94 % of the width from 8 % of the height down.
    A stand-in is .bowed-media (clipped by the bow); a user photo stays a rectangle inside the content box (#53). */
-.design-batch-card { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; width: 100%; min-width: 0; min-height: auto; aspect-ratio: var(--batch-card-ratio); padding: var(--batch-card-inset-y) 0 calc(var(--batch-pill-inset-bottom) + var(--batch-pill-reserve) + var(--space-3)); --fill: var(--batch-colour, var(--colour-background)); text-align: left; }
+.design-batch-card { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; width: 100%; min-width: 0; min-height: auto; aspect-ratio: var(--batch-card-ratio); padding: var(--batch-card-inset-y) 0 var(--batch-pill-foot); --fill: var(--batch-colour, var(--colour-background)); text-align: left; }
 .design-batch-card.selected { --fill: var(--colour-surface-inverse); --stroke: var(--colour-action); --stroke-w: var(--bowed-stroke); }
 .design-batch-card.selected .design-batch-next::before { content: "✓ "; }
 .design-batch-card:hover:not(:disabled) { transform: translateY(-2px); --fill: var(--batch-colour); }
@@ -681,7 +690,7 @@ button.summary-row-count:hover:not(:disabled) { background: var(--colour-backgro
 .design-batch-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin-top: var(--space-2); }
 .design-batch-meta > span { display: inline-flex; align-items: center; gap: var(--space-1); }
 .design-batch-meta svg { width: 16px; height: 16px; }
-.design-batch-pill { position: absolute; left: var(--batch-pill-inset-x); bottom: 0; display: flex; align-items: center; gap: var(--space-2); width: var(--batch-pill-width); aspect-ratio: var(--batch-pill-ratio); margin-bottom: var(--batch-pill-inset-bottom); padding: 0 calc(var(--batch-pill-circle) + var(--space-3)) 0 var(--batch-pill-text); border: var(--stroke-width) solid var(--colour-hairline); border-radius: var(--radius-control); background: var(--colour-background); }
+.design-batch-pill { position: absolute; left: var(--batch-pill-inset-x); bottom: 0; display: flex; align-items: center; gap: var(--space-2); width: var(--batch-pill-width); aspect-ratio: var(--batch-pill-ratio); margin-bottom: var(--batch-pill-inset-bottom); padding: 0 calc(var(--batch-pill-circle) + var(--space-3)) 0 var(--batch-pill-text); border: var(--stroke-width) solid var(--colour-hairline); border-radius: var(--radius-control); background: var(--colour-background); text-align: start; }
 .design-batch-bottom { display: flex; flex-direction: column; min-width: 0; }
 .design-batch-go { position: absolute; top: var(--batch-go-inset-y); bottom: var(--batch-go-inset-y); right: var(--batch-go-inset-x); display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; background: var(--colour-surface-inverse); }
 .design-batch-go svg { width: var(--nav-icon); height: var(--nav-icon); scale: -1 1; }
@@ -930,7 +939,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .profile-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
 .profile-add { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); }
 .profile-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); }
-.profile-card { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(100px, 0.8fr); align-items: stretch; min-width: 0; gap: var(--space-3); padding: var(--card-padding); --fill: var(--profile-colour); }
+.profile-card { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(100px, 0.8fr); align-items: stretch; min-width: 0; gap: var(--space-3); padding: var(--card-padding) var(--card-padding) var(--batch-pill-foot); --fill: var(--profile-colour); }
 .profile-card-main { display: flex; flex-direction: column; align-items: stretch; justify-content: space-between; gap: var(--space-6); min-width: 0; width: 100%; padding: var(--space-2); border: 0; border-radius: var(--radius-small); text-align: left; }
 .profile-card-main:hover:not(:disabled) { transform: translateY(-2px); background: var(--colour-background); }
 .design-profile-visual { position: relative; display: grid; place-items: center; width: 100%; min-height: 240px; align-self: stretch; }
@@ -944,9 +953,10 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .profile-facts > span { display: inline-flex; align-items: center; min-height: var(--batch-chip-height); border-radius: var(--radius-control); padding-inline: var(--space-4); background: var(--colour-frost); backdrop-filter: blur(var(--batch-chip-blur)); }
 .profile-card-guidance { overflow-wrap: anywhere; }
 .profile-card-link { display: flex; justify-content: space-between; gap: var(--space-2); }
-.profile-card-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-2); background: var(--colour-background); border-radius: var(--radius-control); }
-.profile-card-actions button { flex: 1; }
-.profile-card-actions button:first-child { background: var(--colour-surface-inverse); }
+/* The card's foot is the drink card's (spec §1.1, §3): Edit is the batch card's pill with its black circle, placed
+   by the primitive at the card's bottom-left inside the --batch-pill-foot band; Delete is a text action centred on
+   the pill's height at the card's right inset. DOM order (Edit, then Delete) is the focus order. */
+.profile-card-delete { position: absolute; right: var(--batch-card-inset-x); bottom: 0; margin-bottom: calc(var(--batch-pill-inset-bottom) + (var(--batch-pill-reserve) - var(--button-height)) / 2); }
 .profile-list .empty-state { grid-column: 1 / -1; --fill: var(--colour-background); }
 .profile-editor-shell {
   --editor-bg: var(--colour-background);
@@ -1097,7 +1107,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 [aria-checked="true"] > .toggle-switch { background: var(--colour-switch-on); }
 [aria-checked="true"] > .toggle-switch::after { transform: translateX(calc(var(--switch-width) - var(--switch-height))); }
 .settings .form-actions > button { flex: 1 1 160px; }
-.settings button:disabled, .settings input:disabled { opacity: 1; border-style: dashed; background: var(--colour-background); }
+.settings button:disabled { opacity: 1; border-style: dashed; background: var(--colour-background); }
 .settings-exchange label, .formula-term label { display: grid; gap: var(--space-2); }
 .formula-term { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--space-3); }
 .settings-trash-toggle { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); width: 100%; text-align: left; background: var(--colour-surface-inverse); }
@@ -1187,7 +1197,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   .design-topbar-actions { grid-column: 1 / -1; display: flex; flex-wrap: nowrap; width: 100%; }
   .design-topbar .batch-fab { flex: 1; min-width: 0; }
   .batch-overview, .profile-list { grid-template-columns: minmax(0, 1fr); }
-  .profile-card { grid-template-columns: minmax(0, 1.2fr) minmax(80px, 0.8fr); padding: var(--space-4); }
+  .profile-card { grid-template-columns: minmax(0, 1.2fr) minmax(80px, 0.8fr); padding: var(--space-4) var(--space-4) var(--batch-pill-foot); }
   .profile-overview-intro { grid-template-columns: minmax(0, 1fr); }
   .design-profile-visual { height: auto; min-height: 240px; }
   .design-profile-visual img { min-height: 240px; padding: var(--space-8) 0 var(--space-12); }

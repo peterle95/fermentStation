@@ -668,6 +668,35 @@ Totals (26 rows): **15 match** (3 of them after this ticket's fixes), **6 minor 
 - `npm run typecheck` clean; full `npm test` 15 files, 318 / 318.
 - Harness re-run for overview, all-batches, profiles, batch-dates, profile-overview, station-info, batch-picker, calendar and checks at 320, 390, 768 and 1440: 0 failed, every finding count 0. Looked at the filter chips (1440), profile facts (390), station-info sentence (390), picker eyebrow (390) and batch-dates facts (390).
 
+## Ticket 16: profile card foot and form fields on white — done
+
+The two "differs" rows from ticket 15 where the spec needs no decision. Everything in ticket 15's "Needs a decision" list is untouched.
+
+### As built
+
+- **Profile card actions** (spec §3 row "Drink card §1.1 / Profile card"). The card's primitive pill is the batch card's `.design-batch-pill` + `.design-batch-go` (`card-action` is the lime capsule, a different component), so Edit reuses those unchanged: `<button aria-label="Edit …" className="design-batch-pill">` holds `.design-batch-bottom` ("**Edit** / profile") and the black circle with the batch card's mirrored arrow. Delete is `design-quiet profile-card-delete`, the existing underlined text action, placed at the card's right inset (`--batch-card-inset-x`) and centred on the pill's height. The white `.profile-card-actions` capsule, its black first button and the ground-ink entry for it are gone. Accessible names, `ref` for focus return, the confirm text and DOM/focus order (main → Edit → Delete) are unchanged.
+- New token `--batch-pill-foot` (inset + `--batch-pill-reserve` + `--space-3`): the batch card's bottom padding, now shared with `.profile-card` (both the base and the < 600 px padding). `.design-batch-pill` gains `text-align: start` so its label stays left inside a `<button>`.
+- **Fields on white** (spec §3 "Profile editor form"). `input, select, textarea`: `--colour-row` fill, `--stroke-width` transparent border (the slot the states draw in, so text never moves), focus = the shared `:focus-visible` ring (black on white / pastel). States, at class weight via `:where()` and excluding `.dark-field`:
+  - invalid (`[aria-invalid="true"]`): black border plus an inset black ring to `--stroke-focus`; on focus the outer focus ring takes the box-shadow and the black border stays. The message stays linked by `aria-describedby`, so the state is shape + text, not colour.
+  - disabled and read-only (`[readonly]`, not `:read-only`, which would also match `select`): white ground, dashed black border; disabled also `cursor: not-allowed`. This was the Settings-only disabled look; `.settings input:disabled` (style and ink lists) is folded into the shared rule.
+  - Fields on black (`.dark-field`, the search box) are unchanged: same border, fill and focus as before.
+
+### Tests (`src/styles.test.ts`, 98)
+
+- New block "profile card foot and fields on white (ticket 16)", 3 tests: pill markup, order and single pill definition, Delete placement, foot band at both paddings, ink membership; field fill/border/focus with contrast (ink on row ≥ 7, black ring and state borders on white and row ≥ 3); invalid / disabled / read-only rules, cascade order against `:focus-visible` and `.dark-field`, linked error message.
+- Updated: batch card padding now `var(--batch-pill-foot)` (token value asserted); `.profile-card-actions` dropped from the capsule list (the rule no longer exists); the "one dark-field definition" test ignores rules that only mention `:not(.dark-field)`.
+
+### Results
+
+- `npm run typecheck` clean; full `npm test` 15 files, 321 / 321.
+- Harness for profiles, profile-editor, batch-detail, observation-logger, batch-tools, settings, batch-creation and overview at 320, 390, 768 and 1440: 0 failed, every finding count 0. Looked at the profile card foot (320, 390, 1440), the editor (390: name field focused with the black ring, row-filled inputs, selects on the lilac formula row), the inline status logger (390), read-only "Next" dates (dashed, 390), Settings fields (390) and the sheet's dark fields (1440, unchanged).
+
+### Left by ticket 16
+
+- A borderless `#f6f8fa` field on white is about 1.07 : 1 against the card; the field is identified by its label, fill and placeholder rather than a 3 : 1 boundary (WCAG 1.4.11). The spec asks for it; flagged here in case the user wants a hairline.
+- At 1440 the profile cards are about 555 px wide, so the pill scales with them (≈ 308 × 112, circle ≈ 92), as the batch card's pill does at that width.
+- The inline logger has no invalid-field path in the harness; the invalid ring is covered by the CSS tests only.
+
 ## Left for later tickets / known issues
 
 - ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).
