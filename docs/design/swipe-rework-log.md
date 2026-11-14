@@ -616,8 +616,8 @@ Full harness at `60dc406` first: 95 captures, 0 failed, every finding count 0. E
 | Drink card | ui §1.1 | profile card (profiles) | differs | Facts were outlined capsules → **fixed**, now the frosted chip. Actions are still a white capsule holding a black "Edit profile" capsule and an outlined "Delete" capsule; §3 asks for the Swipe pill with the black circle (= Edit) and Delete as a text action. Needs markup, not cheap. |
 | Toggle list | ui §1.2 | Settings preference cards | match | Rows h 72, black selected row, blue switch, avatar d 63 on Suggestions. Units and Notifications rows carry no avatar (minor, content). |
 | Toggle list | ui §1.2 | Checks list (checks, overview "A little care today") | minor difference | Separate white capsule rows on black, no enclosing white bowed card; avatar 44 (`--target-min`), board 63; overdue is a yellow row (ink rule: yellow = due/overdue), §3 says black selected row. |
-| Toggle list | ui §1.2 | desktop sidebar | differs | White circles + labels on black, lime current capsule (decision below). |
-| Toggle list | ui §1.2 | batch picker sheet | differs | Light-blue capsules (decision below). Its date eyebrow was lime → **fixed**, blue (`time`). |
+| Toggle list | ui §1.2 | desktop sidebar | match (was differs) | Was white circles + labels on black with a lime current capsule → **fixed by ticket 18**: one white bowed toggle card, rows h 72, pastel avatars d 63 (lilac, peach, mint, sky), current = black row, batch count as a glass pill in the switch slot. "My batches" wraps to two lines beside the count (minor). |
+| Toggle list | ui §1.2 | batch picker sheet | match (was differs) | Was light-blue capsules → **fixed by ticket 18**: toggle rows with jar avatars in a white bowed card on the black sheet. Its date eyebrow was lime → **fixed**, blue (`time`). |
 | Toggle list | ui §1.2 | trash ("Open recently deleted batches", trash row) | match | The toggle is black in both states. The yellow at 390 is the generic `button:hover` fill: the harness's pointer stays on the toggle after its click; at 1440 the scroll moves the toggle away from it. Touch browsers keep that hover after a tap (decision below). Trash row = grey row + white Restore capsule. |
 | Lime button | ui §1.2 | `card-action` (detail "Add observation", Export ZIP, first-run, sheet submits) | match | |
 | Profile card | ui §1.3 | Kitchen summary, Checks summary | match | Summary-row avatar is a check icon, board a photo (decision below). Count pill holds the number only (board "8x" + glyph). |
@@ -654,10 +654,10 @@ Totals (26 rows): **15 match** (3 of them after this ticket's fixes), **6 minor 
 ### Needs a decision
 
 - **Unique Thin / ExtraLight**: unused since the display and figure roles went to Light. Options: drop the two `@font-face` files; keep them for a future display role.
-- **Desktop sidebar**: keep white circles + labels on black with the lime current capsule; or the spec §3 white bowed toggle card (rows, black current row, pastel avatars, batch count pill).
+- **Desktop sidebar** (settled by ticket 18: the toggle card): keep white circles + labels on black with the lime current capsule; or the spec §3 white bowed toggle card (rows, black current row, pastel avatars, batch count pill).
 - **"Open recently deleted batches"**: keep the black capsule toggle; or a `toggle-row` with the count in the switch slot.
 - **Summary-row avatar**: keep the check icon in the lilac circle; or a batch photo / cutout like the board's "Jacob".
-- **Picker choices**: keep light-blue capsules; `toggle-row`s (selected black); or small cards.
+- **Picker choices** (settled by ticket 18: toggle rows): keep light-blue capsules; `toggle-row`s (selected black); or small cards.
 - **pH conditions** (profile overview): keep the bulleted list; small cards; or `summary-row`s.
 - **`splash.png` placeholders and the `#fff` adaptive-icon background**: leave; delete the unreferenced `drawable*/splash.png`; make the icon background the black ground.
 - **Calendar head at 320**: accept the two-line head; hide "Today" below 380 (the date chip in the top bar already jumps to today); or smaller dark circles below 380 (needs a token below 57).
@@ -730,6 +730,37 @@ Five glass surfaces on the two boards: G1 the drink card chip (translucent white
 - The scrim is now lighter (32 %); the sheet's black still separates from the page, but the blurred page shows more.
 - The detail photo frame's "Active" badge stays a bordered yellow `.status`: it sits on the white frame, which belongs to the remaining `--radius-small` boxes.
 - The `@supports` fallback was not rendered (no browser here lacks `backdrop-filter`); it is covered by the CSS tests only.
+
+## Ticket 18: toggle list in the desktop sidebar and the batch picker — done
+
+The two "differs" rows of the ticket 15 audit (Toggle list, spec §1.2), matched to `ui-board.png`.
+
+### As built
+
+- `src/styles.css` `:root`: `--colour-avatar-peach` `#ebcbb2`, `--colour-avatar-mint` `#c3ecb4`, `--colour-avatar-sky` `#b5dced` (spec §1.2 avatar fills after lilac) and `--sidebar-width: 272px` (was a literal 224 in `.app-shell`; 224 leaves no label column beside a 63 avatar and the count).
+- Toggle primitive, still one definition: new `.toggle-card` (a white bowed card that is itself the list; add `bowed`), `.toggle-count` (the count pill at the switch's size in the switch slot; `glass` in the markup, as the other count pills) and three zero-specificity `:where(.toggle-row:nth-child(4n + k)) > .toggle-avatar` rules for the pastel order. `[aria-current="page"]` joins pressed and checked as the black selected row (fill rule and ground ink set). The avatar padding rule became `.toggle-row:where(:has(> .toggle-avatar))` so the rail's and phone row's own padding wins.
+- Navigation: the desktop rules for circles and the lime capsule moved into `@media (max-width: 1023px)`, where the same elements clear the card (`--fill: transparent`, `padding: 0`) and the rows (`--row-fill: transparent`; current = `--colour-action` with ink). The tablet rail's band is now the card's `--fill`. The phone capsule keeps its bold label through one rule in the phone block. Retired: `.design-nav-count`, the lime desktop capsule, the navigation hover fill.
+- Batch picker: `.upcoming-batch-choice` lost its light-blue fill, ink-set membership and meta role; only `.upcoming-batch-choice small { display: block; }` remains.
+- `src/App.tsx` (18 lines, endings preserved): `<nav … className="navigation toggle-card bowed">`, buttons `toggle-row nav-*`, marks `nav-mark toggle-avatar`, count `toggle-count glass`; in `BatchPicker` a `div.toggle-card.bowed` around the choices, each a `toggle-row` with a jar `toggle-avatar` and a `toggle-label` (name, events in `<small>`). The landmark, `aria-label`s, `aria-current`, DOM order, handlers, the dialog and the blue `<time>` eyebrow are unchanged.
+- `docs/design/swipe-component-spec.md` §3 breakpoints line: sidebar 224 → 272.
+
+### Tests (`src/styles.test.ts`, 105)
+
+- New block "toggle card: desktop sidebar and batch picker (ticket 18 …)", 4 tests: avatar and sidebar tokens (label column ≥ 44 px from the tokens); the card, the avatar order (black ink ≥ 7 : 1 on each pastel) and the count pill once, from tokens; the sidebar markup with landmark, names and `aria-current`, the black current row, the lime capsule and hidden count below 1024; the picker markup, with no `.upcoming-batch-choice` paint left.
+- Updated: the navigation-circles test reads the circle rules from the below-1024 block; the "no bar fill" test checks `--fill` instead of `background`; the toggle primitive's single-definition list (card, count, avatar order, the three-state selector); the sheet pastel-box list (no picker choice).
+- No behaviour test changed; `src/App.test.tsx` queries the navigation and the picker by role and name.
+
+### Results
+
+- `npm run typecheck` clean; `npm test` 15 files, 331 / 331 (one run had "resets canceled inline 'note' edits…" time out at 30 s under load; it passes alone in 1.8 s and in the rerun).
+- Harness: overview, all-batches, batch-detail, checks, calendar, profiles, settings at 1440 and 1024; batch-picker at 390, 768 and 1440; overview at 768; overview and calendar at 390. 0 failed, every finding count 0. Looked at: the sidebar at 1440 and 1024 (white bowed card, four rows h 72, lilac / peach / mint / sky avatars, black "My batches" row with the count pill), the picker at 390 and 1440 (white bowed card on the black sheet, three rows, a long name wraps and its row grows, blue date eyebrow), the rail at 768 and the phone row at 390 (circles, lime current, rail band: as before).
+
+### Left by ticket 18
+
+- At 272 px the label column is about 49 px, so "My batches" sets on two lines beside the count; one line needs a sidebar of about 300 px, which costs the 1024 layout 28 px. Say if that trade is wanted.
+- The count pill is glass (60 % white) on the black current row, so it reads grey with black ink, like the status chip on the selected batch card.
+- The board's selected row carries a blue switch; navigation rows have no switch, only "My batches" has a count.
+- Focus rings on the rows were not captured (the harness has no focus state); they use the shared two-tone `:focus-visible` ring with the existing navigation offset.
 
 ## Left for later tickets / known issues
 

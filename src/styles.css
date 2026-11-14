@@ -48,6 +48,10 @@
   --colour-row: #f6f8fa;
   --colour-switch-on: #2089fd;
   --colour-switch-off: #eceef0;
+  /* Toggle-list avatars after the first (lilac, --colour-emblem): spec §1.2 peach, mint and sky, in row order. */
+  --colour-avatar-peach: #ebcbb2;
+  --colour-avatar-mint: #c3ecb4;
+  --colour-avatar-sky: #b5dced;
   --colour-hairline: #f1f1f1;
   /* Glass (spec "Glass surfaces"): white at 60 % over a blurred backdrop, with a 40 % white rim. The drink card's
      chip measures 0.5–0.7 over the photo, and the board's count pill #fff6ce is this fill over the yellow row.
@@ -211,6 +215,8 @@
   --layout-gutter: 24px;
   --layout-columns: 12;
   --layout-edge: 24px;
+  /* Desktop sidebar: wide enough for the spec §1.2 row (avatar 63, a two-line label, the count pill in the switch slot). */
+  --sidebar-width: 272px;
   --layout-breakpoint-1: 600px;
   --layout-breakpoint-2: 1024px;
   --radius-card: 32px;
@@ -331,8 +337,6 @@ input::file-selector-button,
 .empty-state,
 .design-empty-checks,
 .calendar-empty,
-.navigation button[aria-current="page"],
-.navigation button:hover:not(:disabled),
 .design-account:hover,
 .design-avatar,
 .nav-mark,
@@ -376,7 +380,6 @@ input::file-selector-button,
 .profile-overview-intro,
 .start-batch-basics,
 .start-profile-summary,
-.upcoming-batch-choice,
 .station-dialog .quick-log-types button[aria-pressed="true"],
 .profile-card,
 .profile-list .empty-state,
@@ -388,6 +391,7 @@ input::file-selector-button,
 .settings-recovery,
 .toggle-row,
 .toggle-avatar,
+.toggle-count,
 .settings-count,
 .trash-item,
 .glass {
@@ -408,7 +412,7 @@ input::file-selector-button,
 .settings-live[role="alert"] > p,
 .batch-view-switch button[aria-pressed="true"],
 .quick-log-types button[aria-pressed="true"],
-.toggle-row:is([aria-pressed="true"], [aria-checked="true"]),
+.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]),
 .design-batch-card.selected,
 .design-batch-next,
 .design-batch-go,
@@ -443,9 +447,9 @@ h2, h3, h4, .brand strong { font-size: var(--type-heading); font-weight: var(--t
 .design-tip h3, .design-batch-bottom strong, .design-detail-top h2, .design-input-summary h3, .timeline-panel-heading h3, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .design-detail-next strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 .navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
 body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .guide-step p, .batch-guidance > p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
-button, .small-card-tag, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .calendar-day, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
-small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-check-state, .design-detail-next p, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .upcoming-batch-choice span, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
-strong, b, .warning, .navigation button[aria-current="page"] { font-weight: var(--type-title-weight); }
+button, .small-card-tag, summary, .summary-row-count, .toggle-count, .station-dialog-heading h2, .section-label a, .field-error, .calendar-day, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-next, .design-batch-meta, .batch-image-credit, .design-photo-label, .design-check-copy > span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .design-photo-credits, .design-detail-metrics, .detail-check-state, .design-detail-next p, .design-detail-footer, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
+strong, b, .warning { font-weight: var(--type-title-weight); }
 
 /* Bowed outline (spec §2.3): the one silhouette for every large card. Straight sides, top and
    bottom bowed inward, corners slightly squarer than a circle.
@@ -558,7 +562,7 @@ button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
 .app-shell {
   position: relative;
   display: grid;
-  grid-template-columns: 224px minmax(0, 1fr);
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   width: 100%;
   max-width: var(--layout-container);
   height: 100dvh;
@@ -572,19 +576,15 @@ button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
 .brand-mark { display: grid; place-items: center; width: 48px; height: 48px; flex: none; }
 .brand-mark img { width: 48px; height: 48px; object-fit: contain; }
 .brand strong { display: block; max-width: 100%; overflow-wrap: anywhere; }
-/* Navigation (spec §1.4, §1.5): one vocabulary at every width. Each destination's mark is a white
-   circle; the current destination is lime and its icon sits straight on the lime, as in the Scan pill.
-   Desktop rows keep their labels beside the circles; the rail and the phone row are set further down. */
+/* Navigation. Desktop (spec §3, toggle card §1.2): the nav is a toggle card, each destination a toggle row with
+   its avatar, the current one the black selected row and the batch count in the switch slot; all of that comes
+   from the toggle primitive's classes in the markup. Below 1024 the same elements are the circles of spec §1.4
+   and §1.5 (set in the width adaptations further down). */
 .sidebar .brand-mark { width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-background); }
-.navigation { display: grid; gap: var(--nav-gap); }
-.navigation button { display: flex; align-items: center; gap: var(--space-3); min-width: 0; min-height: var(--nav-circle); height: auto; border: 0; padding: 0 var(--space-4) 0 0; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+.navigation button { min-width: 0; height: auto; white-space: normal; overflow-wrap: anywhere; }
 .nav-word { min-width: 0; overflow-wrap: anywhere; }
-.navigation button[aria-current="page"] { background: var(--colour-action); }
-.nav-mark { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-background); }
-.navigation button[aria-current="page"] .nav-mark { background: none; }
 .navigation svg, .design-avatar svg { width: var(--nav-icon); height: var(--nav-icon); }
 .navigation button:focus-visible, .design-account:focus-visible { outline-offset: var(--stroke-focus); }
-.design-nav-count { margin-left: auto; font-variant-numeric: tabular-nums; }
 .design-nav-profile-desktop { display: inline-flex; }
 .design-nav-profile-mobile, .design-mobile-avatar { display: none; }
 .design-sidebar-bottom { margin-top: auto; }
@@ -1078,7 +1078,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .upcoming-date { display: grid; justify-items: center; flex: none; min-width: var(--target-min); }
 .upcoming-body { flex: 1; min-width: 112px; }
 .upcoming-batch-picker { display: grid; gap: var(--space-4); }
-.upcoming-batch-choice { display: grid; gap: var(--space-2); text-align: left; background: var(--colour-accent); }
+.upcoming-batch-choice small { display: block; }
 .settings-screen { min-width: 0; }
 .settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); align-items: start; gap: var(--space-6); margin-top: var(--space-8); }
 .settings-card { display: grid; gap: var(--space-4); min-width: 0; padding: var(--card-padding); }
@@ -1099,9 +1099,13 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 .setting-row:last-child { border-bottom: 0; }
 .setting-body { flex: 1; min-width: 160px; }
 .setting-body p { margin-top: var(--space-2); }
-/* Toggle list (spec §1.2, gap 10): one definition of the list, the row, the avatar and the switch.
-   Pressed (a choice) or checked (a switch) is the black selected row. */
+/* Toggle list (spec §1.2, gap 10): one definition of the list, the card, the row, the avatar, the switch and the
+   count. Pressed (a choice), checked (a switch) or the current page is the black selected row.
+   - toggle-list: rows inside a padded card (Settings); toggle-card: a white bowed card that is itself the list
+     (add "bowed"), its rows --toggle-inset from the sides and the card padding plus the bow from top and bottom.
+   - Avatars take the board's pastels in row order: lilac, peach, mint, sky. */
 .toggle-list { display: grid; gap: var(--toggle-gap); margin-inline: calc(var(--toggle-inset) - var(--card-padding)); }
+.toggle-card { display: grid; gap: var(--toggle-gap); padding: calc(var(--card-padding) + var(--bow)) var(--toggle-inset); }
 .toggle-row {
   --row-fill: var(--colour-row);
   display: flex;
@@ -1115,12 +1119,17 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
   background: var(--row-fill);
   text-align: left;
 }
-.toggle-row:is([aria-pressed="true"], [aria-checked="true"]) { --row-fill: var(--colour-surface-inverse); }
+.toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]) { --row-fill: var(--colour-surface-inverse); }
 /* The generic button hover paints yellow; a row keeps its fill so a selected row's white text stays readable. */
 .toggle-row:hover:not(:disabled) { background: var(--row-fill); }
-.toggle-row:has(> .toggle-avatar) { padding-inline-start: calc((var(--toggle-row) - var(--toggle-avatar)) / 2); }
+.toggle-row:where(:has(> .toggle-avatar)) { padding-inline-start: calc((var(--toggle-row) - var(--toggle-avatar)) / 2); }
 .toggle-avatar { display: grid; place-items: center; flex: none; width: var(--toggle-avatar); height: var(--toggle-avatar); border-radius: 50%; background: var(--colour-emblem); }
+:where(.toggle-row:nth-child(4n + 2)) > .toggle-avatar { background: var(--colour-avatar-peach); }
+:where(.toggle-row:nth-child(4n + 3)) > .toggle-avatar { background: var(--colour-avatar-mint); }
+:where(.toggle-row:nth-child(4n + 4)) > .toggle-avatar { background: var(--colour-avatar-sky); }
 .toggle-label { flex: 1; min-width: 0; }
+/* A count in the switch slot: the count pill (spec §1.3, glass in the markup) at the switch's size. */
+.toggle-count { display: grid; place-items: center; flex: none; min-width: var(--switch-width); min-height: var(--switch-height); margin-inline-start: auto; padding-inline: var(--space-2); border-radius: var(--radius-control); font-variant-numeric: tabular-nums; }
 .toggle-switch { position: relative; flex: none; width: var(--switch-width); height: var(--switch-height); margin-inline-start: auto; border-radius: var(--radius-control); background: var(--colour-switch-off); }
 .toggle-switch::after {
   content: "";
@@ -1152,7 +1161,15 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 /* Width adaptations, not recovered artwork specifications. No DOM reparenting. */
 @media (max-width: 1023px) {
   .app-shell { grid-template-columns: calc(var(--nav-rail) + 2 * var(--space-2)) minmax(0, 1fr); }
-  .brand > div, .navigation .nav-word, .navigation .design-nav-count, .design-account > span:not(.design-avatar) { display: none; }
+  .brand > div, .navigation .nav-word, .navigation .toggle-count, .design-account > span:not(.design-avatar) { display: none; }
+  /* Navigation circles (spec §1.4, §1.5): each destination's mark is a white circle; the current destination is
+     lime and its icon sits straight on the lime, as in the Scan pill. The toggle card's white fill and the rows'
+     fills give way here (the rail band is the card's fill on tablets). */
+  .navigation { --fill: transparent; display: grid; gap: var(--nav-gap); padding: 0; }
+  .navigation button { --row-fill: transparent; display: flex; align-items: center; gap: var(--space-3); min-height: var(--nav-circle); border: 0; padding: 0; text-align: left; }
+  .navigation button[aria-current="page"] { --row-fill: var(--colour-action); --ink: var(--ink-fill); --ink-meta: var(--ink-fill); --ink-figure: var(--ink-fill); --ink-accent: var(--ink-fill); --ink-attention: var(--ink-fill); --ink-time: var(--ink-fill); color: var(--ink); }
+  .nav-mark { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--nav-circle); height: var(--nav-circle); border-radius: 50%; background: var(--colour-background); }
+  .navigation button[aria-current="page"] .nav-mark { background: none; }
   .design-date-chip { display: none; }
   .batch-overview, .profile-list { grid-template-columns: minmax(0, 1fr); }
   .profile-editor-grid, .calendar-layout { grid-template-columns: minmax(0, 1fr); }
@@ -1164,7 +1181,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
 @media (min-width: 600px) and (max-width: 1023px) {
   .sidebar { align-items: center; gap: 0; padding-inline: 0; }
   .brand { align-items: center; padding-bottom: var(--nav-gap); background: linear-gradient(var(--colour-rail), var(--colour-rail)) center bottom / var(--nav-waist) calc(100% - var(--nav-circle) / 2) no-repeat; }
-  .navigation { background: linear-gradient(var(--colour-rail), var(--colour-rail)) center / var(--nav-waist) calc(100% - var(--nav-circle)) no-repeat; }
+  .navigation { --fill: linear-gradient(var(--colour-rail), var(--colour-rail)) center / var(--nav-waist) calc(100% - var(--nav-circle)) no-repeat; }
   .navigation button { justify-content: center; width: var(--nav-circle); padding: 0; }
   .nav-mark, .sidebar .brand-mark, .design-avatar { box-shadow: 0 0 0 var(--nav-ring) var(--colour-rail); }
   .design-account { justify-content: center; width: auto; padding: 0; }
@@ -1260,6 +1277,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-small)
      visible above it. */
   .station-dialog { --r-end: 0px; --bow-end: 0px; width: 100%; max-height: calc(100dvh - var(--space-12) - var(--safe-top)); margin: auto 0 0; padding-bottom: calc(var(--sheet-inset) + var(--safe-bottom)); }
   .navigation button { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+  .navigation button[aria-current="page"] { font-weight: var(--type-title-weight); }
   .calendar-head h2 { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 }
 

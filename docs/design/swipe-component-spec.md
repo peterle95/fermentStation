@@ -308,7 +308,7 @@ This supersedes the note in issue #50 that "the raster does not prove a reusable
 
 ## 3. Mapping: reference component → app surface
 
-Breakpoints are the current ones and stay as they are (`src/styles.css` L760–870; decision #52): phone < 600 (bottom nav, one pane), tablet 600–1023 (80 px rail, one pane), desktop ≥ 1024 (224 px sidebar, list plus a detail column of `clamp(320px, 28vw, 400px)`).
+Breakpoints are the current ones and stay as they are (`src/styles.css` L760–870; decision #52): phone < 600 (bottom nav, one pane), tablet 600–1023 (80 px rail, one pane), desktop ≥ 1024 (272 px sidebar, `--sidebar-width`, widened from 224 by ticket 18 for the toggle card; list plus a detail column of `clamp(320px, 28vw, 400px)`).
 
 Line references are to `src/App.tsx` (A) and `src/styles.css` (S) at commit `e6e8389`. Prior decisions that constrain the mapping: #50 (fidelity contract), #52 (shell), #53 (imagery: user photos keep rectangular framing; only bundled transparent cutouts are integrated "cutout-style"), #51 (Unique everywhere).
 

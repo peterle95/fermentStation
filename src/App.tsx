@@ -677,19 +677,19 @@ export function App() {
           <StationLogo />
           <div><strong>FermentStation</strong></div>
         </div>
-        <nav aria-label="Primary navigation" className="navigation">
+        <nav aria-label="Primary navigation" className="navigation toggle-card bowed">
           {(["today", "checks", "calendar", "profiles"] as const).map((destination) => (
             <button
               aria-label={destination === "checks" ? "Checks" : labels[destination]}
               aria-current={(destination === "checks" ? showChecks : !showChecks && (shell.destination === destination || destination === "today" && shell.destination === "batches")) ? "page" : undefined}
-              className={`nav-${destination}`}
+              className={`toggle-row nav-${destination}`}
               key={destination}
               onClick={() => destination === "checks" ? openChecks() : navigate(destination)}
               type="button"
             >
-              <span className="nav-mark" aria-hidden="true">{destination === "checks" ? <DesignIcon name="check" /> : <NavIcon destination={destination} />}</span>
+              <span className="nav-mark toggle-avatar" aria-hidden="true">{destination === "checks" ? <DesignIcon name="check" /> : <NavIcon destination={destination} />}</span>
               <span className="nav-word">{destination === "checks" ? "Checks" : labels[destination]}</span>
-              {destination === "today" && <span className="design-nav-count">{batchState.batches.length}</span>}
+              {destination === "today" && <span className="toggle-count glass">{batchState.batches.length}</span>}
             </button>
           ))}
         </nav>
@@ -1200,22 +1200,22 @@ function BatchPicker({ date, events, onClose, onOpen }: BatchPickerProps) {
           <div><p className="eyebrow"><time dateTime={date}>{shortDate(date)}</time></p><h2>Choose a batch</h2></div>
           <button aria-label="Close" className="utility-circle utility-circle-dark" onClick={onClose} type="button"><DesignIcon name="close" /></button>
         </div>
-        {batchIds.map((batchId) => {
+        <div className="toggle-card bowed">{batchIds.map((batchId) => {
           const batchEvents = events.filter((event) => event.batchId === batchId);
           const batchName = batchEvents[0].batchName;
           return (
-            <button aria-label={`Open ${batchName}`} className="upcoming-batch-choice" key={batchId} onClick={() => {
+            <button aria-label={`Open ${batchName}`} className="toggle-row upcoming-batch-choice" key={batchId} onClick={() => {
               // Release native modal inertness before handing the day trigger to openBatch.
               dialogRef.current?.close();
               returnFocus.current?.focus({ preventScroll: true });
               onClose();
               onOpen(batchId);
             }} type="button">
-              <strong>{batchName}</strong>
-              <span>{batchEvents.map((event) => event.label).join(" · ")}</span>
+              <span className="toggle-avatar" aria-hidden="true"><DesignIcon name="jar" /></span>
+              <span className="toggle-label">{batchName}<small>{batchEvents.map((event) => event.label).join(" · ")}</small></span>
             </button>
           );
-        })}
+        })}</div>
     </dialog>
   );
 }
