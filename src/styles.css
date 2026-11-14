@@ -527,6 +527,8 @@ strong, b, .warning { font-weight: var(--type-title-weight); }
    - The rim is an inset shadow at zero specificity, so a focus ring replaces it. */
 :where(.glass) { --glass: var(--colour-glass); box-shadow: inset 0 0 0 var(--glass-edge) var(--colour-glass-edge); }
 .station-dialog::backdrop { --glass: var(--colour-scrim); }
+/* The desktop menu's scrim is the sheet scrim's material on a real element: the scrim fill and no rim. */
+.app-menu .sm-scrim { --glass: var(--colour-scrim); box-shadow: none; }
 .glass, .station-dialog::backdrop, .glass.bowed::after { background: var(--glass) !important; -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
 /* Hover keeps the generic button's yellow, through --glass (the fill is !important). */
 button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
@@ -534,6 +536,7 @@ button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   :where(.glass) { --glass: var(--colour-glass-solid); }
   .station-dialog::backdrop { --glass: var(--colour-scrim-solid); }
+  .app-menu .sm-scrim { --glass: var(--colour-scrim-solid); }
 }
 .primary-action, .station-primary, .profile-add, .component-button-primary, .profile-editor-button.primary {
   background: var(--colour-action);
@@ -1313,6 +1316,11 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
      the 0.32 s close slide. Reduced motion drops the transition, so it hides at once. */
   .app-menu .staggered-menu-panel { visibility: hidden; transition: visibility 0s linear 0.32s; }
   .app-menu[data-open] .staggered-menu-panel { visibility: visible; transition-delay: 0s; }
+  /* Open, the scrim frosts the whole page outside the panel and takes its clicks (the app behind is inert). It fades
+     in with the layers' 0.5 s slide and out with the 0.32 s close slide, and stays hit-testable until that slide ends
+     so a closing click cannot fall through. Reduced motion drops the transitions, so it jumps. */
+  .app-menu .sm-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: auto; opacity: 0; visibility: hidden; transition: opacity 0.32s ease-in, visibility 0s linear 0.32s; }
+  .app-menu[data-open] .sm-scrim { opacity: 1; visibility: visible; transition: opacity 0.5s ease-out, visibility 0s; }
   .design-topbar { padding-inline: calc(var(--layout-edge) + var(--nav-circle) + var(--space-4)) calc(var(--layout-edge) + var(--menu-toggle-width) + var(--space-4)); }
   .profile-editor-shell .design-dashboard { padding-top: calc(var(--safe-top) + var(--space-6) + var(--nav-circle) + var(--space-6)); }
 }

@@ -144,6 +144,29 @@ describe("batch workflow", () => {
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
     expect(document.activeElement).toBe(toggle);
 
+    // Closed, the scrim is not open and the app behind is not blocked.
+    const scrim = document.querySelector<HTMLElement>(".app-menu .sm-scrim")!;
+    const behind = [document.querySelector(".content-shell")!, document.querySelector(".sidebar")!, document.querySelector(".design-skip-link")!];
+    expect(scrim.getAttribute("aria-hidden")).toBe("true");
+    expect(scrim.closest(".app-menu")!.hasAttribute("data-open")).toBe(false);
+    for (const element of behind) expect(element.hasAttribute("inert"), element.className).toBe(false);
+
+    // Open, the app behind the scrim is inert: no pointer, no focus.
+    fireEvent.click(toggle);
+    expect(scrim.closest(".app-menu")!.hasAttribute("data-open")).toBe(true);
+    for (const element of behind) expect(element.hasAttribute("inert"), element.className).toBe(true);
+    // A mousedown on the scrim does not close yet; its click does, so the click ends on the scrim, not under it.
+    const contentClick = vi.fn();
+    document.querySelector(".content-shell")!.addEventListener("click", contentClick);
+    fireEvent.mouseDown(scrim);
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    fireEvent.click(scrim);
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(contentClick).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(toggle);
+    for (const element of behind) expect(element.hasAttribute("inert"), element.className).toBe(false);
+    expect(screen.queryByRole("dialog")).toBeNull();
+
     // The logo takes over the old sidebar's "Home" row: station information.
     fireEvent.click(document.querySelector<HTMLButtonElement>(".app-menu .sm-logo-button")!);
     expect(screen.getByRole("dialog", { name: "Your fermentation station" })).toBeTruthy();

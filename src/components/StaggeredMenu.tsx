@@ -74,6 +74,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const openRef = useRef(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const preLayersRef = useRef<HTMLDivElement | null>(null);
+  const scrimRef = useRef<HTMLDivElement | null>(null);
   const preLayerElsRef = useRef<HTMLElement[]>([]);
   const plusHRef = useRef<HTMLSpanElement | null>(null);
   const plusVRef = useRef<HTMLSpanElement | null>(null);
@@ -398,6 +399,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     if (!closeOnClickAway || !open) return;
 
     const handleClickOutside = (event: MouseEvent) => {
+      // FermentStation: the scrim closes the menu on its own click, so the whole click lands on it and nothing below.
+      if (event.target === scrimRef.current) return;
       if (
         panelRef.current &&
         !panelRef.current.contains(event.target as Node) &&
@@ -445,6 +448,18 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       data-position={position}
       data-open={open || undefined}
     >
+      {/* FermentStation: the frosted scrim over everything outside the panel, below the layers, panel, logo and toggle.
+          "glass" is the app's glass primitive (src/styles.css). Clicking it closes the menu and returns focus to the
+          toggle, as Escape does; the app keeps the page behind inert while the menu is open (onMenuOpen/onMenuClose). */}
+      <div
+        ref={scrimRef}
+        className="sm-scrim glass"
+        aria-hidden="true"
+        onClick={() => {
+          toggleBtnRef.current?.focus();
+          closeMenu();
+        }}
+      />
       <div ref={preLayersRef} className="sm-prelayers" aria-hidden="true">
         {(() => {
           const raw = colors && colors.length ? colors.slice(0, 4) : ['#1e1e22', '#35353c'];

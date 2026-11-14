@@ -827,6 +827,31 @@ On 2026-11-14 the user asked for the desktop sidebar (fox logo, "FermentStation"
 - The accent `#ff6b6b` on the white panel is about 2.8 : 1, so the current item carries an underline as well as the colour cue; the Socials title and numbers are upstream accent text at the same contrast.
 - In the profile editor at 1440 the toggle sits over the top of the editor pane's scrollbar (the pane fills the height there).
 
+## 2026-11-15: frosted scrim behind the open StaggeredMenu (user request) — done
+
+With the desktop menu open, the app outside the white panel (topbar buttons included) stayed sharp and clickable. The user asked for a glass layer over it that blocks the app.
+
+### As built
+
+- `src/components/StaggeredMenu.tsx` (`FermentStation:`): a `div.sm-scrim.glass` (aria-hidden) before the colour layers. Its click closes the menu and returns focus to the toggle, as Escape does; the upstream mousedown click-away ignores it, so the whole click ends on the scrim and nothing under it is activated (also under reduced motion, where the scrim hides at once).
+- `src/styles.css`: the scrim is the glass primitive with the sheet scrim's material (`--glass: var(--colour-scrim)`, no rim; `--colour-scrim-solid` without backdrop-filter), so no second glass recipe. In "Desktop menu (>= 1024)" it covers the viewport at `z-index: 1` inside the menu (layers 5, panel 10, logo and toggle 20), takes pointer events, fades in over 0.5 s (the layers' slide) and out over 0.32 s (the close slide), and stays hit-testable until that slide ends, like the panel's `visibility`. The global reduced-motion rule makes it jump.
+- `src/App.tsx`: `onMenuOpen` / `onMenuClose` keep `menuOpen`; while it is open the skip link, `.sidebar` and `.content-shell` are `inert` (the attribute behind native modal dialogs, which the sheets use; the menu is not a `<dialog>`). Gated on `(min-width: 1024px)` via `useSyncExternalStore`, so a tablet turned to portrait with the menu open (menu hidden below 1024) is not left blocked.
+
+### Tests
+
+- `src/App.test.tsx` "navigates through the desktop StaggeredMenu…": closed, nothing is inert and the menu has no `data-open`; open, the skip link, sidebar and content shell are inert; a mousedown on the scrim does not close, its click does, focus returns to the toggle, no click reaches the content shell, nothing is inert afterwards.
+- `src/styles.test.ts`: new "frosts the page outside the open panel…" (scrim markup, glass tokens and fallback, stacking, pointer events, close-slide visibility, the inert props). The "motion-free readable content" guard against `opacity: 0;` exempts the scrim's two rules (decorative, aria-hidden, no content).
+
+### Results
+
+- `npm run typecheck`, `npm run build` clean; `src/App.test.tsx`, `src/App.settings.test.tsx`, `src/styles.test.ts` 237 / 237 (130 s).
+- Real Chrome (headless, CDP, 1440 × 900, with and without reduced motion): closed, "Start a batch" takes the pointer and nothing is inert; open, `elementFromPoint` over it is the scrim, computed `backdrop-filter: blur(8px)`, fill `rgba(0, 0, 0, 0.32)`, mid-fade opacity 120 ms after opening (1 under reduced motion), 25 Tabs never focus the app, the toggle stays above the scrim; a real click on the scrim closes the menu, opens no dialog and returns focus to the toggle.
+- Harness `-s menu-open,overview,batch-detail -v desktop,tablet-landscape`: 0 failed, every finding 0. `menu-open` at 1440 and 1024: the white topbar buttons, the lime "Start a batch", the cards and photos are blurred and dimmed, black ground unchanged, "Close ×" sharp. `overview` at 1440 unchanged (no scrim).
+
+### Left by this change
+
+- Over the black ground the 32 % black tint adds nothing; the glass reads through the blur of the white and coloured surfaces, which is most of what sits behind the panel.
+
 ## Left for later tickets / known issues
 
 - ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).

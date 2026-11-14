@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { App as CapacitorApp } from "@capacitor/app";
 import { isTauri } from "@tauri-apps/api/core";
 import type { PluginListenerHandle } from "@capacitor/core";
@@ -148,6 +148,16 @@ const menuItems = [
   { label: "Profiles", ariaLabel: "View the profiles", link: "/profiles" },
 ];
 const socialItems = menuItems.map(({ label, link }) => ({ label, link }));
+const desktopMenuQuery = "(min-width: 1024px)";
+const subscribeDesktopMenu = (change: () => void) => {
+  const query = window.matchMedia?.(desktopMenuQuery);
+  query?.addEventListener("change", change);
+  return () => query?.removeEventListener("change", change);
+};
+// The menu is hidden below 1024 px, so an open menu must not keep the app inert there (a tablet turned to portrait).
+function useDesktopMenu() {
+  return useSyncExternalStore(subscribeDesktopMenu, () => window.matchMedia?.(desktopMenuQuery).matches ?? true);
+}
 
 type FieldErrors = Record<string, string>;
 
@@ -410,6 +420,10 @@ export function App() {
   const batchReturnFocus = useRef<HTMLElement | null>(null);
   const calendarReturnScroll = useRef(0);
   const [dialog, setDialog] = useState<StationDialogState | null>(null);
+  // While the desktop menu is open its scrim covers the app, and the app behind it is inert (no pointer, no focus).
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuShown = useDesktopMenu();
+  const behindMenu = menuOpen && menuShown;
   const profileDraft = useUnsavedChanges("Discard unsaved profile changes? Your saved profile and existing batches will not change.");
   const startDraft = useUnsavedChanges("Discard this unsaved batch? Its name, date and inputs will be lost.");
   const dialogTrigger = useRef<HTMLElement | null>(null);
@@ -685,10 +699,12 @@ export function App() {
 
   return (
     <div className={`app-shell new-design${openBatchId && showPhoneDetail ? " has-open-batch" : ""}${editingProfileId && shell.destination === "profiles" ? " profile-editor-shell" : ""}`}>
-      <a className="design-skip-link" href="#main-content">Skip to content</a>
+      <a className="design-skip-link" href="#main-content" inert={behindMenu}>Skip to content</a>
       <StaggeredMenu
         className="app-menu"
         isFixed
+        onMenuOpen={() => setMenuOpen(true)}
+        onMenuClose={() => setMenuOpen(false)}
         position="left"
         items={menuItems}
         socialItems={socialItems}
@@ -706,7 +722,7 @@ export function App() {
         logoAriaLabel="Home — station information"
       />
       {/* Below 1024 px: the tablet rail and the phone bottom row. Hidden on desktop, where the menu above navigates. */}
-      <aside className="sidebar">
+      <aside className="sidebar" inert={behindMenu}>
         <div className="brand">
           <StationLogo />
         </div>
@@ -730,7 +746,7 @@ export function App() {
         </div>
       </aside>
 
-      <div className="content-shell">
+      <div className="content-shell" inert={behindMenu}>
         <header className="design-topbar">
           <button aria-label="Open station information" className="utility-circle station-identity" onClick={() => showDialog({ kind: "info" })} type="button"><StationLogo /></button>
           <div className="design-topbar-copy"><p>{formatToday()}</p></div>

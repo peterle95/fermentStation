@@ -574,7 +574,9 @@ describe("responsive workflow safeguards", () => {
   it("retains two-tone keyboard focus and motion-free readable content", () => {
     expect(rule(":focus-visible")).toContain("outline: var(--stroke-focus) solid var(--colour-text-inverse)");
     expect(rule(":focus-visible")).toContain("box-shadow: 0 0 0 calc(var(--stroke-focus) * 2) var(--colour-text)");
-    expect(styles).not.toMatch(/outline: (?:none|0)|opacity: 0;|scrollIntoView/);
+    // Readable content is never hidden by opacity. The one exception is the desktop menu's scrim, which is decorative
+    // (aria-hidden, no content) and fades in from opacity 0 with the menu.
+    expect(styles.replace(/\.app-menu \.sm-scrim \{[^}]*\}/g, "")).not.toMatch(/outline: (?:none|0)|opacity: 0;|scrollIntoView/);
     expect(rule(".design-skip-link:focus")).toContain("var(--safe-top)");
     const reduced = styles.slice(styles.indexOf("@media (prefers-reduced-motion: reduce)"));
     for (const declaration of ["animation: none !important", "transition: none !important", "scroll-behavior: auto !important", "transform: none !important"]) expect(reduced).toContain(declaration);
@@ -1833,5 +1835,22 @@ describe("desktop navigation: React Bits StaggeredMenu (user request 2026-11-14;
     // The closed panel is hidden after the close slide, at once under reduced motion (transitions are off there).
     expect(rule(".app-menu .staggered-menu-panel", desktop)).toContain("visibility: hidden");
     expect(rule(".app-menu[data-open] .staggered-menu-panel", desktop)).toContain("visibility: visible");
+  });
+
+  it("frosts the page outside the open panel with the sheet scrim's glass, and takes its clicks", () => {
+    // The scrim is the glass primitive with the sheet scrim's fill and no rim, solid where blur is unsupported.
+    expect(component).toContain('className="sm-scrim glass"');
+    expect(rule(".app-menu .sm-scrim")).toBe(" --glass: var(--colour-scrim); box-shadow: none; ");
+    const fallback = styles.match(/@supports not \(\(backdrop-filter: blur\(1px\)\) or \(-webkit-backdrop-filter: blur\(1px\)\)\) \{([\s\S]*?)\n\}/)![1];
+    expect(fallback).toContain(".app-menu .sm-scrim { --glass: var(--colour-scrim-solid); }");
+    // It covers the viewport below the layers (5), panel (10) and header (20), hidden and clear while closed. It
+    // stays hit-testable through the 0.32 s close slide, like the panel, and fades with the menu.
+    const closed = rule(".app-menu .sm-scrim", desktop);
+    for (const declaration of ["inset: 0", "z-index: 1", "pointer-events: auto", "opacity: 0", "visibility: hidden", "visibility 0s linear 0.32s"]) expect(closed).toContain(declaration);
+    const open = rule(".app-menu[data-open] .sm-scrim", desktop);
+    for (const declaration of ["opacity: 1", "visibility: visible"]) expect(open).toContain(declaration);
+    // The app behind is inert while the menu is open on desktop.
+    for (const element of ['<a className="design-skip-link" href="#main-content" inert={behindMenu}>', '<aside className="sidebar" inert={behindMenu}>', '<div className="content-shell" inert={behindMenu}>']) expect(app).toContain(element);
+    for (const prop of ["onMenuOpen={() => setMenuOpen(true)}", "onMenuClose={() => setMenuOpen(false)}"]) expect(menu).toContain(prop);
   });
 });
