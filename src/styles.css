@@ -71,6 +71,9 @@
   --colour-menu-layer: #b497cf;
   --colour-menu-layer-end: #5227ff;
   --colour-menu-accent: #ff6b6b;
+  /* The open panel's top row (2026-11-15): the app name and the Close control as a pair of red capsules, white text
+     (5.3 : 1). */
+  --colour-menu-pill: #cc2e0c;
   /* Text colour pairs. Each --ink-ground-* is a role colour on the black ground; --ink-fill is every role on
      white and pastel fills. src/styles.test.ts checks every pair's contrast from these tokens. */
   --ink-ground: var(--colour-text-inverse);
@@ -106,6 +109,7 @@
      "Menu"/"Close" toggle takes at the topbar's end. */
   --menu-logo: 48px;
   --menu-toggle-width: 112px;
+  --menu-panel-width: clamp(260px, 38vw, 420px);
   /* Utility circles (spec §1.4, §1.5, §1.7; gap 5): the one icon-only button. White d 60 on the ground,
      glyph stroke 2; inside dark panes and sheets a --colour-sheet-control circle d 57, stroke 1.6. Glyph 21.
      Strokes are CSS px at the 21 px glyph size. */
@@ -438,7 +442,8 @@ input::file-selector-button,
 .calendar-overdue-mark,
 .settings-screen,
 .settings-state-label,
-.settings-trash-toggle {
+.settings-trash-toggle,
+.app-menu .sm-panel-brand {
   --ink: var(--ink-ground); --ink-meta: var(--ink-ground-meta); --ink-figure: var(--ink-ground-figure); --ink-accent: var(--ink-ground-accent); --ink-attention: var(--ink-ground-attention); --ink-time: var(--ink-ground-time); color: var(--ink);
 }
 /* Disabled settings controls are white even when pressed (was ordered after the pressed rule). */
@@ -453,7 +458,7 @@ input::file-selector-button,
 h1 { font-size: var(--type-headline); font-weight: var(--type-headline-weight); line-height: var(--type-headline-leading); letter-spacing: var(--type-headline-tracking); }
 .design-batch-copy h3, .design-empty-card > p:first-child, .design-detail-heading h3, .design-profile-copy h2, .profile-editor-title-input { font-size: var(--type-title); font-weight: var(--type-title-weight); line-height: var(--type-title-leading); letter-spacing: var(--type-title-tracking); }
 .design-batch-profile, .design-detail-heading p, .meas-value-small { font-size: var(--type-title-light); font-weight: var(--type-title-light-weight); line-height: var(--type-title-light-leading); letter-spacing: var(--type-title-light-tracking); }
-h2, h3, h4 { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); }
+h2, h3, h4, .sm-panel-brand { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); }
 .design-tip h3, .design-batch-bottom strong, .design-detail-top h2, .design-input-summary h3, .timeline-panel-heading h3, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .design-detail-next strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 .navigation button, .design-batch-bottom > span, .design-topbar-copy p, .design-check-copy strong, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
 body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .guide-step p, .batch-guidance > p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
@@ -1302,12 +1307,13 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .sidebar { display: none; }
   .app-menu { display: block; }
   .app-menu .staggered-menu-header { padding: calc(var(--safe-top) + var(--space-6)) var(--layout-edge) 0; }
-  .app-menu :is(.staggered-menu-panel, .sm-prelayers) { width: clamp(260px, 38vw, 420px); }
+  .app-menu :is(.staggered-menu-panel, .sm-prelayers) { width: var(--menu-panel-width); }
   .app-menu .sm-logo-button { justify-content: center; width: var(--nav-circle); height: var(--nav-circle); min-height: var(--nav-circle); padding: 0; border: 0; border-radius: 50%; background: var(--colour-background); }
   .app-menu .sm-logo-button:hover:not(:disabled) { background: var(--colour-action); }
   .app-menu .sm-logo-img, .app-menu[data-open] .sm-logo-img { width: var(--menu-logo); height: var(--menu-logo); filter: none; }
-  /* The end padding holds the plus icon's corners while it spins to the cross. */
-  .app-menu .sm-toggle { justify-content: flex-end; width: var(--menu-toggle-width); min-height: var(--nav-circle); padding: 0 var(--space-1) 0 0; }
+  /* The end padding holds the plus icon's corners while it spins to the cross. GSAP slides the toggle with the panel,
+     so the generic button's transform and background transitions would make it trail and fade (no transitions). */
+  .app-menu .sm-toggle { justify-content: flex-end; width: var(--menu-toggle-width); min-height: var(--nav-circle); padding: 0 var(--space-1) 0 0; transition: none; }
   .app-menu .sm-toggle:hover:not(:disabled) { background: transparent; }
   /* The current destination (aria-current) is underlined in the accent: a shape, not only a colour. */
   .app-menu .sm-panel-item[aria-current="page"] .sm-panel-itemLabel { text-decoration: underline var(--colour-menu-accent) 0.08em; text-underline-offset: 0.06em; }
@@ -1321,6 +1327,14 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
      so a closing click cannot fall through. Reduced motion drops the transitions, so it jumps. */
   .app-menu .sm-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: auto; opacity: 0; visibility: hidden; transition: opacity 0.32s ease-in, visibility 0s linear 0.32s; }
   .app-menu[data-open] .sm-scrim { opacity: 1; visibility: visible; transition: opacity 0.5s ease-out, visibility 0s; }
+  /* Open panel's top row: while the panel is on screen (data-panel-row, set by the component from the start of the
+     open slide to the end of the close slide) the header spans the panel, so the toggle is the Close control at the
+     panel's right end, riding the slide; the app name sits beside the logo inside the panel. Both are red capsules of
+     the nav circle's height, like the topbar's utility capsules. The toggle's white comes from the component (GSAP),
+     which keeps it white until the close slide ends; the name takes the ground ink. At 1024 the row is 24 + 60 + 12 + name + gap + 112 + 24 within the 389 px panel. */
+  .app-menu[data-panel-row] .staggered-menu-header { width: var(--menu-panel-width); }
+  .app-menu[data-panel-row] .sm-toggle, .app-menu[data-panel-row] .sm-toggle:hover:not(:disabled) { justify-content: center; padding: 0; border-radius: var(--radius-control); background: var(--colour-menu-pill); }
+  .app-menu .sm-panel-brand { position: absolute; top: calc(var(--safe-top) + var(--space-6)); left: calc(var(--layout-edge) + var(--nav-circle) + var(--space-3)); display: flex; align-items: center; height: var(--nav-circle); margin: 0; padding-inline: var(--space-4); border-radius: var(--radius-control); background: var(--colour-menu-pill); white-space: nowrap; }
   .design-topbar { padding-inline: calc(var(--layout-edge) + var(--nav-circle) + var(--space-4)) calc(var(--layout-edge) + var(--menu-toggle-width) + var(--space-4)); }
   .profile-editor-shell .design-dashboard { padding-top: calc(var(--safe-top) + var(--space-6) + var(--nav-circle) + var(--space-6)); }
 }

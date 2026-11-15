@@ -720,6 +720,7 @@ export function App() {
         onItemSelect={(link) => link === "/checks" ? openChecks() : navigate(link === "/calendar" ? "calendar" : link === "/profiles" ? "profiles" : "today")}
         onLogoClick={() => showDialog({ kind: "info" })}
         logoAriaLabel="Home — station information"
+        panelTitle="FermentStation"
       />
       {/* Below 1024 px: the tablet rail and the phone bottom row. Hidden on desktop, where the menu above navigates. */}
       <aside className="sidebar" inert={behindMenu}>

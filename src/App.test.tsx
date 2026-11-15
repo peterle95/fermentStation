@@ -172,6 +172,52 @@ describe("batch workflow", () => {
     expect(screen.getByRole("dialog", { name: "Your fermentation station" })).toBeTruthy();
   });
 
+  it("puts the open menu's Close control in the panel's top row beside the app name, and only while open", () => {
+    // Desktop with reduced motion: the menu's GSAP slides jump to their end, so the close slide finishes at once.
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: /prefers-reduced-motion: reduce|min-width: 1024px/.test(query), media: query, addEventListener() {}, removeEventListener() {} }));
+    try {
+      render(<App />);
+      const menu = document.querySelector<HTMLElement>(".app-menu")!;
+      const panel = document.getElementById("staggered-menu-panel")!;
+      const toggle = screen.getByRole("button", { name: "Open menu" });
+      // Closed: the toggle is "Menu" at the topbar's end; the app name is inside the hidden, inert panel.
+      expect(menu.hasAttribute("data-panel-row")).toBe(false);
+      expect(panel.querySelector(".sm-panel-brand")!.textContent).toBe("FermentStation");
+      expect(panel.getAttribute("aria-hidden")).toBe("true");
+      expect(panel.hasAttribute("inert")).toBe(true);
+
+      // Open: one toggle, now the panel's Close control, beside the visible app name.
+      fireEvent.click(toggle);
+      expect(menu.hasAttribute("data-panel-row")).toBe(true);
+      expect(toggle.getAttribute("aria-label")).toBe("Close menu");
+      expect(toggle.getAttribute("aria-expanded")).toBe("true");
+      expect(panel.getAttribute("aria-hidden")).toBe("false");
+      expect(within(panel).getByText("FermentStation")).toBeTruthy();
+      expect(screen.getAllByRole("button", { name: /menu/i })).toEqual([toggle]);
+
+      // The Close control closes, keeps focus and goes back to the topbar.
+      toggle.focus();
+      fireEvent.click(toggle);
+      expect(toggle.getAttribute("aria-expanded")).toBe("false");
+      expect(toggle.getAttribute("aria-label")).toBe("Open menu");
+      expect(menu.hasAttribute("data-panel-row")).toBe(false);
+      expect(panel.getAttribute("aria-hidden")).toBe("true");
+      expect(document.activeElement).toBe(toggle);
+
+      // Escape and the scrim close it the same way.
+      for (const close of [() => fireEvent.keyDown(document, { key: "Escape" }), () => fireEvent.click(document.querySelector(".app-menu .sm-scrim")!)]) {
+        fireEvent.click(toggle);
+        expect(menu.hasAttribute("data-panel-row")).toBe(true);
+        close();
+        expect(toggle.getAttribute("aria-expanded")).toBe("false");
+        expect(menu.hasAttribute("data-panel-row")).toBe(false);
+        expect(document.activeElement).toBe(toggle);
+      }
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("shows real dated readings without opening tools and explains paused checks", () => {
     const today = localDateForTest();
     const batch = createBatch(createProfileState().profiles[0], { id: "jar", name: "Measured jar", startDate: today });

@@ -852,6 +852,28 @@ With the desktop menu open, the app outside the white panel (topbar buttons incl
 
 - Over the black ground the 32 % black tint adds nothing; the glass reads through the blur of the white and coloured surfaces, which is most of what sits behind the panel.
 
+## 2026-11-15: Close control and app name in the open menu's top row (user request) — done
+
+The user asked for the open menu's "Close ×" to sit in the white panel's top row at its right end (not at the viewport's top-right corner), for "FermentStation" beside the fox logo, and for both on `#CC2E0C`. The closed state is unchanged.
+
+### As built
+
+- One toggle, relocated (no second close button): `src/components/StaggeredMenu.tsx` (`FermentStation:`) sets `data-panel-row` on the wrapper from the start of the open slide to the end of the close slide (a DOM attribute, so it changes in the same frame as the GSAP tweens). With it, the header spans the panel (`--menu-panel-width`, now shared with the panel and layers), so the toggle stands at the panel's right end; GSAP tweens its `x` from `-panel.offsetWidth` with the panel's own duration, ease and start, and back out with the 0.32 s close slide, then clears the transform. It is never at the topbar end while the panel shows, and there is only ever one Menu/Close control. Its colour tween waits for the close slide to end (delay 0.32 s instead of 0.18 s), so the label stays white on the red capsule while it leaves. Labels, `aria-expanded`, Escape, scrim click and focus return are unchanged (focus never leaves the toggle). Reduced motion jumps both ways.
+- `panelTitle` prop: a `p.sm-panel-brand` inside the panel, so it slides with the panel and is hidden and inert with it; `App.tsx` passes "FermentStation".
+- `src/styles.css`: `--colour-menu-pill: #cc2e0c` beside the other menu tokens. Both elements are capsules of the nav circle's height (`--radius-control`, like the topbar's utility capsules); the name uses the old sidebar wordmark's heading role (`h2, h3, h4, .sm-panel-brand`), sits `--space-3` right of the logo, and joins the ground ink set (white). The toggle loses the generic button's transform and background transitions (they made it trail the panel and fade its red in at the topbar end). At 1024 the row is 24 + 60 + 12 + 137 (name) + 20 + 112 + 24 = 389 px, the panel's width; at 1440 the gap is 51 px.
+- Ink rules: text colour must come from an ink set, and a ground-ink surface with a solid fill must give every ground ink 7:1. White on `#cc2e0c` is 5.3:1 and black 4.0:1, so no ink reaches 7:1 on it. `src/styles.test.ts` relaxes that check for this paint only, to `--ink-ground` at 4.5:1 (AA).
+
+### Tests
+
+- `src/App.test.tsx` new "puts the open menu's Close control in the panel's top row…" (matchMedia stubbed to desktop + reduced motion): closed, no `data-panel-row`, the name only in the hidden, inert panel; open, `data-panel-row`, "Close menu", the name visible in the panel, a single menu button; closing by the capsule, Escape and the scrim each remove `data-panel-row` and keep focus on the toggle.
+- `src/styles.test.ts` new "puts the open panel's top row together…" (token and contrast, prop and markup, shared panel width, header and capsule rules, heading role, ground ink set); the ink check's 4.5:1 exception for `--colour-menu-pill`.
+
+### Results
+
+- `npm run typecheck`, `npm run build` clean; `src/App.test.tsx`, `src/App.settings.test.tsx`, `src/styles.test.ts` 239 / 239.
+- Real Chrome (CDP, 1024 × 768 and 1440 × 900, with and without reduced motion): sampled 30–600 ms into the open slide and 60–240 ms into the close slide, the toggle's right edge is exactly 24 px inside the panel's right edge; open, the Close capsule and the name share top (24) and height (60), name 12 px right of the logo, 20 px (1024) / 51 px (1440) before Close; `rgb(204, 46, 12)` with white text; closed again, "Menu" at the topbar end in red with no fill and focus on it. The scrim checks still pass.
+- Harness `-s menu-open,overview,calendar -v desktop,tablet-landscape`: 0 failed, every finding 0; `menu-open` shows the pair at both widths. `overview` and `calendar` at 1440 and 1024 match a capture of `d44ac12` pixel for pixel in the topbar band (one 79 × 4 px anti-aliasing line further down on the 1440 overview).
+
 ## Left for later tickets / known issues
 
 - ~~`styles.test.ts` "opens condensed lettering…" failure~~ — settled by ticket 2 (now guards `h1` = headline).

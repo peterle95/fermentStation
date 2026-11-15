@@ -306,8 +306,11 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
       for (const selector of entry.selectors) {
         const kind = membership.get(selector);
         if (!kind) continue;
-        const inks = kind === "fill" ? ["--ink-fill"] : ["--ink-ground", "--ink-ground-meta", "--ink-ground-accent", "--ink-ground-attention", "--ink-ground-time"];
-        for (const ink of inks) expect(contrast(hex(ink), hex(paint)), `${selector}: ${ink} on ${paint}`).toBeGreaterThanOrEqual(7);
+        // The user's red menu capsules (#cc2e0c, 2026-11-15) carry one white label each: 5.3:1, AA rather than the 7:1
+        // bar, which neither white nor black (4.0:1) reaches on that red.
+        const menuPill = paint === "--colour-menu-pill";
+        const inks = kind === "fill" ? ["--ink-fill"] : menuPill ? ["--ink-ground"] : ["--ink-ground", "--ink-ground-meta", "--ink-ground-accent", "--ink-ground-attention", "--ink-ground-time"];
+        for (const ink of inks) expect(contrast(hex(ink), hex(paint)), `${selector}: ${ink} on ${paint}`).toBeGreaterThanOrEqual(menuPill ? 4.5 : 7);
       }
     }
   });
@@ -1852,5 +1855,23 @@ describe("desktop navigation: React Bits StaggeredMenu (user request 2026-11-14;
     // The app behind is inert while the menu is open on desktop.
     for (const element of ['<a className="design-skip-link" href="#main-content" inert={behindMenu}>', '<aside className="sidebar" inert={behindMenu}>', '<div className="content-shell" inert={behindMenu}>']) expect(app).toContain(element);
     for (const prop of ["onMenuOpen={() => setMenuOpen(true)}", "onMenuClose={() => setMenuOpen(false)}"]) expect(menu).toContain(prop);
+  });
+
+  it("puts the open panel's top row together: the app name and the Close control as a pair of red capsules", () => {
+    // The user's red, white on it at 5.3:1 (AA; the suite's 7:1 bar is relaxed for this paint only).
+    expect(rule(":root")).toContain("--colour-menu-pill: #cc2e0c;");
+    expect(contrast(hex("--ink-ground"), hex("--colour-menu-pill"))).toBeCloseTo(5.3, 1);
+    expect(menu).toContain('panelTitle="FermentStation"');
+    expect(component).toContain('{panelTitle && <p className="sm-panel-brand">{panelTitle}</p>}');
+    // One toggle: while the panel is on screen the header spans only the panel, so the toggle is its Close control.
+    expect(rule(".app-menu :is(.staggered-menu-panel, .sm-prelayers)", desktop)).toBe(" width: var(--menu-panel-width); ");
+    expect(rule(".app-menu[data-panel-row] .staggered-menu-header", desktop)).toBe(" width: var(--menu-panel-width); ");
+    const close = rule(".app-menu[data-panel-row] .sm-toggle, .app-menu[data-panel-row] .sm-toggle:hover:not(:disabled)", desktop);
+    for (const declaration of ["border-radius: var(--radius-control)", "background: var(--colour-menu-pill)"]) expect(close).toContain(declaration);
+    // The name: the old sidebar wordmark's heading role, the same capsule at the nav circle's height beside the logo.
+    expect(styles).toContain("h2, h3, h4, .sm-panel-brand { font-size: var(--type-heading);");
+    const brand = rule(".app-menu .sm-panel-brand", desktop);
+    for (const declaration of ["height: var(--nav-circle)", "border-radius: var(--radius-control)", "background: var(--colour-menu-pill)", "left: calc(var(--layout-edge) + var(--nav-circle) + var(--space-3))"]) expect(brand).toContain(declaration);
+    expect(inkGroups().find((group) => group.selectors.includes(".app-menu .sm-panel-brand"))?.kind).toBe("ground");
   });
 });
