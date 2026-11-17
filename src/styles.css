@@ -59,6 +59,7 @@
   --colour-glass: rgb(255 255 255 / 60%);
   --colour-glass-solid: rgb(255 255 255 / 85%);
   --colour-glass-edge: rgb(255 255 255 / 40%);
+  --colour-glass-tint: rgb(255 255 255 / 10%);
   --colour-event-lilac: #d9b4eb;
   --colour-event-lilac-end: #f6eafc;
   --colour-event-sky: #b4dff9;
@@ -1242,7 +1243,9 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .navigation button[aria-current="page"] .nav-mark { width: var(--nav-icon); height: var(--nav-icon); }
   .navigation .nav-word { display: inline; overflow-wrap: anywhere; word-break: normal; white-space: normal; }
   .navigation button:not([aria-current="page"]) .nav-word { display: none; }
-  .content-shell { grid-area: 1 / 1; height: 100%; }
+  /* The content runs under the floating phone row (grid row 2) to the screen's foot, so it scrolls behind the
+     GlassSurface capsule; the scroll panes below end with room for that row. */
+  .content-shell { grid-area: 1 / 1 / -1; height: 100%; }
   /* Phone topbar (user requests, 2026-11-17): the date line goes, and the settings circle and "Start a batch"
      join the logo on one row, logo | settings, batch. The two controls share whatever the logo leaves, so they
      stay evenly spread edge to edge at every phone width; the date row returns with the 600 px layout. */
@@ -1310,11 +1313,33 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 
 /* Phone bottom row (< 600 px): the React Bits PillNav (src/components/PillNav.tsx), which the user asked for on
    2026-11-17 in place of the RubberSegment; usePhoneNav in App.tsx renders it instead of .navigation. The user chose
-   upstream's dark glass capsule of separate pills, labels only, in the app's font; the selected pill fills from below
-   and a dot slides sideways under its label. These rules only seat it (centred in the row above the safe area) and
-   set the font family. Its colours, sizes and motion are upstream's. */
+   upstream's separate dark pills, labels only, in the app's font; the selected pill fills from below and a dot slides
+   sideways under its label. Its capsule is a React Bits GlassSurface (src/components/GlassSurface.tsx, user
+   2026-11-17) in place of PillNav's dark one, matched to the React Bits demo the user sent: a rounded-rect pane across
+   the row, the pills spread evenly on it at their own size, a white rim and today's faint grey fill. The row floats
+   over the content, so what scrolls under it shows through the glass, bent at the rim. These rules seat it above the
+   safe area, let taps beside the pane reach the content, give the scroll panes room to end clear of it and set the
+   font family. The pills' colours, sizes and motion are upstream's. */
 @media (max-width: 599px) {
-  .phone-navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; min-height: calc(var(--mobile-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); }
+  /* The pane is PillNav's 44 px joined row (a --target-min tall tap row) plus 12 px of glass above and below; the row
+     adds 8 px on each side. */
+  .app-shell { --phone-nav-height: calc(var(--target-min) + 2 * var(--space-3) + 2 * var(--space-2)); }
+  .phone-navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; min-height: calc(var(--phone-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); pointer-events: none; }
+  /* GlassSurface draws its rim from light-dark(): the app's light scheme gives it a black edge, the demo's dark scheme
+     a white one. In the dark scheme its own fill turns black, so today's white grey goes on a layer of its own. */
+  .phone-glass { max-width: 100%; pointer-events: auto; color-scheme: dark; }
+  /* GlassSurface clips its children to the pane's corners, so this layer needs no radius of its own. */
+  .phone-glass::before { content: ""; position: absolute; inset: 0; background: var(--colour-glass-tint); pointer-events: none; }
+  .phone-glass > :last-child { padding: var(--space-3) var(--space-2); }
+  /* The pills spread evenly across the pane. The dot, fill and ink read each slot's offsetLeft, so they follow. */
+  .phone-glass .pill-nav { width: 100%; }
+  .phone-glass .pill-nav-bar,
+  .phone-glass .pill-nav-track { flex: 1 1 auto; }
+  .phone-glass .pill-nav-list,
+  .phone-glass .pill-nav-ink { justify-content: space-evenly; }
+  .main-content { padding-bottom: calc(var(--phone-nav-height) + var(--safe-bottom) + var(--space-6)); }
+  .design-dashboard { padding-bottom: calc(var(--phone-nav-height) + var(--safe-bottom) + var(--space-4)); }
+  .design-selected .design-detail { padding-bottom: calc(var(--phone-nav-height) + var(--safe-bottom) + var(--space-8)); }
   .profile-editor-shell .phone-navigation { display: none; }
   .phone-navigation .pill-nav { font-family: var(--font-family); }
   /* The condensed app face reads small at PillNav's 14 px, so the labels take the meta role; the global button rules (min-height, hover fill,

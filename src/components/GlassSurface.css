@@ -1,0 +1,62 @@
+/* GlassSurface: the upstream Tailwind utilities, ported one-for-one to plain CSS. */
+.glass-surface {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition-property: opacity;
+  transition-duration: 260ms;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+.glass-surface:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  outline-offset: 2px;
+  outline-color: light-dark(#007aff, #0a84ff);
+}
+
+.glass-surface-filter {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.glass-surface-canvas {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.glass-surface-layer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.glass-surface-rim { padding: 3px; }
+
+.glass-surface-trace {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.glass-surface-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  padding: 0.5rem;
+}

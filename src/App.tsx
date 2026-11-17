@@ -74,6 +74,7 @@ import { requestReminderPermission, reconcileReminders } from "./platform/remind
 import { captureNativePhoto, isNativeCameraAvailable, listenForRestoredCameraPhoto, type CapturedPhoto } from "./platform/camera";
 import { StaggeredMenu } from "./components/StaggeredMenu";
 import PillNav from "./components/PillNav";
+import GlassSurface from "./components/GlassSurface";
 import RubberSegment from "./components/RubberSegment";
 import stationLogoUrl from "./assets/station-logo.svg";
 import stationLogoSvg from "./assets/station-logo.svg?raw";
@@ -769,23 +770,28 @@ export function App() {
         </nav>
         ) : (
         <div className="phone-navigation">
-          {/* Upstream's dark glass capsule holding a separate pill per destination, labels only (no logo, no icons).
-              The current destination fills from below and a dot under its label slides sideways to it (user,
-              2026-11-17). It never folds into its burger menu; the CSS fits it to 320 px. */}
-          <PillNav
-            ariaLabel="Primary navigation"
-            items={navDestinations.map((destination) => ({ label: destination === "checks" ? "Checks" : labels[destination], href: destination }))}
-            activeHref={showChecks ? "checks" : shell.destination === "batches" ? "today" : shell.destination}
-            onItemClick={(item) => item.href === "checks" ? openChecks() : navigate(item.href as Exclude<NavDestination, "checks">)}
-            linkComponent={PhoneNavButton}
-            theme="dark"
-            surface="glass"
-            layout="joined"
-            itemStyle="pill"
-            hoverEffect="fill"
-            indicator="dot"
-            collapse="never"
-          />
+          {/* A separate dark pill per destination, labels only (no logo, no icons), on a React Bits GlassSurface
+              pane in place of PillNav's own dark capsule, matched to the React Bits demo (user, 2026-11-17): a
+              full-width rounded rect, 16 px corners, the content scrolling under the floating row showing through,
+              bent at the rim. The current destination fills from below and a dot under its label slides sideways
+              to it. It never folds into its burger menu; the CSS spreads the pills and fits them to 320 px. The
+              grey fill is a CSS layer (styles.css), so the component's own stays off. */}
+          <GlassSurface className="phone-glass" width="100%" height="auto" borderRadius={16} distortionScale={-180} backgroundOpacity={0}>
+            <PillNav
+              ariaLabel="Primary navigation"
+              items={navDestinations.map((destination) => ({ label: destination === "checks" ? "Checks" : labels[destination], href: destination }))}
+              activeHref={showChecks ? "checks" : shell.destination === "batches" ? "today" : shell.destination}
+              onItemClick={(item) => item.href === "checks" ? openChecks() : navigate(item.href as Exclude<NavDestination, "checks">)}
+              linkComponent={PhoneNavButton}
+              theme="dark"
+              surface="none"
+              layout="joined"
+              itemStyle="pill"
+              hoverEffect="fill"
+              indicator="dot"
+              collapse="never"
+            />
+          </GlassSurface>
         </div>
         )}
         <div className="design-sidebar-bottom">
