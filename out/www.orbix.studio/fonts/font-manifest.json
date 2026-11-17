@@ -1,0 +1,57 @@
+{
+  "name": "Unique Typeface",
+  "designer": "Rajesh Rajput",
+  "publisher": "Rajesh Rajput",
+  "source_url": "https://www.behance.net/gallery/160832905/Unique-Typeface-Free-Variable-Condensed-7-Styles",
+  "official_download": "https://rajputrajesh-448.gumroad.com/l/Unique",
+  "license_summary": "Free personal/commercial projects, original font files cannot be modified without written permission. Read original license in acquired archive. Redistribution and web/app embedding rights should be confirmed for your distribution model.",
+  "family_css": "Unique Display",
+  "kind": "rounded condensed display sans",
+  "styles": [
+    {
+      "name": "Thin",
+      "weight": 100
+    },
+    {
+      "name": "ExtraLight",
+      "weight": 200
+    },
+    {
+      "name": "Light",
+      "weight": 300
+    },
+    {
+      "name": "Regular",
+      "weight": 400
+    },
+    {
+      "name": "Medium",
+      "weight": 500
+    },
+    {
+      "name": "SemiBold",
+      "weight": 600
+    },
+    {
+      "name": "Bold",
+      "weight": 700
+    }
+  ],
+  "reported_characters": 367,
+  "reported_glyphs": 422,
+  "character_map_source": "https://befonts.com/unique-font-family.html",
+  "cmap_verified": false,
+  "font_binaries_included": false,
+  "requires_original_download": true,
+  "usage": "Display headings, posters, branding; pair with readable neutral sans for paragraph and small UI text",
+  "color_palette_illustrative": {
+    "acid_lime": "#D9FF57",
+    "hot_orange": "#F14F28",
+    "deep_ink": "#161225",
+    "violet": "#7162FA",
+    "pale_cream": "#FFF0CB",
+    "signal_green": "#11B978",
+    "sun_yellow": "#FFD748"
+  },
+  "design_tokens_guidance": "Spacing/size/color tokens in web/src/tokens.css are suggested, not proprietary font metadata"
+}

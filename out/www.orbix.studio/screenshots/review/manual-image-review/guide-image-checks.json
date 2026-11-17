@@ -1,0 +1,430 @@
+[
+  {
+    "label": "desktop",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "images": [
+      {
+        "slot": "visual slot-hero cover-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-horizon ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-object ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-grid ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-glass ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-tokens ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-sky ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-horizon chapter-backdrop",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-object large-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-glass material-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-sky ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street large-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      }
+    ]
+  },
+  {
+    "label": "tablet-wide",
+    "width": 1024,
+    "scrollWidth": 1024,
+    "images": [
+      {
+        "slot": "visual slot-hero cover-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-horizon ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-object ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-grid ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-glass ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-tokens ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-sky ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-horizon chapter-backdrop",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-object large-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-glass material-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-sky ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street large-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      }
+    ]
+  },
+  {
+    "label": "tablet",
+    "width": 768,
+    "scrollWidth": 768,
+    "images": [
+      {
+        "slot": "visual slot-hero cover-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-horizon ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-object ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-grid ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-glass ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-tokens ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-sky ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-horizon chapter-backdrop",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-object large-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-glass material-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-sky ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street large-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      }
+    ]
+  },
+  {
+    "label": "mobile",
+    "width": 390,
+    "scrollWidth": 390,
+    "images": [
+      {
+        "slot": "visual slot-hero cover-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-horizon ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-object ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-grid ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-glass ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-tokens ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-sky ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-horizon chapter-backdrop",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-object large-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-glass material-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero card-media",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-hero ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-fruit ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-sky ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street ",
+        "label": "AI-generated image",
+        "embedded": true
+      },
+      {
+        "slot": "visual slot-street large-visual",
+        "label": "AI-generated image",
+        "embedded": true
+      }
+    ]
+  }
+]

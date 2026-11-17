@@ -1,0 +1,11 @@
+{
+  "name": "reverse-brand",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Evidence-first, offline unofficial brand guides from public websites",
+  "bin": { "reverse-brand": "./cli.js" },
+  "scripts": { "test": "node --test test/*.test.js" },
+  "dependencies": { "playwright-core": "1.58.2", "sharp": "0.34.5" },
+  "engines": { "node": ">=22" }
+}

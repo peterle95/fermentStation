@@ -9,6 +9,8 @@
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
+    "screenshots": "node scripts/visual/screenshots.mjs",
+    "screenshots:baseline": "node scripts/visual/screenshots.mjs --baseline",
     "cap:sync": "cap sync",
     "android:build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/android-build.ps1",
     "tauri": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tauri.ps1",
@@ -25,6 +27,8 @@
     "@capawesome/capacitor-file-picker": "^7.2.0",
     "@tauri-apps/api": "^2.8.0",
     "fflate": "^0.8.3",
+    "gsap": "^3.13.0",
+    "motion": "^14.14.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

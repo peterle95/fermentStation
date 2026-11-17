@@ -1,0 +1,2458 @@
+{
+  "app": "FermentStation",
+  "files": [
+    {
+      "path": "PREVIEW.png",
+      "bytes": 1432140,
+      "size": [
+        2300,
+        1990
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3764
+    },
+    {
+      "path": "android/adaptive/background-1024.png",
+      "bytes": 51698,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/background-108.png",
+      "bytes": 2883,
+      "size": [
+        108,
+        108
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/background-162.png",
+      "bytes": 4712,
+      "size": [
+        162,
+        162
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/background-216.png",
+      "bytes": 6755,
+      "size": [
+        216,
+        216
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/background-324.png",
+      "bytes": 11144,
+      "size": [
+        324,
+        324
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/background-432.png",
+      "bytes": 16053,
+      "size": [
+        432,
+        432
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/background-512.png",
+      "bytes": 20103,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/foreground-1024.png",
+      "bytes": 408924,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/foreground-108.png",
+      "bytes": 10548,
+      "size": [
+        108,
+        108
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/foreground-162.png",
+      "bytes": 20075,
+      "size": [
+        162,
+        162
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/foreground-216.png",
+      "bytes": 31679,
+      "size": [
+        216,
+        216
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/foreground-324.png",
+      "bytes": 60943,
+      "size": [
+        324,
+        324
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/foreground-432.png",
+      "bytes": 98410,
+      "size": [
+        432,
+        432
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/foreground-512.png",
+      "bytes": 130136,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/monochrome-mask-1024.png",
+      "bytes": 106420,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/monochrome-mask-108.png",
+      "bytes": 5033,
+      "size": [
+        108,
+        108
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/monochrome-mask-162.png",
+      "bytes": 8925,
+      "size": [
+        162,
+        162
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/monochrome-mask-216.png",
+      "bytes": 13325,
+      "size": [
+        216,
+        216
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/monochrome-mask-324.png",
+      "bytes": 23146,
+      "size": [
+        324,
+        324
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/monochrome-mask-432.png",
+      "bytes": 34808,
+      "size": [
+        432,
+        432
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/adaptive/monochrome-mask-512.png",
+      "bytes": 43021,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/google-play-store-512.png",
+      "bytes": 174586,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "android/res/drawable/ic_launcher_foreground.png",
+      "bytes": 98410,
+      "size": [
+        432,
+        432
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/res/drawable/ic_launcher_monochrome.png",
+      "bytes": 33586,
+      "size": [
+        432,
+        432
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "bytes": 341
+    },
+    {
+      "path": "android/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "bytes": 341
+    },
+    {
+      "path": "android/res/mipmap-hdpi/ic_launcher.png",
+      "bytes": 7731,
+      "size": [
+        72,
+        72
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "android/res/mipmap-hdpi/ic_launcher_round.png",
+      "bytes": 10212,
+      "size": [
+        72,
+        72
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/res/mipmap-mdpi/ic_launcher.png",
+      "bytes": 4088,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "android/res/mipmap-mdpi/ic_launcher_round.png",
+      "bytes": 5518,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/res/mipmap-xhdpi/ic_launcher.png",
+      "bytes": 12113,
+      "size": [
+        96,
+        96
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "android/res/mipmap-xhdpi/ic_launcher_round.png",
+      "bytes": 16056,
+      "size": [
+        96,
+        96
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/res/mipmap-xxhdpi/ic_launcher.png",
+      "bytes": 22671,
+      "size": [
+        144,
+        144
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "android/res/mipmap-xxhdpi/ic_launcher_round.png",
+      "bytes": 29226,
+      "size": [
+        144,
+        144
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/res/mipmap-xxxhdpi/ic_launcher.png",
+      "bytes": 35481,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "android/res/mipmap-xxxhdpi/ic_launcher_round.png",
+      "bytes": 45329,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "android/res/values/colors.xml",
+      "bytes": 115
+    },
+    {
+      "path": "background-themes/charcoal-1024.png",
+      "bytes": 556941,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/charcoal-192.png",
+      "bytes": 37769,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/charcoal-512.png",
+      "bytes": 183016,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/charcoal-64.png",
+      "bytes": 6800,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/coral-1024.png",
+      "bytes": 539693,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/coral-192.png",
+      "bytes": 35650,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/coral-512.png",
+      "bytes": 175009,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/coral-64.png",
+      "bytes": 6416,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/cream-1024.png",
+      "bytes": 538003,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/cream-192.png",
+      "bytes": 35481,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/cream-512.png",
+      "bytes": 174586,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/cream-64.png",
+      "bytes": 6446,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/forest-1024.png",
+      "bytes": 556952,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/forest-192.png",
+      "bytes": 37808,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/forest-512.png",
+      "bytes": 183042,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/forest-64.png",
+      "bytes": 6794,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/lavender-1024.png",
+      "bytes": 543220,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/lavender-192.png",
+      "bytes": 36416,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/lavender-512.png",
+      "bytes": 176798,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/lavender-64.png",
+      "bytes": 6596,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/midnight-1024.png",
+      "bytes": 556986,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/midnight-192.png",
+      "bytes": 37880,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/midnight-512.png",
+      "bytes": 183175,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/midnight-64.png",
+      "bytes": 6823,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/mint-1024.png",
+      "bytes": 544012,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/mint-192.png",
+      "bytes": 36670,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/mint-512.png",
+      "bytes": 177536,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/mint-64.png",
+      "bytes": 6660,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/plum-1024.png",
+      "bytes": 556139,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/plum-192.png",
+      "bytes": 37754,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/plum-512.png",
+      "bytes": 182753,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/plum-64.png",
+      "bytes": 6816,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sage-1024.png",
+      "bytes": 542794,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sage-192.png",
+      "bytes": 36291,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sage-512.png",
+      "bytes": 176712,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sage-64.png",
+      "bytes": 6607,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sand-1024.png",
+      "bytes": 539802,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sand-192.png",
+      "bytes": 35597,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sand-512.png",
+      "bytes": 174914,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sand-64.png",
+      "bytes": 6507,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sky-1024.png",
+      "bytes": 543980,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sky-192.png",
+      "bytes": 36679,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sky-512.png",
+      "bytes": 177620,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/sky-64.png",
+      "bytes": 6666,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/white-1024.png",
+      "bytes": 524155,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/white-192.png",
+      "bytes": 33066,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/white-512.png",
+      "bytes": 166994,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "background-themes/white-64.png",
+      "bytes": 5918,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "desktop/Windows-app-icon.ico",
+      "bytes": 78070
+    },
+    {
+      "path": "desktop/app-icon-1024.png",
+      "bytes": 538003,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "desktop/macOS-app-icon.icns",
+      "bytes": 815939
+    },
+    {
+      "path": "drop-in-assets/app_logo-full-bleed.png",
+      "bytes": 538003,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "drop-in-assets/app_logo.png",
+      "bytes": 1646724,
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "drop-in-assets/apple-touch-icon.png",
+      "bytes": 32109,
+      "size": [
+        180,
+        180
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "drop-in-assets/favicon-64.png",
+      "bytes": 7100,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "drop-in-assets/favicon.ico",
+      "bytes": 89125
+    },
+    {
+      "path": "drop-in-assets/icon-192.png",
+      "bytes": 35481,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "drop-in-assets/icon-512.png",
+      "bytes": 174586,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "drop-in-assets/icon-maskable-512.png",
+      "bytes": 114949,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "drop-in-assets/manifest.webmanifest",
+      "bytes": 740
+    },
+    {
+      "path": "ios/AppIcon.appiconset/Contents.json",
+      "bytes": 2397
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ios-marketing-1024pt-1x-1024.png",
+      "bytes": 538003,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-20pt-1x-20.png",
+      "bytes": 1026,
+      "size": [
+        20,
+        20
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-20pt-2x-40.png",
+      "bytes": 3074,
+      "size": [
+        40,
+        40
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-29pt-1x-29.png",
+      "bytes": 1812,
+      "size": [
+        29,
+        29
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-29pt-2x-58.png",
+      "bytes": 5520,
+      "size": [
+        58,
+        58
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-40pt-1x-40.png",
+      "bytes": 3074,
+      "size": [
+        40,
+        40
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-40pt-2x-80.png",
+      "bytes": 9162,
+      "size": [
+        80,
+        80
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-76pt-1x-76.png",
+      "bytes": 8444,
+      "size": [
+        76,
+        76
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-76pt-2x-152.png",
+      "bytes": 24760,
+      "size": [
+        152,
+        152
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-ipad-83_5pt-2x-167.png",
+      "bytes": 28571,
+      "size": [
+        167,
+        167
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-iphone-20pt-2x-40.png",
+      "bytes": 3074,
+      "size": [
+        40,
+        40
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-iphone-20pt-3x-60.png",
+      "bytes": 5820,
+      "size": [
+        60,
+        60
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-iphone-29pt-2x-58.png",
+      "bytes": 5520,
+      "size": [
+        58,
+        58
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-iphone-29pt-3x-87.png",
+      "bytes": 10414,
+      "size": [
+        87,
+        87
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-iphone-40pt-2x-80.png",
+      "bytes": 9162,
+      "size": [
+        80,
+        80
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-iphone-40pt-3x-120.png",
+      "bytes": 17165,
+      "size": [
+        120,
+        120
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-iphone-60pt-2x-120.png",
+      "bytes": 17165,
+      "size": [
+        120,
+        120
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "ios/AppIcon.appiconset/icon-iphone-60pt-3x-180.png",
+      "bytes": 32109,
+      "size": [
+        180,
+        180
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "monochrome/black-1024.png",
+      "bytes": 121526,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/black-128.png",
+      "bytes": 14087,
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/black-192.png",
+      "bytes": 23605,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/black-256.png",
+      "bytes": 33188,
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/black-48.png",
+      "bytes": 3695,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/black-512.png",
+      "bytes": 75466,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/black-64.png",
+      "bytes": 5603,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/black-vector.svg",
+      "bytes": 5623
+    },
+    {
+      "path": "monochrome/orange-1024.png",
+      "bytes": 121544,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/orange-128.png",
+      "bytes": 15233,
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/orange-192.png",
+      "bytes": 25955,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/orange-256.png",
+      "bytes": 36732,
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/orange-48.png",
+      "bytes": 3859,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/orange-512.png",
+      "bytes": 84613,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/orange-64.png",
+      "bytes": 5848,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/orange-vector.svg",
+      "bytes": 5623
+    },
+    {
+      "path": "monochrome/white-1024.png",
+      "bytes": 121619,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/white-128.png",
+      "bytes": 9329,
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/white-192.png",
+      "bytes": 16030,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/white-256.png",
+      "bytes": 23270,
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/white-48.png",
+      "bytes": 2392,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/white-512.png",
+      "bytes": 57830,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/white-64.png",
+      "bytes": 3573,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "monochrome/white-vector.svg",
+      "bytes": 5623
+    },
+    {
+      "path": "recolored-accents/berry-rose-dark-1024.png",
+      "bytes": 552773,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/berry-rose-dark-192.png",
+      "bytes": 37018,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/berry-rose-dark-512.png",
+      "bytes": 180468,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/berry-rose-light-1024.png",
+      "bytes": 534460,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/berry-rose-light-192.png",
+      "bytes": 35292,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/berry-rose-light-512.png",
+      "bytes": 173114,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/berry-rose-transparent-1024.png",
+      "bytes": 634198,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "recolored-accents/botanical-green-dark-1024.png",
+      "bytes": 559720,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/botanical-green-dark-192.png",
+      "bytes": 37292,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/botanical-green-dark-512.png",
+      "bytes": 182207,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/botanical-green-light-1024.png",
+      "bytes": 543811,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/botanical-green-light-192.png",
+      "bytes": 36112,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/botanical-green-light-512.png",
+      "bytes": 176260,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/botanical-green-transparent-1024.png",
+      "bytes": 648071,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "recolored-accents/cobalt-blue-dark-1024.png",
+      "bytes": 555582,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/cobalt-blue-dark-192.png",
+      "bytes": 37203,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/cobalt-blue-dark-512.png",
+      "bytes": 181574,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/cobalt-blue-light-1024.png",
+      "bytes": 541060,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/cobalt-blue-light-192.png",
+      "bytes": 36218,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/cobalt-blue-light-512.png",
+      "bytes": 176332,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/cobalt-blue-transparent-1024.png",
+      "bytes": 644945,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "recolored-accents/coral-red-dark-1024.png",
+      "bytes": 551366,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/coral-red-dark-192.png",
+      "bytes": 36883,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/coral-red-dark-512.png",
+      "bytes": 180264,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/coral-red-light-1024.png",
+      "bytes": 532717,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/coral-red-light-192.png",
+      "bytes": 35145,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/coral-red-light-512.png",
+      "bytes": 172847,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/coral-red-transparent-1024.png",
+      "bytes": 631682,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "recolored-accents/golden-yellow-dark-1024.png",
+      "bytes": 531155,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/golden-yellow-dark-192.png",
+      "bytes": 36850,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/golden-yellow-dark-512.png",
+      "bytes": 176324,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/golden-yellow-light-1024.png",
+      "bytes": 510449,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/golden-yellow-light-192.png",
+      "bytes": 33812,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/golden-yellow-light-512.png",
+      "bytes": 165922,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/golden-yellow-transparent-1024.png",
+      "bytes": 603563,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "recolored-accents/lagoon-teal-dark-1024.png",
+      "bytes": 546018,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/lagoon-teal-dark-192.png",
+      "bytes": 37053,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/lagoon-teal-dark-512.png",
+      "bytes": 179177,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/lagoon-teal-light-1024.png",
+      "bytes": 524629,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/lagoon-teal-light-192.png",
+      "bytes": 34001,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/lagoon-teal-light-512.png",
+      "bytes": 168427,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/lagoon-teal-transparent-1024.png",
+      "bytes": 621456,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "recolored-accents/purple-dark-1024.png",
+      "bytes": 545357,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/purple-dark-192.png",
+      "bytes": 37393,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/purple-dark-512.png",
+      "bytes": 180093,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/purple-light-1024.png",
+      "bytes": 529274,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/purple-light-192.png",
+      "bytes": 35873,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/purple-light-512.png",
+      "bytes": 173267,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "recolored-accents/purple-transparent-1024.png",
+      "bytes": 628834,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-cream-1024.png",
+      "bytes": 640179,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-cream-192.png",
+      "bytes": 41284,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-cream-512.png",
+      "bytes": 205924,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-forest-1024.png",
+      "bytes": 662739,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-forest-192.png",
+      "bytes": 43155,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-forest-512.png",
+      "bytes": 212488,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-lavender-1024.png",
+      "bytes": 646342,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-lavender-192.png",
+      "bytes": 42101,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-lavender-512.png",
+      "bytes": 208447,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-midnight-1024.png",
+      "bytes": 662733,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-midnight-192.png",
+      "bytes": 43146,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-midnight-512.png",
+      "bytes": 212537,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-sage-1024.png",
+      "bytes": 645933,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-sage-192.png",
+      "bytes": 41966,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-sage-512.png",
+      "bytes": 207898,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-white-1024.png",
+      "bytes": 625541,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-white-192.png",
+      "bytes": 39394,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/circle-white-512.png",
+      "bytes": 199566,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/rounded-square-1024.png",
+      "bytes": 637533,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/rounded-square-192.png",
+      "bytes": 40904,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "shapes/rounded-square-512.png",
+      "bytes": 204738,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "source-original.png",
+      "bytes": 1262844,
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "source-transparent-extracted.png",
+      "bytes": 1286934,
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "svg/light-app-icon-embedded-png.svg",
+      "bytes": 663570
+    },
+    {
+      "path": "svg/original-artwork-embedded-png.svg",
+      "bytes": 684418
+    },
+    {
+      "path": "transparent/logo-transparent-100.png",
+      "bytes": 14900,
+      "size": [
+        100,
+        100
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-1024.png",
+      "bytes": 645911,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-114.png",
+      "bytes": 18258,
+      "size": [
+        114,
+        114
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-120.png",
+      "bytes": 19884,
+      "size": [
+        120,
+        120
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-128.png",
+      "bytes": 22094,
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-144.png",
+      "bytes": 26253,
+      "size": [
+        144,
+        144
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-152.png",
+      "bytes": 28851,
+      "size": [
+        152,
+        152
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-16.png",
+      "bytes": 840,
+      "size": [
+        16,
+        16
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-167.png",
+      "bytes": 33181,
+      "size": [
+        167,
+        167
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-180.png",
+      "bytes": 37376,
+      "size": [
+        180,
+        180
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-192.png",
+      "bytes": 41497,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-196.png",
+      "bytes": 42889,
+      "size": [
+        196,
+        196
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-20.png",
+      "bytes": 1223,
+      "size": [
+        20,
+        20
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-216.png",
+      "bytes": 50071,
+      "size": [
+        216,
+        216
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-24.png",
+      "bytes": 1600,
+      "size": [
+        24,
+        24
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-256.png",
+      "bytes": 65695,
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-29.png",
+      "bytes": 2127,
+      "size": [
+        29,
+        29
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-32.png",
+      "bytes": 2462,
+      "size": [
+        32,
+        32
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-36.png",
+      "bytes": 2939,
+      "size": [
+        36,
+        36
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-384.png",
+      "bytes": 128163,
+      "size": [
+        384,
+        384
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-40.png",
+      "bytes": 3543,
+      "size": [
+        40,
+        40
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-432.png",
+      "bytes": 155069,
+      "size": [
+        432,
+        432
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-48.png",
+      "bytes": 4653,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-50.png",
+      "bytes": 4972,
+      "size": [
+        50,
+        50
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-512.png",
+      "bytes": 207663,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-57.png",
+      "bytes": 6092,
+      "size": [
+        57,
+        57
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-58.png",
+      "bytes": 6285,
+      "size": [
+        58,
+        58
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-60.png",
+      "bytes": 6647,
+      "size": [
+        60,
+        60
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-64.png",
+      "bytes": 7388,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-72.png",
+      "bytes": 8925,
+      "size": [
+        72,
+        72
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-76.png",
+      "bytes": 9629,
+      "size": [
+        76,
+        76
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-80.png",
+      "bytes": 10499,
+      "size": [
+        80,
+        80
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-87.png",
+      "bytes": 11952,
+      "size": [
+        87,
+        87
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "transparent/logo-transparent-96.png",
+      "bytes": 13853,
+      "size": [
+        96,
+        96
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/INTEGRATION.html",
+      "bytes": 336
+    },
+    {
+      "path": "web/apple-touch-icon.png",
+      "bytes": 32109,
+      "size": [
+        180,
+        180
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "web/favicon-16x16.png",
+      "bytes": 788,
+      "size": [
+        16,
+        16
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-256.png",
+      "bytes": 67564,
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-32x32.png",
+      "bytes": 2350,
+      "size": [
+        32,
+        32
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-48x48.png",
+      "bytes": 4509,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-64.png",
+      "bytes": 7100,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-64x64.png",
+      "bytes": 7100,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-cat-128.png",
+      "bytes": 21566,
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-cat-16.png",
+      "bytes": 788,
+      "size": [
+        16,
+        16
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-cat-256.png",
+      "bytes": 67564,
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-cat-32.png",
+      "bytes": 2350,
+      "size": [
+        32,
+        32
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-cat-48.png",
+      "bytes": 4509,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-cat-512.png",
+      "bytes": 210432,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-cat-64.png",
+      "bytes": 7100,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-cat-master.png",
+      "bytes": 67564,
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-jar-128.png",
+      "bytes": 19926,
+      "size": [
+        128,
+        128
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-jar-16.png",
+      "bytes": 688,
+      "size": [
+        16,
+        16
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-jar-256.png",
+      "bytes": 67376,
+      "size": [
+        256,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-jar-32.png",
+      "bytes": 2123,
+      "size": [
+        32,
+        32
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-jar-48.png",
+      "bytes": 4060,
+      "size": [
+        48,
+        48
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-jar-512.png",
+      "bytes": 224642,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon-jar-64.png",
+      "bytes": 6473,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/favicon.ico",
+      "bytes": 89125
+    },
+    {
+      "path": "web/favicon.png",
+      "bytes": 7100,
+      "size": [
+        64,
+        64
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "web/icon-1024.png",
+      "bytes": 538003,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "web/icon-192.png",
+      "bytes": 35481,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "web/icon-512.png",
+      "bytes": 174586,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "web/icon-maskable-1024.png",
+      "bytes": 351947,
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "web/icon-maskable-192.png",
+      "bytes": 24975,
+      "size": [
+        192,
+        192
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "web/icon-maskable-512.png",
+      "bytes": 114949,
+      "size": [
+        512,
+        512
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "web/manifest.webmanifest",
+      "bytes": 740
+    }
+  ]
+}

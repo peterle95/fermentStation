@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, configDefaults } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { pwaManifest } from "./src/platform/pwa";
@@ -14,22 +14,12 @@ export default defineConfig({
         "icon-192.png",
         "icon-512.png",
         "icon-maskable-512.png",
+        "new-design/*",
+        "fonts/unique/*",
       ],
       manifest: pwaManifest,
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: "CacheFirst",
-            options: { cacheName: "google-fonts-css", expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: "CacheFirst",
-            options: { cacheName: "google-fonts-webfonts", expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
-          },
-        ],
       },
     }),
   ],
@@ -37,10 +27,16 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     watch: {
-      ignored: ["**/src-tauri/target/**"],
+      // screenshots/: output of `npm run screenshots`; its index.html would otherwise trigger full reloads.
+      ignored: ["**/src-tauri/target/**", "**/screenshots/**"],
     },
   },
   test: {
     environment: "node",
+    // The App integration tests drive the whole UI through many awaited interactions; the slowest
+    // ("reflects edited cadence and pauses and resumes checks…") takes 5-8 s alone and longer when the
+    // files run in parallel, so vitest's 5 s default made a plain `npm test` fail on timing alone.
+    testTimeout: 30_000,
+    exclude: [...configDefaults.exclude, "tools/**"],
   },
 });

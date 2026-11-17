@@ -1,0 +1,13 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "frames": 2700,
+  "duration": 45,
+  "codec": "libx264",
+  "crf": 14,
+  "pixelFormat": "yuv420p",
+  "range": "tv",
+  "matrix": "bt709",
+  "timing": "Every Web Animation paused and sought to i/60. One screenshot per encoded frame."
+}

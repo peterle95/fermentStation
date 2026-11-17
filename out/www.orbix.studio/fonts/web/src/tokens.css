@@ -1,0 +1,21 @@
+/* Suggested layout tokens, NOT font metadata; serve /fonts/unique.css after installing genuine fonts. */
+@import url('/fonts/unique.css');
+:root {
+  --type-display: 'Unique Display', Impact, 'Arial Narrow', sans-serif;
+  --type-ui: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --color-lime: #D9FF57;
+  --color-coral: #F14F28;
+  --color-ink: #161225;
+  --color-violet: #7162FA;
+  --color-paper: #FFF0CB;
+  --color-green: #11B978;
+  --display-tight: 0.9;
+}
+.type-display { font-family: var(--type-display); font-synthesis: none; }
+.type-display--hero { font-family: var(--type-display); font-size: clamp(4.5rem, 13vw, 14rem); font-weight: 700; line-height: .84; letter-spacing: -.012em; overflow-wrap: normal; }
+.type-display--h1 { font-family: var(--type-display); font-size: clamp(3rem, 7vw, 8rem); font-weight: 600; line-height: .9; letter-spacing: 0; }
+.type-display--h2 { font-family: var(--type-display); font-size: clamp(2rem, 4vw, 4.25rem); font-weight: 500; line-height: 1; }
+.type-body { font-family: var(--type-ui); font-size: 1rem; line-height: 1.55; }
+@media (max-width: 500px) {
+  .type-display--hero { font-size: clamp(3.4rem, 16vw, 6.5rem); }
+}

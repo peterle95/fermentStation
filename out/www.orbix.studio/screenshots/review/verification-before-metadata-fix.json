@@ -1,0 +1,150 @@
+{
+  "passed": false,
+  "checks": [
+    {
+      "name": "brand-guide.html: byte budget",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: token JSON",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: no copied assets or remote dependencies",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: offline, no network attempts or script errors",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: required sections and disclosures",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: quotes, rules and inline tokens",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: AI attribution",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: token rebuild computed styles",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: typography tabs use distinct role sizes",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: keyboard focus visible on light and dark grounds",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: no horizontal scroll at 1440px",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: no horizontal scroll at 1024px",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: no horizontal scroll at 768px",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: no horizontal scroll at 390px",
+      "pass": true
+    },
+    {
+      "name": "brand-guide.html: no delayed network attempts",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: byte budget",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: token JSON",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: no copied assets or remote dependencies",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: offline, no network attempts or script errors",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: required sections and disclosures",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: quotes, rules and inline tokens",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: AI attribution",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: token rebuild computed styles",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: typography tabs use distinct role sizes",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: keyboard focus visible on light and dark grounds",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: no horizontal scroll at 1440px",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: no horizontal scroll at 1024px",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: no horizontal scroll at 768px",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: no horizontal scroll at 390px",
+      "pass": true
+    },
+    {
+      "name": "brand-guide-hero.html: no delayed network attempts",
+      "pass": true
+    },
+    {
+      "name": "instagram: dimensions, counts and disclaimers",
+      "pass": true
+    },
+    {
+      "name": "x: dimensions, counts and disclaimers",
+      "pass": true
+    },
+    {
+      "name": "video: 11 scenes, seekable paused animations and labelled images",
+      "pass": true
+    },
+    {
+      "name": "video: encoded frame count, duration, colour and frame rate",
+      "pass": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'bt709'\n\n    at file:///C:/Users/molze/GitHub/fermentstation/tools/reverse-brand/verify.js:127:330\n    at async check (file:///C:/Users/molze/GitHub/fermentstation/tools/reverse-brand/verify.js:13:37)\n    at async verify (file:///C:/Users/molze/GitHub/fermentstation/tools/reverse-brand/verify.js:122:16)"
+    }
+  ],
+  "failures": [
+    {
+      "name": "video: encoded frame count, duration, colour and frame rate",
+      "pass": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'bt709'\n\n    at file:///C:/Users/molze/GitHub/fermentstation/tools/reverse-brand/verify.js:127:330\n    at async check (file:///C:/Users/molze/GitHub/fermentstation/tools/reverse-brand/verify.js:13:37)\n    at async verify (file:///C:/Users/molze/GitHub/fermentstation/tools/reverse-brand/verify.js:122:16)"
+    }
+  ],
+  "checkedAt": "2026-11-09T21:19:44.347Z"
+}

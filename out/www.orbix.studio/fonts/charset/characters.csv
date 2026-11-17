@@ -1,0 +1,365 @@
+﻿group,character,unicode,name
+Uppercase A–Z,A,U+0041,LATIN CAPITAL LETTER A
+Uppercase A–Z,B,U+0042,LATIN CAPITAL LETTER B
+Uppercase A–Z,C,U+0043,LATIN CAPITAL LETTER C
+Uppercase A–Z,D,U+0044,LATIN CAPITAL LETTER D
+Uppercase A–Z,E,U+0045,LATIN CAPITAL LETTER E
+Uppercase A–Z,F,U+0046,LATIN CAPITAL LETTER F
+Uppercase A–Z,G,U+0047,LATIN CAPITAL LETTER G
+Uppercase A–Z,H,U+0048,LATIN CAPITAL LETTER H
+Uppercase A–Z,I,U+0049,LATIN CAPITAL LETTER I
+Uppercase A–Z,J,U+004A,LATIN CAPITAL LETTER J
+Uppercase A–Z,K,U+004B,LATIN CAPITAL LETTER K
+Uppercase A–Z,L,U+004C,LATIN CAPITAL LETTER L
+Uppercase A–Z,M,U+004D,LATIN CAPITAL LETTER M
+Uppercase A–Z,N,U+004E,LATIN CAPITAL LETTER N
+Uppercase A–Z,O,U+004F,LATIN CAPITAL LETTER O
+Uppercase A–Z,P,U+0050,LATIN CAPITAL LETTER P
+Uppercase A–Z,Q,U+0051,LATIN CAPITAL LETTER Q
+Uppercase A–Z,R,U+0052,LATIN CAPITAL LETTER R
+Uppercase A–Z,S,U+0053,LATIN CAPITAL LETTER S
+Uppercase A–Z,T,U+0054,LATIN CAPITAL LETTER T
+Uppercase A–Z,U,U+0055,LATIN CAPITAL LETTER U
+Uppercase A–Z,V,U+0056,LATIN CAPITAL LETTER V
+Uppercase A–Z,W,U+0057,LATIN CAPITAL LETTER W
+Uppercase A–Z,X,U+0058,LATIN CAPITAL LETTER X
+Uppercase A–Z,Y,U+0059,LATIN CAPITAL LETTER Y
+Uppercase A–Z,Z,U+005A,LATIN CAPITAL LETTER Z
+Lowercase a–z,a,U+0061,LATIN SMALL LETTER A
+Lowercase a–z,b,U+0062,LATIN SMALL LETTER B
+Lowercase a–z,c,U+0063,LATIN SMALL LETTER C
+Lowercase a–z,d,U+0064,LATIN SMALL LETTER D
+Lowercase a–z,e,U+0065,LATIN SMALL LETTER E
+Lowercase a–z,f,U+0066,LATIN SMALL LETTER F
+Lowercase a–z,g,U+0067,LATIN SMALL LETTER G
+Lowercase a–z,h,U+0068,LATIN SMALL LETTER H
+Lowercase a–z,i,U+0069,LATIN SMALL LETTER I
+Lowercase a–z,j,U+006A,LATIN SMALL LETTER J
+Lowercase a–z,k,U+006B,LATIN SMALL LETTER K
+Lowercase a–z,l,U+006C,LATIN SMALL LETTER L
+Lowercase a–z,m,U+006D,LATIN SMALL LETTER M
+Lowercase a–z,n,U+006E,LATIN SMALL LETTER N
+Lowercase a–z,o,U+006F,LATIN SMALL LETTER O
+Lowercase a–z,p,U+0070,LATIN SMALL LETTER P
+Lowercase a–z,q,U+0071,LATIN SMALL LETTER Q
+Lowercase a–z,r,U+0072,LATIN SMALL LETTER R
+Lowercase a–z,s,U+0073,LATIN SMALL LETTER S
+Lowercase a–z,t,U+0074,LATIN SMALL LETTER T
+Lowercase a–z,u,U+0075,LATIN SMALL LETTER U
+Lowercase a–z,v,U+0076,LATIN SMALL LETTER V
+Lowercase a–z,w,U+0077,LATIN SMALL LETTER W
+Lowercase a–z,x,U+0078,LATIN SMALL LETTER X
+Lowercase a–z,y,U+0079,LATIN SMALL LETTER Y
+Lowercase a–z,z,U+007A,LATIN SMALL LETTER Z
+Numerals,0,U+0030,DIGIT ZERO
+Numerals,1,U+0031,DIGIT ONE
+Numerals,2,U+0032,DIGIT TWO
+Numerals,3,U+0033,DIGIT THREE
+Numerals,4,U+0034,DIGIT FOUR
+Numerals,5,U+0035,DIGIT FIVE
+Numerals,6,U+0036,DIGIT SIX
+Numerals,7,U+0037,DIGIT SEVEN
+Numerals,8,U+0038,DIGIT EIGHT
+Numerals,9,U+0039,DIGIT NINE
+ASCII punctuation & keyboard symbols,!,U+0021,EXCLAMATION MARK
+ASCII punctuation & keyboard symbols,"""",U+0022,QUOTATION MARK
+ASCII punctuation & keyboard symbols,#,U+0023,NUMBER SIGN
+ASCII punctuation & keyboard symbols,$,U+0024,DOLLAR SIGN
+ASCII punctuation & keyboard symbols,%,U+0025,PERCENT SIGN
+ASCII punctuation & keyboard symbols,&,U+0026,AMPERSAND
+ASCII punctuation & keyboard symbols,',U+0027,APOSTROPHE
+ASCII punctuation & keyboard symbols,(,U+0028,LEFT PARENTHESIS
+ASCII punctuation & keyboard symbols,),U+0029,RIGHT PARENTHESIS
+ASCII punctuation & keyboard symbols,*,U+002A,ASTERISK
+ASCII punctuation & keyboard symbols,+,U+002B,PLUS SIGN
+ASCII punctuation & keyboard symbols,",",U+002C,COMMA
+ASCII punctuation & keyboard symbols,-,U+002D,HYPHEN-MINUS
+ASCII punctuation & keyboard symbols,.,U+002E,FULL STOP
+ASCII punctuation & keyboard symbols,/,U+002F,SOLIDUS
+ASCII punctuation & keyboard symbols,:,U+003A,COLON
+ASCII punctuation & keyboard symbols,;,U+003B,SEMICOLON
+ASCII punctuation & keyboard symbols,<,U+003C,LESS-THAN SIGN
+ASCII punctuation & keyboard symbols,=,U+003D,EQUALS SIGN
+ASCII punctuation & keyboard symbols,>,U+003E,GREATER-THAN SIGN
+ASCII punctuation & keyboard symbols,?,U+003F,QUESTION MARK
+ASCII punctuation & keyboard symbols,@,U+0040,COMMERCIAL AT
+ASCII punctuation & keyboard symbols,[,U+005B,LEFT SQUARE BRACKET
+ASCII punctuation & keyboard symbols,\,U+005C,REVERSE SOLIDUS
+ASCII punctuation & keyboard symbols,],U+005D,RIGHT SQUARE BRACKET
+ASCII punctuation & keyboard symbols,^,U+005E,CIRCUMFLEX ACCENT
+ASCII punctuation & keyboard symbols,_,U+005F,LOW LINE
+ASCII punctuation & keyboard symbols,`,U+0060,GRAVE ACCENT
+ASCII punctuation & keyboard symbols,{,U+007B,LEFT CURLY BRACKET
+ASCII punctuation & keyboard symbols,|,U+007C,VERTICAL LINE
+ASCII punctuation & keyboard symbols,},U+007D,RIGHT CURLY BRACKET
+ASCII punctuation & keyboard symbols,~,U+007E,TILDE
+Latin-1 and Western European accents,¡,U+00A1,INVERTED EXCLAMATION MARK
+Latin-1 and Western European accents,¢,U+00A2,CENT SIGN
+Latin-1 and Western European accents,£,U+00A3,POUND SIGN
+Latin-1 and Western European accents,¤,U+00A4,CURRENCY SIGN
+Latin-1 and Western European accents,¥,U+00A5,YEN SIGN
+Latin-1 and Western European accents,¦,U+00A6,BROKEN BAR
+Latin-1 and Western European accents,§,U+00A7,SECTION SIGN
+Latin-1 and Western European accents,¨,U+00A8,DIAERESIS
+Latin-1 and Western European accents,©,U+00A9,COPYRIGHT SIGN
+Latin-1 and Western European accents,ª,U+00AA,FEMININE ORDINAL INDICATOR
+Latin-1 and Western European accents,«,U+00AB,LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+Latin-1 and Western European accents,¬,U+00AC,NOT SIGN
+Latin-1 and Western European accents,®,U+00AE,REGISTERED SIGN
+Latin-1 and Western European accents,¯,U+00AF,MACRON
+Latin-1 and Western European accents,°,U+00B0,DEGREE SIGN
+Latin-1 and Western European accents,±,U+00B1,PLUS-MINUS SIGN
+Latin-1 and Western European accents,²,U+00B2,SUPERSCRIPT TWO
+Latin-1 and Western European accents,³,U+00B3,SUPERSCRIPT THREE
+Latin-1 and Western European accents,´,U+00B4,ACUTE ACCENT
+Latin-1 and Western European accents,¶,U+00B6,PILCROW SIGN
+Latin-1 and Western European accents,·,U+00B7,MIDDLE DOT
+Latin-1 and Western European accents,¸,U+00B8,CEDILLA
+Latin-1 and Western European accents,¹,U+00B9,SUPERSCRIPT ONE
+Latin-1 and Western European accents,º,U+00BA,MASCULINE ORDINAL INDICATOR
+Latin-1 and Western European accents,»,U+00BB,RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+Latin-1 and Western European accents,¼,U+00BC,VULGAR FRACTION ONE QUARTER
+Latin-1 and Western European accents,½,U+00BD,VULGAR FRACTION ONE HALF
+Latin-1 and Western European accents,¾,U+00BE,VULGAR FRACTION THREE QUARTERS
+Latin-1 and Western European accents,¿,U+00BF,INVERTED QUESTION MARK
+Latin-1 and Western European accents,À,U+00C0,LATIN CAPITAL LETTER A WITH GRAVE
+Latin-1 and Western European accents,Á,U+00C1,LATIN CAPITAL LETTER A WITH ACUTE
+Latin-1 and Western European accents,Â,U+00C2,LATIN CAPITAL LETTER A WITH CIRCUMFLEX
+Latin-1 and Western European accents,Ã,U+00C3,LATIN CAPITAL LETTER A WITH TILDE
+Latin-1 and Western European accents,Ä,U+00C4,LATIN CAPITAL LETTER A WITH DIAERESIS
+Latin-1 and Western European accents,Å,U+00C5,LATIN CAPITAL LETTER A WITH RING ABOVE
+Latin-1 and Western European accents,Æ,U+00C6,LATIN CAPITAL LETTER AE
+Latin-1 and Western European accents,Ç,U+00C7,LATIN CAPITAL LETTER C WITH CEDILLA
+Latin-1 and Western European accents,È,U+00C8,LATIN CAPITAL LETTER E WITH GRAVE
+Latin-1 and Western European accents,É,U+00C9,LATIN CAPITAL LETTER E WITH ACUTE
+Latin-1 and Western European accents,Ê,U+00CA,LATIN CAPITAL LETTER E WITH CIRCUMFLEX
+Latin-1 and Western European accents,Ë,U+00CB,LATIN CAPITAL LETTER E WITH DIAERESIS
+Latin-1 and Western European accents,Ì,U+00CC,LATIN CAPITAL LETTER I WITH GRAVE
+Latin-1 and Western European accents,Í,U+00CD,LATIN CAPITAL LETTER I WITH ACUTE
+Latin-1 and Western European accents,Î,U+00CE,LATIN CAPITAL LETTER I WITH CIRCUMFLEX
+Latin-1 and Western European accents,Ï,U+00CF,LATIN CAPITAL LETTER I WITH DIAERESIS
+Latin-1 and Western European accents,Ð,U+00D0,LATIN CAPITAL LETTER ETH
+Latin-1 and Western European accents,Ñ,U+00D1,LATIN CAPITAL LETTER N WITH TILDE
+Latin-1 and Western European accents,Ò,U+00D2,LATIN CAPITAL LETTER O WITH GRAVE
+Latin-1 and Western European accents,Ó,U+00D3,LATIN CAPITAL LETTER O WITH ACUTE
+Latin-1 and Western European accents,Ô,U+00D4,LATIN CAPITAL LETTER O WITH CIRCUMFLEX
+Latin-1 and Western European accents,Õ,U+00D5,LATIN CAPITAL LETTER O WITH TILDE
+Latin-1 and Western European accents,Ö,U+00D6,LATIN CAPITAL LETTER O WITH DIAERESIS
+Latin-1 and Western European accents,×,U+00D7,MULTIPLICATION SIGN
+Latin-1 and Western European accents,Ø,U+00D8,LATIN CAPITAL LETTER O WITH STROKE
+Latin-1 and Western European accents,Ù,U+00D9,LATIN CAPITAL LETTER U WITH GRAVE
+Latin-1 and Western European accents,Ú,U+00DA,LATIN CAPITAL LETTER U WITH ACUTE
+Latin-1 and Western European accents,Û,U+00DB,LATIN CAPITAL LETTER U WITH CIRCUMFLEX
+Latin-1 and Western European accents,Ü,U+00DC,LATIN CAPITAL LETTER U WITH DIAERESIS
+Latin-1 and Western European accents,Ý,U+00DD,LATIN CAPITAL LETTER Y WITH ACUTE
+Latin-1 and Western European accents,Þ,U+00DE,LATIN CAPITAL LETTER THORN
+Latin-1 and Western European accents,ß,U+00DF,LATIN SMALL LETTER SHARP S
+Latin-1 and Western European accents,à,U+00E0,LATIN SMALL LETTER A WITH GRAVE
+Latin-1 and Western European accents,á,U+00E1,LATIN SMALL LETTER A WITH ACUTE
+Latin-1 and Western European accents,â,U+00E2,LATIN SMALL LETTER A WITH CIRCUMFLEX
+Latin-1 and Western European accents,ã,U+00E3,LATIN SMALL LETTER A WITH TILDE
+Latin-1 and Western European accents,ä,U+00E4,LATIN SMALL LETTER A WITH DIAERESIS
+Latin-1 and Western European accents,å,U+00E5,LATIN SMALL LETTER A WITH RING ABOVE
+Latin-1 and Western European accents,æ,U+00E6,LATIN SMALL LETTER AE
+Latin-1 and Western European accents,ç,U+00E7,LATIN SMALL LETTER C WITH CEDILLA
+Latin-1 and Western European accents,è,U+00E8,LATIN SMALL LETTER E WITH GRAVE
+Latin-1 and Western European accents,é,U+00E9,LATIN SMALL LETTER E WITH ACUTE
+Latin-1 and Western European accents,ê,U+00EA,LATIN SMALL LETTER E WITH CIRCUMFLEX
+Latin-1 and Western European accents,ë,U+00EB,LATIN SMALL LETTER E WITH DIAERESIS
+Latin-1 and Western European accents,ì,U+00EC,LATIN SMALL LETTER I WITH GRAVE
+Latin-1 and Western European accents,í,U+00ED,LATIN SMALL LETTER I WITH ACUTE
+Latin-1 and Western European accents,î,U+00EE,LATIN SMALL LETTER I WITH CIRCUMFLEX
+Latin-1 and Western European accents,ï,U+00EF,LATIN SMALL LETTER I WITH DIAERESIS
+Latin-1 and Western European accents,ð,U+00F0,LATIN SMALL LETTER ETH
+Latin-1 and Western European accents,ñ,U+00F1,LATIN SMALL LETTER N WITH TILDE
+Latin-1 and Western European accents,ò,U+00F2,LATIN SMALL LETTER O WITH GRAVE
+Latin-1 and Western European accents,ó,U+00F3,LATIN SMALL LETTER O WITH ACUTE
+Latin-1 and Western European accents,ô,U+00F4,LATIN SMALL LETTER O WITH CIRCUMFLEX
+Latin-1 and Western European accents,õ,U+00F5,LATIN SMALL LETTER O WITH TILDE
+Latin-1 and Western European accents,ö,U+00F6,LATIN SMALL LETTER O WITH DIAERESIS
+Latin-1 and Western European accents,÷,U+00F7,DIVISION SIGN
+Latin-1 and Western European accents,ø,U+00F8,LATIN SMALL LETTER O WITH STROKE
+Latin-1 and Western European accents,ù,U+00F9,LATIN SMALL LETTER U WITH GRAVE
+Latin-1 and Western European accents,ú,U+00FA,LATIN SMALL LETTER U WITH ACUTE
+Latin-1 and Western European accents,û,U+00FB,LATIN SMALL LETTER U WITH CIRCUMFLEX
+Latin-1 and Western European accents,ü,U+00FC,LATIN SMALL LETTER U WITH DIAERESIS
+Latin-1 and Western European accents,ý,U+00FD,LATIN SMALL LETTER Y WITH ACUTE
+Latin-1 and Western European accents,þ,U+00FE,LATIN SMALL LETTER THORN
+Latin-1 and Western European accents,ÿ,U+00FF,LATIN SMALL LETTER Y WITH DIAERESIS
+Latin Extended-A,Ā,U+0100,LATIN CAPITAL LETTER A WITH MACRON
+Latin Extended-A,ā,U+0101,LATIN SMALL LETTER A WITH MACRON
+Latin Extended-A,Ă,U+0102,LATIN CAPITAL LETTER A WITH BREVE
+Latin Extended-A,ă,U+0103,LATIN SMALL LETTER A WITH BREVE
+Latin Extended-A,Ą,U+0104,LATIN CAPITAL LETTER A WITH OGONEK
+Latin Extended-A,ą,U+0105,LATIN SMALL LETTER A WITH OGONEK
+Latin Extended-A,Ć,U+0106,LATIN CAPITAL LETTER C WITH ACUTE
+Latin Extended-A,ć,U+0107,LATIN SMALL LETTER C WITH ACUTE
+Latin Extended-A,Ĉ,U+0108,LATIN CAPITAL LETTER C WITH CIRCUMFLEX
+Latin Extended-A,ĉ,U+0109,LATIN SMALL LETTER C WITH CIRCUMFLEX
+Latin Extended-A,Ċ,U+010A,LATIN CAPITAL LETTER C WITH DOT ABOVE
+Latin Extended-A,ċ,U+010B,LATIN SMALL LETTER C WITH DOT ABOVE
+Latin Extended-A,Č,U+010C,LATIN CAPITAL LETTER C WITH CARON
+Latin Extended-A,č,U+010D,LATIN SMALL LETTER C WITH CARON
+Latin Extended-A,Ď,U+010E,LATIN CAPITAL LETTER D WITH CARON
+Latin Extended-A,ď,U+010F,LATIN SMALL LETTER D WITH CARON
+Latin Extended-A,Đ,U+0110,LATIN CAPITAL LETTER D WITH STROKE
+Latin Extended-A,đ,U+0111,LATIN SMALL LETTER D WITH STROKE
+Latin Extended-A,Ē,U+0112,LATIN CAPITAL LETTER E WITH MACRON
+Latin Extended-A,ē,U+0113,LATIN SMALL LETTER E WITH MACRON
+Latin Extended-A,Ĕ,U+0114,LATIN CAPITAL LETTER E WITH BREVE
+Latin Extended-A,ĕ,U+0115,LATIN SMALL LETTER E WITH BREVE
+Latin Extended-A,Ė,U+0116,LATIN CAPITAL LETTER E WITH DOT ABOVE
+Latin Extended-A,ė,U+0117,LATIN SMALL LETTER E WITH DOT ABOVE
+Latin Extended-A,Ę,U+0118,LATIN CAPITAL LETTER E WITH OGONEK
+Latin Extended-A,ę,U+0119,LATIN SMALL LETTER E WITH OGONEK
+Latin Extended-A,Ě,U+011A,LATIN CAPITAL LETTER E WITH CARON
+Latin Extended-A,ě,U+011B,LATIN SMALL LETTER E WITH CARON
+Latin Extended-A,Ĝ,U+011C,LATIN CAPITAL LETTER G WITH CIRCUMFLEX
+Latin Extended-A,ĝ,U+011D,LATIN SMALL LETTER G WITH CIRCUMFLEX
+Latin Extended-A,Ğ,U+011E,LATIN CAPITAL LETTER G WITH BREVE
+Latin Extended-A,ğ,U+011F,LATIN SMALL LETTER G WITH BREVE
+Latin Extended-A,Ġ,U+0120,LATIN CAPITAL LETTER G WITH DOT ABOVE
+Latin Extended-A,ġ,U+0121,LATIN SMALL LETTER G WITH DOT ABOVE
+Latin Extended-A,Ģ,U+0122,LATIN CAPITAL LETTER G WITH CEDILLA
+Latin Extended-A,ģ,U+0123,LATIN SMALL LETTER G WITH CEDILLA
+Latin Extended-A,Ĥ,U+0124,LATIN CAPITAL LETTER H WITH CIRCUMFLEX
+Latin Extended-A,ĥ,U+0125,LATIN SMALL LETTER H WITH CIRCUMFLEX
+Latin Extended-A,Ħ,U+0126,LATIN CAPITAL LETTER H WITH STROKE
+Latin Extended-A,ħ,U+0127,LATIN SMALL LETTER H WITH STROKE
+Latin Extended-A,Ĩ,U+0128,LATIN CAPITAL LETTER I WITH TILDE
+Latin Extended-A,ĩ,U+0129,LATIN SMALL LETTER I WITH TILDE
+Latin Extended-A,Ī,U+012A,LATIN CAPITAL LETTER I WITH MACRON
+Latin Extended-A,ī,U+012B,LATIN SMALL LETTER I WITH MACRON
+Latin Extended-A,Ĭ,U+012C,LATIN CAPITAL LETTER I WITH BREVE
+Latin Extended-A,ĭ,U+012D,LATIN SMALL LETTER I WITH BREVE
+Latin Extended-A,Į,U+012E,LATIN CAPITAL LETTER I WITH OGONEK
+Latin Extended-A,į,U+012F,LATIN SMALL LETTER I WITH OGONEK
+Latin Extended-A,İ,U+0130,LATIN CAPITAL LETTER I WITH DOT ABOVE
+Latin Extended-A,ı,U+0131,LATIN SMALL LETTER DOTLESS I
+Latin Extended-A,Ĳ,U+0132,LATIN CAPITAL LIGATURE IJ
+Latin Extended-A,ĳ,U+0133,LATIN SMALL LIGATURE IJ
+Latin Extended-A,Ĵ,U+0134,LATIN CAPITAL LETTER J WITH CIRCUMFLEX
+Latin Extended-A,ĵ,U+0135,LATIN SMALL LETTER J WITH CIRCUMFLEX
+Latin Extended-A,Ķ,U+0136,LATIN CAPITAL LETTER K WITH CEDILLA
+Latin Extended-A,ķ,U+0137,LATIN SMALL LETTER K WITH CEDILLA
+Latin Extended-A,ĸ,U+0138,LATIN SMALL LETTER KRA
+Latin Extended-A,Ĺ,U+0139,LATIN CAPITAL LETTER L WITH ACUTE
+Latin Extended-A,ĺ,U+013A,LATIN SMALL LETTER L WITH ACUTE
+Latin Extended-A,Ļ,U+013B,LATIN CAPITAL LETTER L WITH CEDILLA
+Latin Extended-A,ļ,U+013C,LATIN SMALL LETTER L WITH CEDILLA
+Latin Extended-A,Ľ,U+013D,LATIN CAPITAL LETTER L WITH CARON
+Latin Extended-A,ľ,U+013E,LATIN SMALL LETTER L WITH CARON
+Latin Extended-A,Ŀ,U+013F,LATIN CAPITAL LETTER L WITH MIDDLE DOT
+Latin Extended-A,ŀ,U+0140,LATIN SMALL LETTER L WITH MIDDLE DOT
+Latin Extended-A,Ł,U+0141,LATIN CAPITAL LETTER L WITH STROKE
+Latin Extended-A,ł,U+0142,LATIN SMALL LETTER L WITH STROKE
+Latin Extended-A,Ń,U+0143,LATIN CAPITAL LETTER N WITH ACUTE
+Latin Extended-A,ń,U+0144,LATIN SMALL LETTER N WITH ACUTE
+Latin Extended-A,Ņ,U+0145,LATIN CAPITAL LETTER N WITH CEDILLA
+Latin Extended-A,ņ,U+0146,LATIN SMALL LETTER N WITH CEDILLA
+Latin Extended-A,Ň,U+0147,LATIN CAPITAL LETTER N WITH CARON
+Latin Extended-A,ň,U+0148,LATIN SMALL LETTER N WITH CARON
+Latin Extended-A,ŉ,U+0149,LATIN SMALL LETTER N PRECEDED BY APOSTROPHE
+Latin Extended-A,Ŋ,U+014A,LATIN CAPITAL LETTER ENG
+Latin Extended-A,ŋ,U+014B,LATIN SMALL LETTER ENG
+Latin Extended-A,Ō,U+014C,LATIN CAPITAL LETTER O WITH MACRON
+Latin Extended-A,ō,U+014D,LATIN SMALL LETTER O WITH MACRON
+Latin Extended-A,Ŏ,U+014E,LATIN CAPITAL LETTER O WITH BREVE
+Latin Extended-A,ŏ,U+014F,LATIN SMALL LETTER O WITH BREVE
+Latin Extended-A,Ő,U+0150,LATIN CAPITAL LETTER O WITH DOUBLE ACUTE
+Latin Extended-A,ő,U+0151,LATIN SMALL LETTER O WITH DOUBLE ACUTE
+Latin Extended-A,Œ,U+0152,LATIN CAPITAL LIGATURE OE
+Latin Extended-A,œ,U+0153,LATIN SMALL LIGATURE OE
+Latin Extended-A,Ŕ,U+0154,LATIN CAPITAL LETTER R WITH ACUTE
+Latin Extended-A,ŕ,U+0155,LATIN SMALL LETTER R WITH ACUTE
+Latin Extended-A,Ŗ,U+0156,LATIN CAPITAL LETTER R WITH CEDILLA
+Latin Extended-A,ŗ,U+0157,LATIN SMALL LETTER R WITH CEDILLA
+Latin Extended-A,Ř,U+0158,LATIN CAPITAL LETTER R WITH CARON
+Latin Extended-A,ř,U+0159,LATIN SMALL LETTER R WITH CARON
+Latin Extended-A,Ś,U+015A,LATIN CAPITAL LETTER S WITH ACUTE
+Latin Extended-A,ś,U+015B,LATIN SMALL LETTER S WITH ACUTE
+Latin Extended-A,Ŝ,U+015C,LATIN CAPITAL LETTER S WITH CIRCUMFLEX
+Latin Extended-A,ŝ,U+015D,LATIN SMALL LETTER S WITH CIRCUMFLEX
+Latin Extended-A,Ş,U+015E,LATIN CAPITAL LETTER S WITH CEDILLA
+Latin Extended-A,ş,U+015F,LATIN SMALL LETTER S WITH CEDILLA
+Latin Extended-A,Š,U+0160,LATIN CAPITAL LETTER S WITH CARON
+Latin Extended-A,š,U+0161,LATIN SMALL LETTER S WITH CARON
+Latin Extended-A,Ţ,U+0162,LATIN CAPITAL LETTER T WITH CEDILLA
+Latin Extended-A,ţ,U+0163,LATIN SMALL LETTER T WITH CEDILLA
+Latin Extended-A,Ť,U+0164,LATIN CAPITAL LETTER T WITH CARON
+Latin Extended-A,ť,U+0165,LATIN SMALL LETTER T WITH CARON
+Latin Extended-A,Ŧ,U+0166,LATIN CAPITAL LETTER T WITH STROKE
+Latin Extended-A,ŧ,U+0167,LATIN SMALL LETTER T WITH STROKE
+Latin Extended-A,Ũ,U+0168,LATIN CAPITAL LETTER U WITH TILDE
+Latin Extended-A,ũ,U+0169,LATIN SMALL LETTER U WITH TILDE
+Latin Extended-A,Ū,U+016A,LATIN CAPITAL LETTER U WITH MACRON
+Latin Extended-A,ū,U+016B,LATIN SMALL LETTER U WITH MACRON
+Latin Extended-A,Ŭ,U+016C,LATIN CAPITAL LETTER U WITH BREVE
+Latin Extended-A,ŭ,U+016D,LATIN SMALL LETTER U WITH BREVE
+Latin Extended-A,Ů,U+016E,LATIN CAPITAL LETTER U WITH RING ABOVE
+Latin Extended-A,ů,U+016F,LATIN SMALL LETTER U WITH RING ABOVE
+Latin Extended-A,Ű,U+0170,LATIN CAPITAL LETTER U WITH DOUBLE ACUTE
+Latin Extended-A,ű,U+0171,LATIN SMALL LETTER U WITH DOUBLE ACUTE
+Latin Extended-A,Ų,U+0172,LATIN CAPITAL LETTER U WITH OGONEK
+Latin Extended-A,ų,U+0173,LATIN SMALL LETTER U WITH OGONEK
+Latin Extended-A,Ŵ,U+0174,LATIN CAPITAL LETTER W WITH CIRCUMFLEX
+Latin Extended-A,ŵ,U+0175,LATIN SMALL LETTER W WITH CIRCUMFLEX
+Latin Extended-A,Ŷ,U+0176,LATIN CAPITAL LETTER Y WITH CIRCUMFLEX
+Latin Extended-A,ŷ,U+0177,LATIN SMALL LETTER Y WITH CIRCUMFLEX
+Latin Extended-A,Ÿ,U+0178,LATIN CAPITAL LETTER Y WITH DIAERESIS
+Latin Extended-A,Ź,U+0179,LATIN CAPITAL LETTER Z WITH ACUTE
+Latin Extended-A,ź,U+017A,LATIN SMALL LETTER Z WITH ACUTE
+Latin Extended-A,Ż,U+017B,LATIN CAPITAL LETTER Z WITH DOT ABOVE
+Latin Extended-A,ż,U+017C,LATIN SMALL LETTER Z WITH DOT ABOVE
+Latin Extended-A,Ž,U+017D,LATIN CAPITAL LETTER Z WITH CARON
+Latin Extended-A,ž,U+017E,LATIN SMALL LETTER Z WITH CARON
+Latin Extended-A,ſ,U+017F,LATIN SMALL LETTER LONG S
+Additional accented Latin,ƒ,U+0192,LATIN SMALL LETTER F WITH HOOK
+Additional accented Latin,Ǽ,U+01FC,LATIN CAPITAL LETTER AE WITH ACUTE
+Additional accented Latin,ǽ,U+01FD,LATIN SMALL LETTER AE WITH ACUTE
+Additional accented Latin,Ǿ,U+01FE,LATIN CAPITAL LETTER O WITH STROKE AND ACUTE
+Additional accented Latin,ǿ,U+01FF,LATIN SMALL LETTER O WITH STROKE AND ACUTE
+Additional accented Latin,Ș,U+0218,LATIN CAPITAL LETTER S WITH COMMA BELOW
+Additional accented Latin,ș,U+0219,LATIN SMALL LETTER S WITH COMMA BELOW
+Additional accented Latin,Ț,U+021A,LATIN CAPITAL LETTER T WITH COMMA BELOW
+Additional accented Latin,ț,U+021B,LATIN SMALL LETTER T WITH COMMA BELOW
+Additional accented Latin,ȷ,U+0237,LATIN SMALL LETTER DOTLESS J
+Additional accented Latin,Ẁ,U+1E80,LATIN CAPITAL LETTER W WITH GRAVE
+Additional accented Latin,ẁ,U+1E81,LATIN SMALL LETTER W WITH GRAVE
+Additional accented Latin,Ẃ,U+1E82,LATIN CAPITAL LETTER W WITH ACUTE
+Additional accented Latin,ẃ,U+1E83,LATIN SMALL LETTER W WITH ACUTE
+Additional accented Latin,Ẅ,U+1E84,LATIN CAPITAL LETTER W WITH DIAERESIS
+Additional accented Latin,ẅ,U+1E85,LATIN SMALL LETTER W WITH DIAERESIS
+Additional accented Latin,Ỳ,U+1EF2,LATIN CAPITAL LETTER Y WITH GRAVE
+Additional accented Latin,ỳ,U+1EF3,LATIN SMALL LETTER Y WITH GRAVE
+Diacritic marks,ˆ,U+02C6,MODIFIER LETTER CIRCUMFLEX ACCENT
+Diacritic marks,ˇ,U+02C7,CARON
+Diacritic marks,˘,U+02D8,BREVE
+Diacritic marks,˙,U+02D9,DOT ABOVE
+Diacritic marks,˚,U+02DA,RING ABOVE
+Diacritic marks,˛,U+02DB,OGONEK
+Diacritic marks,˜,U+02DC,SMALL TILDE
+Diacritic marks,˝,U+02DD,DOUBLE ACUTE ACCENT
+Editorial punctuation & ligatures,–,U+2013,EN DASH
+Editorial punctuation & ligatures,—,U+2014,EM DASH
+Editorial punctuation & ligatures,‘,U+2018,LEFT SINGLE QUOTATION MARK
+Editorial punctuation & ligatures,’,U+2019,RIGHT SINGLE QUOTATION MARK
+Editorial punctuation & ligatures,‚,U+201A,SINGLE LOW-9 QUOTATION MARK
+Editorial punctuation & ligatures,“,U+201C,LEFT DOUBLE QUOTATION MARK
+Editorial punctuation & ligatures,”,U+201D,RIGHT DOUBLE QUOTATION MARK
+Editorial punctuation & ligatures,„,U+201E,DOUBLE LOW-9 QUOTATION MARK
+Editorial punctuation & ligatures,†,U+2020,DAGGER
+Editorial punctuation & ligatures,‡,U+2021,DOUBLE DAGGER
+Editorial punctuation & ligatures,•,U+2022,BULLET
+Editorial punctuation & ligatures,…,U+2026,HORIZONTAL ELLIPSIS
+Editorial punctuation & ligatures,‰,U+2030,PER MILLE SIGN
+Editorial punctuation & ligatures,‹,U+2039,SINGLE LEFT-POINTING ANGLE QUOTATION MARK
+Editorial punctuation & ligatures,›,U+203A,SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
+Editorial punctuation & ligatures,⁄,U+2044,FRACTION SLASH
+Editorial punctuation & ligatures,⁴,U+2074,SUPERSCRIPT FOUR
+Editorial punctuation & ligatures,™,U+2122,TRADE MARK SIGN
+Editorial punctuation & ligatures,−,U+2212,MINUS SIGN
+Editorial punctuation & ligatures,ﬁ,U+FB01,LATIN SMALL LIGATURE FI
+Editorial punctuation & ligatures,ﬂ,U+FB02,LATIN SMALL LIGATURE FL
+"Currency, math and other symbols",€,U+20AC,EURO SIGN
+"Currency, math and other symbols",μ,U+03BC,GREEK SMALL LETTER MU

@@ -1,0 +1,36 @@
+{
+  "images": 9,
+  "embeddedOnce": true,
+  "requests": [],
+  "errors": [],
+  "report": [
+    {
+      "label": "desktop",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "textBottom": 4649.125,
+      "creditTop": 4664.125
+    },
+    {
+      "label": "tablet-wide",
+      "width": 1024,
+      "scrollWidth": 1024,
+      "textBottom": 4985.046875,
+      "creditTop": 5000.046875
+    },
+    {
+      "label": "tablet",
+      "width": 768,
+      "scrollWidth": 768,
+      "textBottom": 5456.40625,
+      "creditTop": 5471.40625
+    },
+    {
+      "label": "mobile",
+      "width": 390,
+      "scrollWidth": 390,
+      "textBottom": 6687.78125,
+      "creditTop": 6702.78125
+    }
+  ]
+}

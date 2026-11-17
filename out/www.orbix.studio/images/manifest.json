@@ -1,0 +1,92 @@
+[
+  {
+    "slot": "hero",
+    "path": "images/hero.webp",
+    "bytes": 57074,
+    "width": 1672,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  },
+  {
+    "slot": "horizon",
+    "path": "images/horizon.webp",
+    "bytes": 14986,
+    "width": 1672,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  },
+  {
+    "slot": "object",
+    "path": "images/object.webp",
+    "bytes": 15428,
+    "width": 1122,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  },
+  {
+    "slot": "street",
+    "path": "images/street.webp",
+    "bytes": 103264,
+    "width": 1122,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  },
+  {
+    "slot": "sky",
+    "path": "images/sky.webp",
+    "bytes": 36448,
+    "width": 1672,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  },
+  {
+    "slot": "glass",
+    "path": "images/glass.webp",
+    "bytes": 51556,
+    "width": 1122,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  },
+  {
+    "slot": "grid",
+    "path": "images/grid.webp",
+    "bytes": 54804,
+    "width": 1672,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  },
+  {
+    "slot": "tokens",
+    "path": "images/tokens.webp",
+    "bytes": 18466,
+    "width": 1122,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  },
+  {
+    "slot": "fruit",
+    "path": "images/fruit.webp",
+    "bytes": 91670,
+    "width": 1122,
+    "credit": "AI-generated image",
+    "provenance": "User-supplied manual generation; no source photograph input authorised.",
+    "cost": null,
+    "status": "imported; requires visual review"
+  }
+]

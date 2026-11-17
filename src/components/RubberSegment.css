@@ -1,0 +1,78 @@
+/* RubberSegment: the upstream Tailwind utilities, ported one-for-one to plain CSS. */
+.rubber-segment {
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: auto;
+  vertical-align: middle;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  padding: var(--rs-inset);
+  border-radius: var(--rs-radius);
+  background: var(--rs-track);
+}
+.rubber-segment[data-equal] { grid-auto-columns: minmax(0, 1fr); }
+.rubber-segment[data-held] { cursor: grabbing; }
+.rubber-segment[aria-disabled="true"] { pointer-events: none; opacity: 0.5; }
+
+.rubber-segment-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: calc(var(--rs-h) - var(--rs-inset) * 2);
+  min-width: var(--rs-min);
+  margin: 0;
+  border: 0;
+  background: transparent;
+  padding: 0 var(--rs-pad);
+  border-radius: var(--rs-thumb-radius);
+  font: inherit;
+  font-size: var(--rs-font);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  outline: none;
+  transition: opacity 160ms ease, transform 160ms var(--rs-ease-out);
+  cursor: default;
+  color: inherit;
+}
+.rubber-segment-item {
+  /* FermentStation: --rs-slot lets a host fill the unselected slots (upstream: transparent). */
+  background: var(--rs-slot, transparent);
+  cursor: pointer;
+  color: var(--rs-ink);
+  opacity: 0.7;
+}
+.rubber-segment-item[aria-checked="true"] { cursor: default; }
+.rubber-segment[data-draggable] .rubber-segment-item[aria-checked="true"] { cursor: grab; }
+.rubber-segment[data-held] .rubber-segment-item { cursor: grabbing; }
+.rubber-segment-item[data-pressed] { transform: scale(0.96); }
+.rubber-segment-item:focus-visible { outline: 2px solid var(--rs-thumb); outline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) {
+  .rubber-segment-item[aria-checked="false"]:hover { opacity: 0.9; }
+}
+/* Host-page guards: a page's global button:hover / :active / :focus-visible rules must not repaint the slots. */
+.rubber-segment .rubber-segment-item:not(:disabled):is(:hover, :active) { background: var(--rs-slot, transparent); color: var(--rs-ink); }
+.rubber-segment .rubber-segment-item:not(:disabled):active { transform: none; }
+.rubber-segment .rubber-segment-item:not(:disabled)[data-pressed] { transform: scale(0.96); }
+.rubber-segment .rubber-segment-item:focus-visible { box-shadow: none; }
+@media (prefers-reduced-motion: reduce) {
+  .rubber-segment-slot { transition: opacity 160ms ease; }
+}
+
+.rubber-segment-thumb {
+  pointer-events: none;
+  position: absolute;
+  inset: var(--rs-inset);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: auto;
+  background: var(--rs-thumb);
+  color: var(--rs-ink-active);
+}
+.rubber-segment[data-equal] .rubber-segment-thumb { grid-auto-columns: minmax(0, 1fr); }
