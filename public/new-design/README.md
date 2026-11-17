@@ -4,19 +4,20 @@ Extracted unchanged from `prototypes/new_design/phone/index.html`. All photograp
 
 | File | Author / source | License |
 | --- | --- | --- |
-| kimchi.webp | Shisma, [Kimchi in jar](https://commons.wikimedia.org/wiki/File:Kimchi_in_jar.jpg) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
-| kombucha.webp | Romarin, [Kombucha jar](https://commons.wikimedia.org/wiki/File:Kombucha_jar.jpg) | Public domain |
-| sourdough.webp | PilotChicago, [Sourdough starter](https://commons.wikimedia.org/wiki/File:Sourdough_starter.jpg) | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
-| kraut.webp | Bdubay, [Sauerkraut Jar](https://commons.wikimedia.org/wiki/File:Sauerkraut_Jar.jpg) | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
+| kimchi.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/kimchi-bowl.png` | User-supplied; no third-party license |
+| kraut.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/sauerkraut-bowl.png` | User-supplied; no third-party license |
+| sourdough.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/sourdough-loaf.png` | User-supplied; no third-party license |
+| milk-kefir.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/milk-kefir-bottle.png` | User-supplied; no third-party license |
+| kombucha.webp | Romarin, [Kombucha jar](https://commons.wikimedia.org/wiki/File:Kombucha_jar.jpg) | Public domain. Kept for existing installs; `profileVisual` no longer uses it. |
 
-The adapted share-alike photographic assets retain their respective CC BY-SA licenses. Interface credits are available in the dashboard and Settings.
+These four batch stand-ins replaced the earlier Wikimedia Commons photographs on 2026-11-17 (Shisma's *Kimchi in jar*, CC BY 4.0; PilotChicago's *Sourdough starter*, CC BY-SA 4.0; Bdubay's *Sauerkraut Jar*, CC BY-SA 3.0). Those versions are no longer distributed; their authors and licences are recorded here for history. `scripts/assets/make-batch-standins.py` trimmed and downscaled them to 700 px tall RGBA WebP: kimchi, sourdough and milk kefir arrived with their alpha channel already cut, and the sauerkraut was keyed against its white studio ground. Interface credits are available in the dashboard and Settings.
 
 | File | Author / source | License |
 | --- | --- | --- |
 | grapefruit-spritz.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/hero.png` (glass only) | User-supplied; no third-party license |
 | fruit-still-life.webp | AI-generated image, user-supplied: `out/www.orbix.studio/images/fruit.png` | User-supplied; no third-party license |
 
-These two Swipe-rework cutouts are derived from user-supplied, AI-generated imagery and are not affiliated with Swipe Drinks. They were background-removed, trimmed and downscaled by `scripts/assets/make-cutouts.py`; the originals are unchanged. Method, sizes, intended card use and known flaws are in `docs/design/swipe-cutouts.md`. The app uses them as batch-card stand-ins only where a profile has no photograph of its own: `grapefruit-spritz` for drink profiles (water kefir, kvass, soda, jun, …) and the batch empty state, `fruit-still-life` for fruit profiles; both always on a pastel card.
+These two Swipe-rework cutouts are derived from user-supplied, AI-generated imagery and are not affiliated with Swipe Drinks. They were background-removed, trimmed and downscaled by `scripts/assets/make-cutouts.py`; the originals are unchanged. Method, sizes, intended card use and known flaws are in `docs/design/swipe-cutouts.md`. The app uses them as batch-card stand-ins only where a profile has no photograph of its own: `grapefruit-spritz` for kombucha, the other drink profiles (water kefir, kvass, soda, jun, …) and the batch empty state, `fruit-still-life` for fruit profiles; both always on a pastel card. `kombucha.webp` stays bundled and credited for existing installs, but `profileVisual` no longer uses it.
 
 `Outfit.ttf`: Copyright 2021 The Outfit Project Authors (https://github.com/Outfitio/Outfit-Fonts). SIL Open Font License 1.1; full text in `OFL.txt`.
 
