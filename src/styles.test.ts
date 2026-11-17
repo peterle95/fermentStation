@@ -491,7 +491,7 @@ describe("responsive workflow safeguards", () => {
     expect(rule(".navigation button", mobile)).toContain("min-width: 0");
     const label = rule(".navigation .nav-word", mobile);
     for (const declaration of ["overflow-wrap: anywhere", "word-break: normal", "white-space: normal"]) expect(label).toContain(declaration);
-    expect(rule(".design-topbar-actions", mobile)).toContain("grid-column: 1 / -1");
+    expect(rule(".design-topbar", mobile)).toContain("grid-template-columns: auto minmax(0, 1fr)");
   });
 
   it("removes the entire phone background from layout and focus when detail is selected", () => {

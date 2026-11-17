@@ -1242,11 +1242,16 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .navigation .nav-word { display: inline; overflow-wrap: anywhere; word-break: normal; white-space: normal; }
   .navigation button:not([aria-current="page"]) .nav-word { display: none; }
   .content-shell { grid-area: 1 / 1; height: 100%; }
-  .design-topbar { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); padding-block: calc(var(--safe-top) + var(--space-3)) var(--space-4); }
+  /* Phone topbar (user requests, 2026-11-17): the date line goes, and the settings circle and "Start a batch"
+     join the logo on one row, logo | settings, batch. The two controls share whatever the logo leaves, so they
+     stay evenly spread edge to edge at every phone width; the date row returns with the 600 px layout. */
+  .design-topbar { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-3); padding-block: calc(var(--safe-top) + var(--space-3)) var(--space-4); }
   .station-identity { display: inline-flex; }
-  .design-topbar-copy { min-width: 0; }
-  .design-topbar-actions { grid-column: 1 / -1; display: flex; flex-wrap: nowrap; width: 100%; }
-  .design-topbar .batch-fab { flex: 1; min-width: 0; }
+  .design-topbar-copy { display: none; }
+  .design-topbar-actions { display: flex; flex-wrap: nowrap; gap: var(--space-2); width: 100%; min-width: 0; }
+  /* "Start a batch" takes the middle of that row and the settings circle the end (user request, 2026-11-17).
+     Order only: the DOM and every wider layout keep settings first, so focus order and desktop are unchanged. */
+  .design-topbar .batch-fab { flex: 1; min-width: 0; order: -1; }
   .batch-overview, .profile-list { grid-template-columns: minmax(0, 1fr); }
   .profile-card { grid-template-columns: minmax(0, 1.2fr) minmax(80px, 0.8fr); padding: var(--space-4) var(--space-4) var(--batch-pill-foot); }
   .profile-overview-intro { grid-template-columns: minmax(0, 1fr); }
