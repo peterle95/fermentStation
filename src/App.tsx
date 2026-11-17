@@ -215,11 +215,12 @@ function useUnsavedChanges(message: string) {
 function profileVisual(profile: FermentationProfile) {
   const name = profile.name.toLowerCase();
   if (name.includes("kimchi")) return { photo: "kimchi", color: "var(--colour-action-alt)" };
-  if (name.includes("kombucha")) return { photo: "kombucha", color: "var(--colour-accent)" };
   if (name.includes("sourdough")) return { photo: "sourdough", color: "var(--colour-surface)" };
   if (name.includes("sauerkraut")) return { photo: "kraut", color: "var(--colour-action)" };
+  if (name.includes("milk kefir")) return { photo: "milk-kefir", color: "var(--colour-action-alt)" };
   // Swipe cutouts (docs/design/swipe-cutouts.md) stand in only where no profile photograph exists, on a pastel card.
-  if (drinkProfile.test(name)) return { photo: "grapefruit-spritz", color: "var(--colour-accent)", pastelOnly: true };
+  // Kombucha uses the spritz glass instead of a jar photograph.
+  if (name.includes("kombucha") || drinkProfile.test(name)) return { photo: "grapefruit-spritz", color: "var(--colour-accent)", pastelOnly: true };
   if (fruitProfile.test(name)) return { photo: "fruit-still-life", color: "var(--colour-action)", pastelOnly: true };
   return { photo: null, color: "var(--colour-action-alt)" };
 }
@@ -277,11 +278,8 @@ function BatchMeta({ batch, units, guidance = false }: { batch: Batch; units: Sh
 }
 
 function PhotoCredits() {
-  return <details className="design-photo-credits"><summary>Photographs via Wikimedia Commons</summary><ul>
-    <li><a href="https://commons.wikimedia.org/wiki/File:Kimchi_in_jar.jpg">Kimchi in jar</a> · Shisma · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</li>
-    <li><a href="https://commons.wikimedia.org/wiki/File:Kombucha_jar.jpg">Kombucha jar</a> · Romarin · Public domain.</li>
-    <li><a href="https://commons.wikimedia.org/wiki/File:Sourdough_starter.jpg">Sourdough starter</a> · PilotChicago · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</li>
-    <li><a href="https://commons.wikimedia.org/wiki/File:Sauerkraut_Jar.jpg">Sauerkraut Jar</a> · Bdubay · <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
+  return <details className="design-photo-credits"><summary>Stand-in photographs</summary><ul>
+    <li>Kimchi, sauerkraut, sourdough and milk kefir · AI-generated images supplied by the user, cut out for this app.</li>
     <li>Grapefruit spritz and fruit still life · AI-generated images supplied by the user, cut out for this app · not affiliated with Swipe Drinks.</li>
   </ul><p>Stand-in photographs, cropped with backgrounds removed. Your own batch photos replace these illustrations.</p></details>;
 }

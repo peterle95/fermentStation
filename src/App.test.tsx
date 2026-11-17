@@ -2511,13 +2511,12 @@ describe("batch workflow", () => {
     expect(stored.batches[1].timeline).toEqual([]);
   });
 
-  it("makes the bundled font and share-alike photograph credits reachable in Settings", () => {
+  it("makes the bundled font and stand-in photograph credits reachable in Settings", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     expect(screen.getByRole("link", { name: "SIL Open Font License 1.1" }).getAttribute("href")).toContain("new-design/OFL.txt");
-    fireEvent.click(within(screen.getByRole("region", { name: "Settings" })).getByText("Photographs via Wikimedia Commons"));
-    expect(screen.getByRole("link", { name: "CC BY-SA 4.0" }).getAttribute("href")).toBe("https://creativecommons.org/licenses/by-sa/4.0/");
-    expect(screen.getByRole("link", { name: "CC BY-SA 3.0" }).getAttribute("href")).toBe("https://creativecommons.org/licenses/by-sa/3.0/");
+    fireEvent.click(within(screen.getByRole("region", { name: "Settings" })).getByText("Stand-in photographs"));
+    expect(screen.getAllByText(/Kimchi, sauerkraut, sourdough and milk kefir/).length).toBeGreaterThan(0);
   });
 
   it("starts a batch from other destinations through the same creation form", () => {

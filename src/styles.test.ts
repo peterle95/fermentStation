@@ -1087,8 +1087,10 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
       expect(visuals).toContain(`{ photo: "${cutout}", color: "var(--colour-${colour})", pastelOnly: true }`);
       expect(read("../public/new-design/README.md")).toContain(`${cutout}.webp`);
     }
-    // The four profile photographs keep their own stand-ins and win over a cutout.
-    for (const name of ["kimchi", "kombucha", "sourdough", "kraut"]) expect(visuals.indexOf(`photo: "${name}"`)).toBeLessThan(visuals.indexOf("grapefruit-spritz"));
+    // The four profile stand-ins win over a cutout; kombucha uses the spritz glass.
+    for (const name of ["kimchi", "sourdough", "kraut", "milk-kefir"]) expect(visuals.indexOf(`photo: "${name}"`)).toBeLessThan(visuals.indexOf("grapefruit-spritz"));
+    expect(visuals).not.toContain('photo: "kombucha"');
+    expect(visuals).toContain('if (name.includes("kombucha") || drinkProfile.test(name))');
     expect(rule(".design-batch-card.selected .pastel-only :is(img, .batch-image-credit)")).toContain("visibility: hidden");
     expect(rule(".design-empty-card")).toContain("--fill: var(--colour-action-alt)");
     expect(app).toContain('<section className="design-empty-batches"><div className="design-empty-card bowed">');
@@ -1134,7 +1136,7 @@ describe("installed appearance and provenance", () => {
     const credits = read("../public/new-design/README.md");
     expect(credits).toContain("unofficial reconstruction");
     expect(credits).toContain("Unique by Rajesh Rajput");
-    for (const asset of ["kimchi", "kombucha", "sourdough", "kraut"]) {
+    for (const asset of ["kimchi", "kombucha", "sourdough", "kraut", "milk-kefir"]) {
       expect(readFileSync(new URL(`../public/new-design/${asset}.webp`, import.meta.url)).length).toBeGreaterThan(0);
       expect(credits).toContain(`${asset}.webp`);
     }
