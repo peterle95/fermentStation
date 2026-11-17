@@ -769,8 +769,9 @@ export function App() {
         </nav>
         ) : (
         <div className="phone-navigation">
-          {/* Upstream's dark glass, joined into one capsule, labels only (no logo, no icons): the current
-              destination is the gliding pill. It never folds into its burger menu; the CSS fits it to 320 px. */}
+          {/* Upstream's dark glass capsule holding a separate pill per destination, labels only (no logo, no icons).
+              The current destination fills from below and a dot under its label slides sideways to it (user,
+              2026-11-17). It never folds into its burger menu; the CSS fits it to 320 px. */}
           <PillNav
             ariaLabel="Primary navigation"
             items={navDestinations.map((destination) => ({ label: destination === "checks" ? "Checks" : labels[destination], href: destination }))}
@@ -780,9 +781,9 @@ export function App() {
             theme="dark"
             surface="glass"
             layout="joined"
-            itemStyle="plain"
+            itemStyle="pill"
             hoverEffect="fill"
-            indicator="pill"
+            indicator="dot"
             collapse="never"
           />
         </div>

@@ -204,7 +204,8 @@
   border-radius: 9999px;
   opacity: 0;
   background: var(--pn-dot);
-  transition: background-color 300ms ease;
+  /* FermentStation: 150 ms (upstream 300) so the dot's ink keeps up as it slides off one filled slot onto the next. */
+  transition: background-color 150ms ease;
   will-change: transform, opacity;
 }
 .pill-nav[data-dot-lit] .pill-nav-dot { background: var(--pn-pill-ink); }

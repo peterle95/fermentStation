@@ -365,9 +365,24 @@ const PillNav = ({
         slot.toggleAttribute('data-hover', hovered && s.hoverEffect === 'fill');
       });
       root.toggleAttribute('data-focus', state.focus && state.hover >= 0);
+      paintDot();
+    };
+
+    // FermentStation: with the fill and the dot together, the selected slot stays filled, so the dot takes the
+    // fill's ink while it is over that slot and the bar's ink while it crosses the others (upstream: lit only when
+    // the selected slot is hovered).
+    const paintDot = () => {
+      const s = settingsRef.current;
+      const active = rects[s.activeIndex];
+      const onFill =
+        s.hoverEffect === 'fill' &&
+        s.indicator === 'dot' &&
+        active !== undefined &&
+        state.dotX > active.left + 4 &&
+        state.dotX < active.left + active.width - 4;
       root.toggleAttribute(
         'data-dot-lit',
-        s.hoverEffect === 'fill' && state.hover >= 0 && state.hover === s.activeIndex
+        onFill || (s.hoverEffect === 'fill' && state.hover >= 0 && state.hover === s.activeIndex)
       );
     };
 
@@ -395,6 +410,7 @@ const PillNav = ({
         const pull = clamp(Math.abs(state.dotVelocity) / 700, 0, 2.2);
         dot.style.transform = `translate3d(${state.dotX}px, 0, 0) scaleX(${1 + pull})`;
         dot.style.opacity = `${state.dotAlpha}`;
+        paintDot();
       }
     };
 
@@ -828,7 +844,7 @@ const PillNav = ({
                     slotRefs.current[index] = element;
                   }}
                   className={SLOT}
-                  data-on={fill && indicator === 'pill' && index === activeIndex ? '' : undefined}
+                  data-on={fill && indicator !== 'none' && index === activeIndex ? '' : undefined}
                   onPointerEnter={event => engineRef.current?.enter(index, event)}
                   onPointerDown={event => engineRef.current?.press(event)}
                   onFocus={event => engineRef.current?.focus(index, event)}

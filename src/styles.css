@@ -1310,8 +1310,9 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 
 /* Phone bottom row (< 600 px): the React Bits PillNav (src/components/PillNav.tsx), which the user asked for on
    2026-11-17 in place of the RubberSegment; usePhoneNav in App.tsx renders it instead of .navigation. The user chose
-   upstream's dark glass, joined into one capsule, labels only, in the app's font: these rules only seat it (centred
-   in the row above the safe area) and set the font family. Its colours, sizes and motion are upstream's. */
+   upstream's dark glass capsule of separate pills, labels only, in the app's font; the selected pill fills from below
+   and a dot slides sideways under its label. These rules only seat it (centred in the row above the safe area) and
+   set the font family. Its colours, sizes and motion are upstream's. */
 @media (max-width: 599px) {
   .phone-navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; min-height: calc(var(--mobile-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); }
   .profile-editor-shell .phone-navigation { display: none; }
@@ -1321,8 +1322,14 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .phone-navigation .pill-nav-item,
   .phone-navigation .pill-nav-ink-item { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); }
   .phone-navigation .pill-nav-item { min-height: 0; max-width: none; }
-  .phone-navigation .pill-nav-item:hover:not(:disabled) { background: none; }
+  .phone-navigation .pill-nav-item:hover:not(:disabled) { background: var(--pn-tile); }
   .phone-navigation .pill-nav-item:active:not(:disabled) { transform: none; }
+}
+/* Below 380 the four pills at upstream's 16 px padding overrun the capsule by 2 px; 12 px padding fits 320. The
+   hidden measuring row (ink items) takes the same padding so it matches what it measures. */
+@media (max-width: 379px) {
+  .phone-navigation .pill-nav-item,
+  .phone-navigation .pill-nav-ink-item { padding-inline: var(--space-3); }
 }
 
 /* Desktop menu (>= 1024): the React Bits StaggeredMenu (src/components/StaggeredMenu.tsx). On 2026-11-14 the user
