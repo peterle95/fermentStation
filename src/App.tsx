@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ButtonHTMLAttributes, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { App as CapacitorApp } from "@capacitor/app";
 import { isTauri } from "@tauri-apps/api/core";
 import type { PluginListenerHandle } from "@capacitor/core";
@@ -73,6 +73,7 @@ import { isNativeTransferAvailable, pickNativeArchive, shareNativeFile } from ".
 import { requestReminderPermission, reconcileReminders } from "./platform/reminders";
 import { captureNativePhoto, isNativeCameraAvailable, listenForRestoredCameraPhoto, type CapturedPhoto } from "./platform/camera";
 import { StaggeredMenu } from "./components/StaggeredMenu";
+import PillNav from "./components/PillNav";
 import RubberSegment from "./components/RubberSegment";
 import stationLogoUrl from "./assets/station-logo.svg";
 import stationLogoSvg from "./assets/station-logo.svg?raw";
@@ -162,8 +163,8 @@ function useDesktopMenu() {
   return useSyncExternalStore(subscribeDesktopMenu, () => window.matchMedia?.(desktopMenuQuery).matches ?? true);
 }
 
-// Phone bottom row (< 600 px): the React Bits RubberSegment the user asked for on 2026-11-17, configured as they
-// specified, over the same four destinations, icons and labels as the rail. Tablets keep the rail of circles.
+// Phone bottom row (< 600 px): the React Bits PillNav the user asked for on 2026-11-17 in place of the RubberSegment,
+// over the same four destinations and labels as the rail (no icons). Tablets keep the rail of circles.
 const phoneNavQuery = "(max-width: 599px)";
 const subscribePhoneNav = (change: () => void) => {
   const query = window.matchMedia?.(phoneNavQuery);
@@ -175,6 +176,11 @@ function usePhoneNav() {
 }
 const navDestinations = ["today", "checks", "calendar", "profiles"] as const;
 type NavDestination = (typeof navDestinations)[number];
+// PillNav marks the current item by href, so each phone item's href is its destination; this renders it as a
+// button (in-app navigation, not a link) that names its destination for the screenshot harness.
+function PhoneNavButton({ href, ...props }: { href: string } & ButtonHTMLAttributes<HTMLButtonElement>) {
+  return <button type="button" data-destination={href} {...props} />;
+}
 
 type FieldErrors = Record<string, string>;
 
@@ -762,34 +768,24 @@ export function App() {
           ))}
         </nav>
         ) : (
-        <nav aria-label="Primary navigation" className="phone-navigation">
-          <RubberSegment
-            aria-label="Destinations"
-            items={navDestinations.map((destination) => ({
-              value: destination,
-              ariaLabel: destination === "checks" ? "Checks" : labels[destination],
-              icon: <span className="nav-mark" aria-hidden="true">{destination === "checks" ? <DesignIcon name="check" /> : <NavIcon destination={destination} />}</span>,
-              label: <span className="nav-word">{destination === "checks" ? "Checks" : labels[destination]}</span>,
-            }))}
-            value={showChecks ? "checks" : shell.destination === "batches" ? "today" : shell.destination}
-            onChange={(destination) => destination === "checks" ? openChecks() : navigate(destination as Exclude<NavDestination, "checks">)}
-            // The tablet rail's look laid sideways: a --colour-rail pill, white circles, a lime thumb. inset is the
-            // --nav-ring (6) and radius is half a --nav-circle (60) plus that ring, so the thumb is a circle.
-            trackColor="var(--colour-rail)"
-            thumbColor="var(--colour-action)"
-            textColor="var(--ink-fill)"
-            activeTextColor="var(--ink-fill)"
-            size="md"
-            radius={36}
-            inset={6}
-            equalSlots={false}
-            stretch={100}
-            squash={0}
-            speed={0.7}
-            glide={100}
-            draggable
+        <div className="phone-navigation">
+          {/* Upstream's dark glass, joined into one capsule, labels only (no logo, no icons): the current
+              destination is the gliding pill. It never folds into its burger menu; the CSS fits it to 320 px. */}
+          <PillNav
+            ariaLabel="Primary navigation"
+            items={navDestinations.map((destination) => ({ label: destination === "checks" ? "Checks" : labels[destination], href: destination }))}
+            activeHref={showChecks ? "checks" : shell.destination === "batches" ? "today" : shell.destination}
+            onItemClick={(item) => item.href === "checks" ? openChecks() : navigate(item.href as Exclude<NavDestination, "checks">)}
+            linkComponent={PhoneNavButton}
+            theme="dark"
+            surface="glass"
+            layout="joined"
+            itemStyle="plain"
+            hoverEffect="fill"
+            indicator="pill"
+            collapse="never"
           />
-        </nav>
+        </div>
         )}
         <div className="design-sidebar-bottom">
           <button aria-label="Home — station information" className="design-account" onClick={() => showDialog({ kind: "info" })} type="button"><span className="design-avatar"><DesignIcon name="user" /></span></button>
@@ -841,7 +837,6 @@ export function App() {
                 visible={shell.destination !== "calendar" && shell.destination !== "settings"}
                 batches={batchState.batches}
                 beforeBatchReplace={beforeBatchReplace}
-                mode={shell.destination === "today" ? "today" : "batches"}
                 pane={showChecks ? "checks" : shell.destination === "profiles" ? "profiles" : "batches"}
                 showPhoneDetail={showPhoneDetail}
                 backLabel={detailOrigin === "calendar" ? "Calendar" : showChecks ? "Checks" : "batches"}
@@ -1470,7 +1465,6 @@ interface BatchViewProps {
   batches: Batch[];
   onDialog(dialog: StationDialogState): void;
   batchListVersion: number;
-  mode: "today" | "batches";
   pane: "batches" | "checks" | "profiles";
   profilePane: ReactNode;
   showPhoneDetail: boolean;
@@ -1607,7 +1601,7 @@ function ChecksView({ batches, onOpen, onComplete, onNavigate }: { batches: Batc
   </section>;
 }
 
-function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mode, pane, profilePane, showPhoneDetail, backLabel, onObservationAdded, profiles, units, onDialog, batchListVersion, onChange, onUpdate, onComplete, onDelete, onNavigate, onOpen, onSelect, openBatchId }: BatchViewProps) {
+function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, pane, profilePane, showPhoneDetail, backLabel, onObservationAdded, profiles, units, onDialog, batchListVersion, onChange, onUpdate, onComplete, onDelete, onNavigate, onOpen, onSelect, openBatchId }: BatchViewProps) {
   const [filter, setFilter] = useState<BatchListFilter>("all");
   const [query, setQuery] = useState("");
   const [sorted, setSorted] = useState(false);
@@ -1646,9 +1640,9 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
         <h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1} className="sr-only">My batches <span>{batches.length}</span></h1>
         <div className="design-search-row"><div className="design-search"><div className="dark-field design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /></div><button aria-label="Sort batches by finish date" aria-pressed={sorted} className="utility-circle utility-circle-dark" onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div></div>
         
-        {/* The status filter is the bottom row's RubberSegment beside the heading (user, 2026-11-17): white circles,
-            no track, a lime thumb; only the chosen filter shows its word. */}
-        <div className="design-section-head batch-filter-head"><h2>{mode === "today" ? "Batch overview" : "All batches"}</h2>
+        {/* The status filter is a RubberSegment in the place of the former "Batch overview" heading, which the user
+            removed (2026-11-17): white circles, no track, a lime thumb; only the chosen filter shows its word. */}
+        <div className="design-section-head batch-filter-head">
           <RubberSegment
             aria-label="Filter batches by status"
             className="batch-filter"

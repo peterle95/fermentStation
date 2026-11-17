@@ -56,7 +56,10 @@
 @media (hover: hover) and (pointer: fine) {
   .rubber-segment-item[aria-checked="false"]:hover { opacity: 0.9; }
 }
-/* Host-page guards: a page's global button:hover / :active / :focus-visible rules must not repaint the slots. */
+/* Host-page guards: a page's global button:hover / :active / :focus-visible rules must not repaint the slots.
+   FermentStation: nor may a global button min-height stretch the buttons past the thumb layer's spans, which would
+   leave the selected slot's content off-centre in its pill. */
+.rubber-segment .rubber-segment-item { min-height: 0; }
 .rubber-segment .rubber-segment-item:not(:disabled):is(:hover, :active) { background: var(--rs-slot, transparent); color: var(--rs-ink); }
 .rubber-segment .rubber-segment-item:not(:disabled):active { transform: none; }
 .rubber-segment .rubber-segment-item:not(:disabled)[data-pressed] { transform: scale(0.96); }

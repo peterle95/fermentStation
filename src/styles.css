@@ -697,18 +697,20 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 .design-stat-track { display: none; }
 .design-stat-track i { display: block; height: 100%; background: var(--colour-text); }
 .design-section-head, .section-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); margin-bottom: var(--space-4); }
-/* Status filter (user, 2026-11-17): the phone bottom row's RubberSegment beside the section heading, lighter (no
-   track): white --target-min circles at --nav-gap, the lime thumb on the chosen filter, the only slot with its word.
-   Where heading and filter do not fit on one line, the filter wraps under the heading. */
+/* Status filter (user, 2026-11-17): a RubberSegment where the "Batch overview" heading was (the user removed it), lighter
+   (no track): white --target-min circles at --nav-gap, the lime thumb on the chosen filter, the only slot with its
+   word. The word's line box is trimmed to its cap height so the condensed face centres in the pill like the icons. */
 .batch-filter-head { margin-bottom: var(--space-6); }
-.batch-filter { --rs-slot: var(--colour-background); gap: var(--nav-gap); margin-inline-start: auto; }
+.batch-filter { --rs-slot: var(--colour-background); gap: var(--nav-gap); }
 .batch-filter .rubber-segment-thumb { gap: var(--nav-gap); }
 .batch-filter .rubber-segment-slot { gap: var(--space-2); width: var(--target-min); min-width: 0; height: var(--target-min); padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
 .batch-filter .rubber-segment-slot[data-active] { width: auto; padding-inline: var(--space-3) var(--space-4); font-weight: var(--type-title-weight); }
 .batch-filter .rubber-segment-item, .batch-filter .rubber-segment-item[aria-checked="false"]:hover { opacity: 1; }
 .batch-filter .filter-mark { display: inline-flex; flex: none; width: var(--nav-icon); height: var(--nav-icon); }
 .batch-filter .filter-mark svg { width: 100%; height: 100%; }
-.batch-filter .rubber-segment-slot:not([data-active]) .filter-word { display: none; }.quick-log-types button[aria-pressed="true"] { background: var(--colour-surface-inverse); border-color: var(--colour-surface-inverse); }
+.batch-filter .rubber-segment-slot:not([data-active]) .filter-word { display: none; }
+.batch-filter .filter-word { text-box: trim-both cap alphabetic; }
+.quick-log-types button[aria-pressed="true"] { background: var(--colour-surface-inverse); border-color: var(--colour-surface-inverse); }
 .batch-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--batch-card-min)), 1fr)); gap: var(--layout-gutter); }
 /* Batch card (spec §1.1 drink card; gap 9). The card is a full-width grid item, so its percentage padding and
    its children's percentage margins and horizontal offsets are fractions of the card's width. Title pair at the
@@ -1301,31 +1303,26 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .calendar-head, .calendar-legend, .calendar-helper { padding-inline: calc(var(--layout-edge) - var(--space-1)); }
   .navigation { padding-inline: var(--safe-left) var(--safe-right); }
   /* Batch filter: four circles and the "Attention" capsule need about 310 px; the gaps and the capsule's padding
-     narrow (the circles stay --target-min) to fit 288. */
+     narrow (the circles stay --target-min) to fit 288; the extra end padding balances the word's trailing tracking. */
   .batch-filter, .batch-filter .rubber-segment-thumb { gap: 2px; }
-  .batch-filter .rubber-segment-slot[data-active] { gap: var(--space-1); padding-inline: var(--space-2); }
+  .batch-filter .rubber-segment-slot[data-active] { gap: var(--space-1); padding-inline: var(--space-1) var(--space-2); }
 }
 
-/* Phone bottom row (< 600 px): the React Bits RubberSegment (src/components/RubberSegment.tsx), which the user asked
-   for on 2026-11-17 in place of the circles and capsule; usePhoneNav in App.tsx renders it instead of .navigation.
-   On 2026-11-17 the user asked for it to look like the tablet rail laid sideways, without the logo: a compact,
-   centred --colour-rail pill (its padding is the --nav-ring) holding white --nav-circle circles; the lime thumb
-   is the current destination, the only slot that shows its label. Its motion is upstream's, unchanged. */
+/* Phone bottom row (< 600 px): the React Bits PillNav (src/components/PillNav.tsx), which the user asked for on
+   2026-11-17 in place of the RubberSegment; usePhoneNav in App.tsx renders it instead of .navigation. The user chose
+   upstream's dark glass, joined into one capsule, labels only, in the app's font: these rules only seat it (centred
+   in the row above the safe area) and set the font family. Its colours, sizes and motion are upstream's. */
 @media (max-width: 599px) {
   .phone-navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; min-height: calc(var(--mobile-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); }
   .profile-editor-shell .phone-navigation { display: none; }
-  .phone-navigation .rubber-segment { --rs-slot: var(--colour-background); gap: var(--nav-gap); }
-  .phone-navigation .rubber-segment-thumb { gap: var(--nav-gap); }
-  .phone-navigation .rubber-segment-slot { gap: var(--space-3); width: var(--nav-circle); min-width: 0; height: var(--nav-circle); min-height: 0; max-width: none; padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
-  .phone-navigation .rubber-segment-slot[data-active] { width: auto; min-width: var(--nav-capsule); padding-inline: calc((var(--nav-circle) - var(--nav-icon)) / 2); font-weight: var(--type-title-weight); }
-  .phone-navigation .rubber-segment-item, .phone-navigation .rubber-segment-item[aria-checked="false"]:hover { opacity: 1; }
-  .phone-navigation .nav-mark { display: inline-flex; flex: none; width: var(--nav-icon); height: var(--nav-icon); border-radius: 0; background: none; box-shadow: none; }
-  .phone-navigation .nav-mark svg { width: var(--nav-icon); height: var(--nav-icon); }
-  .phone-navigation .rubber-segment-slot:not([data-active]) .nav-word { display: none; }
-}
-/* Three circles, the capsule, the gaps and the ring need about 320 px: the row gives up its side padding there. */
-@media (max-width: 379px) {
-  .phone-navigation { padding-inline: var(--safe-left) var(--safe-right); }
+  .phone-navigation .pill-nav { font-family: var(--font-family); }
+  /* The condensed app face reads small at PillNav's 14 px, so the labels take the meta role; the global button rules (min-height, hover fill,
+     active nudge) would push the faces off the glide ink, so they are reset here. */
+  .phone-navigation .pill-nav-item,
+  .phone-navigation .pill-nav-ink-item { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); }
+  .phone-navigation .pill-nav-item { min-height: 0; max-width: none; }
+  .phone-navigation .pill-nav-item:hover:not(:disabled) { background: none; }
+  .phone-navigation .pill-nav-item:active:not(:disabled) { transform: none; }
 }
 
 /* Desktop menu (>= 1024): the React Bits StaggeredMenu (src/components/StaggeredMenu.tsx). On 2026-11-14 the user

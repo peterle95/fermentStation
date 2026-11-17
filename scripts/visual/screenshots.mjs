@@ -32,12 +32,11 @@ const openDetail = [
 
 // Primary navigation. Desktop (>= 1024) navigates through the StaggeredMenu: open it, then choose the item (its
 // link is an in-app destination). Below 1024 the menu toggle is hidden, so that optional tap is skipped and the
-// rail button, or the phone row's RubberSegment slot (< 600, named by its aria-label), is tapped instead.
+// rail button, or the phone row's PillNav item (< 600, its button names its destination), is tapped instead.
 const menuLinks = { today: "/", checks: "/checks", calendar: "/calendar", profiles: "/profiles" };
-const phoneSlotNames = { today: "My batches", checks: "Checks", calendar: "Calendar", profiles: "Profiles" };
 const navigateTo = (destination) => [
   { tap: ".app-menu .sm-toggle", optional: true },
-  { tap: `.navigation .nav-${destination}, .phone-navigation [role="radio"][aria-label="${phoneSlotNames[destination]}"], .app-menu .sm-panel-item[href="${menuLinks[destination]}"]` },
+  { tap: `.navigation .nav-${destination}, .phone-navigation .pill-nav-item[data-destination="${destination}"], .app-menu .sm-panel-item[href="${menuLinks[destination]}"]` },
 ];
 const desktopViewports = ["1440x900", "1024x768"];
 
