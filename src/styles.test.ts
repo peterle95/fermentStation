@@ -336,7 +336,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md ยง2)", ()
 
   it("moves the last legacy rounded rectangles onto the bowed card, the small card, the capsule or a photo frame", () => {
     for (const name of ["design-empty-checks", "calendar-empty"]) expect(app).toContain(`className="${name} small-card bowed"`);
-    for (const selector of [".batch-view-switch", ".queue-card"]) expect(rule(selector)).toContain("border-radius: var(--radius-control)");
+    for (const selector of [".queue-card"]) expect(rule(selector)).toContain("border-radius: var(--radius-control)");
     // The detail photo frame is bowed (ticket 19): its colour is --fill, never a box of its own.
     expect(app).toContain('style={detail && !photo ? { "--fill": visual.color } as CSSProperties : undefined}');
     expect(rule(".design-detail-photo")).not.toMatch(/border|background/);
@@ -781,7 +781,7 @@ describe("utility circles and search field (swipe-rework-log.md, ticket 4; spec 
     expect(rule("input::placeholder, textarea::placeholder")).toContain("color: var(--ink-meta)");
     expect(contrast(hex("--ink-ground-meta"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(7);
     // Field first, then the sort circle, both inside .design-search; the input keeps its name and type.
-    const search = app.slice(app.indexOf('<div className="design-search">'), app.indexOf('className="batch-view-switch"'));
+    const search = app.slice(app.indexOf('<div className="design-search">'), app.indexOf('<div className="filter-row"'));
     expect(search).toMatch(/<div className="dark-field design-search-box">.*<input aria-label="Search batches"[\s\S]*?type="search" value=\{query\} \/><\/div><button aria-label="Sort batches by finish date" aria-pressed=\{sorted\} className="utility-circle utility-circle-dark"/);
   });
 });
@@ -1259,7 +1259,7 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec ย
 
   it("maps the app's content onto the anatomy without changing labels or focus order", () => {
     const markup = summary();
-    expect(markup).toContain('<section className="design-summary-group" aria-label="Kitchen summary" hidden={mode !== "today"}>');
+    expect(markup).toContain('<section className="design-summary-group" aria-label="Kitchen summary">');
     const order = ['className="design-summary bowed"', '<span className="design-summary-emblem"><StationLogo /></span>', "<h2>Kitchen summary</h2>",
       "ready to enjoy", 'className="summary-row design-summary-next bowed"', 'className="summary-row-avatar" aria-hidden="true"', "summary-row-count",
       'className="big-number design-gauge"', "<strong>{batches.length}</strong>", 'className="big-number-circle" aria-hidden="true"',
@@ -1270,12 +1270,14 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec ย
     // The batch detail's next check is the same sub-row; its "Complete check" button is the count pill.
     expect(app).toContain('<section className="summary-row design-detail-next bowed" aria-label="Next batch check">');
     expect(app).toMatch(/aria-label=\{`Complete check: \$\{dueCheck\.name\} for this batch`\} className="summary-row-count glass"/);
-    expect(app.match(/summary-row-count/g)).toHaveLength(3);
+    expect(app.match(/summary-row-count/g)).toHaveLength(2);
     expect(rule("button.summary-row-count:hover:not(:disabled)")).toContain("--glass: var(--colour-background)");
   });
 
-  it("gives the Checks summary the same component, with both counts on lime and yellow in ink (ticket 13)", () => {
-    expect(app).toContain('<section className="design-summary-group" aria-label="Checks summary"><div className="design-summary bowed"><span className="design-summary-emblem"><StationLogo /></span><div className="design-summary-label"><h2>Checks summary</h2><p>{paused.length} paused batches</p></div><p className="summary-row design-summary-next bowed"><span className="summary-row-avatar" aria-hidden="true"><DesignIcon name="check" /></span><span className="summary-row-count glass">{due.length}</span>{" "}<span className="summary-row-label">checks due or overdue</span></p></div></section>');
+  it("uses the Kitchen summary on Checks instead of a second summary (moved from My batches)", () => {
+    expect(app.match(/aria-label="Kitchen summary"/g)).toHaveLength(1);
+    expect(app).not.toContain('aria-label="Checks summary"');
+    expect(app).not.toContain('<div className="batch-view-switch"');
     // No rule is scoped to the Checks view's summary: it is the Kitchen summary's anatomy unchanged.
     expect(styles).not.toMatch(/design-checks-view[^{]*design-summary|design-checks-view[^{]*summary-row/);
   });
@@ -1466,7 +1468,7 @@ describe("calendar and upcoming strip (swipe-rework-log.md, ticket 11; spec ยง3 
     expect(rule(".upcoming-strip .small-card-tag").trim()).toBe("justify-self: center;");
     expect(styles).not.toMatch(/\.upcoming-strip \[class\^="event-"\]/);
     // The strip may scroll inside its section, so the actions panel's column cannot grow to the strip's width.
-    expect(rule(".design-more-actions > div")).toContain("grid-template-columns: minmax(0, 1fr)");
+    expect(styles).not.toContain(".design-more-actions");
     expect(rule(".section-label a")).toContain("min-height: var(--target-min)");
   });
 

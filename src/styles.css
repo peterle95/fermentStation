@@ -361,7 +361,6 @@ input::file-selector-button,
 .ios-install-guide,
 .design-summary,
 .big-number-circle,
-.batch-view-switch,
 .filter-row button,
 .design-batch-card,
 .design-batch-card:hover:not(:disabled),
@@ -425,7 +424,6 @@ input::file-selector-button,
 .storage-warning,
 [role="alert"],
 .settings-live[role="alert"] > p,
-.batch-view-switch button[aria-pressed="true"],
 .quick-log-types button[aria-pressed="true"],
 .toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]),
 .design-batch-card.selected,
@@ -656,7 +654,6 @@ button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
 .dark-field:is(textarea, [type="file"]) { height: auto; border-radius: var(--radius-line); }
 /* Search (gap 7): the field and the dark sort circle on one line. */
 .design-search { display: flex; flex: 1 1 240px; align-items: center; gap: var(--space-2); min-width: 0; }
-.design-search-row .batch-view-switch { margin-left: auto; }
 .design-search-box { display: flex; flex: 1; align-items: center; gap: var(--space-2); min-width: 0; padding-inline: var(--space-4) var(--space-1); }
 .design-search-box input { flex: 1; align-self: stretch; width: 0; min-height: 0; border: 0; background: transparent; padding-inline: var(--space-1); }
 .design-summary-group { container-type: inline-size; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6) var(--space-8); margin-bottom: var(--space-8); }
@@ -701,9 +698,6 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 .design-stat-track { display: none; }
 .design-stat-track i { display: block; height: 100%; background: var(--colour-text); }
 .design-section-head, .section-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); margin-bottom: var(--space-4); }
-.batch-view-switch { display: flex; flex-wrap: wrap; gap: var(--space-1); padding: var(--space-1); border-radius: var(--radius-control); background: var(--colour-background); }
-.batch-view-switch button { border: 0; min-height: var(--target-min); padding: var(--space-2) var(--space-4); }
-.batch-view-switch button[aria-pressed="true"] { background: var(--colour-surface-inverse); }
 /* Filter chips borrow the bottom row (spec §1.5, §3): white capsules h 60 at gap 6, the chosen one lime. */
 .filter-row { display: flex; flex-wrap: wrap; gap: var(--nav-gap); margin-bottom: var(--space-6); }
 .filter-row button { min-height: var(--nav-circle); padding: var(--space-2) var(--space-4); background: var(--colour-background); }
@@ -758,6 +752,7 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 .status-to-fridge { background: var(--colour-accent); }
 .status-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
 .action-queue { margin-top: var(--space-8); }
+.checks-upcoming { margin-top: var(--space-8); }
 .queue-grid, .design-all-checks { display: grid; gap: var(--space-4); }
 .queue-card { display: flex; align-items: center; gap: var(--space-3); min-width: 0; padding: var(--space-3); border-radius: var(--radius-control); background: var(--colour-background); }
 .queue-icon, .design-check-symbol, .next-action-icon { display: grid; place-items: center; flex: none; width: var(--target-min); height: var(--target-min); border-radius: var(--radius-control); background: var(--colour-emblem); }
@@ -779,8 +774,6 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 .checks-paused-row strong, .checks-paused-row > span > span { display: block; }
 .design-tip { display: flex; align-items: flex-start; gap: var(--space-4); margin-top: var(--space-8); padding: var(--card-padding); --fill: var(--colour-accent); }
 .design-tip h3 { margin-bottom: var(--space-2); }
-.design-more-actions { margin-top: var(--space-6); }
-.design-more-actions > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4); padding-block: var(--space-4); }
 .section-label a { display: inline-flex; align-items: center; min-height: var(--target-min); }
 .upcoming-strip { display: flex; gap: var(--small-card-spacing); overflow-x: auto; padding: var(--space-2) var(--space-2) var(--space-4); overscroll-behavior-inline: contain; }
 .upcoming-strip button { flex: 0 0 var(--strip-day); text-align: center; }

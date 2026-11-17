@@ -45,11 +45,10 @@ const desktopViewports = ["1440x900", "1024x768"];
 // (seed), viewports (names; default all), motion: true (no reduced-motion emulation, for animated states).
 const surfaces = [
   { name: "overview", description: "Batch overview (My batches)", steps: [{ waitFor: ".design-batch-card" }] },
-  { name: "all-batches", description: "All batches list", steps: [{ tap: ".batch-view-switch button:nth-child(2)" }, { waitFor: '.batch-view-switch button:nth-child(2)[aria-pressed="true"]' }] },
   { name: "batch-detail", description: `Batch detail (${detailBatch})`, steps: openDetail },
   { name: "observation-logger", description: "Batch detail with the Add observation logger open", steps: [...openDetail, { tap: ".design-detail .design-record-observation" }, { waitFor: "dialog.observation-logger.station-dialog[open]" }] },
   { name: "batch-tools", description: "Batch detail with Batch tools open, scrolled to the tools", steps: [...openDetail, { tap: '.design-detail button[aria-label="More batch tools"]' }, { waitFor: "#batch-management" }, { scrollTo: "#batch-management" }] },
-  { name: "upcoming-strip", description: "Batch overview with More batch actions open, scrolled to the upcoming strip", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-more-actions > summary" }, { waitFor: ".upcoming-strip .small-card" }, { scrollTo: ".upcoming" }] },
+  { name: "upcoming-strip", description: "Checks view scrolled to the Upcoming · next 7 days strip", steps: [...navigateTo("checks"), { waitFor: ".upcoming-strip .small-card" }, { scrollTo: ".upcoming" }] },
   { name: "checks", description: "Checks view", steps: [...navigateTo("checks"), { waitFor: ".design-checks-view" }] },
   { name: "calendar", description: "Calendar", steps: [...navigateTo("calendar"), { waitFor: ".calendar-screen" }] },
   { name: "profiles", description: "Fermentation profiles", steps: [...navigateTo("profiles"), { waitFor: ".profiles-screen .profile-card" }] },
@@ -59,7 +58,7 @@ const surfaces = [
   { name: "first-run", description: "Empty first-run state (no saved data)", scenario: "empty", steps: [{ waitFor: ".design-dashboard" }] },
   // Ticket 14: states styled before the harness could reach them. No baseline exists for these.
   { name: "trash", description: "Settings with Recently deleted batches open, scrolled to the trash rows", steps: [{ tap: '.design-topbar button[aria-label="Settings"]' }, { waitFor: ".settings-screen" }, { tap: ".settings-trash-toggle" }, { waitFor: ".deleted-batches-panel .trash-item" }, { scrollTo: ".settings-trash-toggle" }] },
-  { name: "batch-picker", description: "Choose a batch sheet from an upcoming-strip day with several batches", steps: [{ waitFor: ".design-batch-card" }, { tap: ".design-more-actions > summary" }, { waitFor: '.upcoming-strip button[aria-haspopup="dialog"]' }, { tap: '.upcoming-strip button[aria-haspopup="dialog"]' }, { waitFor: "dialog.upcoming-batch-picker[open]" }] },
+  { name: "batch-picker", description: "Choose a batch sheet from an upcoming-strip day with several batches", steps: [...navigateTo("checks"), { waitFor: '.upcoming-strip button[aria-haspopup="dialog"]' }, { tap: '.upcoming-strip button[aria-haspopup="dialog"]' }, { waitFor: "dialog.upcoming-batch-picker[open]" }] },
   { name: "profile-overview", description: "Profile overview dialog (Kimchi)", steps: [...navigateTo("profiles"), { tap: 'button[aria-label="View Kimchi guidance"]' }, { waitFor: "dialog.station-dialog[open]" }] },
   { name: "batch-dates", description: `Batch dates dialog (${detailBatch})`, steps: [...openDetail, { tap: '.design-detail button[aria-label="View batch dates"]' }, { waitFor: "dialog.station-dialog[open]" }] },
   { name: "profile-inputs", description: `Profile inputs dialog (${detailBatch})`, steps: [...openDetail, { tap: ".design-detail .design-input-summary .design-quiet" }, { waitFor: "dialog.station-dialog[open]" }] },

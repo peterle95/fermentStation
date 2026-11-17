@@ -1493,17 +1493,104 @@ function compareScheduledChecks(left: { batch: Batch; check: Batch["checks"][num
   return left.check.nextDueDate.localeCompare(right.check.nextDueDate) || left.batch.name.localeCompare(right.batch.name) || left.check.name.localeCompare(right.check.name);
 }
 
-function ChecksView({ batches, onOpen, onComplete }: { batches: Batch[]; onOpen(id: string): void; onComplete(batchId: string, checkId: string): void }) {
+function ChecksView({ batches, onOpen, onComplete, onNavigate }: { batches: Batch[]; onOpen(id: string): void; onComplete(batchId: string, checkId: string): void; onNavigate(destination: Destination): void }) {
   const today = localDate();
   const checks = batches.filter(({ status }) => status === "active").flatMap((batch) => batch.checks.map((check) => ({ batch, check })))
     .sort((left, right) => Number(left.check.lastCompletedDate === today) - Number(right.check.lastCompletedDate === today) || compareScheduledChecks(left, right));
-  const due = checks.filter(({ check }) => check.nextDueDate <= today);
   const paused = batches.filter(({ status, checks }) => status !== "active" && checks.length > 0);
+  const [openUpcomingDate, setOpenUpcomingDate] = useState<string | null>(null);
+  const dueChecks = prioritizeToday(batches, localDate()).flatMap((batch) => dueBatchChecks(batch, localDate()).map((check) => ({ batch, check })))
+    .sort(compareScheduledChecks);
+  const readyBatches = batches.filter(({ status }) => status === "ready");
+  const upcoming = calendarEvents(batches).filter(({ date }) => date >= today);
+  const upcomingDays = Array.from({ length: 7 }, (_, offset) => {
+    const date = new Date(`${today}T12:00:00`);
+    date.setDate(date.getDate() + offset);
+    const dateValue = date.toISOString().slice(0, 10);
+    return { date: dateValue, events: upcoming.filter((event) => event.date === dateValue) };
+  });
+  const selectedUpcomingEvents = upcomingDays.find(({ date }) => date === openUpcomingDate)?.events ?? [];
+  const pendingFocus = useRef<string | null>(null);
+  useEffect(() => {
+    const label = pendingFocus.current;
+    if (!label) return;
+    const target = Array.from(document.querySelectorAll<HTMLButtonElement>(".design-checks-view button")).find((button) => button.getAttribute("aria-label") === label);
+    if (!target) return;
+    pendingFocus.current = null;
+    target.focus({ preventScroll: true });
+  });
+  const upcomingChecks = checks.filter(({ batch, check }) => !dueChecks.some((entry) => entry.batch.id === batch.id && entry.check.id === check.id));
   return <section aria-label="Batch checks" className="design-checks-view">
     <div className="design-view-heading"><p className="eyebrow">Care for your cultures</p><h1 tabIndex={-1}>Your batch checks</h1><p>Complete a check here, or open its batch for notes and readings.</p></div>
-    <section className="design-summary-group" aria-label="Checks summary"><div className="design-summary bowed"><span className="design-summary-emblem"><StationLogo /></span><div className="design-summary-label"><h2>Checks summary</h2><p>{paused.length} paused batches</p></div><p className="summary-row design-summary-next bowed"><span className="summary-row-avatar" aria-hidden="true"><DesignIcon name="check" /></span><span className="summary-row-count glass">{due.length}</span>{" "}<span className="summary-row-label">checks due or overdue</span></p></div></section>
-    <div className="design-section-head"><h2>Scheduled checks</h2><span className="design-badge">{checks.length} checks</span></div>
-    <div className="design-all-checks">{checks.map(({ batch, check }) => {
+    <section className="design-summary-group" aria-label="Kitchen summary">
+      <div className="design-summary bowed">
+        <span className="design-summary-emblem"><StationLogo /></span>
+        <div className="design-summary-label"><h2>Kitchen summary</h2><p>{readyBatches.length} ready to enjoy</p></div>
+        <p className="summary-row design-summary-next bowed"><span className="summary-row-avatar" aria-hidden="true"><DesignIcon name="check" /></span><span className="summary-row-count glass">{dueChecks.length}</span>{" "}<span className="summary-row-label">checks due</span></p>
+      </div>
+      <div className="design-summary-figures">
+        <div className="big-number design-gauge"><strong>{batches.length}</strong><span className="big-number-circle" aria-hidden="true"><DesignIcon name="jar" /></span><span className="big-number-caption">Total batches</span></div>
+        <div className="design-summary-stats">{batchStatuses.map((status) => {
+          const count = batches.filter((batch) => batch.status === status).length;
+          return <div className="design-stat-row" key={status}><div>{statusLabel(status)}<span className="design-stat-number">{count}<span>/{batches.length}</span></span></div><div className="design-stat-track"><i style={{ width: `${batches.length ? count / batches.length * 100 : 0}%` }} /></div></div>;
+        })}</div>
+      </div>
+    </section>
+    <section aria-labelledby="upcoming-heading" className="upcoming">
+      <div className="section-label">
+        <h2 id="upcoming-heading">Upcoming · next 7 days</h2>
+        <a href="#calendar" onClick={(event) => { event.preventDefault(); onNavigate("calendar"); }}>Open calendar</a>
+      </div>
+      <div className="upcoming-strip">
+        {upcomingDays.map(({ date: dateValue, events }) => {
+          const date = new Date(`${dateValue}T12:00:00`);
+          const batchIds = [...new Set(events.map(({ batchId }) => batchId))];
+          const canChooseBatch = batchIds.length > 1;
+          return (
+            <button
+              aria-controls={canChooseBatch ? `upcoming-batch-picker-${dateValue}` : undefined}
+              aria-expanded={canChooseBatch ? openUpcomingDate === dateValue : undefined}
+              aria-haspopup={canChooseBatch ? "dialog" : undefined}
+              aria-label={canChooseBatch ? `Choose a batch for ${dateValue}` : undefined}
+              className={dateValue === today ? "small-card bowed small-card-current" : "small-card bowed"}
+              key={dateValue}
+              onClick={() => {
+                if (canChooseBatch) return setOpenUpcomingDate((openDate) => openDate === dateValue ? null : dateValue);
+                setOpenUpcomingDate(null);
+                if (batchIds.length === 1) onOpen(batchIds[0]);
+              }}
+              type="button"
+            >
+              <time dateTime={dateValue}><strong>{date.getDate()}</strong>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</time>
+              <div>{events.map((event) => <span className="small-card-tag" key={`${event.batchId}-${event.kind}-${event.label}`}>{event.label}</span>)}</div>
+            </button>
+          );
+        })}
+      </div>
+      {openUpcomingDate && <BatchPicker date={openUpcomingDate} events={selectedUpcomingEvents} onClose={() => setOpenUpcomingDate(null)} onOpen={onOpen} />}
+    </section>
+
+    {checks.length === 0 && <p className="design-empty-checks small-card bowed">No checks scheduled for your active batches.</p>}
+    <section className="action-queue" aria-labelledby="action-queue-heading">
+      <div className="design-section-head"><h2 id="action-queue-heading"><span className="sr-only">Action queue · </span>A little care today</h2><span className="design-badge">{dueChecks.length} checks</span></div>
+      <div className="queue-grid">
+        {dueChecks.map(({ batch, check }) => (
+          <article className="queue-card attention" key={`${batch.id}-${check.id}`}>
+            <span className={`queue-icon${check.overdue ? " overdue" : ""}`} aria-hidden="true">{check.overdue ? "!" : <DesignIcon name={check.name.toLowerCase().includes("brine") ? "drop" : "leaf"} />}</span>
+            <button aria-label={`Open ${batch.name} for ${check.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{check.name}</strong><span>{batch.name} · {check.overdue ? `Overdue ${shortDate(check.nextDueDate)}` : "Today"}</span></button>
+            <button aria-label={`Complete ${check.name} for ${batch.name}`} className="utility-circle utility-circle-dark design-check-complete" onClick={() => { pendingFocus.current = `Open ${batch.name} for ${check.name}`; onComplete(batch.id, check.id); }} type="button"><DesignIcon name="check" /></button>
+          </article>
+        ))}
+      </div>
+      {dueChecks.length === 0 && checks.length > 0 && <p className="checks-caught-up">All caught up. You can still complete an upcoming check early.</p>}
+    </section>
+    {readyBatches.length > 0 && <section className="action-queue" aria-labelledby="ready-heading">
+      <div className="design-section-head"><h2 id="ready-heading">Ready to enjoy</h2><span className="design-badge">{readyBatches.length} ready</span></div>
+      <div className="queue-grid">{readyBatches.map((batch) => <article className="queue-card ready" key={`ready-${batch.id}`}><span className="queue-icon" aria-hidden="true">✓</span><button aria-label={`Open ready batch ${batch.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{batch.name} is ready</strong><span>Review the batch and choose its next status.</span></button></article>)}</div>
+    </section>}
+    {upcomingChecks.length > 0 && <section aria-label="Upcoming checks" className="checks-upcoming">
+      <div className="design-section-head"><h2>Upcoming checks</h2><span className="design-badge">{upcomingChecks.length} checks</span></div>
+    <div className="design-all-checks">{upcomingChecks.map(({ batch, check }) => {
       const completed = check.lastCompletedDate === today;
       const overdue = !completed && check.nextDueDate < today;
       return <article className={`queue-card${completed ? " done" : overdue ? " overdue" : ""}`} key={`${batch.id}-${check.id}`}>
@@ -1511,10 +1598,9 @@ function ChecksView({ batches, onOpen, onComplete }: { batches: Batch[]; onOpen(
         <button aria-label={`Open ${batch.name} for ${check.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{check.name}</strong><span>{batch.name} · {check.nextDueDate === today ? "Today" : `${overdue ? "Overdue" : "Due"} ${shortDate(check.nextDueDate)}`}</span>{completed && <span>Completed today</span>}</button>
         <button aria-label={`${completed ? "Completed" : "Complete"} ${check.name} for ${batch.name}`} className="utility-circle utility-circle-dark design-check-complete" disabled={completed} onClick={(event) => { if (document.activeElement === event.currentTarget) (event.currentTarget.previousElementSibling as HTMLButtonElement)?.focus({ preventScroll: true }); onComplete(batch.id, check.id); }} type="button"><DesignIcon name="check" /></button>
       </article>;
-    })}</div>
-    {checks.length === 0 && <p className="design-empty-checks small-card bowed">No checks scheduled for your active batches.</p>}
-    {checks.length > 0 && due.length === 0 && <p className="checks-caught-up">All caught up. You can still complete an upcoming check early.</p>}
+    })}</div></section>}
     {paused.length > 0 && <section className="checks-paused" aria-labelledby="paused-checks-heading"><h2 id="paused-checks-heading">Paused checks</h2><p>Checks resume when a batch becomes active again.</p><div className="design-all-checks">{paused.map((batch) => <button aria-label={`Open paused batch ${batch.name}`} className="checks-paused-row" onClick={() => onOpen(batch.id)} key={batch.id} type="button"><span><strong>{batch.name}</strong><span>{batch.checks.map(({ name }) => name).join(" · ")}</span></span><span className="design-badge">{statusLabel(batch.status)} · paused</span></button>)}</div></section>}
+    <div className="design-tip bowed"><DesignIcon name="leaf" /><div><h3>Keep an eye on the temperature</h3><p>A temperature reading helps you notice how your kitchen affects each batch.</p></div></div>
   </section>;
 }
 
@@ -1523,8 +1609,6 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
   const [query, setQuery] = useState("");
   const [sorted, setSorted] = useState(false);
   useEffect(() => { setFilter("all"); setQuery(""); }, [batchListVersion]);
-  const [openUpcomingDate, setOpenUpcomingDate] = useState<string | null>(null);
-  const [moreActionsOpen, setMoreActionsOpen] = useState(false);
   const overviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const detailRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -1544,18 +1628,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
     initializedSelection.current = true;
     if (!openBatchId) onSelect(batches[0].id);
   }, [batches, onSelect, openBatchId]);
-  const dueChecks = prioritizeToday(batches, localDate()).flatMap((batch) => dueBatchChecks(batch, localDate()).map((check) => ({ batch, check })))
-    .sort(compareScheduledChecks);
-  const readyBatches = batches.filter(({ status }) => status === "ready");
-  const today = localDate();
-  const upcoming = calendarEvents(batches).filter(({ date }) => date >= today);
-  const upcomingDays = Array.from({ length: 7 }, (_, offset) => {
-    const date = new Date(`${today}T12:00:00`);
-    date.setDate(date.getDate() + offset);
-    const dateValue = date.toISOString().slice(0, 10);
-    return { date: dateValue, events: upcoming.filter((event) => event.date === dateValue) };
-  });
-  const selectedUpcomingEvents = upcomingDays.find(({ date }) => date === openUpcomingDate)?.events ?? [];
+
 
   function closeBatch() {
     // Release the responsive focus-within pane before restoring its hidden origin.
@@ -1566,26 +1639,13 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
   return (
     <section className={`batches design-workspace${pane === "profiles" ? " profile-workspace" : ""}${openBatch && showPhoneDetail ? " design-selected" : ""}`} aria-label="Fermentation workspace">
       <div className="design-dashboard" key={pane}>
-      {pane === "profiles" ? profilePane : pane === "checks" ? <ChecksView batches={batches} onOpen={onOpen} onComplete={onComplete} /> : <>
+      {pane === "profiles" ? profilePane : pane === "checks" ? <ChecksView batches={batches} onOpen={onOpen} onComplete={onComplete} onNavigate={onNavigate} /> : <>
         <h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1} className="sr-only">My batches <span>{batches.length}</span></h1>
-        <div className="design-search-row"><div className="design-search"><div className="dark-field design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /></div><button aria-label="Sort batches by finish date" aria-pressed={sorted} className="utility-circle utility-circle-dark" onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div><div className="batch-view-switch" role="group" aria-label="My batches view"><button aria-pressed={mode === "today"} onClick={() => onNavigate("today")} type="button">Overview</button><button aria-pressed={mode === "batches"} onClick={() => onNavigate("batches")} type="button">All batches</button></div></div>
-        <section className="design-summary-group" aria-label="Kitchen summary" hidden={mode !== "today"}>
-          <div className="design-summary bowed">
-            <span className="design-summary-emblem"><StationLogo /></span>
-            <div className="design-summary-label"><h2>Kitchen summary</h2><p>{readyBatches.length} ready to enjoy</p></div>
-            <p className="summary-row design-summary-next bowed"><span className="summary-row-avatar" aria-hidden="true"><DesignIcon name="check" /></span><span className="summary-row-count glass">{dueChecks.length}</span>{" "}<span className="summary-row-label">checks due</span></p>
-          </div>
-          <div className="design-summary-figures">
-            <div className="big-number design-gauge"><strong>{batches.length}</strong><span className="big-number-circle" aria-hidden="true"><DesignIcon name="jar" /></span><span className="big-number-caption">Total batches</span></div>
-            <div className="design-summary-stats">{batchStatuses.map((status) => {
-              const count = batches.filter((batch) => batch.status === status).length;
-              return <div className="design-stat-row" key={status}><div>{statusLabel(status)}<span className="design-stat-number">{count}<span>/{batches.length}</span></span></div><div className="design-stat-track"><i style={{ width: `${batches.length ? count / batches.length * 100 : 0}%` }} /></div></div>;
-            })}</div>
-          </div>
-        </section>
+        <div className="design-search-row"><div className="design-search"><div className="dark-field design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /></div><button aria-label="Sort batches by finish date" aria-pressed={sorted} className="utility-circle utility-circle-dark" onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div></div>
+        
         <div className="design-section-head"><h2>{mode === "today" ? "Batch overview" : "All batches"}</h2><span>{visible.length} shown</span></div>
         <div className="filter-row" role="group" aria-label="Filter batches by status">
-          {(["all", ...batchStatuses] as BatchFilter[]).map((status) => <button aria-pressed={filter === status} key={status} onClick={() => setFilter(status)} type="button">{status === "all" ? "All" : statusLabel(status)}</button>)}
+          {(["all", ...batchStatuses, "attention"] as BatchListFilter[]).map((status) => <button aria-pressed={filter === status} key={status} onClick={() => setFilter(status)} type="button">{status === "all" ? "All" : status === "attention" ? "Attention" : statusLabel(status)}</button>)}
         </div>
 
       {profiles.length === 0 && <p className="notice">Restore or create a profile before starting a batch. <button className="station-text-action" onClick={() => onNavigate("profiles")} type="button">Open Profiles</button></p>}
@@ -1605,62 +1665,9 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
         </section>
       )}
 
-      <section className="action-queue" aria-labelledby="action-queue-heading">
-          <div className="design-section-head"><h2 id="action-queue-heading"><span className="sr-only">Action queue · </span>A little care today</h2><span className="design-badge">{dueChecks.length} checks</span></div>
-          <div className="queue-grid">
-            {dueChecks.map(({ batch, check }) => (
-              <article className="queue-card attention" key={`${batch.id}-${check.id}`}>
-                <span className={`queue-icon${check.overdue ? " overdue" : ""}`} aria-hidden="true">{check.overdue ? "!" : <DesignIcon name={check.name.toLowerCase().includes("brine") ? "drop" : "leaf"} />}</span>
-                <button aria-label={`Open ${batch.name} for ${check.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{check.name}</strong><span>{batch.name} · {check.overdue ? `Overdue ${shortDate(check.nextDueDate)}` : "Today"}</span></button>
-                <button aria-label={`Complete ${check.name} for ${batch.name}`} className="utility-circle utility-circle-dark design-check-complete" onClick={() => onComplete(batch.id, check.id)} type="button"><DesignIcon name="check" /></button>
-              </article>
-            ))}
-          </div>
-          {dueChecks.length === 0 && readyBatches.length === 0 && <p className="design-empty-checks small-card bowed">All caught up. Your next checks will appear here.</p>}
-      </section>
-      <div className="design-tip bowed"><DesignIcon name="leaf" /><div><h3>Keep an eye on the temperature</h3><p>A temperature reading helps you notice how your kitchen affects each batch.</p></div></div>
+      
 
-      <details className="design-more-actions" open={moreActionsOpen}><summary onClick={(event) => { event.preventDefault(); setMoreActionsOpen((open) => !open); }}>{readyBatches.length > 0 ? `${readyBatches.length} ready · ` : ""}More batch actions</summary>
-      <div hidden={!moreActionsOpen}>
-        <button aria-pressed={filter === "attention"} className="design-quiet" onClick={() => setFilter(filter === "attention" ? "all" : "attention")} type="button">Active · attention</button>
-        <div className="queue-grid">{readyBatches.map((batch) => <article className="queue-card ready" key={`ready-${batch.id}`}><span className="queue-icon" aria-hidden="true">✓</span><button aria-label={`Open ready batch ${batch.name}`} className="design-check-copy" onClick={() => onOpen(batch.id)} type="button"><strong>{batch.name} is ready</strong><span>Review the batch and choose its next status.</span></button></article>)}</div>
-      {mode === "today" && (
-        <section aria-labelledby="upcoming-heading" className="upcoming">
-          <div className="section-label">
-            <h2 id="upcoming-heading">Upcoming · next 7 days</h2>
-            <a href="#calendar" onClick={(event) => { event.preventDefault(); onNavigate("calendar"); }}>Open calendar</a>
-          </div>
-          <div className="upcoming-strip">
-            {upcomingDays.map(({ date: dateValue, events }) => {
-              const date = new Date(`${dateValue}T12:00:00`);
-              const batchIds = [...new Set(events.map(({ batchId }) => batchId))];
-              const canChooseBatch = batchIds.length > 1;
-              return (
-                <button
-                  aria-controls={canChooseBatch ? `upcoming-batch-picker-${dateValue}` : undefined}
-                  aria-expanded={canChooseBatch ? openUpcomingDate === dateValue : undefined}
-                  aria-haspopup={canChooseBatch ? "dialog" : undefined}
-                  aria-label={canChooseBatch ? `Choose a batch for ${dateValue}` : undefined}
-                  className={dateValue === today ? "small-card bowed small-card-current" : "small-card bowed"}
-                  key={dateValue}
-                  onClick={() => {
-                    if (canChooseBatch) return setOpenUpcomingDate((openDate) => openDate === dateValue ? null : dateValue);
-                    setOpenUpcomingDate(null);
-                    if (batchIds.length === 1) onOpen(batchIds[0]);
-                  }}
-                  type="button"
-                >
-                  <time dateTime={dateValue}><strong>{date.getDate()}</strong>{new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(date)}</time>
-                  <div>{events.map((event) => <span className="small-card-tag" key={`${event.batchId}-${event.kind}-${event.label}`}>{event.label}</span>)}</div>
-                </button>
-              );
-            })}
-          </div>
-          {openUpcomingDate && <BatchPicker date={openUpcomingDate} events={selectedUpcomingEvents} onClose={() => setOpenUpcomingDate(null)} onOpen={onOpen} />}
-        </section>
-      )}
-      </div>
-      </details>
+      
       <PhotoCredits />
       </>}
       </div>

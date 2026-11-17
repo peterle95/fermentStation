@@ -52,11 +52,10 @@ Surfaces (`-s`):
 | Name | What it shows | How it is reached |
 | --- | --- | --- |
 | `overview` | Batch overview (My batches) | app start |
-| `all-batches` | All batches list | tap the "All batches" switch |
 | `batch-detail` | Batch detail for "Napa cabbage kimchi" | tap its card |
 | `observation-logger` | Batch detail with the Add observation logger open | tap "Add observation" |
 | `batch-tools` | Batch tools, scrolled into view | tap "More batch tools" |
-| `upcoming-strip` | Batch overview with "More batch actions" open, scrolled to the Upcoming · next 7 days strip (added in ticket 11; no baseline capture, the pre-rework baseline predates it) | tap "More batch actions" |
+| `upcoming-strip` | Checks view scrolled to the Upcoming · next 7 days strip (added in ticket 11; no baseline capture, the pre-rework baseline predates it) | navigate to Checks |
 | `checks` | Checks view | navigation (desktop: open the StaggeredMenu, choose the item; below 1024: rail or phone row) |
 | `calendar` | Calendar | navigation (as `checks`) |
 | `profiles` | Fermentation profiles | navigation (as `checks`) |
@@ -65,7 +64,7 @@ Surfaces (`-s`):
 | `settings` | Settings | tap the settings button |
 | `first-run` | Empty first-run state, no saved data | app start with an empty store |
 | `trash` | Settings with "Recently deleted batches" open, scrolled to the trash row for the seeded deleted batch "Jun tea (abandoned)" (ticket 14; no baseline) | Settings, tap "Open recently deleted batches" |
-| `batch-picker` | "Choose a batch" sheet for the first upcoming-strip day that has several batches (ticket 14; no baseline) | tap "More batch actions", then that day |
+| `batch-picker` | "Choose a batch" sheet for the first upcoming-strip day that has several batches (ticket 14; no baseline) | Checks, then that day |
 | `profile-overview` | Kimchi profile overview dialog (ticket 14; no baseline) | Profiles, tap "View Kimchi guidance" |
 | `batch-dates` | "Batch dates" dialog for "Napa cabbage kimchi" (ticket 14; no baseline) | its card, then "View batch dates" |
 | `profile-inputs` | "Profile inputs" dialog for "Napa cabbage kimchi" (ticket 14; no baseline) | its card, then "See all" under Profile inputs |
