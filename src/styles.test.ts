@@ -30,6 +30,12 @@ function rules(source = styles): Rule[] {
   });
 }
 
+/** Every declaration of every block with this exact selector, joined, for a selector split over several rules. */
+function allDeclarations(selector: string, source = styles) {
+  return rules(source).filter((entry) => entry.selector === selector)
+    .map((entry) => entry.declarations.map(([property, value]) => `${property}: ${value}`).join("; ")).join("; ");
+}
+
 /** The bowed-outline primitive owns its own radius, clip and pseudo-element layers. */
 const isPrimitive = (rule: Rule) => rule.selectors.every((selector) => /\.bowed(?:-clip)?\b|^:where\(\.bowed/.test(selector));
 
@@ -46,6 +52,16 @@ function bowedSurfaces() {
 
 const colourLiteral = /#[\da-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/i;
 const namedColour = /\b(?:white|black|red|green|blue|yellow|orange|purple|pink|gr[ae]y|silver|navy|teal|lime|olive|maroon|aqua|fuchsia)\b/i;
+
+/** The desktop menu's brand label (user request 2026-11-17). It is the one text painted directly rather than through
+    an ink set: white over the app's black ground while the header is closed, black over the menu's own layers while
+    the panel is open, at one spacing step above the title role. The colour, type-role and ink loops therefore exempt
+    these two rules; the desktop-navigation tests pin their declarations exactly, so the exception cannot drift. */
+const menuBrandRules = new Set([".app-menu .sm-header-brand", ".app-menu[data-open] .sm-header-brand"]);
+
+/** styles.css only corrects the size of three upstream menu labels (2026-11-17); React Bits keeps their weight,
+    leading and tracking. The type-role loop exempts them and the desktop-navigation tests pin each size to its role. */
+const menuSizeOnlyRules = new Set([".app-menu .sm-toggle", ".app-menu .sm-socials-title", ".app-menu .sm-socials-link"]);
 
 describe("Swipe-derived design contract", () => {
   it("takes every colour from the :root token layer, with the boards' black ground and ink", () => {
@@ -64,6 +80,7 @@ describe("Swipe-derived design contract", () => {
           if (colourLiteral.test(value)) expect(property, `colour literal outside a --colour-* token: ${property}`).toMatch(/^--colour-[\w-]+$/);
           continue;
         }
+        if (menuBrandRules.has(selector)) continue;
         expect(value, `${selector} { ${property} } must use a --colour-* token`).not.toMatch(colourLiteral);
         expect(value, `${selector} { ${property} } must use a --colour-* token`).not.toMatch(namedColour);
       }
@@ -74,7 +91,9 @@ describe("Swipe-derived design contract", () => {
       expect(definitions.length).toBeGreaterThan(5);
       expect(definitions.every(([, value]) => /^var\(--colour-[\w-]+\)$/.test(value))).toBe(true);
     }
-    expect(app).not.toMatch(colourLiteral);
+    // App.tsx's one colour literal is the station logo recoloured to white for the menu's closed header (2026-11-17).
+    expect(app).toContain(`stationLogoSvg.replace('fill="#1c1e22"', 'fill="#ffffff"')`);
+    expect(app.replace(/const stationLogoWhiteUrl = `[^`]*`;/, "")).not.toMatch(colourLiteral);
     const visuals = app.slice(app.indexOf("function profileVisual"), app.indexOf("function BatchPhoto"));
     for (const color of ["surface", "action", "action-alt", "accent"]) expect(visuals).toContain(`var(--colour-${color})`);
   });
@@ -213,7 +232,7 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
 
   it("sets type only by applying a complete role, never a raw size, weight, leading or tracking", () => {
     for (const entry of rules()) {
-      if (entry.selector === ":root" || entry.selector.startsWith("@font-face")) continue;
+      if (entry.selector === ":root" || entry.selector.startsWith("@font-face") || menuBrandRules.has(entry.selector) || menuSizeOnlyRules.has(entry.selector)) continue;
       const values = new Map(entry.declarations);
       const font = values.get("font");
       if (font !== undefined) expect(font, `${entry.selector} { font } may only inherit`).toBe("inherit");
@@ -281,7 +300,7 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
     for (const entry of rules()) {
       if (entry.selector === ":root") continue;
       for (const [property, value] of entry.declarations) {
-        if (property === "color") expect(value, `${entry.selector} { color }`).toMatch(/^(?:inherit|currentColor|var\(--ink(?:-[a-z]+)?\))$/);
+        if (property === "color" && !menuBrandRules.has(entry.selector)) expect(value, `${entry.selector} { color }`).toMatch(/^(?:inherit|currentColor|var\(--ink(?:-[a-z]+)?\))$/);
       }
     }
     const groups = inkGroups();
@@ -1824,16 +1843,19 @@ describe("desktop navigation: React Bits StaggeredMenu (user request 2026-11-14;
       expect(rule(":root")).toContain(`--colour-${token}: ${value};`);
       expect(menu).toContain(`var(--colour-${token})`);
     }
+    // The menu's labels take their sizes from the role tokens; React Bits keeps their weight, leading and tracking.
+    for (const [selector, role] of [[".app-menu .sm-toggle", "row"], [".app-menu .sm-socials-title", "label"], [".app-menu .sm-socials-link", "body"]]) expect(allDeclarations(selector, desktop)).toContain(`font-size: var(--type-${role})`);
   });
 
-  it("shows only from 1024, overlays the app, and keeps the topbar clear of its logo and toggle", () => {
+  it("shows only from 1024, overlays the app, and keeps the topbar clear of the menu panel", () => {
     expect(rule(".app-menu")).toBe(" display: none; ");
     expect(rule(".app-menu", desktop)).toBe(" display: block; ");
     expect(rule(".sidebar", desktop)).toBe(" display: none; ");
     const topbar = rule(".design-topbar", desktop);
-    for (const token of ["var(--nav-circle)", "var(--menu-toggle-width)"]) expect(topbar).toContain(token);
-    expect(rule(".app-menu .sm-toggle", desktop)).toContain("width: var(--menu-toggle-width)");
-    expect(rule(".app-menu .sm-socials-link", desktop)).toContain("min-height: var(--target-min)");
+    // The topbar clears the open panel's width, so neither the logo nor the toggle overlaps the page's own header.
+    for (const declaration of ["padding-inline: calc(var(--menu-panel-width) + var(--space-4)) var(--layout-edge)"]) expect(topbar).toContain(declaration);
+    expect(allDeclarations(".app-menu .sm-toggle", desktop)).toContain("width: var(--menu-toggle-width)");
+    expect(allDeclarations(".app-menu .sm-socials-link", desktop)).toContain("min-height: var(--target-min)");
     expect(rule(".app-menu .sm-logo-button", desktop)).toContain("width: var(--nav-circle)");
     // The closed panel is hidden after the close slide, at once under reduced motion (transitions are off there).
     expect(rule(".app-menu .staggered-menu-panel", desktop)).toContain("visibility: hidden");
@@ -1857,21 +1879,23 @@ describe("desktop navigation: React Bits StaggeredMenu (user request 2026-11-14;
     for (const prop of ["onMenuOpen={() => setMenuOpen(true)}", "onMenuClose={() => setMenuOpen(false)}"]) expect(menu).toContain(prop);
   });
 
-  it("puts the open panel's top row together: the app name and the Close control as a pair of red capsules", () => {
+  it("puts the app name beside the logo on the header, white on the ground and black over the open panel", () => {
     // The user's red, white on it at 5.3:1 (AA; the suite's 7:1 bar is relaxed for this paint only).
     expect(rule(":root")).toContain("--colour-menu-pill: #cc2e0c;");
     expect(contrast(hex("--ink-ground"), hex("--colour-menu-pill"))).toBeCloseTo(5.3, 1);
-    expect(menu).toContain('panelTitle="FermentStation"');
-    expect(component).toContain('{panelTitle && <p className="sm-panel-brand">{panelTitle}</p>}');
+    expect(menu).toContain('brandName="FermentStation"');
+    expect(component).toContain('{brandName && <span className="sm-header-brand">{brandName}</span>}');
     // One toggle: while the panel is on screen the header spans only the panel, so the toggle is its Close control.
     expect(rule(".app-menu :is(.staggered-menu-panel, .sm-prelayers)", desktop)).toBe(" width: var(--menu-panel-width); ");
-    expect(rule(".app-menu[data-panel-row] .staggered-menu-header", desktop)).toBe(" width: var(--menu-panel-width); ");
+    expect(rule(".app-menu .staggered-menu-header", desktop)).toContain("width: var(--menu-panel-width)");
     const close = rule(".app-menu[data-panel-row] .sm-toggle, .app-menu[data-panel-row] .sm-toggle:hover:not(:disabled)", desktop);
     for (const declaration of ["border-radius: var(--radius-control)", "background: var(--colour-menu-pill)"]) expect(close).toContain(declaration);
-    // The name: the old sidebar wordmark's heading role, the same capsule at the nav circle's height beside the logo.
-    expect(styles).toContain("h2, h3, h4, .sm-panel-brand { font-size: var(--type-heading);");
-    const brand = rule(".app-menu .sm-panel-brand", desktop);
-    for (const declaration of ["height: var(--nav-circle)", "border-radius: var(--radius-control)", "background: var(--colour-menu-pill)", "left: calc(var(--layout-edge) + var(--nav-circle) + var(--space-3))"]) expect(brand).toContain(declaration);
-    expect(inkGroups().find((group) => group.selectors.includes(".app-menu .sm-panel-brand"))?.kind).toBe("ground");
+    // The name: plain text beside the logo, one spacing step above the title role so it reads at the header's height.
+    const brandBlocks = rules(desktop).filter((entry) => entry.selector === ".app-menu .sm-header-brand");
+    expect(brandBlocks).toHaveLength(2);
+    const brand = allDeclarations(".app-menu .sm-header-brand", desktop);
+    for (const declaration of ["margin-left: var(--space-2)", "font-size: calc(var(--type-title) + var(--space-1))", "white-space: nowrap", "pointer-events: none", "color: #fff"]) expect(brand).toContain(declaration);
+    // Over the open panel's layers the name flips to black.
+    expect(rule(".app-menu[data-open] .sm-header-brand", desktop)).toBe(" color: #000; ");
   });
 });

@@ -2551,7 +2551,7 @@ describe("batch workflow", () => {
     fireEvent.click(profileManagementButton("Edit Kombucha F1"));
     const mobileLogo = document.querySelector<HTMLImageElement>(".profile-mobile-bar .brand-mark img")!;
     expect(mobileLogo.getAttribute("src")).toBe(document.querySelector(".brand .brand-mark img")!.getAttribute("src"));
-    expect(mobileLogo.getAttribute("src")).toContain("logo-transparent-96.png");
+    expect(mobileLogo.getAttribute("src")).toContain("station-logo.svg");
     fireEvent.click(screen.getByRole("button", { name: "Back to profiles" }));
     expect(screen.getByRole("heading", { name: "Fermentation profiles" })).toBeTruthy();
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "Edit Kombucha F1" }));
