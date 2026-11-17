@@ -781,7 +781,7 @@ describe("utility circles and search field (swipe-rework-log.md, ticket 4; spec 
     expect(rule("input::placeholder, textarea::placeholder")).toContain("color: var(--ink-meta)");
     expect(contrast(hex("--ink-ground-meta"), hex("--colour-surface-inverse"))).toBeGreaterThanOrEqual(7);
     // Field first, then the sort circle, both inside .design-search; the input keeps its name and type.
-    const search = app.slice(app.indexOf('<div className="design-search">'), app.indexOf('<div className="filter-row"'));
+    const search = app.slice(app.indexOf('<div className="design-search">'), app.indexOf('<div className="design-section-head batch-filter-head">'));
     expect(search).toMatch(/<div className="dark-field design-search-box">.*<input aria-label="Search batches"[\s\S]*?type="search" value=\{query\} \/><\/div><button aria-label="Sort batches by finish date" aria-pressed=\{sorted\} className="utility-circle utility-circle-dark"/);
   });
 });
@@ -1496,16 +1496,12 @@ describe("final 1:1 audit (ticket 15)", () => {
     expect(rule(".upcoming-date")).toContain("min-width: var(--target-min)");
   });
 
-  it("draws filter chips as the bottom row: white capsules h 60 at gap 6, the chosen one lime with ink", () => {
-    expect(rule(".filter-row")).toContain("gap: var(--nav-gap)");
-    expect(rule(".filter-row button")).toContain("min-height: var(--nav-circle)");
-    const chosen = rule('.filter-row button[aria-pressed="true"]');
-    expect(chosen).toContain("background: var(--colour-action)");
-    expect(chosen).not.toContain("outline");
-    // Lime takes the fill ink: the chip stays in the light-fill list and out of the ground list.
-    const ground = rules().find((entry) => entry.selectors.includes(".settings-trash-toggle") && entry.declarations.some(([property, value]) => property === "--ink" && value === "var(--ink-ground)"));
-    expect(ground).toBeDefined();
-    expect(ground!.selectors.some((selector) => selector.includes(".filter-row"))).toBe(false);
+  it("draws the status filter as the bottom row's segment: white circles at gap 6, the chosen one lime with its word", () => {
+    expect(rule(".batch-filter")).toContain("gap: var(--nav-gap)");
+    expect(rule(".batch-filter")).toContain("--rs-slot: var(--colour-background)");
+    expect(rule(".batch-filter .rubber-segment-slot")).toContain("width: var(--target-min)");
+    expect(rule(".batch-filter .rubber-segment-slot:not([data-active]) .filter-word")).toContain("display: none");
+    expect(app).toMatch(/aria-label="Filter batches by status"[\s\S]*?thumbColor="var\(--colour-action\)"[\s\S]*?activeTextColor="var\(--ink-fill\)"/);
   });
 
   it("gives profile facts the batch card's glass chip", () => {

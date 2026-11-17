@@ -361,7 +361,6 @@ input::file-selector-button,
 .ios-install-guide,
 .design-summary,
 .big-number-circle,
-.filter-row button,
 .design-batch-card,
 .design-batch-card:hover:not(:disabled),
 .design-batch-photo,
@@ -698,11 +697,18 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 .design-stat-track { display: none; }
 .design-stat-track i { display: block; height: 100%; background: var(--colour-text); }
 .design-section-head, .section-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); margin-bottom: var(--space-4); }
-/* Filter chips borrow the bottom row (spec §1.5, §3): white capsules h 60 at gap 6, the chosen one lime. */
-.filter-row { display: flex; flex-wrap: wrap; gap: var(--nav-gap); margin-bottom: var(--space-6); }
-.filter-row button { min-height: var(--nav-circle); padding: var(--space-2) var(--space-4); background: var(--colour-background); }
-.filter-row button[aria-pressed="true"] { background: var(--colour-action); border-color: var(--colour-action); }
-.quick-log-types button[aria-pressed="true"] { background: var(--colour-surface-inverse); border-color: var(--colour-surface-inverse); }
+/* Status filter (user, 2026-11-17): the phone bottom row's RubberSegment beside the section heading, lighter (no
+   track): white --target-min circles at --nav-gap, the lime thumb on the chosen filter, the only slot with its word.
+   Where heading and filter do not fit on one line, the filter wraps under the heading. */
+.batch-filter-head { margin-bottom: var(--space-6); }
+.batch-filter { --rs-slot: var(--colour-background); gap: var(--nav-gap); margin-inline-start: auto; }
+.batch-filter .rubber-segment-thumb { gap: var(--nav-gap); }
+.batch-filter .rubber-segment-slot { gap: var(--space-2); width: var(--target-min); min-width: 0; height: var(--target-min); padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+.batch-filter .rubber-segment-slot[data-active] { width: auto; padding-inline: var(--space-3) var(--space-4); font-weight: var(--type-title-weight); }
+.batch-filter .rubber-segment-item, .batch-filter .rubber-segment-item[aria-checked="false"]:hover { opacity: 1; }
+.batch-filter .filter-mark { display: inline-flex; flex: none; width: var(--nav-icon); height: var(--nav-icon); }
+.batch-filter .filter-mark svg { width: 100%; height: 100%; }
+.batch-filter .rubber-segment-slot:not([data-active]) .filter-word { display: none; }.quick-log-types button[aria-pressed="true"] { background: var(--colour-surface-inverse); border-color: var(--colour-surface-inverse); }
 .batch-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--batch-card-min)), 1fr)); gap: var(--layout-gutter); }
 /* Batch card (spec §1.1 drink card; gap 9). The card is a full-width grid item, so its percentage padding and
    its children's percentage margins and horizontal offsets are fractions of the card's width. Title pair at the
@@ -1294,6 +1300,10 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .calendar-weekdays, .calendar-grid, .calendar-week { gap: 0; }
   .calendar-head, .calendar-legend, .calendar-helper { padding-inline: calc(var(--layout-edge) - var(--space-1)); }
   .navigation { padding-inline: var(--safe-left) var(--safe-right); }
+  /* Batch filter: four circles and the "Attention" capsule need about 310 px; the gaps and the capsule's padding
+     narrow (the circles stay --target-min) to fit 288. */
+  .batch-filter, .batch-filter .rubber-segment-thumb { gap: 2px; }
+  .batch-filter .rubber-segment-slot[data-active] { gap: var(--space-1); padding-inline: var(--space-2); }
 }
 
 /* Phone bottom row (< 600 px): the React Bits RubberSegment (src/components/RubberSegment.tsx), which the user asked

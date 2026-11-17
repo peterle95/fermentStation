@@ -1488,6 +1488,9 @@ interface BatchViewProps {
 }
 
 type BatchListFilter = BatchFilter | "attention";
+const batchListFilters: BatchListFilter[] = ["all", ...batchStatuses, "attention"];
+const filterLabel = (status: BatchListFilter) => status === "all" ? "All" : status === "attention" ? "Attention" : statusLabel(status);
+const filterIcons: Record<BatchListFilter, "jar" | "clock" | "sparkles" | "temp" | "bell"> = { all: "jar", active: "clock", ready: "sparkles", "to-fridge": "temp", attention: "bell" };
 
 function compareScheduledChecks(left: { batch: Batch; check: Batch["checks"][number] }, right: { batch: Batch; check: Batch["checks"][number] }) {
   return left.check.nextDueDate.localeCompare(right.check.nextDueDate) || left.batch.name.localeCompare(right.batch.name) || left.check.name.localeCompare(right.check.name);
@@ -1643,9 +1646,29 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, mod
         <h1 id="batch-overview-heading" ref={overviewHeadingRef} tabIndex={-1} className="sr-only">My batches <span>{batches.length}</span></h1>
         <div className="design-search-row"><div className="design-search"><div className="dark-field design-search-box"><DesignIcon name="search" /><input aria-label="Search batches" autoComplete="off" onChange={(event) => setQuery(event.target.value)} placeholder="Search your batches" type="search" value={query} /></div><button aria-label="Sort batches by finish date" aria-pressed={sorted} className="utility-circle utility-circle-dark" onClick={() => setSorted(!sorted)} type="button"><DesignIcon name="sort" /></button></div></div>
         
-        <div className="design-section-head"><h2>{mode === "today" ? "Batch overview" : "All batches"}</h2><span>{visible.length} shown</span></div>
-        <div className="filter-row" role="group" aria-label="Filter batches by status">
-          {(["all", ...batchStatuses, "attention"] as BatchListFilter[]).map((status) => <button aria-pressed={filter === status} key={status} onClick={() => setFilter(status)} type="button">{status === "all" ? "All" : status === "attention" ? "Attention" : statusLabel(status)}</button>)}
+        {/* The status filter is the bottom row's RubberSegment beside the heading (user, 2026-11-17): white circles,
+            no track, a lime thumb; only the chosen filter shows its word. */}
+        <div className="design-section-head batch-filter-head"><h2>{mode === "today" ? "Batch overview" : "All batches"}</h2>
+          <RubberSegment
+            aria-label="Filter batches by status"
+            className="batch-filter"
+            items={batchListFilters.map((status) => ({
+              value: status,
+              ariaLabel: filterLabel(status),
+              icon: <span className="filter-mark" aria-hidden="true"><DesignIcon name={filterIcons[status]} /></span>,
+              label: <span className="filter-word">{filterLabel(status)}</span>,
+            }))}
+            value={filter}
+            onChange={(status) => setFilter(status as BatchListFilter)}
+            trackColor="transparent"
+            thumbColor="var(--colour-action)"
+            textColor="var(--ink-fill)"
+            activeTextColor="var(--ink-fill)"
+            size="md"
+            radius={22}
+            inset={0}
+            equalSlots={false}
+          />
         </div>
 
       {profiles.length === 0 && <p className="notice">Restore or create a profile before starting a batch. <button className="station-text-action" onClick={() => onNavigate("profiles")} type="button">Open Profiles</button></p>}

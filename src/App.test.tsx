@@ -429,13 +429,13 @@ describe("batch workflow", () => {
     render(<App />);
     expect(screen.queryByRole("group", { name: "My batches view" })).toBeNull();
     expect(screen.queryByRole("region", { name: "Kitchen summary" })).toBeNull();
-    const filters = within(screen.getByRole("group", { name: "Filter batches by status" }));
+    const filters = within(screen.getByRole("radiogroup", { name: "Filter batches by status" }));
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "First" } });
     fireEvent.click(screen.getByRole("button", { name: "Sort batches by finish date" }));
-    fireEvent.click(filters.getByRole("button", { name: "Active" }));
+    fireEvent.click(filters.getByRole("radio", { name: "Active" }));
     expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("First");
     expect(screen.getByRole("button", { name: "Sort batches by finish date" }).getAttribute("aria-pressed")).toBe("true");
-    expect(filters.getByRole("button", { name: "Active" }).getAttribute("aria-pressed")).toBe("true");
+    expect(filters.getByRole("radio", { name: "Active" }).getAttribute("aria-checked")).toBe("true");
     expect(screen.getByRole("button", { name: "Open First jar" }).getAttribute("aria-pressed")).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: "Checks" }));
     expect(within(document.querySelector(".design-checks-view")!).getByRole("region", { name: "Kitchen summary" })).toBeTruthy();
@@ -597,8 +597,8 @@ describe("batch workflow", () => {
     expect(screen.queryByRole("region", { name: "Kitchen summary" })).toBeNull();
     expect(screen.queryByRole("region", { name: /Upcoming/ })).toBeNull();
     expect(screen.queryByRole("button", { name: "Open ready batch Ready jar" })).toBeNull();
-    const filters = within(screen.getByRole("group", { name: "Filter batches by status" }));
-    fireEvent.click(filters.getByRole("button", { name: "Attention" }));
+    const filters = within(screen.getByRole("radiogroup", { name: "Filter batches by status" }));
+    fireEvent.click(filters.getByRole("radio", { name: "Attention" }));
     expect(screen.getByRole("button", { name: "Open First jar" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Open ready batch Ready jar" })).toBeNull();
 
@@ -1755,10 +1755,10 @@ describe("batch workflow", () => {
 
     fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     dashboard = within(document.querySelector(".design-dashboard")!);
-    const filters = within(dashboard.getByRole("group", { name: "Filter batches by status" }));
-    fireEvent.click(filters.getByRole("button", { name: "Active" }));
+    const filters = within(dashboard.getByRole("radiogroup", { name: "Filter batches by status" }));
+    fireEvent.click(filters.getByRole("radio", { name: "Active" }));
     expect(dashboard.getByText("No batches match this status.")).toBeTruthy();
-    fireEvent.click(filters.getByRole("button", { name: "Ready" }));
+    fireEvent.click(filters.getByRole("radio", { name: "Ready" }));
     expect(within(dashboard.getByRole("region", { name: "Batch overview" })).getByText("Kitchen kombucha")).toBeTruthy();
   });
 
@@ -2494,7 +2494,7 @@ describe("batch workflow", () => {
     const logger = draft.closest("form");
     fireEvent.change(draft, { target: { value: "Keep this on the first jar" } });
     fireEvent.change(screen.getByRole("searchbox", { name: "Search batches" }), { target: { value: "nothing matches" } });
-    fireEvent.click(within(screen.getByRole("group", { name: "Filter batches by status" })).getByRole("button", { name: "Ready" }));
+    fireEvent.click(within(screen.getByRole("radiogroup", { name: "Filter batches by status" })).getByRole("radio", { name: "Ready" }));
     fireEvent.click(screen.getByRole("button", { name: "Sort batches by finish date" }));
     for (const width of [344, 884, 344]) {
       Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
