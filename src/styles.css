@@ -59,7 +59,6 @@
   --colour-glass: rgb(255 255 255 / 60%);
   --colour-glass-solid: rgb(255 255 255 / 85%);
   --colour-glass-edge: rgb(255 255 255 / 40%);
-  --colour-glass-tint: rgb(255 255 255 / 10%);
   --colour-event-lilac: #d9b4eb;
   --colour-event-lilac-end: #f6eafc;
   --colour-event-sky: #b4dff9;
@@ -1321,16 +1320,14 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
    safe area, let taps beside the pane reach the content, give the scroll panes room to end clear of it and set the
    font family. The pills' colours, sizes and motion are upstream's. */
 @media (max-width: 599px) {
-  /* The pane is PillNav's 44 px joined row (a --target-min tall tap row) plus 12 px of glass above and below; the row
-     adds 8 px on each side. */
-  .app-shell { --phone-nav-height: calc(var(--target-min) + 2 * var(--space-3) + 2 * var(--space-2)); }
+  /* The pane is PillNav's 44 px joined row (a --target-min tall tap row) plus 16 px of glass above and below, 76 px
+     like the React Bits demo; the row adds 8 px on each side. */
+  .app-shell { --phone-nav-height: calc(var(--target-min) + 2 * var(--space-4) + 2 * var(--space-2)); }
   .phone-navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; min-height: calc(var(--phone-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); pointer-events: none; }
-  /* GlassSurface draws its rim from light-dark(): the app's light scheme gives it a black edge, the demo's dark scheme
-     a white one. In the dark scheme its own fill turns black, so today's white grey goes on a layer of its own. */
+  /* GlassSurface draws its rim and fill from light-dark(): the app's light scheme gives it a black edge, the demo's
+     dark scheme a white one and the demo's faint dark fill (backgroundOpacity 0.1). No tint layer of our own. */
   .phone-glass { max-width: 100%; pointer-events: auto; color-scheme: dark; }
-  /* GlassSurface clips its children to the pane's corners, so this layer needs no radius of its own. */
-  .phone-glass::before { content: ""; position: absolute; inset: 0; background: var(--colour-glass-tint); pointer-events: none; }
-  .phone-glass > :last-child { padding: var(--space-3) var(--space-2); }
+  .phone-glass > :last-child { padding: var(--space-4) var(--space-2); }
   /* The pills spread evenly across the pane. The dot, fill and ink read each slot's offsetLeft, so they follow. */
   .phone-glass .pill-nav { width: 100%; }
   .phone-glass .pill-nav-bar,

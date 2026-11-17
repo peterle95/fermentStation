@@ -775,8 +775,8 @@ export function App() {
               full-width rounded rect, 16 px corners, the content scrolling under the floating row showing through,
               bent at the rim. The current destination fills from below and a dot under its label slides sideways
               to it. It never folds into its burger menu; the CSS spreads the pills and fits them to 320 px. The
-              grey fill is a CSS layer (styles.css), so the component's own stays off. */}
-          <GlassSurface className="phone-glass" width="100%" height="auto" borderRadius={16} distortionScale={-180} backgroundOpacity={0}>
+              material is the demo's exactly (user, 2026-11-17): 76 px tall, displace 0.5, backgroundOpacity 0.1. */}
+          <GlassSurface className="phone-glass" width="100%" height="auto" borderRadius={16} distortionScale={-180} displace={0.5} backgroundOpacity={0.1}>
             <PillNav
               ariaLabel="Primary navigation"
               items={navDestinations.map((destination) => ({ label: destination === "checks" ? "Checks" : labels[destination], href: destination }))}
