@@ -170,6 +170,8 @@ const RubberSegment: React.FC<RubberSegmentProps> = ({
   const listKey = list.map(item => item.value).join('|');
   useLayoutEffect(() => {
     measure();
+    // FermentStation: environments without ResizeObserver (jsdom) measure once.
+    if (typeof ResizeObserver === 'undefined') return;
     const observer = new ResizeObserver(measure);
     if (trackRef.current) observer.observe(trackRef.current);
     // FermentStation: also watch the slots, whose sizes can change while the track's does not.
@@ -415,6 +417,13 @@ const RubberSegment: React.FC<RubberSegmentProps> = ({
           data-active={found >= 0 && i === index ? '' : undefined}
           className="rubber-segment-slot rubber-segment-item"
           onPointerDown={e => handlePointerDown(e, i)}
+          // FermentStation: a click with no pointer behind it (Enter/Space, assistive tech, tests) selects too;
+          // pointer taps (detail >= 1) are already handled on pointer up.
+          onClick={e => {
+            if (disabled || e.detail !== 0 || (i === index && found >= 0)) return;
+            commit(i);
+            jumpTo(i);
+          }}
           onKeyDown={handleKeyDown}
         >
           {item.icon}

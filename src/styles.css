@@ -361,7 +361,6 @@ input::file-selector-button,
 .ios-install-guide,
 .design-summary,
 .big-number-circle,
-.filter-row button,
 .design-batch-card,
 .design-batch-card:hover:not(:disabled),
 .design-batch-photo,
@@ -698,10 +697,19 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 .design-stat-track { display: none; }
 .design-stat-track i { display: block; height: 100%; background: var(--colour-text); }
 .design-section-head, .section-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); margin-bottom: var(--space-4); }
-/* Filter chips borrow the bottom row (spec §1.5, §3): white capsules h 60 at gap 6, the chosen one lime. */
-.filter-row { display: flex; flex-wrap: wrap; gap: var(--nav-gap); margin-bottom: var(--space-6); }
-.filter-row button { min-height: var(--nav-circle); padding: var(--space-2) var(--space-4); background: var(--colour-background); }
-.filter-row button[aria-pressed="true"] { background: var(--colour-action); border-color: var(--colour-action); }
+/* Status filter (user, 2026-11-17): a RubberSegment where the "Batch overview" heading was (the user removed it), lighter
+   (no track): white --target-min circles at --nav-gap, the lime thumb on the chosen filter, the only slot with its
+   word. The word's line box is trimmed to its cap height so the condensed face centres in the pill like the icons. */
+.batch-filter-head { margin-bottom: var(--space-6); }
+.batch-filter { --rs-slot: var(--colour-background); gap: var(--nav-gap); }
+.batch-filter .rubber-segment-thumb { gap: var(--nav-gap); }
+.batch-filter .rubber-segment-slot { gap: var(--space-2); width: var(--target-min); min-width: 0; height: var(--target-min); padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+.batch-filter .rubber-segment-slot[data-active] { width: auto; padding-inline: var(--space-3) var(--space-4); font-weight: var(--type-title-weight); }
+.batch-filter .rubber-segment-item, .batch-filter .rubber-segment-item[aria-checked="false"]:hover { opacity: 1; }
+.batch-filter .filter-mark { display: inline-flex; flex: none; width: var(--nav-icon); height: var(--nav-icon); }
+.batch-filter .filter-mark svg { width: 100%; height: 100%; }
+.batch-filter .rubber-segment-slot:not([data-active]) .filter-word { display: none; }
+.batch-filter .filter-word { text-box: trim-both cap alphabetic; }
 .quick-log-types button[aria-pressed="true"] { background: var(--colour-surface-inverse); border-color: var(--colour-surface-inverse); }
 .batch-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--batch-card-min)), 1fr)); gap: var(--layout-gutter); }
 /* Batch card (spec §1.1 drink card; gap 9). The card is a full-width grid item, so its percentage padding and
@@ -1234,7 +1242,9 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .navigation button[aria-current="page"] .nav-mark { width: var(--nav-icon); height: var(--nav-icon); }
   .navigation .nav-word { display: inline; overflow-wrap: anywhere; word-break: normal; white-space: normal; }
   .navigation button:not([aria-current="page"]) .nav-word { display: none; }
-  .content-shell { grid-area: 1 / 1; height: 100%; }
+  /* The content runs under the floating phone row (grid row 2) to the screen's foot, so it scrolls behind the
+     GlassSurface capsule; the scroll panes below end with room for that row. */
+  .content-shell { grid-area: 1 / 1 / -1; height: 100%; }
   /* Phone topbar (user requests, 2026-11-17): the date line goes, and the settings circle and "Start a batch"
      join the logo on one row, logo | settings, batch. The two controls share whatever the logo leaves, so they
      stay evenly spread edge to edge at every phone width; the date row returns with the 600 px layout. */
@@ -1294,28 +1304,54 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .calendar-weekdays, .calendar-grid, .calendar-week { gap: 0; }
   .calendar-head, .calendar-legend, .calendar-helper { padding-inline: calc(var(--layout-edge) - var(--space-1)); }
   .navigation { padding-inline: var(--safe-left) var(--safe-right); }
+  /* Batch filter: four circles and the "Attention" capsule need about 310 px; the gaps and the capsule's padding
+     narrow (the circles stay --target-min) to fit 288; the extra end padding balances the word's trailing tracking. */
+  .batch-filter, .batch-filter .rubber-segment-thumb { gap: 2px; }
+  .batch-filter .rubber-segment-slot[data-active] { gap: var(--space-1); padding-inline: var(--space-1) var(--space-2); }
 }
 
-/* Phone bottom row (< 600 px): the React Bits RubberSegment (src/components/RubberSegment.tsx), which the user asked
-   for on 2026-11-17 in place of the circles and capsule; usePhoneNav in App.tsx renders it instead of .navigation.
-   On 2026-11-17 the user asked for it to look like the tablet rail laid sideways, without the logo: a compact,
-   centred --colour-rail pill (its padding is the --nav-ring) holding white --nav-circle circles; the lime thumb
-   is the current destination, the only slot that shows its label. Its motion is upstream's, unchanged. */
+/* Phone bottom row (< 600 px): the React Bits PillNav (src/components/PillNav.tsx), which the user asked for on
+   2026-11-17 in place of the RubberSegment; usePhoneNav in App.tsx renders it instead of .navigation. The user chose
+   upstream's separate dark pills, labels only, in the app's font; the selected pill fills from below and a dot slides
+   sideways under its label. Its capsule is a React Bits GlassSurface (src/components/GlassSurface.tsx, user
+   2026-11-17) in place of PillNav's dark one, matched to the React Bits demo the user sent: a rounded-rect pane across
+   the row, the pills spread evenly on it at their own size, a white rim and today's faint grey fill. The row floats
+   over the content, so what scrolls under it shows through the glass, bent at the rim. These rules seat it above the
+   safe area, let taps beside the pane reach the content, give the scroll panes room to end clear of it and set the
+   font family. The pills' colours, sizes and motion are upstream's. */
 @media (max-width: 599px) {
-  .phone-navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; min-height: calc(var(--mobile-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); }
+  /* The pane is PillNav's 44 px joined row (a --target-min tall tap row) plus 16 px of glass above and below, 76 px
+     like the React Bits demo; the row adds 8 px on each side. */
+  .app-shell { --phone-nav-height: calc(var(--target-min) + 2 * var(--space-4) + 2 * var(--space-2)); }
+  .phone-navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; min-height: calc(var(--phone-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); pointer-events: none; }
+  /* GlassSurface draws its rim and fill from light-dark(): the app's light scheme gives it a black edge, the demo's
+     dark scheme a white one and the demo's faint dark fill (backgroundOpacity 0.1). No tint layer of our own. */
+  .phone-glass { max-width: 100%; pointer-events: auto; color-scheme: dark; }
+  .phone-glass > :last-child { padding: var(--space-4) var(--space-2); }
+  /* The pills spread evenly across the pane. The dot, fill and ink read each slot's offsetLeft, so they follow. */
+  .phone-glass .pill-nav { width: 100%; }
+  .phone-glass .pill-nav-bar,
+  .phone-glass .pill-nav-track { flex: 1 1 auto; }
+  .phone-glass .pill-nav-list,
+  .phone-glass .pill-nav-ink { justify-content: space-evenly; }
+  .main-content { padding-bottom: calc(var(--phone-nav-height) + var(--safe-bottom) + var(--space-6)); }
+  .design-dashboard { padding-bottom: calc(var(--phone-nav-height) + var(--safe-bottom) + var(--space-4)); }
+  .design-selected .design-detail { padding-bottom: calc(var(--phone-nav-height) + var(--safe-bottom) + var(--space-8)); }
   .profile-editor-shell .phone-navigation { display: none; }
-  .phone-navigation .rubber-segment { --rs-slot: var(--colour-background); gap: var(--nav-gap); }
-  .phone-navigation .rubber-segment-thumb { gap: var(--nav-gap); }
-  .phone-navigation .rubber-segment-slot { gap: var(--space-3); width: var(--nav-circle); min-width: 0; height: var(--nav-circle); min-height: 0; max-width: none; padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
-  .phone-navigation .rubber-segment-slot[data-active] { width: auto; min-width: var(--nav-capsule); padding-inline: calc((var(--nav-circle) - var(--nav-icon)) / 2); font-weight: var(--type-title-weight); }
-  .phone-navigation .rubber-segment-item, .phone-navigation .rubber-segment-item[aria-checked="false"]:hover { opacity: 1; }
-  .phone-navigation .nav-mark { display: inline-flex; flex: none; width: var(--nav-icon); height: var(--nav-icon); border-radius: 0; background: none; box-shadow: none; }
-  .phone-navigation .nav-mark svg { width: var(--nav-icon); height: var(--nav-icon); }
-  .phone-navigation .rubber-segment-slot:not([data-active]) .nav-word { display: none; }
+  .phone-navigation .pill-nav { font-family: var(--font-family); }
+  /* The condensed app face reads small at PillNav's 14 px, so the labels take the meta role; the global button rules (min-height, hover fill,
+     active nudge) would push the faces off the glide ink, so they are reset here. */
+  .phone-navigation .pill-nav-item,
+  .phone-navigation .pill-nav-ink-item { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); }
+  .phone-navigation .pill-nav-item { min-height: 0; max-width: none; }
+  .phone-navigation .pill-nav-item:hover:not(:disabled) { background: var(--pn-tile); }
+  .phone-navigation .pill-nav-item:active:not(:disabled) { transform: none; }
 }
-/* Three circles, the capsule, the gaps and the ring need about 320 px: the row gives up its side padding there. */
+/* Below 380 the four pills at upstream's 16 px padding overrun the capsule by 2 px; 12 px padding fits 320. The
+   hidden measuring row (ink items) takes the same padding so it matches what it measures. */
 @media (max-width: 379px) {
-  .phone-navigation { padding-inline: var(--safe-left) var(--safe-right); }
+  .phone-navigation .pill-nav-item,
+  .phone-navigation .pill-nav-ink-item { padding-inline: var(--space-3); }
 }
 
 /* Desktop menu (>= 1024): the React Bits StaggeredMenu (src/components/StaggeredMenu.tsx). On 2026-11-14 the user
