@@ -46,8 +46,7 @@ export interface StaggeredMenuProps {
   // FermentStation: with onLogoClick the logo is a button (the old sidebar's "Home" row opened station information).
   onLogoClick?: () => void;
   logoAriaLabel?: string;
-  // FermentStation: the app name, shown in the open panel's top row beside the logo.
-  panelTitle?: string;
+  brandName?: string;
 }
 
 export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
@@ -71,7 +70,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   activeLink,
   onLogoClick,
   logoAriaLabel,
-  panelTitle
+  brandName
 }: StaggeredMenuProps) => {
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
@@ -95,11 +94,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const toggleBtnRef = useRef<HTMLButtonElement | null>(null);
   const busyRef = useRef(false);
   const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
-  const toggleSlideRef = useRef<gsap.core.Tween | null>(null);
-
-  // FermentStation: while the panel is on screen (from the start of the open slide to the end of the close slide) the
-  // header row spans only the panel, so the toggle sits at the panel's right end as its Close control and slides in
-  // and out with it. A DOM attribute, not state, so it changes in the same frame as the GSAP tweens.
+  // FermentStation: keep the Close capsule styled until the panel finishes sliding away.
   const setPanelRow = (on: boolean) => wrapperRef.current?.toggleAttribute('data-panel-row', on);
 
   useLayoutEffect(() => {
@@ -143,7 +138,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       closeTweenRef.current = null;
     }
     itemEntranceTweenRef.current?.kill();
-    toggleSlideRef.current?.kill(); // FermentStation: the toggle's close slide
 
     const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel')) as HTMLElement[];
     const numberEls = Array.from(
@@ -183,12 +177,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       { xPercent: 0, duration: panelDuration, ease: 'power4.out' },
       panelInsertTime
     );
-    // FermentStation: the toggle moves into the panel's top row and rides in with the panel.
-    const toggle = toggleBtnRef.current;
-    if (toggle) {
-      setPanelRow(true);
-      tl.fromTo(toggle, { x: -panel.offsetWidth }, { x: 0, duration: panelDuration, ease: 'power4.out', clearProps: 'transform' }, panelInsertTime);
-    }
+    // FermentStation: Menu and Close share one fixed position in the header.
+    setPanelRow(true);
 
     if (itemEls.length) {
       const itemsStartRatio = 0.15;
@@ -289,6 +279,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       ease: 'power3.in',
       overwrite: 'auto',
       onComplete: () => {
+        setPanelRow(false);
         const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel')) as HTMLElement[];
         if (itemEls.length) {
           gsap.set(itemEls, { yPercent: 140, rotate: 10 });
@@ -306,23 +297,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         busyRef.current = false;
       }
     });
-    // FermentStation: the toggle slides out with the panel, then goes back to the topbar's end as "Menu".
-    const toggle = toggleBtnRef.current;
-    toggleSlideRef.current?.kill();
-    toggleSlideRef.current = toggle
-      ? gsap.to(toggle, {
-          x: -panel.offsetWidth,
-          duration: 0.32,
-          ease: 'power3.in',
-          onComplete: () => {
-            setPanelRow(false);
-            gsap.set(toggle, { clearProps: 'transform' });
-          }
-        })
-      : null;
     if (prefersReducedMotion()) {
       closeTweenRef.current.progress(1); // FermentStation: reduced motion
-      toggleSlideRef.current?.progress(1);
     }
   }, [position]);
 
@@ -526,6 +502,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           />
         </div>
         )}
+        {brandName && <span className="sm-header-brand">{brandName}</span>}
         <button
           ref={toggleBtnRef}
           className="sm-toggle"
@@ -553,8 +530,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
       {/* FermentStation: inert while closed so the off-screen links leave the tab order. */}
       <aside id="staggered-menu-panel" ref={panelRef} className="staggered-menu-panel" aria-hidden={!open} inert={!open}>
-        {/* FermentStation: the app name, beside the logo in the panel's top row; it slides with the panel. */}
-        {panelTitle && <p className="sm-panel-brand">{panelTitle}</p>}
         <div className="sm-panel-inner">
           <ul className="sm-panel-list" role="list" data-numbering={displayItemNumbering || undefined}>
             {items && items.length ? (

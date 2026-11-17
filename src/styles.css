@@ -102,11 +102,12 @@
   --nav-gap: 6px;
   --nav-capsule: 107px;
   --nav-icon: 21px;
+  --nav-segment-icon: 16px;
   --nav-ring: 6px;
   --nav-rail: calc(var(--nav-circle) + 2 * var(--nav-ring));
   --nav-waist: 46px;
   /* Desktop menu (React Bits StaggeredMenu, 2026-11-14): the fox in a white nav circle, and the room the
-     "Menu"/"Close" toggle takes at the topbar's end. */
+     "Menu"/"Close" toggle takes beside the logo. */
   --menu-logo: 48px;
   --menu-toggle-width: 112px;
   --menu-panel-width: clamp(260px, 38vw, 420px);
@@ -1297,6 +1298,28 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .navigation { padding-inline: var(--safe-left) var(--safe-right); }
 }
 
+/* Phone bottom row (< 600 px): the React Bits RubberSegment (src/components/RubberSegment.tsx), which the user asked
+   for on 2026-11-17 in place of the circles and capsule; usePhoneNav in App.tsx renders it instead of .navigation.
+   On 2026-11-17 the user asked for it to look like the tablet rail laid sideways, without the logo: a compact,
+   centred --colour-rail pill (its padding is the --nav-ring) holding white --nav-circle circles; the lime thumb
+   is the current destination, the only slot that shows its label. Its motion is upstream's, unchanged. */
+@media (max-width: 599px) {
+  .phone-navigation { position: relative; grid-area: 2 / 1; z-index: 20; display: flex; justify-content: center; align-items: center; min-height: calc(var(--mobile-nav-height) + var(--safe-bottom)); padding: var(--space-2) calc(var(--space-3) + var(--safe-right)) calc(var(--space-2) + var(--safe-bottom)) calc(var(--space-3) + var(--safe-left)); }
+  .profile-editor-shell .phone-navigation { display: none; }
+  .phone-navigation .rubber-segment { --rs-slot: var(--colour-background); gap: var(--nav-gap); }
+  .phone-navigation .rubber-segment-thumb { gap: var(--nav-gap); }
+  .phone-navigation .rubber-segment-slot { gap: var(--space-3); width: var(--nav-circle); min-width: 0; height: var(--nav-circle); min-height: 0; max-width: none; padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+  .phone-navigation .rubber-segment-slot[data-active] { width: auto; min-width: var(--nav-capsule); padding-inline: calc((var(--nav-circle) - var(--nav-icon)) / 2); font-weight: var(--type-title-weight); }
+  .phone-navigation .rubber-segment-item, .phone-navigation .rubber-segment-item[aria-checked="false"]:hover { opacity: 1; }
+  .phone-navigation .nav-mark { display: inline-flex; flex: none; width: var(--nav-icon); height: var(--nav-icon); border-radius: 0; background: none; box-shadow: none; }
+  .phone-navigation .nav-mark svg { width: var(--nav-icon); height: var(--nav-icon); }
+  .phone-navigation .rubber-segment-slot:not([data-active]) .nav-word { display: none; }
+}
+/* Three circles, the capsule, the gaps and the ring need about 320 px: the row gives up its side padding there. */
+@media (max-width: 379px) {
+  .phone-navigation { padding-inline: var(--safe-left) var(--safe-right); }
+}
+
 /* Desktop menu (>= 1024): the React Bits StaggeredMenu (src/components/StaggeredMenu.tsx). On 2026-11-14 the user
    asked for it in place of the Swipe toggle-card sidebar; do not restore that sidebar as a fidelity fix. The menu's
    own stylesheet stays as upstream ships it; these rules only seat it in the app: hidden below 1024 (the rail and the
@@ -1306,14 +1329,19 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 @media (min-width: 1024px) {
   .sidebar { display: none; }
   .app-menu { display: block; }
-  .app-menu .staggered-menu-header { padding: calc(var(--safe-top) + var(--space-6)) var(--layout-edge) 0; }
+   .app-menu .staggered-menu-header { justify-content: flex-start; width: var(--menu-panel-width); gap: var(--space-3); padding: calc(var(--safe-top) + var(--space-6)) var(--layout-edge) 0; }
+   .app-menu .sm-header-brand { flex: none; min-width: 0; color: #fff; white-space: nowrap; pointer-events: none; }
+   .app-menu[data-open] .sm-header-brand { color: #000; }
+   .app-menu .sm-header-brand { margin-left: var(--space-2); font-size: calc(var(--type-title) + var(--space-1)); }
+   .app-menu .sm-toggle { font-size: var(--type-row); }
+   .app-menu .sm-socials-title { font-size: var(--type-label); }
+   .app-menu .sm-socials-link { font-size: var(--type-body); }
   .app-menu :is(.staggered-menu-panel, .sm-prelayers) { width: var(--menu-panel-width); }
-  .app-menu .sm-logo-button { justify-content: center; width: var(--nav-circle); height: var(--nav-circle); min-height: var(--nav-circle); padding: 0; border: 0; border-radius: 50%; background: var(--colour-background); }
-  .app-menu .sm-logo-button:hover:not(:disabled) { background: var(--colour-action); }
+   .app-menu .sm-logo-button { justify-content: center; width: var(--nav-circle); height: var(--nav-circle); min-height: var(--nav-circle); padding: 0; border: 0; border-radius: 50%; background: transparent; }
+   .app-menu .sm-logo-button:hover:not(:disabled) { background: transparent; opacity: 0.8; }
   .app-menu .sm-logo-img, .app-menu[data-open] .sm-logo-img { width: var(--menu-logo); height: var(--menu-logo); filter: none; }
-  /* The end padding holds the plus icon's corners while it spins to the cross. GSAP slides the toggle with the panel,
-     so the generic button's transform and background transitions would make it trail and fade (no transitions). */
-  .app-menu .sm-toggle { justify-content: flex-end; width: var(--menu-toggle-width); min-height: var(--nav-circle); padding: 0 var(--space-1) 0 0; transition: none; }
+   /* Menu and Close stay centered in the same header slot, independent of the panel's slide. */
+   .app-menu .sm-toggle { flex-shrink: 0; justify-content: center; width: var(--menu-toggle-width); min-height: var(--nav-circle); padding: 0; transition: none; }
   .app-menu .sm-toggle:hover:not(:disabled) { background: transparent; }
   /* The current destination (aria-current) is underlined in the accent: a shape, not only a colour. */
   .app-menu .sm-panel-item[aria-current="page"] .sm-panel-itemLabel { text-decoration: underline var(--colour-menu-accent) 0.08em; text-underline-offset: 0.06em; }
@@ -1327,15 +1355,10 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
      so a closing click cannot fall through. Reduced motion drops the transitions, so it jumps. */
   .app-menu .sm-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: auto; opacity: 0; visibility: hidden; transition: opacity 0.32s ease-in, visibility 0s linear 0.32s; }
   .app-menu[data-open] .sm-scrim { opacity: 1; visibility: visible; transition: opacity 0.5s ease-out, visibility 0s; }
-  /* Open panel's top row: while the panel is on screen (data-panel-row, set by the component from the start of the
-     open slide to the end of the close slide) the header spans the panel, so the toggle is the Close control at the
-     panel's right end, riding the slide; the app name sits beside the logo inside the panel. Both are red capsules of
-     the nav circle's height, like the topbar's utility capsules. The toggle's white comes from the component (GSAP),
-     which keeps it white until the close slide ends; the name takes the ground ink. At 1024 the row is 24 + 60 + 12 + name + gap + 112 + 24 within the 389 px panel. */
-  .app-menu[data-panel-row] .staggered-menu-header { width: var(--menu-panel-width); }
+   /* Keep the red Close capsule until the panel's close slide ends. */
   .app-menu[data-panel-row] .sm-toggle, .app-menu[data-panel-row] .sm-toggle:hover:not(:disabled) { justify-content: center; padding: 0; border-radius: var(--radius-control); background: var(--colour-menu-pill); }
-  .app-menu .sm-panel-brand { position: absolute; top: calc(var(--safe-top) + var(--space-6)); left: calc(var(--layout-edge) + var(--nav-circle) + var(--space-3)); display: flex; align-items: center; height: var(--nav-circle); margin: 0; padding-inline: var(--space-4); border-radius: var(--radius-control); background: var(--colour-menu-pill); white-space: nowrap; }
-  .design-topbar { padding-inline: calc(var(--layout-edge) + var(--nav-circle) + var(--space-4)) calc(var(--layout-edge) + var(--menu-toggle-width) + var(--space-4)); }
+   .design-topbar { padding-inline: calc(var(--menu-panel-width) + var(--space-4)) var(--layout-edge); }
+   .design-topbar-copy p { display: none; }
   .profile-editor-shell .design-dashboard { padding-top: calc(var(--safe-top) + var(--space-6) + var(--nav-circle) + var(--space-6)); }
 }
 

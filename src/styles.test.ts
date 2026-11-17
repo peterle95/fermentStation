@@ -1819,7 +1819,7 @@ describe("desktop navigation: React Bits StaggeredMenu (user request 2026-11-14;
       "{ label: \"Profiles\", ariaLabel: \"View the profiles\", link: \"/profiles\" }",
     ]) expect(app).toContain(item);
     expect(app).toContain("const socialItems = menuItems.map(({ label, link }) => ({ label, link }));");
-    for (const prop of ['position="left"', "isFixed", "displaySocials={true}", "displayItemNumbering={true}", "changeMenuColorOnOpen={true}", "logoUrl={stationLogoUrl}"]) expect(menu).toContain(prop);
+    for (const prop of ['position="left"', "isFixed", "displaySocials={true}", "displayItemNumbering={true}", "changeMenuColorOnOpen={true}", "logoUrl={menuOpen ? stationLogoUrl : stationLogoWhiteUrl}"]) expect(menu).toContain(prop);
     for (const [token, value] of [["menu-button", "#ef4444"], ["menu-button-open", "#ffffff"], ["menu-layer", "#b497cf"], ["menu-layer-end", "#5227ff"], ["menu-accent", "#ff6b6b"]]) {
       expect(rule(":root")).toContain(`--colour-${token}: ${value};`);
       expect(menu).toContain(`var(--colour-${token})`);

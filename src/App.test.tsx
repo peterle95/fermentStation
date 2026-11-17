@@ -172,7 +172,7 @@ describe("batch workflow", () => {
     expect(screen.getByRole("dialog", { name: "Your fermentation station" })).toBeTruthy();
   });
 
-  it("puts the open menu's Close control in the panel's top row beside the app name, and only while open", () => {
+  it("keeps the brand beside the shared Menu and Close control, outside the sliding panel", () => {
     // Desktop with reduced motion: the menu's GSAP slides jump to their end, so the close slide finishes at once.
     vi.stubGlobal("matchMedia", (query: string) => ({ matches: /prefers-reduced-motion: reduce|min-width: 1024px/.test(query), media: query, addEventListener() {}, removeEventListener() {} }));
     try {
@@ -180,19 +180,26 @@ describe("batch workflow", () => {
       const menu = document.querySelector<HTMLElement>(".app-menu")!;
       const panel = document.getElementById("staggered-menu-panel")!;
       const toggle = screen.getByRole("button", { name: "Open menu" });
-      // Closed: the toggle is "Menu" at the topbar's end; the app name is inside the hidden, inert panel.
+      const brand = menu.querySelector(".sm-header-brand")!;
+      const logo = menu.querySelector<HTMLImageElement>(".sm-logo-img")!;
+      expect(decodeURIComponent(logo.getAttribute("src")!)).toContain('fill="#ffffff"');
+      expect(brand.textContent).toBe("FermentStation");
+      expect(brand.parentElement).toBe(toggle.parentElement);
+      // Closed: the toggle is "Menu" beside the logo; the panel is hidden and inert.
       expect(menu.hasAttribute("data-panel-row")).toBe(false);
-      expect(panel.querySelector(".sm-panel-brand")!.textContent).toBe("FermentStation");
+      expect(panel.querySelector(".sm-panel-brand")).toBeNull();
       expect(panel.getAttribute("aria-hidden")).toBe("true");
       expect(panel.hasAttribute("inert")).toBe(true);
 
-      // Open: one toggle, now the panel's Close control, beside the visible app name.
+      // Open: one toggle, now the panel's Close control, with no app-name capsule.
       fireEvent.click(toggle);
       expect(menu.hasAttribute("data-panel-row")).toBe(true);
       expect(toggle.getAttribute("aria-label")).toBe("Close menu");
       expect(toggle.getAttribute("aria-expanded")).toBe("true");
       expect(panel.getAttribute("aria-hidden")).toBe("false");
-      expect(within(panel).getByText("FermentStation")).toBeTruthy();
+      expect(menu.querySelector(".sm-header-brand")).toBe(brand);
+      expect(logo.getAttribute("src")).toContain("station-logo.svg");
+      expect(within(panel).queryByText("FermentStation")).toBeNull();
       expect(screen.getAllByRole("button", { name: /menu/i })).toEqual([toggle]);
 
       // The Close control closes, keeps focus and goes back to the topbar.

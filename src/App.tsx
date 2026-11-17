@@ -73,6 +73,9 @@ import { isNativeTransferAvailable, pickNativeArchive, shareNativeFile } from ".
 import { requestReminderPermission, reconcileReminders } from "./platform/reminders";
 import { captureNativePhoto, isNativeCameraAvailable, listenForRestoredCameraPhoto, type CapturedPhoto } from "./platform/camera";
 import { StaggeredMenu } from "./components/StaggeredMenu";
+import RubberSegment from "./components/RubberSegment";
+import stationLogoUrl from "./assets/station-logo.svg";
+import stationLogoSvg from "./assets/station-logo.svg?raw";
 import {
   sharedDataStore,
   type SharedSnapshot,
@@ -132,7 +135,7 @@ function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{name === "jar" && <rect x="6" y="3" width="12" height="4" rx="1.5" />}<path d={paths[name]} />{name === "temp" && <circle cx="12" cy="18" r="1" />}</svg>;
 }
 
-const stationLogoUrl = `${import.meta.env.BASE_URL}new-design/new_app_logo/FermentStation_Logo_Asset_Pack/transparent/logo-transparent-96.png`;
+const stationLogoWhiteUrl = `data:image/svg+xml,${encodeURIComponent(stationLogoSvg.replace('fill="#1c1e22"', 'fill="#ffffff"'))}`;
 
 function StationLogo() {
   return <span className="brand-mark" aria-hidden="true"><img alt="" src={stationLogoUrl} /></span>;
@@ -158,6 +161,20 @@ const subscribeDesktopMenu = (change: () => void) => {
 function useDesktopMenu() {
   return useSyncExternalStore(subscribeDesktopMenu, () => window.matchMedia?.(desktopMenuQuery).matches ?? true);
 }
+
+// Phone bottom row (< 600 px): the React Bits RubberSegment the user asked for on 2026-11-17, configured as they
+// specified, over the same four destinations, icons and labels as the rail. Tablets keep the rail of circles.
+const phoneNavQuery = "(max-width: 599px)";
+const subscribePhoneNav = (change: () => void) => {
+  const query = window.matchMedia?.(phoneNavQuery);
+  query?.addEventListener("change", change);
+  return () => query?.removeEventListener("change", change);
+};
+function usePhoneNav() {
+  return useSyncExternalStore(subscribePhoneNav, () => window.matchMedia?.(phoneNavQuery).matches ?? false);
+}
+const navDestinations = ["today", "checks", "calendar", "profiles"] as const;
+type NavDestination = (typeof navDestinations)[number];
 
 type FieldErrors = Record<string, string>;
 
@@ -423,6 +440,7 @@ export function App() {
   // While the desktop menu is open its scrim covers the app, and the app behind it is inert (no pointer, no focus).
   const [menuOpen, setMenuOpen] = useState(false);
   const menuShown = useDesktopMenu();
+  const phoneNav = usePhoneNav();
   const behindMenu = menuOpen && menuShown;
   const profileDraft = useUnsavedChanges("Discard unsaved profile changes? Your saved profile and existing batches will not change.");
   const startDraft = useUnsavedChanges("Discard this unsaved batch? Its name, date and inputs will be lost.");
@@ -714,21 +732,22 @@ export function App() {
         openMenuButtonColor="var(--colour-menu-button-open)"
         changeMenuColorOnOpen={true}
         colors={["var(--colour-menu-layer)", "var(--colour-menu-layer-end)"]}
-        logoUrl={stationLogoUrl}
+        logoUrl={menuOpen ? stationLogoUrl : stationLogoWhiteUrl}
         accentColor="var(--colour-menu-accent)"
         activeLink={showChecks ? "/checks" : shell.destination === "calendar" ? "/calendar" : shell.destination === "profiles" ? "/profiles" : shell.destination === "settings" ? undefined : "/"}
         onItemSelect={(link) => link === "/checks" ? openChecks() : navigate(link === "/calendar" ? "calendar" : link === "/profiles" ? "profiles" : "today")}
         onLogoClick={() => showDialog({ kind: "info" })}
         logoAriaLabel="Home — station information"
-        panelTitle="FermentStation"
+        brandName="FermentStation"
       />
       {/* Below 1024 px: the tablet rail and the phone bottom row. Hidden on desktop, where the menu above navigates. */}
       <aside className="sidebar" inert={behindMenu}>
         <div className="brand">
           <StationLogo />
         </div>
+        {!phoneNav ? (
         <nav aria-label="Primary navigation" className="navigation bowed">
-          {(["today", "checks", "calendar", "profiles"] as const).map((destination) => (
+          {navDestinations.map((destination) => (
             <button
               aria-label={destination === "checks" ? "Checks" : labels[destination]}
               aria-current={(destination === "checks" ? showChecks : !showChecks && (shell.destination === destination || destination === "today" && shell.destination === "batches")) ? "page" : undefined}
@@ -742,6 +761,36 @@ export function App() {
             </button>
           ))}
         </nav>
+        ) : (
+        <nav aria-label="Primary navigation" className="phone-navigation">
+          <RubberSegment
+            aria-label="Destinations"
+            items={navDestinations.map((destination) => ({
+              value: destination,
+              ariaLabel: destination === "checks" ? "Checks" : labels[destination],
+              icon: <span className="nav-mark" aria-hidden="true">{destination === "checks" ? <DesignIcon name="check" /> : <NavIcon destination={destination} />}</span>,
+              label: <span className="nav-word">{destination === "checks" ? "Checks" : labels[destination]}</span>,
+            }))}
+            value={showChecks ? "checks" : shell.destination === "batches" ? "today" : shell.destination}
+            onChange={(destination) => destination === "checks" ? openChecks() : navigate(destination as Exclude<NavDestination, "checks">)}
+            // The tablet rail's look laid sideways: a --colour-rail pill, white circles, a lime thumb. inset is the
+            // --nav-ring (6) and radius is half a --nav-circle (60) plus that ring, so the thumb is a circle.
+            trackColor="var(--colour-rail)"
+            thumbColor="var(--colour-action)"
+            textColor="var(--ink-fill)"
+            activeTextColor="var(--ink-fill)"
+            size="md"
+            radius={36}
+            inset={6}
+            equalSlots={false}
+            stretch={100}
+            squash={0}
+            speed={0.7}
+            glide={100}
+            draggable
+          />
+        </nav>
+        )}
         <div className="design-sidebar-bottom">
           <button aria-label="Home — station information" className="design-account" onClick={() => showDialog({ kind: "info" })} type="button"><span className="design-avatar"><DesignIcon name="user" /></span></button>
         </div>
