@@ -425,7 +425,6 @@ input::file-selector-button,
 .settings-live[role="alert"] > p,
 .quick-log-types button[aria-pressed="true"],
 .toggle-row:is([aria-pressed="true"], [aria-checked="true"], [aria-current="page"]),
-.design-batch-card.selected,
 .design-batch-next,
 .design-batch-go,
 .queue-icon.overdue,
@@ -701,8 +700,11 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
    (no track): white --target-min circles at --nav-gap, the lime thumb on the chosen filter, the only slot with its
    word. The word's line box is trimmed to its cap height so the condensed face centres in the pill like the icons. */
 .batch-filter-head { margin-bottom: var(--space-6); }
-.batch-filter { --rs-slot: var(--colour-background); gap: var(--nav-gap); }
-.batch-filter .rubber-segment-thumb { gap: var(--nav-gap); }
+/* The filter spans the card width below it; the active capsule grows into the leftover space. */
+.batch-filter { --rs-slot: var(--colour-background); display: flex; width: 100%; gap: var(--nav-gap); }
+.batch-filter .rubber-segment-thumb { display: flex; gap: var(--nav-gap); }
+.batch-filter .rubber-segment-slot { flex: none; }
+.batch-filter .rubber-segment-slot[data-active] { flex: 1 1 auto; }
 .batch-filter .rubber-segment-slot { gap: var(--space-2); width: var(--target-min); min-width: 0; height: var(--target-min); padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
 .batch-filter .rubber-segment-slot[data-active] { width: auto; padding-inline: var(--space-3) var(--space-4); font-weight: var(--type-title-weight); }
 .batch-filter .rubber-segment-item, .batch-filter .rubber-segment-item[aria-checked="false"]:hover { opacity: 1; }
@@ -718,8 +720,12 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
    pill with its black circle at bottom-left; the photo slot at 48-94 % of the width from 8 % of the height down.
    A stand-in is .bowed-media (clipped by the bow); a user photo stays a rectangle inside the content box (#53). */
 .design-batch-card { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; width: 100%; min-width: 0; min-height: auto; aspect-ratio: var(--batch-card-ratio); padding: var(--batch-card-inset-y) 0 var(--batch-pill-foot); --fill: var(--batch-colour, var(--colour-background)); text-align: left; }
-.design-batch-card.selected { --fill: var(--colour-surface-inverse); --stroke: var(--colour-action); --stroke-w: var(--bowed-stroke); }
-.design-batch-card.selected .design-batch-next::before { content: "✓ "; }
+/* Selected card (tablet and desktop only, user 2026-11-20): keeps its pastel fill and image, adds the lime outline
+   and the ✓. On phone a tap opens the full-screen detail, so the selected card looks like any other. */
+@media (min-width: 600px) {
+  .design-batch-card.selected { --stroke: var(--colour-action); --stroke-w: var(--bowed-stroke); }
+  .design-batch-card.selected .design-batch-next::before { content: "✓ "; }
+}
 .design-batch-card:hover:not(:disabled) { transform: translateY(-2px); --fill: var(--batch-colour); }
 .design-batch-copy { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
 /* The title band holds two title lines (--batch-title-band), so a longer name ellipsizes on the second line; the
@@ -741,10 +747,13 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 .design-batch-photo { position: absolute; inset: 0; z-index: -1; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; gap: var(--space-2); padding: 0 var(--batch-card-inset-x) calc(var(--batch-pill-inset-bottom) + var(--space-2)); pointer-events: none; }
 .design-batch-photo img { position: absolute; left: var(--batch-photo-left); top: 0; width: var(--batch-photo-width); height: 100%; padding-top: var(--batch-title-band); object-fit: contain; object-position: center bottom; transition: transform var(--motion-photo-duration) var(--motion-easing); }
 .design-batch-photo.user-photo img { width: calc(100% - var(--batch-photo-left) - var(--batch-card-inset-x)); padding-bottom: var(--batch-card-inset-y); object-position: center; }
+/* Stand-in cutouts (every profile, user 2026-11-20): lifted up and left so the base clears the chips, 15 % larger and
+   turned on a perspective so the object reads as 3D, with a soft shadow on the card. User photos stay flat. */
+.design-batch-photo:not(.user-photo) img { --photo-tilt: perspective(700px) rotateY(-18deg) rotateX(4deg) scale(1.15); translate: -8% -14%; transform-origin: 50% 100%; transform: var(--photo-tilt); filter: drop-shadow(-10px 14px 12px rgb(0 0 0 / 0.22)); }
+.design-batch-card:hover .design-batch-photo:not(.user-photo) img { transform: perspective(700px) rotateY(-12deg) rotateX(4deg) scale(1.18); }
 .design-batch-photo .batch-photo-fallback { left: var(--batch-photo-left); width: var(--batch-photo-width); }
 .design-batch-photo > svg { position: absolute; left: calc(var(--batch-photo-left) + var(--batch-photo-width) / 2); top: 50%; translate: -50% -50%; width: 64px; height: 80px; }
 .design-batch-photo :is(.batch-image-credit, .design-photo-label) { position: relative; inset: auto; max-width: calc(100% - var(--batch-pill-inset-x) - var(--batch-pill-width)); }
-.design-batch-card.selected .pastel-only :is(img, .batch-image-credit) { visibility: hidden; }
 /* The batch empty state is the same card with the drink cutout on lilac; its copy keeps left of the photo slot. */
 .design-empty-batches { width: min(100%, var(--batch-card-max)); }
 .design-empty-card { aspect-ratio: var(--batch-card-ratio); padding: var(--batch-card-inset-y) calc(100% - var(--batch-photo-left)) var(--batch-card-inset-y) var(--batch-card-inset-x); --fill: var(--colour-action-alt); }
@@ -1399,4 +1408,5 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   button:hover, button:active, .design-batch-card:hover img, .profile-card:hover img { transform: none !important; }
+  .design-batch-card:hover .design-batch-photo:not(.user-photo) img { transform: var(--photo-tilt) !important; }
 }
