@@ -146,7 +146,9 @@ describe("Swipe-derived design contract", () => {
   it("renews card anatomy and presents real statuses instead of a decorative progress gauge", () => {
     expect(rule(".design-batch-card")).toContain("grid-template-columns:");
     const selected = rule(".design-batch-card.selected");
-    for (const declaration of ["--fill: var(--colour-surface-inverse)", "--stroke: var(--colour-action)", "--stroke-w: var(--bowed-stroke)"]) expect(selected).toContain(declaration);
+    // Selected keeps its pastel fill and image (user 2026-11-20); only the lime outline marks it.
+    for (const declaration of ["--stroke: var(--colour-action)", "--stroke-w: var(--bowed-stroke)"]) expect(selected).toContain(declaration);
+    expect(selected).not.toContain("--fill");
     expect(rule(".design-batch-photo img")).toContain("object-fit: contain");
     expect(app).toContain('className="design-batch-profile"');
     expect(app).toContain('className="design-batch-next"');
@@ -315,7 +317,7 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
       for (const selector of group.selectors) membership.set(selector, group.kind);
     }
     expect(membership.get(".app-shell")).toBe("ground");
-    expect(membership.get(".design-batch-card.selected")).toBe("ground");
+    expect(membership.get(".design-batch-card.selected")).toBeUndefined();
     expect(membership.get(".design-batch-card")).toBe("fill");
     // A surface that paints a solid token fill must read with the ink set it joined.
     for (const entry of rules()) {
@@ -1110,7 +1112,8 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     for (const name of ["kimchi", "sourdough", "kraut", "milk-kefir"]) expect(visuals.indexOf(`photo: "${name}"`)).toBeLessThan(visuals.indexOf("grapefruit-spritz"));
     expect(visuals).not.toContain('photo: "kombucha"');
     expect(visuals).toContain('if (name.includes("kombucha") || drinkProfile.test(name))');
-    expect(rule(".design-batch-card.selected .pastel-only :is(img, .batch-image-credit)")).toContain("visibility: hidden");
+    // A selected card keeps its cutout (user 2026-11-20).
+    expect(styles).not.toContain(".design-batch-card.selected .pastel-only");
     expect(rule(".design-empty-card")).toContain("--fill: var(--colour-action-alt)");
     expect(app).toContain('<section className="design-empty-batches"><div className="design-empty-card bowed">');
     expect(app).toContain('<div className="design-batch-photo bowed-media"><BatchImage source={`${import.meta.env.BASE_URL}new-design/grapefruit-spritz.webp`}');

@@ -53,6 +53,7 @@
   --colour-avatar-mint: #c3ecb4;
   --colour-avatar-sky: #b5dced;
   --colour-hairline: #f1f1f1;
+  --colour-photo-shadow: rgb(0 0 0 / 22%);
   /* Glass (spec "Glass surfaces"): white at 60 % over a blurred backdrop, with a 40 % white rim. The drink card's
      chip measures 0.5–0.7 over the photo, and the board's count pill #fff6ce is this fill over the yellow row.
      Without backdrop-filter the fill turns to -solid, so text keeps its contrast over any ground. */
@@ -155,6 +156,11 @@
   --batch-go-inset-x: 3.3%;
   --batch-pill-text: 7%;
   --batch-photo-left: 48%;
+  /* Stand-in cutout pose (user 2026-11-20): lifted up-left, turned on a perspective, with a soft card shadow. */
+  --batch-photo-lift: -8% -14%;
+  --batch-photo-tilt: perspective(700px) rotateY(-18deg) rotateX(4deg) scale(1.15);
+  --batch-photo-tilt-hover: perspective(700px) rotateY(-12deg) rotateX(4deg) scale(1.18);
+  --batch-photo-shadow: drop-shadow(-10px 14px 12px var(--colour-photo-shadow));
   --batch-photo-width: 46%;
   /* The board's photo starts at 8 % of the height, beside a one-word title. Titles here span the full width, so
      the photo starts below the title pair and the one meta line under it. */
@@ -703,10 +709,8 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 /* The filter spans the card width below it; the active capsule grows into the leftover space. */
 .batch-filter { --rs-slot: var(--colour-background); display: flex; width: 100%; gap: var(--nav-gap); }
 .batch-filter .rubber-segment-thumb { display: flex; gap: var(--nav-gap); }
-.batch-filter .rubber-segment-slot { flex: none; }
-.batch-filter .rubber-segment-slot[data-active] { flex: 1 1 auto; }
-.batch-filter .rubber-segment-slot { gap: var(--space-2); width: var(--target-min); min-width: 0; height: var(--target-min); padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
-.batch-filter .rubber-segment-slot[data-active] { width: auto; padding-inline: var(--space-3) var(--space-4); font-weight: var(--type-title-weight); }
+.batch-filter .rubber-segment-slot { flex: none; gap: var(--space-2); width: var(--target-min); min-width: 0; height: var(--target-min); padding: 0; border-radius: var(--radius-control); font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+.batch-filter .rubber-segment-slot[data-active] { flex: 1 1 auto; width: auto; padding-inline: var(--space-3) var(--space-4); font-weight: var(--type-title-weight); }
 .batch-filter .rubber-segment-item, .batch-filter .rubber-segment-item[aria-checked="false"]:hover { opacity: 1; }
 .batch-filter .filter-mark { display: inline-flex; flex: none; width: var(--nav-icon); height: var(--nav-icon); }
 .batch-filter .filter-mark svg { width: 100%; height: 100%; }
@@ -749,8 +753,8 @@ button.summary-row-count:hover:not(:disabled) { --glass: var(--colour-background
 .design-batch-photo.user-photo img { width: calc(100% - var(--batch-photo-left) - var(--batch-card-inset-x)); padding-bottom: var(--batch-card-inset-y); object-position: center; }
 /* Stand-in cutouts (every profile, user 2026-11-20): lifted up and left so the base clears the chips, 15 % larger and
    turned on a perspective so the object reads as 3D, with a soft shadow on the card. User photos stay flat. */
-.design-batch-photo:not(.user-photo) img { --photo-tilt: perspective(700px) rotateY(-18deg) rotateX(4deg) scale(1.15); translate: -8% -14%; transform-origin: 50% 100%; transform: var(--photo-tilt); filter: drop-shadow(-10px 14px 12px rgb(0 0 0 / 0.22)); }
-.design-batch-card:hover .design-batch-photo:not(.user-photo) img { transform: perspective(700px) rotateY(-12deg) rotateX(4deg) scale(1.18); }
+.design-batch-photo:not(.user-photo) img { translate: var(--batch-photo-lift); transform-origin: 50% 100%; transform: var(--batch-photo-tilt); filter: var(--batch-photo-shadow); }
+.design-batch-card:hover .design-batch-photo:not(.user-photo) img { transform: var(--batch-photo-tilt-hover); }
 .design-batch-photo .batch-photo-fallback { left: var(--batch-photo-left); width: var(--batch-photo-width); }
 .design-batch-photo > svg { position: absolute; left: calc(var(--batch-photo-left) + var(--batch-photo-width) / 2); top: 50%; translate: -50% -50%; width: 64px; height: 80px; }
 .design-batch-photo :is(.batch-image-credit, .design-photo-label) { position: relative; inset: auto; max-width: calc(100% - var(--batch-pill-inset-x) - var(--batch-pill-width)); }
@@ -1408,5 +1412,5 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   button:hover, button:active, .design-batch-card:hover img, .profile-card:hover img { transform: none !important; }
-  .design-batch-card:hover .design-batch-photo:not(.user-photo) img { transform: var(--photo-tilt) !important; }
+  .design-batch-card:hover .design-batch-photo:not(.user-photo) img { transform: var(--batch-photo-tilt) !important; }
 }
