@@ -340,13 +340,15 @@ describe("type system: roles, weights and text colour (swipe-rework-log.md, tick
 describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", () => {
   // Gap 1 of the spec: every large card takes its silhouette from the primitive.
   const bowedCards = [
-    "design-batch-card", "design-summary", "design-detail-card", "profile-card", "profile-editor-section",
-    "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "timeline-entry", "summary-row", "small-card",
+    "design-batch-card", "design-summary", "profile-card", "profile-editor-section",
+    "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "summary-row", "small-card",
     // Ticket 12: the former rounded rectangles.
-    "app-loading", "empty-state", "ios-install-guide", "design-tip", "design-input-summary", "batch-guidance", "next-action", "wb-panel",
+    "app-loading", "empty-state", "ios-install-guide", "design-tip", "design-input-summary", "next-action", "wb-panel",
     "batch-tools-danger", "profile-overview-intro", "start-batch-basics", "start-profile-summary", "profile-editor-card",
     // Ticket 13: the inline observation logger's card (bowed only while inline).
     "activity-logger-card",
+    // Variant B batch details (prototypes/batch_details): the due check, the pH card and the two mini readings.
+    "bd-due", "bd-ph", "bd-mini",
   ];
   const clippedScrollers = ["station-dialog"];
   // Rounded rectangles that predate the primitive. Shrink only: when a ticket bows one of these
@@ -589,7 +591,7 @@ describe("responsive workflow safeguards", () => {
     const inline = rule(".inline-logger");
     for (const declaration of ["position: static", "width: auto", "margin: 0", "padding: 0", "overflow: visible"]) expect(inline).toContain(declaration);
     expect(rule(".observation-fields, .observation-actions")).toContain("display: contents");
-    expect(app).toContain('<time className="small-card-chip glass" dateTime={entry.date}>');
+    expect(app).toContain('<time dateTime={entry.date}>{shortDate(entry.date)}</time>');
     expect(app.match(/id="batch-activity-form"/g)).toHaveLength(1);
     expect(app).not.toContain('key={editing?.id ?? "new"}');
     expect(app).toContain("else dialog.open = true;");
@@ -1140,7 +1142,9 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     expect(rule(".design-empty-card")).toContain("--fill: var(--colour-action-alt)");
     expect(app).toContain('<section className="design-empty-batches"><div className="design-empty-card bowed">');
     expect(app).toContain('<div className="design-batch-photo bowed-media"><BatchImage source={`${import.meta.env.BASE_URL}new-design/grapefruit-spritz.webp`}');
-    expect(app).toContain("Grapefruit spritz and fruit still life");
+    expect(app).not.toContain("design-photo-credits");
+    expect(app).not.toContain("Stand-in photographs");
+    expect(app).not.toContain("stand-in photograph");
     // User photos keep their rectangle and today's uncropped fit.
     expect(rule(".design-batch-photo.user-photo img")).toContain("width: calc(100% - var(--batch-photo-left) - var(--batch-card-inset-x))");
     expect(rule(".user-photo img")).toContain("object-fit: contain");
@@ -1314,11 +1318,10 @@ describe("Kitchen summary and big numbers (swipe-rework-log.md, ticket 9; spec �
     expect(order.every((index) => index >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect(markup).not.toMatch(/<button|tabIndex/);
-    // The batch detail's next check is the same sub-row; its "Complete check" button is the count pill.
-    expect(app).toContain('<section className="summary-row design-detail-next bowed" aria-label="Next batch check">');
-    expect(app).toMatch(/aria-label=\{`Complete check: \$\{dueCheck\.name\} for this batch`\} className="summary-row-count glass"/);
-    expect(app.match(/summary-row-count/g)).toHaveLength(2);
-    expect(rule("button.summary-row-count:hover:not(:disabled)")).toContain("--glass: var(--colour-background)");
+    // Variant B: the batch detail's next check is its own yellow card with a full-width "Mark done" button.
+    expect(app).toContain('<section className="bd-due bowed" aria-label="Next batch check">');
+    expect(app).toMatch(/aria-label=\{`Complete check: \$\{dueCheck\.name\} for this batch`\} className="bd-done"/);
+    expect(app.match(/summary-row-count/g)).toHaveLength(1);
   });
 
   it("uses the Kitchen summary on Checks instead of a second summary (moved from My batches)", () => {
@@ -1338,7 +1341,7 @@ describe("small cards (swipe-rework-log.md, ticket 10; spec §1.7 event card, §
   /** Every className literal in App.tsx that makes an element a small card, as its list of classes. */
   const cards = () => [...app.matchAll(/["`]([^"`]*\bsmall-card\b(?!-)[^"`]*)["`]/g)].map(([, literal]) => literal.split(/\s+/).map((name) => name.replace(/\$\{.*$/, "")));
   /** Selectors outside the component that address a small card instance. */
-  const instances = [".timeline-entry", ".upcoming-item", ".overdue-item", ".upcoming-strip button", ".detail-readings > div"];
+  const instances = [".upcoming-item", ".overdue-item", ".upcoming-strip button"];
   const addresses = (selector: string) => instances.some((instance) => selector === instance || selector.startsWith(`${instance}:`) || selector.startsWith(`${instance}.`));
   const roleOf = (selector: string) => rules().find((entry) => entry.selectors.includes(selector) && new Map(entry.declarations).has("font-size"))
     ?.declarations.find(([property]) => property === "font-size")?.[1].match(/^var\(--type-([\w-]+)\)$/)?.[1];
@@ -1397,31 +1400,21 @@ describe("small cards (swipe-rework-log.md, ticket 10; spec §1.7 event card, §
     }
     // The upcoming item lays its date, text and tag out in a row and sets nothing else of the card.
     expect(rule(".upcoming-item").trim()).toBe("display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); width: 100%; text-align: left;");
-    for (const list of [".timeline", ".upcoming-list", ".upcoming-strip", ".detail-readings"]) expect(rule(list), list).toContain("gap: var(--small-card-spacing)");
-    // Retired: the white timeline panel, the per-kind flat fills, the dot, the yellow overdue fill, the black readings, the lime today tile.
-    expect(rule(".design-timeline-panel").trim()).toBe("order: 2;");
+    for (const list of [".upcoming-list", ".upcoming-strip"]) expect(rule(list), list).toContain("gap: var(--small-card-spacing)");
+    // Retired: the per-kind flat fills, the dot, the yellow overdue fill, the black readings, the lime today tile.
+    // Variant B journal rows are one-line list rows, not small cards; their kind colour sits on the .bd-kind-* circle.
     expect(styles).not.toMatch(/\.timeline-(?:note|check|status|dot)\b|\.overdue-item \{|\.detail-readings (?:dt|dd|time)\b|\.upcoming-strip button\.today|\.calendar-status/);
     expect(app).not.toMatch(/timeline-dot|calendar-status/);
   });
 
-  it("makes the timeline, readings and upcoming items small cards with a lime tag, a Light value and a time chip", () => {
+  it("makes the upcoming items, calendar days and empty notes small cards with a lime tag, a Light value and a time chip", () => {
     const literals = cards();
     for (const classes of literals) expect(classes, classes.join(" ")).toContain("bowed");
     const joined = literals.map((classes) => classes.join(" "));
     for (const expected of [
-      "small-card bowed", "small-card bowed small-card-blue", "upcoming-item small-card bowed small-card-blue", "upcoming-item small-card bowed",
+      "small-card bowed", "upcoming-item small-card bowed small-card-blue", "upcoming-item small-card bowed",
       "upcoming-item overdue-item small-card bowed", "small-card bowed small-card-current",
     ]) expect(joined).toContain(expected);
-    expect(app).toContain('className={`timeline-entry small-card bowed timeline-${entry.kind}${entry.kind === "ph" || entry.kind === "temperature" || entry.kind === "measurement" ? " small-card-blue" : ""}`}');
-    // Readings: pH lilac, temperature blue, each with the kind in the tag, the value and its date chip.
-    const start = app.indexOf('<dl className="detail-readings"');
-    const readings = app.slice(start, app.indexOf("</dl>", start));
-    expect(readings.match(/<dt className="small-card-tag">/g)).toHaveLength(2);
-    expect(readings.match(/<dd className="small-card-value">/g)).toHaveLength(2);
-    expect(readings.match(/<time className="small-card-chip glass"/g)).toHaveLength(2);
-    expect(app).toContain('<span className="timeline-content"><strong className="small-card-tag">');
-    // Ticket 13: a reading entry shows its number in the value part; screen readers keep the full sentence.
-    expect(app).toContain('{timelineReading(entry, units) ? <><span className="sr-only">{timelineEntryText(entry, units)}</span><span aria-hidden="true" className="small-card-value">{timelineReading(entry, units)}</span></> : timelineEntryText(entry, units)}');
     expect(app).toContain('if (entry.kind === "temperature") return `${displayTemperature(entry.value, units)} °${units === "imperial" ? "F" : "C"}`;');
     expect(app).toContain('<span className="small-card-tag">{isFinish ? "Finish" : "Check"}</span>');
     // Type roles: the tag is a label, the value the Light figure, the time chip meta.
@@ -1652,8 +1645,8 @@ describe("glass primitive (ticket 17)", () => {
   const alpha = (token: string) => Number(rootTokens().get(token)!.match(/\/ (\d+)%\)$/)![1]);
   const isGlassPrimitive = (selector: string) => /\.glass\b/.test(selector) || selector === ".station-dialog::backdrop";
   const glassMarkup = [
-    '<span className="design-photo-label glass">', '<span className="batch-image-credit glass">Stand-in</span>', '<span className={`status status-${batch.status} glass`}>',
-    '<span className="summary-row-count glass">', 'className="summary-row-count glass" onClick', '<time className="small-card-chip glass"',
+    '<span className="design-photo-label glass">', '<span className={`status status-${batch.status} glass`}>',
+    '<span className="summary-row-count glass">',
     'className="glass" onClick={() => editEntry(entry)}', '<span className="profile-facts"><span className="glass">',
   ];
 
@@ -1711,7 +1704,7 @@ describe("glass primitive (ticket 17)", () => {
       }
     }
     for (const markup of glassMarkup) expect(app).toContain(markup);
-    for (const selector of [":is(.design-batch-card, .design-detail-photo) .status", ".design-photo-label", ".batch-image-credit", ".summary-row-count", ".small-card-chip", ".timeline-entry-actions button", ".profile-facts > span"]) {
+    for (const selector of [":is(.design-batch-card, .design-detail-photo) .status", ".design-photo-label", ".summary-row-count", ".small-card-chip", ".timeline-entry-actions button", ".profile-facts > span"]) {
       for (const entry of rules()) if (entry.selectors.includes(selector)) expect(new Map(entry.declarations).has("background"), `${entry.selector} paints a glass surface`).toBe(false);
     }
   });
@@ -1788,7 +1781,7 @@ describe("last small boxes on board primitives, one-line sidebar label, selected
   it("retires --radius-small: no token, no use, and user photos keep their rectangular framing (#53)", () => {
     expect(styles).not.toContain("--radius-small");
     expect(app).not.toContain("--radius-small");
-    for (const selector of [".user-photo img", ".timeline-description img"]) expect(rule(selector), selector).not.toContain("border-radius");
+    for (const selector of [".user-photo img", ".timeline-content .timeline-photo-frame img"]) expect(rule(selector), selector).not.toContain("border-radius");
     // Multi-line fields and wrapping text targets take the one-line capsule's end; one-line links and keys are capsules.
     for (const selector of ["textarea", 'input[type="file"]', '.dark-field:is(textarea, [type="file"])', ".design-check-copy", ".profile-card-main", ".component-check-state"]) {
       expect(rule(selector), selector).toContain("border-radius: var(--radius-line)");

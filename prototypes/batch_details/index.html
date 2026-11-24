@@ -1,0 +1,471 @@
+<!doctype html>
+<!--
+  PROTOTYPE — throwaway. Question: "How should the batch details page be laid out with less text?"
+  Three structurally different variants of the batch details page (A Focus, B Tabs, C Bento), each shown in a
+  phone / tablet / desktop frame. Switch with the red bar at the bottom, or ?variant=A|B|C&device=phone|tablet|desktop.
+  Keyboard: 1/2/3 pick a variant, P/T/D pick a device. Open this file directly in a browser.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batch details prototype</title>
+<style>
+@font-face { font-family: "Unique"; src: url("../../public/fonts/unique/Unique-Light.woff2") format("woff2"); font-weight: 300; }
+@font-face { font-family: "Unique"; src: url("../../public/fonts/unique/Unique-Regular.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Unique"; src: url("../../public/fonts/unique/Unique-Medium.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Unique"; src: url("../../public/fonts/unique/Unique-SemiBold.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Unique"; src: url("../../public/fonts/unique/Unique-Bold.woff2") format("woff2"); font-weight: 700; }
+
+:root {
+  --ink: #18181b; --rail: #1c1b21; --line: #26252c; --muted: #a3a2ad;
+  --lilac: #dab8f1; --lime: #b6f074; --sky: #b6e1fa; --yellow: #ffec89; --peach: #ebcbb2; --mint: #c3ecb4; --red: #fc5659;
+  --glass-shadow: inset 0 0 0 1px rgba(24,24,27,.07), inset 0 1px 0 rgba(255,255,255,.95), 0 14px 28px -16px rgba(24,24,27,.45), 0 4px 10px -5px rgba(24,24,27,.18);
+  --gd-surface: rgba(38,35,46,.66); --gd-edge: rgba(255,255,255,.08); --gd-rim: rgba(255,255,255,.07);
+  --gd-shadow: 0 22px 44px -20px rgba(0,0,0,.8), 0 6px 16px -8px rgba(0,0,0,.5);
+  --blur: blur(20px) saturate(1.6);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #0d0d10; color: #fff; font-family: "Unique", system-ui, sans-serif; letter-spacing: .01em; }
+button { font: inherit; color: inherit; letter-spacing: inherit; cursor: pointer; }
+h1, h2, h3, p, ol { margin: 0; }
+img { display: block; }
+
+/* ---------- Device frames ---------- */
+.stage { display: flex; justify-content: center; padding: 24px 16px 120px; }
+.device { position: relative; overflow: auto; background: #000; border-radius: 28px; container-type: inline-size; scrollbar-width: thin; scrollbar-color: #333 transparent;
+  box-shadow: 0 0 0 1px #2a2a30, 0 0 0 10px #151518, 0 0 0 11px #2a2a30, 0 40px 80px -30px #000; }
+.device.phone { border-radius: 46px; }
+.screen { min-height: 100%; display: flex; flex-direction: column; padding: 0 16px; }
+.screen > .page { flex: 1; }
+@container (min-width: 700px) { .screen { padding: 0 28px; } }
+@container (min-width: 1100px) { .screen { padding: 0 40px; } .screen > * { width: 100%; max-width: 1360px; margin-inline: auto; } }
+
+/* ---------- The bowed outline (copied from src/styles.css "bowed") ---------- */
+.bw, .bw::after, .bw > .clip {
+  --rr: min(var(--r), 50%);
+  --shape: shape(from 0 var(--rr),
+    curve to var(--rr) 0 with 0 calc(var(--rr) * (1 - var(--k))) / calc(var(--rr) * (1 - var(--k))) 0,
+    curve to calc(100% - var(--rr)) 0 with 50% calc(var(--bow) * 4 / 3) / 50% calc(var(--bow) * 4 / 3),
+    curve to 100% var(--rr) with calc(100% - var(--rr) * (1 - var(--k))) 0 / 100% calc(var(--rr) * (1 - var(--k))),
+    line to 100% calc(100% - var(--rr)),
+    curve to calc(100% - var(--rr)) 100% with 100% calc(100% - var(--rr) * (1 - var(--k))) / calc(100% - var(--rr) * (1 - var(--k))) 100%,
+    curve to var(--rr) 100% with 50% calc(100% - var(--bow) * 4 / 3) / 50% calc(100% - var(--bow) * 4 / 3),
+    curve to 0 calc(100% - var(--rr)) with calc(var(--rr) * (1 - var(--k))) 100% / 0 calc(100% - var(--rr) * (1 - var(--k))),
+    close);
+}
+.bw { --r: 40px; --bow: 5px; --k: .64; --fill: #fff; position: relative; isolation: isolate; color: var(--ink); border-radius: var(--r); }
+.bw::after { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--fill); clip-path: var(--shape); }
+.bw > .clip { position: absolute; inset: 0; z-index: -1; clip-path: var(--shape); overflow: hidden; }
+@supports not (clip-path: shape(from 0 0, line to 1px 1px)) { .bw::after, .bw > .clip { clip-path: none; border-radius: var(--r); overflow: hidden; } }
+.tint { --fill: linear-gradient(165deg, var(--tint) 0%, color-mix(in srgb, var(--tint) 45%, #fff) 55%, #fff 100%); }
+
+/* ---------- Shared pieces ---------- */
+.glass { background: rgba(240,240,243,.62); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); box-shadow: var(--glass-shadow); color: var(--ink); }
+.glass-dark { background: var(--gd-surface); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); box-shadow: inset 0 0 0 1px var(--gd-edge), inset 0 1px 0 var(--gd-rim), var(--gd-shadow); color: #fff; }
+.circle { flex: none; width: 48px; height: 48px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--rail); color: #fff; }
+.circle.ink { width: 56px; height: 56px; background: #000; color: #fff; }
+.circle.lime { background: var(--lime); color: var(--ink); }
+.ic { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ttl b { display: block; font-size: 2.5rem; font-weight: 700; line-height: .98; }
+.ttl span { display: block; font-size: 2.5rem; font-weight: 300; line-height: 1.02; }
+.k { display: flex; align-items: center; gap: 8px; font-size: 1.125rem; font-weight: 500; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red); flex: none; }
+.track { height: 10px; border-radius: 999px; background: rgb(24 24 27 / 9%); box-shadow: inset 0 1px 2px rgb(24 24 27 / 12%); overflow: hidden; }
+.track i { display: block; height: 100%; width: var(--p); border-radius: inherit; background: var(--ink); }
+.track.lime i { background: var(--lime); box-shadow: inset 0 0 0 1px rgb(24 24 27 / 10%); }
+.chip { height: 34px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; font-size: 1.0625rem; font-weight: 500; background: var(--rail); color: #fff; white-space: nowrap; }
+.chip .ic { width: 17px; height: 17px; }
+.chip.ph { background: var(--lilac); color: var(--ink); }
+.chip.ph.bad { background: transparent; box-shadow: inset 0 0 0 1.5px var(--red); color: #ff8f91; }
+.chip.temp { background: var(--sky); color: var(--ink); }
+.chip.check { background: transparent; box-shadow: inset 0 0 0 1px #3a3942; color: #d9d8e0; }
+.chip.light { background: rgb(255 255 255 / 70%); color: var(--ink); box-shadow: inset 0 0 0 1px rgb(24 24 27 / 8%); }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.xl { display: flex; justify-content: space-between; font-size: .9375rem; font-weight: 500; opacity: .55; margin-top: 4px; }
+.steps { padding-left: 1.3em; display: grid; gap: 8px; font-size: 1.1875rem; line-height: 1.3; }
+.steps li::marker { font-weight: 700; }
+.linkish { display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--ink); color: #fff; font-size: 1.125rem; font-weight: 600; }
+
+/* App chrome */
+.appbar { display: none; align-items: center; gap: 18px; padding: 22px 0 6px; }
+.brand { font-size: 1.875rem; font-weight: 700; margin-right: auto; display: flex; align-items: center; gap: 12px; }
+.brand i { width: 40px; height: 40px; border-radius: 50%; background: #fff; display: block; }
+.appnav { display: flex; gap: 4px; padding: 5px; border-radius: 999px; }
+.appnav span { padding: 11px 18px; border-radius: 999px; font-size: 1.125rem; font-weight: 600; }
+.appnav span.on { background: linear-gradient(180deg, #fff, #ebebf0); color: var(--ink); }
+.startbtn { height: 52px; padding: 0 22px; border-radius: 999px; border: 0; background: var(--lime); color: var(--ink); font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.toolbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 10px; padding: 18px 0 14px; background: linear-gradient(#000 72%, rgb(0 0 0 / 0)); }
+.toolbar .crumb { display: none; font-size: 1.25rem; font-weight: 500; color: var(--muted); }
+.toolbar .crumb b { color: #fff; font-weight: 600; }
+.toolbar .sp { flex: 1; }
+@container (min-width: 700px) { .appbar { display: flex; } .toolbar .crumb { display: block; } }
+@container (max-width: 899px) { .appnav { display: none; } }
+.dock { position: sticky; bottom: 0; z-index: 30; display: grid; justify-items: center; gap: 10px; padding: 18px 0 16px; pointer-events: none;
+  background: linear-gradient(rgb(0 0 0 / 0), rgb(0 0 0 / 75%) 55%); }
+.dock > * { pointer-events: auto; }
+.tabbar { display: flex; gap: 4px; padding: 5px; border-radius: 999px; width: 100%; }
+.tabbar span { flex: 1; text-align: center; padding: 12px 0; border-radius: 999px; font-size: 1.0625rem; font-weight: 600; }
+.tabbar span.on { background: linear-gradient(180deg, #fff, #ebebf0); color: var(--ink); }
+@container (min-width: 700px) { .tabbar { display: none; } }
+.fab { height: 60px; padding: 0 26px 0 10px; border: 0; border-radius: 999px; background: var(--lime); color: var(--ink); display: flex; align-items: center; gap: 12px; font-size: 1.375rem; font-weight: 600;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 18px 30px -14px rgb(182 240 116 / 55%); }
+.fab .circle { width: 42px; height: 42px; background: var(--ink); color: #fff; }
+
+/* =================== Variant A — Focus: one summary card, one action, a compact journal =================== */
+.va { display: grid; gap: 14px; padding-top: 4px; }
+.va-main { display: grid; gap: 12px; align-content: start; }
+.hero { --tint: var(--lilac); min-height: 340px; padding: 28px 24px 26px; display: flex; flex-direction: column; }
+.hero .clip img { position: absolute; right: 0; top: 0; height: 100%; width: 50%; object-fit: cover; object-position: 40% 50%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 42%); mask-image: linear-gradient(90deg, transparent 0, #000 42%); }
+.hero .ttl { max-width: 62%; }
+.hero .ttl b { -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.hero-day { margin-top: auto; width: 56%; }
+.hero-day .big { display: flex; align-items: baseline; gap: 6px; }
+.hero-day .big b { font-size: 4.25rem; font-weight: 700; line-height: .9; }
+.hero-day .big em { font-style: normal; font-size: 2rem; font-weight: 300; }
+.hero-day .track { margin: 12px 0 10px; }
+.hero-day p { font-size: 1.125rem; font-weight: 500; }
+.next { --fill: var(--yellow); --r: 34px; --bow: 4px; display: flex; align-items: center; gap: 14px; padding: 16px 14px 16px 24px; }
+.next div { flex: 1; min-width: 0; }
+.next h3 { font-size: 1.875rem; font-weight: 700; line-height: 1; margin-top: 4px; }
+.vitals { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.vital { --r: 32px; --bow: 4px; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 2px; }
+.vital.ph { --fill: color-mix(in srgb, var(--lilac) 55%, #fff); }
+.vital.temp { --fill: color-mix(in srgb, var(--sky) 60%, #fff); }
+.vital strong { font-size: 3rem; font-weight: 700; line-height: 1; margin-top: 8px; }
+.vital small { font-size: 1rem; font-weight: 500; opacity: .65; }
+.sect-h { display: flex; align-items: baseline; justify-content: space-between; margin: 18px 0 2px; }
+.sect-h h2 { font-size: 2.25rem; font-weight: 700; }
+.sect-h span { font-size: 1.125rem; color: var(--muted); }
+.jday { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 14px; padding: 16px 0; border-top: 1px solid var(--line); }
+.jdate b { display: block; font-size: 2.25rem; font-weight: 700; line-height: .95; }
+.jdate span { font-size: 1rem; color: var(--muted); }
+.jchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.jnote { margin-top: 10px; font-size: 1.1875rem; line-height: 1.3; color: #e6e5ec; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+.jnote.open { -webkit-line-clamp: unset; }
+.jphoto { display: flex; align-items: center; gap: 12px; margin-top: 10px; font-size: 1.1875rem; color: #e6e5ec; }
+.jphoto img { width: 64px; height: 64px; border-radius: 20px; object-fit: cover; flex: none; }
+.recipe { --fill: var(--peach); --r: 34px; --bow: 4px; padding: 4px 22px; margin-top: 8px; }
+.recipe summary { list-style: none; display: flex; align-items: center; gap: 12px; padding: 16px 0; cursor: pointer; font-size: 1.5rem; font-weight: 700; }
+.recipe summary::-webkit-details-marker { display: none; }
+.recipe summary span { font-weight: 300; }
+.recipe summary .ic { margin-left: auto; transition: transform .2s; }
+.recipe[open] summary .ic { transform: rotate(180deg); }
+.recipe .in { display: grid; gap: 14px; padding: 0 0 22px; }
+.recipe .jchips .chip { background: rgb(255 255 255 / 70%); color: var(--ink); }
+@container (min-width: 700px) {
+  .va { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 28px; align-items: start; }
+  .va-main { grid-row: span 2; position: sticky; top: 84px; }
+  .va .journal { grid-column: 2; }
+  .va .recipe { grid-column: 2; }
+  .va .sect-h { margin-top: 0; }
+}
+@container (min-width: 1100px) {
+  .va { grid-template-columns: 5fr 6fr 4fr; }
+  .va-main { grid-row: auto; }
+  .va .recipe { grid-column: 3; grid-row: 1; position: sticky; top: 84px; margin-top: 0; }
+  .hero { min-height: 400px; }
+}
+
+/* =================== Variant B — Tabs: compact header, Today / Journal / Recipe =================== */
+.vb-head { display: flex; align-items: center; gap: 14px; padding: 2px 0 18px; }
+.thumb { --r: 26px; --bow: 3px; width: 86px; height: 86px; flex: none; }
+.thumb .clip img { width: 100%; height: 100%; object-fit: cover; }
+.vb-id { min-width: 0; }
+.vb-id b { display: block; font-size: 2rem; font-weight: 700; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vb-id span { display: block; font-size: 1.5rem; font-weight: 300; color: #d9d8e0; }
+.ring { margin-left: auto; flex: none; width: 78px; height: 78px; position: relative; display: grid; place-items: center; text-align: center; }
+.ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ring b { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+.ring small { display: block; font-size: .875rem; color: var(--muted); }
+.vb-panes { display: block; }
+.seg { position: sticky; top: 80px; z-index: 20; display: flex; gap: 4px; padding: 5px; border-radius: 999px; margin-bottom: 16px; }
+.seg button { flex: 1; height: 46px; border: 0; border-radius: 999px; background: transparent; font-size: 1.1875rem; font-weight: 600; color: #fff; }
+.seg button.on { background: linear-gradient(180deg, #fff, #ebebf0); color: var(--ink); box-shadow: inset 0 1px 0 rgb(255 255 255 / 90%), 0 6px 16px -6px rgb(0 0 0 / 60%); }
+.pane { display: none; gap: 12px; align-content: start; }
+.vb[data-tab="today"] .pane[data-pane="today"], .vb[data-tab="journal"] .pane[data-pane="journal"], .vb[data-tab="recipe"] .pane[data-pane="recipe"] { display: grid; }
+.pane-h { display: none; font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
+.due { --fill: var(--yellow); --r: 36px; padding: 22px 22px 20px; display: grid; gap: 4px; }
+.due h3 { font-size: 2.25rem; font-weight: 700; line-height: 1; }
+.due .wide { margin-top: 14px; height: 56px; border: 0; border-radius: 999px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.25rem; font-weight: 600; }
+.phcard { --tint: var(--lilac); --r: 36px; padding: 22px 22px 18px; }
+.phcard .row { display: flex; align-items: center; justify-content: space-between; }
+.phcard strong { display: block; font-size: 3.5rem; font-weight: 700; line-height: 1; margin: 6px 0 10px; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mini { --r: 30px; --bow: 4px; padding: 16px 18px; display: grid; gap: 4px; }
+.mini strong { font-size: 2.25rem; font-weight: 700; line-height: 1; }
+.mini small { font-size: 1rem; opacity: .65; font-weight: 500; }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+.quick button { border: 0; background: none; display: grid; justify-items: center; gap: 8px; font-size: 1.0625rem; font-weight: 500; color: #fff; padding: 0; }
+.quick .circle { width: 60px; height: 60px; }
+.qh { font-size: 1.25rem; font-weight: 600; color: var(--muted); margin-top: 10px; }
+.filters { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+.filters button { flex: none; height: 38px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--rail); color: #fff; font-size: 1.0625rem; font-weight: 600; }
+.filters button.on { background: #fff; color: var(--ink); }
+.rows { display: grid; }
+.row-j { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.row-j .circle { width: 44px; height: 44px; }
+.row-j .circle.ph { background: var(--lilac); color: var(--ink); } .row-j .circle.temp { background: var(--sky); color: var(--ink); }
+.row-j .circle.check { background: var(--mint); color: var(--ink); } .row-j .circle.note { background: var(--peach); color: var(--ink); }
+.row-j .circle.photo { background: var(--yellow); color: var(--ink); }
+.row-j p { font-size: 1.25rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.row-j p.open { white-space: normal; }
+.row-j p em { font-style: normal; color: var(--red); font-size: 1rem; margin-left: 6px; }
+.row-j time { font-size: 1rem; color: var(--muted); }
+.rows[data-f="readings"] .row-j:not([data-k="ph"]):not([data-k="temp"]),
+.rows[data-f="checks"] .row-j:not([data-k="check"]),
+.rows[data-f="notes"] .row-j:not([data-k="note"]):not([data-k="photo"]) { display: none; }
+.recipe-card { --fill: var(--peach); --r: 36px; padding: 22px; display: grid; gap: 16px; }
+.recipe-card h3 { font-size: 1.5rem; font-weight: 700; }
+@container (min-width: 700px) {
+  .vb-panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 0 28px; align-items: start; }
+  .seg { grid-column: 2; grid-row: 1; top: 84px; }
+  .seg button[data-tab="today"] { display: none; }
+  .vb[data-tab="today"] .seg button[data-tab="journal"] { background: linear-gradient(180deg, #fff, #ebebf0); color: var(--ink); }
+  .pane[data-pane="today"] { display: grid; grid-column: 1; grid-row: 1 / 3; position: sticky; top: 84px; }
+  .pane[data-pane="journal"], .pane[data-pane="recipe"] { grid-column: 2; grid-row: 2; }
+  .vb[data-tab="today"] .pane[data-pane="journal"] { display: grid; }
+}
+@container (min-width: 1100px) {
+  .vb-panes { grid-template-columns: 5fr 6fr 4fr; grid-template-rows: auto; }
+  .seg { display: none; }
+  .pane, .vb .pane { display: grid !important; grid-row: 1 !important; }
+  .pane[data-pane="journal"] { grid-column: 2; } .pane[data-pane="recipe"] { grid-column: 3; position: sticky; top: 84px; }
+  .pane-h { display: block; }
+}
+
+/* =================== Variant C — Bento: everything at a glance, one tile per fact =================== */
+.bento { display: grid; gap: 12px; padding-top: 4px; grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas: "photo photo" "prog next" "ph ph" "temp add" "jrnl jrnl" "recipe recipe"; }
+.t { --r: 32px; --bow: 4px; padding: 18px; min-height: 168px; display: flex; flex-direction: column; min-width: 0; }
+.t-photo { grid-area: photo; min-height: 320px; justify-content: space-between; padding: 16px; }
+.t-photo .clip img { width: 100%; height: 100%; object-fit: cover; }
+.t-photo .tag { align-self: flex-start; height: 38px; padding: 0 14px; border-radius: 999px; display: flex; align-items: center; gap: 8px; font-size: 1.125rem; font-weight: 600; }
+.t-photo .tag i { width: 9px; height: 9px; border-radius: 50%; background: #3fbf4f; }
+.t-photo .name { align-self: flex-start; max-width: 100%; padding: 14px 20px 16px; border-radius: 26px; }
+.t-photo .name b { font-size: 2.25rem; } .t-photo .name span { font-size: 1.75rem; }
+.t-prog { grid-area: prog; --fill: var(--lime); }
+.t-prog .big { margin-top: auto; display: flex; align-items: baseline; gap: 4px; }
+.t-prog .big b { font-size: 4.25rem; font-weight: 700; line-height: .85; }
+.t-prog .big em { font-style: normal; font-size: 2rem; font-weight: 300; }
+.t-prog .track { margin-top: 12px; background: rgb(24 24 27 / 14%); }
+.t-next { grid-area: next; --fill: var(--yellow); }
+.t-next h3 { font-size: 1.75rem; font-weight: 700; line-height: 1; margin-top: 8px; }
+.t-next .circle { margin-top: auto; align-self: flex-end; }
+.t-ph { grid-area: ph; --tint: var(--lilac); }
+.t-ph .row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.t-ph strong { font-size: 3.25rem; font-weight: 700; line-height: 1; }
+.t-ph .chartwrap { margin-top: auto; padding-top: 10px; }
+.t-temp { grid-area: temp; --fill: color-mix(in srgb, var(--sky) 70%, #fff); }
+.t-temp strong { margin-top: auto; font-size: 2.75rem; font-weight: 700; line-height: 1; }
+.t-temp small { font-size: 1rem; opacity: .65; font-weight: 500; }
+.t-add { grid-area: add; --fill: var(--rail); color: #fff; border: 0; text-align: left; justify-content: space-between; font-size: 1.5rem; font-weight: 600; line-height: 1.02; }
+.t-add .circle { width: 56px; height: 56px; }
+.t-jrnl { grid-area: jrnl; }
+.t-jrnl .head { display: flex; align-items: baseline; justify-content: space-between; }
+.t-jrnl h3 { font-size: 1.75rem; font-weight: 700; }
+.t-jrnl .rows .row-j { border-color: rgb(24 24 27 / 8%); }
+.t-jrnl .row-j time { color: rgb(24 24 27 / 55%); }
+.t-jrnl .more { margin-top: 12px; align-self: flex-start; }
+.t-recipe { grid-area: recipe; --fill: var(--peach); gap: 12px; }
+.t-recipe h3 { font-size: 1.75rem; font-weight: 700; }
+.t-recipe p { font-size: 1.1875rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.t-recipe .chip { background: rgb(255 255 255 / 70%); color: var(--ink); }
+@container (min-width: 700px) {
+  .bento { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "photo photo prog next" "photo photo ph ph" "temp add ph ph" "jrnl jrnl recipe recipe"; }
+  .t-photo { min-height: 0; }
+}
+@container (min-width: 1100px) {
+  .bento { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(206px, auto));
+    grid-template-areas: "photo photo prog next jrnl jrnl" "photo photo ph ph jrnl jrnl" "temp add ph ph recipe recipe"; }
+}
+
+/* ---------- Prototype switcher (deliberately not app styling) ---------- */
+.switch { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 99; display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 5px;
+  background: #ff3b30; color: #fff; border-radius: 22px; box-shadow: 0 8px 24px rgb(0 0 0 / 50%); font-family: system-ui, sans-serif; letter-spacing: 0; max-width: calc(100% - 24px); }
+.switch button { border: 0; background: transparent; color: #fff; font: 600 13px system-ui, sans-serif; padding: 8px 12px; border-radius: 999px; }
+.switch button.on { background: #fff; color: #ff3b30; }
+.switch .sep { width: 1px; height: 22px; background: rgb(255 255 255 / 40%); margin: 0 4px; }
+.switch .what { font: 500 12px system-ui, sans-serif; padding: 0 10px; opacity: .9; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="stage"><div class="device" id="device"></div></div>
+<div class="switch" id="switch" role="toolbar" aria-label="Prototype switcher"></div>
+
+<script>
+const IMG = "../../public/new-design/kimchi.webp";
+const VARIANTS = { A: "Focus — one summary card, one action, compact journal", B: "Tabs — Today / Journal / Recipe", C: "Bento — every fact in its own tile" };
+const DEVICES = { phone: [390, 844], tablet: [834, 1112], desktop: [1440, 900] };
+const params = new URLSearchParams(location.search);
+let variant = VARIANTS[params.get("variant")] ? params.get("variant") : "A";
+let device = DEVICES[params.get("device")] ? params.get("device") : "phone";
+
+const batch = { name: "Napa cabbage kimchi", profile: "Kimchi", started: "14 Mar", finish: "19 Mar", day: 5, total: 5,
+  due: { name: "Burp the jar", since: "17 Mar" }, ph: "4.31", temp: "20.2 °C", tempDate: "17 Mar",
+  inputs: ["cabbage", "water"],
+  guidance: ["Pack firmly so juice rises and leave headspace for gas.", "Ferment warm briefly, then move to the fridge when the pH reaches 4.2."] };
+const journal = [
+  { d: "17", k: "ph", v: "4.31", ok: true }, { d: "17", k: "temp", v: "20.2 °C" },
+  { d: "17", k: "note", text: "Smells sour and garlicky, a little fizz when pressed down. Tasted a leaf: still crunchy, needs another day or two before it goes in the fridge." },
+  { d: "16", k: "ph", v: "4.5", ok: true }, { d: "16", k: "photo", text: "Bubbling nicely after two days" },
+  { d: "16", k: "check", text: "Check brine level" }, { d: "16", k: "check", text: "Burp the jar" },
+  { d: "15", k: "ph", v: "4.9", ok: false }, { d: "15", k: "temp", v: "21.5 °C" }, { d: "15", k: "check", text: "Burp the jar" },
+  { d: "14", k: "ph", v: "5.6", ok: false },
+  { d: "14", k: "note", text: "Packed into the 2 L jar with gochugaru paste, spring onion and daikon. Brine covers everything." },
+];
+
+const PATHS = { back: "M15 5l-7 7 7 7", cal: "M4 6.5h16V20H4zM4 10h16M8 3.5v5M16 3.5v5", more: "M5.5 12h.01M12 12h.01M18.5 12h.01",
+  check: "M5 12.5l4.5 4.5L19 7", plus: "M12 5v14M5 12h14", ph: "M12 3.5s6 6.6 6 10.5a6 6 0 0 1-12 0c0-3.9 6-10.5 6-10.5z",
+  temp: "M10 14.5V5a2 2 0 1 1 4 0v9.5a4 4 0 1 1-4 0z", note: "M6 3.5h8.5l3.5 3.5v13.5H6zM9 11h6M9 15h6",
+  photo: "M3.5 8h3.5l2-3h6l2 3h3.5v11.5h-17zM12 16.5a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z", arrow: "M5 12h14M13 6l6 6-6 6", down: "M6 9l6 6 6-6" };
+const ic = (name, extra = "") => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" ${name === "more" ? 'style="stroke-width:3.2"' : ""} ${extra}><path d="${PATHS[name]}"/></svg>`;
+const days = [...new Set(journal.map((entry) => entry.d))];
+
+function phChart() {
+  const values = [5.6, 4.9, 4.5, 4.31], W = 300, H = 104, pad = 8, top = 5.8, bottom = 4.0;
+  const x = (i) => pad + i * (W - 2 * pad) / (values.length - 1);
+  const y = (v) => pad + (top - v) / (top - bottom) * (H - 2 * pad);
+  const line = values.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="pH fell from 5.6 to 4.31 over four days; safe below 4.6, target 4.2">
+    <rect x="0" y="${y(4.6)}" width="${W}" height="${H - y(4.6)}" rx="10" fill="rgb(182 240 116 / 55%)"/>
+    <line x1="0" x2="${W}" y1="${y(4.2)}" y2="${y(4.2)}" stroke="#18181b" stroke-opacity=".35" stroke-dasharray="4 5"/>
+    <text x="${W - 6}" y="${y(4.6) + 16}" text-anchor="end" font-family="Unique" font-size="14" font-weight="500" fill="#18181b" fill-opacity=".6">safe</text>
+    <path d="${line}" fill="none" stroke="#18181b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    ${values.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="${i === values.length - 1 ? 7 : 4.5}" fill="${i === values.length - 1 ? "#18181b" : v >= 4.6 ? "#fc5659" : "#18181b"}" stroke="#fff" stroke-width="${i === values.length - 1 ? 3 : 2}"/>`).join("")}
+  </svg><div class="xl"><span>14</span><span>15</span><span>16</span><span>17 Mar</span></div>`;
+}
+
+const chipFor = (e) => e.k === "ph" ? `<span class="chip ph${e.ok ? "" : " bad"}">${ic("ph")}pH ${e.v}</span>`
+  : e.k === "temp" ? `<span class="chip temp">${ic("temp")}${e.v}</span>`
+  : e.k === "check" ? `<span class="chip check">${ic("check")}${e.text}</span>` : "";
+const rowText = (e) => e.k === "ph" ? `pH ${e.v}${e.ok ? "" : "<em>above 4.6</em>"}` : e.k === "temp" ? e.v : e.text;
+const rowJ = (e) => `<div class="row-j" data-k="${e.k}"><span class="circle ${e.k}">${ic(e.k === "check" ? "check" : e.k)}</span><p class="${e.k === "note" ? "expand" : ""}">${rowText(e)}</p><time>${e.d} Mar</time></div>`;
+
+function chrome(inner, { fab = false } = {}) {
+  return `<div class="screen">
+    <header class="appbar"><div class="brand"><i></i>FermentStation</div>
+      <nav class="appnav glass-dark"><span class="on">My batches</span><span>Checks</span><span>Calendar</span><span>Profiles</span></nav>
+      <button class="startbtn">${ic("plus")}Start a batch</button></header>
+    <div class="toolbar"><button class="circle" aria-label="Back to my batches">${ic("back")}</button>
+      <p class="crumb">My batches / <b>${batch.name}</b></p><span class="sp"></span>
+      <button class="circle" aria-label="Batch dates">${ic("cal")}</button><button class="circle" aria-label="More batch tools">${ic("more")}</button></div>
+    <main class="page">${inner}</main>
+    <div class="dock">${fab ? `<button class="fab"><span class="circle">${ic("plus")}</span>Add observation</button>` : ""}
+      <nav class="tabbar glass-dark"><span class="on">My batches</span><span>Checks</span><span>Calendar</span><span>Profiles</span></nav></div>
+  </div>`;
+}
+
+function variantA() {
+  const dayBlock = (d) => {
+    const entries = journal.filter((e) => e.d === d);
+    const chips = entries.filter((e) => ["ph", "temp", "check"].includes(e.k)).map(chipFor).join("");
+    const notes = entries.filter((e) => e.k === "note").map((e) => `<p class="jnote expand">${e.text}</p>`).join("");
+    const photos = entries.filter((e) => e.k === "photo").map((e) => `<div class="jphoto"><img src="${IMG}" alt="">${e.text}</div>`).join("");
+    return `<div class="jday"><div class="jdate"><b>${d}</b><span>Mar</span></div><div>${chips ? `<div class="jchips">${chips}</div>` : ""}${photos}${notes}</div></div>`;
+  };
+  return chrome(`<div class="va">
+    <div class="va-main">
+      <section class="bw tint hero"><div class="clip"><img src="${IMG}" alt=""></div>
+        <h1 class="ttl"><b>${batch.name}</b><span>${batch.profile}</span></h1>
+        <div class="hero-day"><div class="big"><b>Day ${batch.day}</b><em>of ${batch.total}</em></div>
+          <div class="track"><i style="--p:100%"></i></div><p>Ready ${batch.finish} · tomorrow</p></div>
+      </section>
+      <section class="bw next"><div><p class="k"><span class="dot"></span>Overdue since ${batch.due.since}</p><h3>${batch.due.name}</h3></div>
+        <button class="circle ink" aria-label="Mark ${batch.due.name} done">${ic("check")}</button></section>
+      <div class="vitals">
+        <section class="bw vital ph"><p class="k">${ic("ph")}pH</p><strong>${batch.ph}</strong><small>↓ 0.19 · target 4.2</small></section>
+        <section class="bw vital temp"><p class="k">${ic("temp")}Temp</p><strong>${batch.temp.replace(" ", "")}</strong><small>${batch.tempDate}</small></section>
+      </div>
+    </div>
+    <section class="journal"><div class="sect-h"><h2>Journal</h2><span>${journal.length} entries</span></div>${days.map(dayBlock).join("")}</section>
+    <details class="bw recipe"${device === "desktop" ? " open" : ""}><summary>Recipe <span>${batch.profile}</span>${ic("down")}</summary>
+      <div class="in"><div class="jchips">${batch.inputs.map((i) => `<span class="chip">${i}</span>`).join("")}</div>
+        <ol class="steps">${batch.guidance.map((g) => `<li>${g}</li>`).join("")}</ol>
+        <button class="linkish">Open ${batch.profile} profile ${ic("arrow")}</button></div></details>
+  </div>`, { fab: true });
+}
+
+function variantB() {
+  const C = 2 * Math.PI * 33;
+  return chrome(`<div class="vb" data-tab="today">
+    <header class="vb-head"><div class="bw thumb"><div class="clip"><img src="${IMG}" alt=""></div></div>
+      <div class="vb-id"><b>${batch.name}</b><span>${batch.profile}</span></div>
+      <div class="ring" role="img" aria-label="Day ${batch.day} of ${batch.total}"><svg viewBox="0 0 78 78"><circle cx="39" cy="39" r="33" fill="none" stroke="#26252c" stroke-width="7"/>
+        <circle cx="39" cy="39" r="33" fill="none" stroke="#b6f074" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - batch.day / batch.total)}"/></svg>
+        <div><b>${batch.day}/${batch.total}</b><small>days</small></div></div></header>
+    <div class="vb-panes">
+      <nav class="seg glass-dark" role="tablist">${["today", "journal", "recipe"].map((t) => `<button role="tab" data-tab="${t}" class="${t === "today" ? "on" : ""}">${t[0].toUpperCase() + t.slice(1)}</button>`).join("")}</nav>
+      <section class="pane" data-pane="today"><h2 class="pane-h">Today</h2>
+        <div class="bw due"><p class="k"><span class="dot"></span>Overdue since ${batch.due.since}</p><h3>${batch.due.name}</h3>
+          <button class="wide">${ic("check")}Mark done</button></div>
+        <div class="bw tint phcard"><div class="row"><p class="k">${ic("ph")}pH</p><span class="chip light">safe · target 4.2</span></div><strong>${batch.ph}</strong>${phChart()}</div>
+        <div class="duo"><div class="bw mini" style="--fill: color-mix(in srgb, var(--sky) 70%, #fff)"><p class="k">${ic("temp")}Temp</p><strong>${batch.temp.replace(" ", "")}</strong><small>${batch.tempDate}</small></div>
+          <div class="bw mini" style="--fill: var(--lime)"><p class="k">${ic("cal")}Ready</p><strong>${batch.finish}</strong><small>tomorrow</small></div></div>
+        <p class="qh">Log something</p>
+        <div class="quick">${[["note", "Note"], ["ph", "pH"], ["temp", "Temp"], ["photo", "Photo"]].map(([k, l]) => `<button><span class="circle glass-dark">${ic(k)}</span>${l}</button>`).join("")}</div>
+      </section>
+      <section class="pane" data-pane="journal"><h2 class="pane-h">Journal</h2>
+        <div class="filters">${[["all", "All"], ["readings", "Readings"], ["checks", "Checks"], ["notes", "Notes & photos"]].map(([f, l], i) => `<button data-f="${f}" class="${i ? "" : "on"}">${l}</button>`).join("")}</div>
+        <div class="rows" data-f="all">${journal.map(rowJ).join("")}</div></section>
+      <section class="pane" data-pane="recipe"><h2 class="pane-h">Recipe</h2>
+        <div class="bw recipe-card"><h3>Inputs</h3><div class="jchips">${batch.inputs.map((i) => `<span class="chip light">${i}</span>`).join("")}</div>
+          <h3>Guidance</h3><ol class="steps">${batch.guidance.map((g) => `<li>${g}</li>`).join("")}</ol>
+          <button class="linkish">Open ${batch.profile} profile ${ic("arrow")}</button></div></section>
+    </div></div>`);
+}
+
+function variantC() {
+  return chrome(`<div class="bento">
+    <section class="bw t t-photo"><div class="clip"><img src="${IMG}" alt="${batch.name}"></div>
+      <span class="tag glass"><i></i>Active</span>
+      <h1 class="ttl name glass"><b>${batch.name}</b><span>${batch.profile}</span></h1></section>
+    <section class="bw t t-prog"><p class="k">${batch.started} → ${batch.finish}</p><div class="big"><b>${batch.day}</b><em>/${batch.total} days</em></div><div class="track"><i style="--p:100%"></i></div></section>
+    <section class="bw t t-next"><p class="k"><span class="dot"></span>Overdue</p><h3>${batch.due.name}</h3><button class="circle ink" aria-label="Mark ${batch.due.name} done">${ic("check")}</button></section>
+    <section class="bw tint t t-ph"><div class="row"><p class="k">${ic("ph")}pH</p><strong>${batch.ph}</strong></div><div class="chartwrap">${phChart()}</div></section>
+    <section class="bw t t-temp"><p class="k">${ic("temp")}Temp</p><strong>${batch.temp.replace(" ", "")}</strong><small>${batch.tempDate}</small></section>
+    <button class="bw t t-add"><span class="circle lime">${ic("plus")}</span>Add<br>observation</button>
+    <section class="bw t t-jrnl"><div class="head"><h3>Journal</h3><span class="k">${journal.length}</span></div>
+      <div class="rows">${journal.slice(0, 4).map(rowJ).join("")}</div><button class="linkish more">See all ${journal.length} ${ic("arrow")}</button></section>
+    <section class="bw t t-recipe"><h3>${batch.profile} recipe</h3><div class="jchips">${batch.inputs.map((i) => `<span class="chip">${i}</span>`).join("")}</div>
+      <p>${batch.guidance.join(" ")}</p><button class="linkish">Open profile ${ic("arrow")}</button></section>
+  </div>`);
+}
+
+const deviceEl = document.getElementById("device"), switchEl = document.getElementById("switch");
+function render() {
+  const [w, h] = DEVICES[device];
+  deviceEl.className = `device ${device}`;
+  deviceEl.style.width = `${w}px`; deviceEl.style.height = `${h}px`;
+  deviceEl.style.zoom = Math.min(1, (innerWidth - 56) / w);
+  deviceEl.innerHTML = { A: variantA, B: variantB, C: variantC }[variant]();
+  deviceEl.scrollTop = 0;
+  switchEl.innerHTML = Object.keys(VARIANTS).map((v) => `<button data-v="${v}" class="${v === variant ? "on" : ""}">${v}</button>`).join("")
+    + `<span class="sep"></span>` + Object.keys(DEVICES).map((d) => `<button data-d="${d}" class="${d === device ? "on" : ""}">${d[0].toUpperCase() + d.slice(1)}</button>`).join("")
+    + `<span class="what">${VARIANTS[variant]} · ${w}×${h}</span>`;
+  history.replaceState(null, "", `?variant=${variant}&device=${device}`);
+}
+switchEl.addEventListener("click", (event) => {
+  const b = event.target.closest("button"); if (!b) return;
+  if (b.dataset.v) variant = b.dataset.v; if (b.dataset.d) device = b.dataset.d; render();
+});
+deviceEl.addEventListener("click", (event) => {
+  const tab = event.target.closest(".seg button");
+  if (tab) { tab.closest(".vb").dataset.tab = tab.dataset.tab; tab.parentElement.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b === tab)); return; }
+  const filter = event.target.closest(".filters button");
+  if (filter) { filter.parentElement.nextElementSibling.dataset.f = filter.dataset.f; filter.parentElement.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b === filter)); return; }
+  const text = event.target.closest(".jnote, .row-j p"); if (text) text.classList.toggle("open");
+});
+addEventListener("keydown", (event) => {
+  if (event.target.closest("input, textarea")) return;
+  const key = event.key.toLowerCase();
+  if ({ 1: "A", 2: "B", 3: "C" }[key]) { variant = { 1: "A", 2: "B", 3: "C" }[key]; render(); }
+  if ({ p: "phone", t: "tablet", d: "desktop" }[key]) { device = { p: "phone", t: "tablet", d: "desktop" }[key]; render(); }
+});
+addEventListener("resize", () => { deviceEl.style.zoom = Math.min(1, (innerWidth - 56) / DEVICES[device][0]); });
+render();
+</script>
+</body>
+</html>

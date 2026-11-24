@@ -115,7 +115,7 @@ function NavIcon({ destination }: { destination: Destination }) {
   return <DesignIcon name="user" />;
 }
 
-function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus" | "bell" | "user" | "sparkles" | "temp" | "clock" | "back" | "check" | "book" | "drop" | "settings" | "close" | "arrow" }) {
+function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus" | "bell" | "user" | "sparkles" | "temp" | "clock" | "back" | "check" | "book" | "drop" | "settings" | "close" | "arrow" | "more" | "note" | "photo" | "ph" | "cal" }) {
   const paths = {
     leaf: "M19 3C9 3 3 7 5 14c2 6 12 6 14-11ZM4 21 15 9m-6 6 6 1",
     jar: "M7 7c0 3-2 3-2 6v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6c0-3-2-3-2-6M5 12h14M5 16h14",
@@ -134,8 +134,13 @@ function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus
     book: "M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Zm0 0v15",
     drop: "M12 2S4 11 4 15a8 8 0 0 0 16 0c0-4-8-13-8-13Z",
     settings: "m9 3-1 3-3 1-2 5 2 5 3 1 1 3h6l1-3 3-1 2-5-2-5-3-1-1-3ZM16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
+    more: "M5.5 12h.01M12 12h.01M18.5 12h.01",
+    note: "M6 3.5h8.5l3.5 3.5v13.5H6zM9 11h6M9 15h6",
+    photo: "M3.5 8h3.5l2-3h6l2 3h3.5v11.5h-17zM12 16.5a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z",
+    ph: "M12 3.5s6 6.6 6 10.5a6 6 0 0 1-12 0c0-3.9 6-10.5 6-10.5z",
+    cal: "M4 6.5h16V20H4zM4 10h16M8 3.5v5M16 3.5v5",
   };
-  return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{name === "jar" && <rect x="6" y="3" width="12" height="4" rx="1.5" />}<path d={paths[name]} />{name === "temp" && <circle cx="12" cy="18" r="1" />}</svg>;
+  return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={name === "more" ? "3.2" : "1.6"} strokeLinecap="round" strokeLinejoin="round">{name === "jar" && <rect x="6" y="3" width="12" height="4" rx="1.5" />}<path d={paths[name]} />{name === "temp" && <circle cx="12" cy="18" r="1" />}</svg>;
 }
 
 const stationLogoWhiteUrl = `data:image/svg+xml,${encodeURIComponent(stationLogoSvg.replace('fill="#1c1e22"', 'fill="#ffffff"'))}`;
@@ -236,7 +241,7 @@ function BatchPhoto({ batch, detail = false }: { batch: Batch; detail?: boolean 
   // On the batch card a stand-in cut-out spills over the card edge; a user photo stays clipped by the card outline.
   const card = detail ? " bowed" : photo ? " bowed-media" : visual.pastelOnly ? " pastel-only" : "";
   return <div className={`${detail ? "design-detail-photo" : "design-batch-photo"}${photo ? " user-photo" : ""}${card}`} style={detail && !photo ? { "--fill": visual.color } as CSSProperties : undefined}>
-    {source ? <BatchImage key={source} source={source} userPhoto={!!photo} retryable={detail} description={photo ? `Batch photograph: ${photo.caption || photo.name}` : `${batch.profileSnapshot.name} stand-in photograph`} />
+    {source ? <BatchImage key={source} source={source} userPhoto={!!photo} retryable={detail} description={photo ? `Batch photograph: ${photo.caption || photo.name}` : `${batch.profileSnapshot.name} photograph`} />
       : <DesignIcon name="jar" />}
     {detail && <span className={`status status-${batch.status} glass`}>{statusLabel(batch.status)}</span>}
     {detail && <span className="design-photo-label glass">{batch.status === "to-fridge" ? "In the fridge" : batch.finishDate ? `Finish ${shortDate(batch.finishDate)}` : "No finish date"}</span>}
@@ -246,9 +251,8 @@ function BatchPhoto({ batch, detail = false }: { batch: Batch; detail?: boolean 
 function BatchImage({ source, description, userPhoto, retryable = false }: { source: string; description: string; userPhoto: boolean; retryable?: boolean }) {
   const [state, setState] = useState<"loading" | "loaded" | "failed">("loading");
   return <>
-    {state !== "loaded" && <span className="batch-photo-fallback" role={state === "failed" ? "img" : undefined} aria-label={state === "failed" ? userPhoto ? "Batch photograph unavailable; original retained" : "Stand-in photograph unavailable" : undefined}><DesignIcon name="jar" /></span>}
-    {state !== "failed" && <img alt={description} data-source={userPhoto ? "user" : "stand-in"} onLoad={() => setState("loaded")} onError={() => setState("failed")} src={source} />}
-    {!userPhoto && <span className="batch-image-credit glass">Stand-in</span>}
+    {state !== "loaded" && <span className="batch-photo-fallback" role={state === "failed" ? "img" : undefined} aria-label={state === "failed" ? userPhoto ? "Batch photograph unavailable; original retained" : "Photograph unavailable" : undefined}><DesignIcon name="jar" /></span>}
+    {state !== "failed" && <img alt={description} data-source={userPhoto ? "user" : "bundled"} onLoad={() => setState("loaded")} onError={() => setState("failed")} src={source} />}
     {state === "failed" && retryable && <button className="batch-photo-retry" onClick={() => setState("loading")} type="button">Retry photograph</button>}
   </>;
 }
@@ -259,13 +263,6 @@ function batchDay(batch: Batch) {
 
 function shortDate(date: string) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(`${date}T12:00:00`));
-}
-
-function PhotoCredits() {
-  return <details className="design-photo-credits"><summary>Stand-in photographs</summary><ul>
-    <li>Kimchi, sauerkraut, sourdough and milk kefir · AI-generated images supplied by the user, cut out for this app.</li>
-    <li>Grapefruit spritz and fruit still life · AI-generated images supplied by the user, cut out for this app · not affiliated with Swipe Drinks.</li>
-  </ul><p>Stand-in photographs, cropped with backgrounds removed. Your own batch photos replace these illustrations.</p></details>;
 }
 
 function StatusIcon({ status }: { status: BatchStatus | "attention" }) {
@@ -320,7 +317,7 @@ function ProfileOverview({ profile, onStart }: { profile: FermentationProfile; o
 
 function ProfilePhoto({ profile }: { profile: FermentationProfile }) {
   const visual = profileVisual(profile);
-  return <div className="design-profile-visual">{visual.photo ? <BatchImage key={visual.photo} source={`${import.meta.env.BASE_URL}new-design/${visual.photo}.webp`} description={`${profile.name} stand-in photograph`} userPhoto={false} retryable /> : <DesignIcon name="jar" />}</div>;
+  return <div className="design-profile-visual">{visual.photo ? <BatchImage key={visual.photo} source={`${import.meta.env.BASE_URL}new-design/${visual.photo}.webp`} description={`${profile.name} photograph`} userPhoto={false} retryable /> : <DesignIcon name="jar" />}</div>;
 }
 
 function ProfileGuidance({ profile }: { profile: FermentationProfile }) {
@@ -357,7 +354,9 @@ function StartBatchForm({ profiles, initialProfile, onCreate, onCancel, onDirty,
     }
   }
   if (!available.length) return <div className="station-dialog-body"><p>Create or restore a fermentation profile before starting a batch.</p><div className="station-dialog-actions"><button className="station-primary card-action card-action-foot" onClick={onProfiles} type="button">Open Profiles</button></div></div>;
-  return <form onChange={onDirty} onInput={() => { setError(""); setFieldErrors({}); }} onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))} onSubmit={save}>
+  // A select's input event fires before its change event; re-rendering here would reset the controlled select to the
+  // old profile before onChange could read the new one, so the select clears errors in its own onChange instead.
+  return <form onChange={onDirty} onInput={(event) => { if (event.target instanceof HTMLSelectElement) return; setError(""); setFieldErrors({}); }}onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))} onSubmit={save}>
     <p className="station-helper">Choose a reusable method. This batch will keep its own copy.</p>
     <fieldset className="start-batch-basics bowed"><legend>Your batch</legend>
     <label className="station-field">Batch name<input {...fieldErrorProps(fieldErrors, "start-name")} aria-label="Batch name" className="dark-field" autoComplete="off" maxLength={60} name="name" placeholder="e.g. My weekend kimchi" title="Optional; uses the profile name if blank" /><FieldError errors={fieldErrors} id="start-name" /></label>
@@ -1238,7 +1237,6 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         <p>Unique by Rajesh Rajput. Original, unmodified web fonts are bundled for offline use, with the user's confirmed rights. <a href={`${import.meta.env.BASE_URL}fonts/unique/License.pdf`}>Unique end-user license</a>. System sans is the font-load and unsupported-character fallback.</p>
         <p>Legacy bundled font: Outfit © 2021 The Outfit Project Authors. <a href={`${import.meta.env.BASE_URL}new-design/OFL.txt`}>SIL Open Font License 1.1</a>. Not used by the current interface.</p>
         <p>Legacy bundled font: Sofia Sans Extra Condensed © 2019 The Sofia Sans Project Authors. <a href={`${import.meta.env.BASE_URL}new-design/SofiaSansExtraCondensed-OFL.txt`}>Sofia Sans Open Font License</a>. Not used by the current interface.</p>
-        <PhotoCredits />
       </section>
     </section>
   );
@@ -1660,7 +1658,7 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, pan
         <section className="design-empty-batches"><div className="design-empty-card bowed">
           <p>{batches.length === 0 ? "No batches yet." : query ? "No batches found." : "No batches match this status."}</p>
           <p>{query ? "Try another name or batch status." : "Start one from a fermentation profile when you are ready."}</p>
-          <div className="design-batch-photo bowed-media"><BatchImage source={`${import.meta.env.BASE_URL}new-design/grapefruit-spritz.webp`} description="Grapefruit spritz stand-in photograph" userPhoto={false} /></div>
+          <div className="design-batch-photo bowed-media"><BatchImage source={`${import.meta.env.BASE_URL}new-design/grapefruit-spritz.webp`} description="Grapefruit spritz photograph" userPhoto={false} /></div>
           {batches.length === 0 && profiles.length > 0 && <button className="primary-action card-action" onClick={() => onDialog({ kind: "start" })} type="button"><DesignIcon name="plus" /><span>Start your first batch</span></button>}
         </div></section>
       ) : (
@@ -1674,11 +1672,10 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, pan
       
 
       
-      <PhotoCredits />
       </>}
       </div>
       <aside aria-label="Selected batch" className="design-detail" ref={detailRef} tabIndex={-1}>
-        {openBatch ? <><div className="design-detail-top"><button aria-label={`Back to ${backLabel}`} className="utility-circle utility-circle-dark design-back" onClick={closeBatch} type="button"><DesignIcon name="back" /></button><h2>Batch details</h2><button aria-label="View batch dates" className="utility-circle utility-circle-dark" onClick={() => onDialog({ kind: "dates", batch: openBatch })} type="button"><NavIcon destination="calendar" /></button></div><BatchCard batch={openBatch} key={openBatch.id} beforeBatchReplace={beforeBatchReplace} visible={workspaceVisible} onChange={onChange} onUpdate={onUpdate} onComplete={onComplete} onObservationAdded={onObservationAdded} onDialog={onDialog} onDelete={onDelete} units={units} /></> : <div className="design-detail-empty"><DesignIcon name="jar" /><h2>Your batch details</h2><p>Choose a batch to see its progress and record an observation.</p></div>}
+        {openBatch ? <BatchCard batch={openBatch} key={openBatch.id} backLabel={backLabel} onBack={closeBatch} beforeBatchReplace={beforeBatchReplace} visible={workspaceVisible} onChange={onChange} onUpdate={onUpdate} onComplete={onComplete} onObservationAdded={onObservationAdded} onDialog={onDialog} onDelete={onDelete} units={units} /> : <div className="design-detail-empty"><DesignIcon name="jar" /><h2>Your batch details</h2><p>Choose a batch to see its progress and record an observation.</p></div>}
       </aside>
     </section>
   );
@@ -1777,6 +1774,8 @@ function CompactBatchCard({ batch, selected, onOpen }: { batch: Batch; selected:
 }
 
 interface BatchCardProps {
+  backLabel: string;
+  onBack(): void;
   beforeBatchReplace: BatchReplacementGuard;
   visible: boolean;
   onObservationAdded(): void;
@@ -1790,9 +1789,12 @@ interface BatchCardProps {
 }
 
 type LoggerKind = "note" | "ph" | "temperature" | "status" | "photo";
+type QuickLogKind = "note" | "ph" | "temperature" | "photo";
+type DetailTab = "today" | "journal" | "recipe";
+type JournalFilter = "all" | "readings" | "checks" | "notes";
 type EditableTimelineEntry = Extract<TimelineEntry, { kind: LoggerKind }>;
 
-function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onComplete, onObservationAdded, onDialog, onDelete, units }: BatchCardProps) {
+function BatchCard({ backLabel, onBack, beforeBatchReplace, batch, visible, onChange, onUpdate, onComplete, onObservationAdded, onDialog, onDelete, units }: BatchCardProps) {
   const [editing, setEditing] = useState<EditableTimelineEntry | null>(null);
   const [loggerKind, setLoggerKind] = useState<LoggerKind>("status");
   const [checkDrafts, setCheckDrafts] = useState<Record<string, string>>({});
@@ -1808,6 +1810,10 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
   const [managementOpen, setManagementOpen] = useState(false);
   const [toolErrors, setToolErrors] = useState<FieldErrors>({});
   const [toolFeedback, setToolFeedback] = useState("");
+  const [tab, setTab] = useState<DetailTab>("today");
+  const [journalFilter, setJournalFilter] = useState<JournalFilter>("all");
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
+  const pendingFocus = useRef<QuickLogKind | null>(null);
   const managementRef = useRef<HTMLElement>(null);
   const addCheckRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -1899,7 +1905,11 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
       if (dialog.open) dialog.close();
       dialog.showModal();
       dialog.scrollTop = 0;
-      closeRef.current?.focus({ preventScroll: true });
+      // A quick-log circle opens the logger on its own field; the plain Add observation lands on Close.
+      const quick = pendingFocus.current;
+      pendingFocus.current = null;
+      const field = quick ? formRef.current?.querySelector<HTMLInputElement | HTMLTextAreaElement>(quick === "note" ? "textarea" : quick === "photo" ? '[name="photo"]' : `[data-value="${quick}"]`) : null;
+      (field && !field.disabled ? field : closeRef.current)?.focus({ preventScroll: true });
     } else dialog.open = true; // inline: no show() autofocus or React open conflict
   }, [loggerModal]);
 
@@ -1910,6 +1920,20 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
     if (!dirty.current && !editing && !capturedPhoto) {
       setObservationMode(true);
       setLoggerKind("note");
+    }
+    modal.current = true;
+    setLoggerModal(true);
+  }
+
+  function quickLog(kind: QuickLogKind, event: React.MouseEvent<HTMLButtonElement>) {
+    returnFocus.current = event.currentTarget;
+    if (!dirty.current && !editing && !capturedPhoto) {
+      // A clean logger switches to the tapped field: note and temperature live on the basic observation form,
+      // pH and photo on the advanced one. A draft in progress is reopened as it is.
+      const basic = kind === "note" || kind === "temperature";
+      setObservationMode(basic);
+      setLoggerKind(basic ? "note" : kind);
+      pendingFocus.current = kind;
     }
     modal.current = true;
     setLoggerModal(true);
@@ -2207,17 +2231,120 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
         ? { kick: "To fridge · in storage", title: "Taste and check in", body: "Keep the batch cold and add the next observation when you taste it." }
         : { kick: "Batch in progress", title: nextCheck ? `Next ${nextCheck.name}` : "Keep the timeline current", body: nextCheck ? `Next check due ${nextCheck.nextDueDate}.` : "Record readings, notes, and status changes as the ferment develops." };
 
+  const totalDays = batch.finishDate ? Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000)) : undefined;
+  const ringLength = 2 * Math.PI * 33;
+  const ringOffset = totalDays ? ringLength * (1 - Math.min(1, day / totalDays)) : ringLength;
+  const optimalZone = batch.profileSnapshot.phZones.find(({ label }) => label === "optimal");
+  // The chart reads the last six pH entries on a 5.8–4.0 axis that widens only when a reading falls outside it.
+  const phSeries = batch.timeline.filter((entry): entry is Extract<TimelineEntry, { kind: "ph" }> => entry.kind === "ph").slice(-6);
+  const chart = (() => {
+    const width = 300, height = 104, pad = 8;
+    const values = phSeries.map(({ value }) => value);
+    const top = Math.max(5.8, ...values.map((value) => value + 0.2));
+    const bottom = Math.min(4.0, ...values.map((value) => value - 0.2));
+    const x = (index: number) => values.length === 1 ? width / 2 : pad + index * (width - 2 * pad) / (values.length - 1);
+    const y = (value: number) => pad + (top - value) / (top - bottom) * (height - 2 * pad);
+    return { width, height, x, y, safe: y(4.6), target: optimalZone ? y(optimalZone.max) : undefined, line: values.map((value, index) => `${index ? "L" : "M"}${x(index).toFixed(1)} ${y(value).toFixed(1)}`).join(" ") };
+  })();
+  const readyIn = batch.finishDate ? Math.round((Date.parse(`${batch.finishDate}T00:00:00Z`) - Date.parse(`${localDate()}T00:00:00Z`)) / 86_400_000) : undefined;
+  const journalBucket = (entry: TimelineEntry): Exclude<JournalFilter, "all"> => entry.kind === "ph" || entry.kind === "temperature" || entry.kind === "measurement" ? "readings" : entry.kind === "check" || entry.kind === "status" ? "checks" : "notes";
+  const tabs: DetailTab[] = ["today", "journal", "recipe"];
+  function moveTab(event: React.KeyboardEvent<HTMLDivElement>) {
+    const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+    if (!step) return;
+    event.preventDefault();
+    const next = tabs[(tabs.indexOf(tab) + step + tabs.length) % tabs.length];
+    setTab(next);
+    event.currentTarget.querySelector<HTMLButtonElement>(`[data-tab="${next}"]`)?.focus();
+  }
+  function toggleEntry(id: string) {
+    setExpanded((open) => { const next = new Set(open); if (!next.delete(id)) next.add(id); return next; });
+  }
+
   return (
     <article className="batch-workspace">
-      <div className="design-detail-card bowed">
-        <div className="design-detail-heading"><span className="design-check-symbol"><DesignIcon name="jar" /></span><div><h3>{batch.name}</h3><p>{batch.profileSnapshot.name} batch</p></div><button aria-label="Add observation" className="primary-action card-action design-record-observation" onClick={showLogger} ref={observationTrigger} type="button"><DesignIcon name="plus" /><span>Add observation</span></button></div>
-        <div className="design-detail-metrics"><span>Started {shortDate(batch.startDate)}</span><strong>Day {day}<small>{batch.finishDate ? ` / ${Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))}` : ""}</small></strong></div>
+      <div className="design-detail-top"><button aria-label={`Back to ${backLabel}`} className="utility-circle utility-circle-dark design-back" onClick={onBack} type="button"><DesignIcon name="back" /></button><h2 className="sr-only">Batch details</h2><button aria-label="View batch dates" className="utility-circle utility-circle-dark" onClick={() => onDialog({ kind: "dates", batch })} type="button"><NavIcon destination="calendar" /></button><button aria-controls="batch-management" aria-expanded={managementOpen} aria-label="More batch tools" className="utility-circle utility-circle-dark" onClick={() => setManagementOpen((open) => !open)} type="button"><DesignIcon name="more" /></button></div>
+      <header className="bd-head">
         <BatchPhoto batch={batch} detail />
-        <dl className="detail-readings" aria-label="Latest observed readings"><div className="small-card bowed"><dt className="small-card-tag"><DesignIcon name="drop" />pH</dt><dd className="small-card-value">{latestPh ? latestPh.value : "Not recorded"}</dd>{latestPh && <time className="small-card-chip glass" dateTime={latestPh.date}>{shortDate(latestPh.date)}</time>}</div><div className="small-card bowed small-card-blue"><dt className="small-card-tag"><DesignIcon name="temp" />Temperature</dt><dd className="small-card-value">{latestTemperature ? `${displayTemperature(latestTemperature.value, units)} ${temperatureUnit}` : "Not recorded"}</dd>{latestTemperature && <time className="small-card-chip glass" dateTime={latestTemperature.date}>{shortDate(latestTemperature.date)}</time>}</div></dl>
-        {batch.status === "active" && nextCheck && <section className="summary-row design-detail-next bowed" aria-label="Next batch check"><div><p>{dueCheck ? "Check due" : "Next check"}</p><strong>{dueCheck?.name ?? nextCheck.name}</strong><p>{dueCheck?.overdue ? "Overdue · " : "Due · "}{shortDate((dueCheck ?? nextCheck).nextDueDate)}</p></div>{dueCheck && <button aria-label={`Complete check: ${dueCheck.name} for this batch`} className="summary-row-count glass" onClick={(event) => { if (document.activeElement === event.currentTarget && dueBatchChecks(batch, localDate()).length === 1) observationTrigger.current?.focus({ preventScroll: true }); onComplete(batch.id, dueCheck.id); }} type="button"><DesignIcon name="check" /><span>Complete check</span></button>}</section>}
-        {(!nextCheck || batch.status !== "active") && <p className="detail-check-state">{batch.status !== "active" ? "Recurring checks paused while this batch is not active." : "No recurring checks scheduled."}</p>}
+        <div className="bd-id"><h3>{batch.name}</h3><p>{batch.profileSnapshot.name}{batch.status !== "active" ? ` · ${statusLabel(batch.status)}` : ""}</p></div>
+        <div className="bd-ring"><svg aria-hidden="true" viewBox="0 0 78 78"><circle cx="39" cy="39" r="33" fill="none" stroke="var(--colour-line)" strokeWidth="7" /><circle cx="39" cy="39" r="33" fill="none" stroke="var(--colour-action)" strokeWidth="7" strokeLinecap="round" strokeDasharray={ringLength} strokeDashoffset={ringOffset} /></svg><p aria-hidden="true"><b>{totalDays ? `${day}/${totalDays}` : day}</b><small>{totalDays ? "days" : "day"}</small></p><span className="sr-only">{totalDays ? `Day ${day} of ${totalDays}` : `Day ${day}`}</span></div>
+      </header>
+      <div className="bd-panes" data-tab={tab}>
+        <div aria-label="Batch sections" className="bd-seg glass" onKeyDown={moveTab} role="tablist">
+          {tabs.map((name) => <button aria-controls={`bd-pane-${name}`} aria-selected={tab === name} data-tab={name} id={`bd-tab-${name}`} key={name} onClick={() => setTab(name)} role="tab" tabIndex={tab === name || (tab === "today" && name === "journal") ? 0 : -1} type="button">{name[0].toUpperCase() + name.slice(1)}</button>)}
+        </div>
+        <section aria-labelledby="bd-tab-today" className="bd-pane" data-pane="today" id="bd-pane-today" role="tabpanel">
+          {batch.status === "active" && nextCheck ? <section className="bd-due bowed" aria-label="Next batch check">
+            <p className="bd-kick">{dueCheck?.overdue && <span className="bd-dot" />}{dueCheck ? dueCheck.overdue ? `Overdue since ${shortDate(dueCheck.nextDueDate)}` : "Due today" : `Next · ${shortDate(nextCheck.nextDueDate)}`}</p>
+            <h4>{dueCheck?.name ?? nextCheck.name}</h4>
+            {dueCheck && <button aria-label={`Complete check: ${dueCheck.name} for this batch`} className="bd-done" onClick={(event) => { if (document.activeElement === event.currentTarget && dueBatchChecks(batch, localDate()).length === 1) observationTrigger.current?.focus({ preventScroll: true }); onComplete(batch.id, dueCheck.id); }} type="button"><DesignIcon name="check" /><span>Mark done</span></button>}
+          </section> : <p className="detail-check-state">{batch.status !== "active" ? "Recurring checks paused while this batch is not active." : "No recurring checks scheduled."}</p>}
+          <div aria-label="Latest observed readings" className="bd-readings" role="group">
+            <div className="bd-ph bowed">
+              <div className="bd-card-row"><p className="bd-kick"><DesignIcon name="ph" />pH</p>{latestPh && <span className="bd-chip"><span>{phZoneLabel(batch, latestPh.value) ?? "outside zone"}</span>{optimalZone ? ` · target ≤${optimalZone.max}` : ""}</span>}</div>
+              <strong className="bd-figure">{latestPh ? latestPh.value : "—"}</strong>
+              {phSeries.length > 0 ? <div className="bd-chart">
+                <svg aria-hidden="true" viewBox={`0 0 ${chart.width} ${chart.height}`}>
+                  <rect x="0" y={chart.safe} width={chart.width} height={Math.max(0, chart.height - chart.safe)} rx="10" fill="var(--colour-safe-zone)" />
+                  {chart.target !== undefined && <line x1="0" x2={chart.width} y1={chart.target} y2={chart.target} stroke="var(--colour-chart-guide)" strokeDasharray="4 5" />}
+                  <path d={chart.line} fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+                  {phSeries.map((entry, index) => { const last = index === phSeries.length - 1; return <circle cx={chart.x(index)} cy={chart.y(entry.value)} fill={!last && entry.value >= 4.6 ? "var(--colour-figure)" : "currentColor"} key={entry.id} r={last ? 7 : 4.5} stroke="var(--colour-background)" strokeWidth={last ? 3 : 2} />; })}
+                </svg>
+                <span aria-hidden="true" className="bd-safe" style={{ top: `${(chart.safe / chart.height) * 100}%` }}>safe</span>
+                <p className="bd-axis">{phSeries.map((entry, index) => index === phSeries.length - 1 ? <time dateTime={entry.date} key={entry.id}>{shortDate(entry.date)}</time> : <span key={entry.id}>{shortDate(entry.date).split(" ")[0]}</span>)}</p>
+              </div> : <p className="bd-empty">No pH readings yet</p>}
+            </div>
+            <div className="bd-duo">
+              <div className="bd-mini bd-temp bowed"><p className="bd-kick"><DesignIcon name="temp" />Temp</p><strong>{latestTemperature ? `${displayTemperature(latestTemperature.value, units)} ${temperatureUnit}` : "—"}</strong>{latestTemperature ? <time dateTime={latestTemperature.date}>{shortDate(latestTemperature.date)}</time> : <small>not recorded</small>}</div>
+              <div className="bd-mini bd-ready bowed"><p className="bd-kick"><DesignIcon name="cal" />Ready</p><strong>{batch.finishDate ? shortDate(batch.finishDate) : "—"}</strong><small>{readyIn === undefined ? "no finish date" : readyIn === 0 ? "today" : readyIn === 1 ? "tomorrow" : readyIn > 1 ? `in ${readyIn} days` : `${-readyIn} days ago`}</small></div>
+            </div>
+          </div>
+          <p className="bd-label">Log something</p>
+          <div className="bd-quick">
+            {([["note", "Note", "note", "Log a note"], ["ph", "pH", "ph", "Log pH"], ["temperature", "Temp", "temp", "Log temperature"], ["photo", "Photo", "photo", "Log photo"]] as const).map(([kind, label, icon, name]) => <div className="bd-quick-item" key={kind}><button aria-label={name} className="utility-circle utility-circle-dark" onClick={(event) => quickLog(kind, event)} type="button"><DesignIcon name={icon} /></button><span aria-hidden="true">{label}</span></div>)}
+          </div>
+          <div className="design-detail-heading"><button aria-label="Add observation" className="primary-action card-action design-record-observation" onClick={showLogger} ref={observationTrigger} type="button"><DesignIcon name="plus" /><span>Add observation</span></button></div>
+        </section>
+        <section aria-labelledby="bd-tab-journal" className="bd-pane" data-pane="journal" id="bd-pane-journal" role="tabpanel">
+          <section className="bd-journal" aria-label={`${batch.name} timeline`}>
+            <h3 className="sr-only">Batch timeline <span>{batch.timeline.length} entries</span></h3>
+            <div aria-label="Filter timeline" className="bd-filters" role="group">
+              {([["all", "All", "Show all entries"], ["readings", "Readings", "Show readings"], ["checks", "Checks", "Show checks"], ["notes", "Notes & photos", "Show notes and photos"]] as const).map(([filter, label, name]) => <button aria-label={name} aria-pressed={journalFilter === filter} key={filter} onClick={() => setJournalFilter(filter)} type="button">{label}</button>)}
+            </div>
+            <div className="timeline" data-filter={journalFilter}>
+              {batch.timeline.length === 0 && <p className="bd-empty">No activity recorded yet.</p>}
+              {[...batch.timeline].reverse().map((entry) => {
+                const open = expanded.has(entry.id);
+                const reading = timelineReading(entry, units);
+                const text = timelineEntryText(entry, units);
+                return <div className={`timeline-entry timeline-${entry.kind}`} data-k={journalBucket(entry)} key={entry.id}>
+                  <span className={`bd-kind bd-kind-${entry.kind}`}><DesignIcon name={entry.kind === "ph" ? "ph" : entry.kind === "temperature" || entry.kind === "measurement" ? "temp" : entry.kind === "note" ? "note" : entry.kind === "photo" ? "photo" : "check"} /></span>
+                  <div className="timeline-content">
+                    <strong className="sr-only">{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong>
+                    <button aria-expanded={open} className="timeline-description" onClick={() => toggleEntry(entry.id)} type="button">{reading ? <><span className="sr-only">{text}</span><span aria-hidden="true">{entry.kind === "ph" ? `pH ${reading}` : reading}</span></> : text}{entry.kind === "ph" && entry.value >= 4.6 && <em>above 4.6</em>}{entry.kind === "ph" && phWarning(entry.value) && <em className="sr-only">{phWarning(entry.value)}</em>}</button>
+                    {entry.kind === "photo" && <span className="timeline-photo-frame user-photo bowed"><BatchImage key={entry.dataUrl} source={entry.dataUrl} description={entry.caption || entry.name} userPhoto retryable /></span>}
+                    <div className="timeline-entry-actions" hidden={!managementOpen && !open}>
+                      {entry.kind !== "check" && entry.kind !== "measurement" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} className="glass" onClick={() => editEntry(entry)} type="button">Edit</button>}
+                      <button aria-label={`Delete ${entry.kind} from ${entry.date}`} className="glass" onClick={() => { if (editing?.id === entry.id && !discardDraft()) return; onChange(deleteTimelineEntry(batch, entry.id, Date.now())); }} type="button">Delete</button>
+                    </div>
+                  </div>
+                  <time dateTime={entry.date}>{shortDate(entry.date)}</time>
+                </div>;
+              })}
+            </div>
+            {batch.timelineTrash.length > 0 && <div className="timeline-trash bowed" hidden={!managementOpen}><strong>Recently deleted activity</strong>{batch.timelineTrash.map((entry) => <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">Restore {entry.kind} from {entry.date}</button>)}</div>}
+          </section>
+        </section>
+        <section aria-labelledby="bd-tab-recipe" className="bd-pane" data-pane="recipe" id="bd-pane-recipe" role="tabpanel">
+          <section className="design-input-summary bowed" aria-label="Recipe">
+            <div className="design-section-head"><h4>Inputs</h4><button className="design-quiet" onClick={() => onDialog({ kind: "inputs", batch })} type="button">See all</button></div>
+            <div className="design-ingredients">{batch.profileSnapshot.inputs.map((input) => <span key={input.name}>{input.name}</span>)}{batch.profileSnapshot.inputs.length === 0 && <p>No profile inputs.</p>}</div>
+            <h4>Guidance</h4>
+            {batch.profileSnapshot.guidance.length > 0 ? <ol className="bd-steps">{batch.profileSnapshot.guidance.map((guidance, index) => <li key={`${guidance}-${index}`}><RichProfileText value={guidance} /></li>)}</ol> : <p>No active guidance in this profile snapshot.</p>}
+            <button className="bd-link" onClick={() => onDialog({ kind: "profile", profile: batch.profileSnapshot })} type="button">Open {batch.profileSnapshot.name} profile<DesignIcon name="arrow" /></button><p className="snapshot-line sr-only"><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
+          </section>
+        </section>
       </div>
-      <section className="design-input-summary bowed"><div className="design-section-head"><h3>Profile inputs</h3><button className="design-quiet" onClick={() => onDialog({ kind: "inputs", batch })} type="button">See all</button></div><div className="design-ingredients">{batch.profileSnapshot.inputs.map((input) => <span key={input.name}>{input.name}</span>)}{batch.profileSnapshot.inputs.length === 0 && <p>No profile inputs.</p>}</div></section>
       <div className="workbench">
         <div className="wb-rail">
       <section className="batch-management" hidden={!managementOpen} id="batch-management" aria-label="Batch management tools" ref={managementRef} onInvalid={(event) => captureFieldError(event, (id, message) => setToolErrors((previous) => ({ ...previous, [id]: message })))} onInput={(event) => { const id = (event.target as HTMLInputElement).id; setToolErrors((previous) => ({ ...previous, [id]: "" })); setToolFeedback(""); }}>
@@ -2366,14 +2493,6 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
         </section>
         <section className="batch-tools-danger bowed" aria-label="Batch deletion"><div><h4>Delete this batch</h4><p>Move it to Recently deleted in Settings. You can restore it for seven days.</p></div><button onClick={() => { if (window.confirm(`Move ${batch.name} to Recently deleted? It can be restored for seven days.`)) onDelete(batch.id); }} type="button">Delete batch</button></section>
       </section>
-
-          <section className="wb-panel batch-guidance bowed" aria-labelledby="guidance-heading">
-            <div className="design-guidance-title"><h4 id="guidance-heading"><span><DesignIcon name="leaf" /></span>Profile guidance</h4><DesignIcon name="sparkles" /></div>
-            {batch.profileSnapshot.guidance.map((guidance, index) => <div className="guide-step" key={`${guidance}-${index}`}><p><RichProfileText value={guidance} /></p></div>)}
-            {batch.profileSnapshot.guidance.length === 0 && <p className="muted-copy">No active guidance in this profile snapshot.</p>}
-            <button className="design-snapshot" onClick={() => onDialog({ kind: "profile", profile: batch.profileSnapshot })} type="button">See fermentation profile</button><p className="snapshot-line sr-only"><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
-          </section>
-
         </div>
 
         <div className="wb-main">
@@ -2412,30 +2531,9 @@ function BatchCard({ beforeBatchReplace, batch, visible, onChange, onUpdate, onC
             </dialog>
             </div>
           </section>
-
-          <section className="wb-panel design-timeline-panel" aria-label={`${batch.name} timeline`}>
-            <div className="timeline-panel-heading"><h3>Batch timeline <span className="sr-only">{batch.timeline.length} entries</span></h3><div className="timeline-panel-actions"><button aria-controls="batch-management" aria-expanded={managementOpen} aria-label="More batch tools" className="design-quiet" onClick={() => setManagementOpen((open) => !open)} type="button">Tools</button><button aria-label="Record timeline observation" className="design-quiet" onClick={showLogger} type="button">Add observation</button></div></div>
-            <section className="timeline">
-              {batch.timeline.length === 0 && <p>No activity recorded yet.</p>}
-              {[...batch.timeline].reverse().map((entry) => (
-                <div className={`timeline-entry small-card bowed timeline-${entry.kind}${entry.kind === "ph" || entry.kind === "temperature" || entry.kind === "measurement" ? " small-card-blue" : ""}`} key={entry.id}>
-                  <span className="timeline-content"><strong className="small-card-tag">{entry.kind === "ph" ? "pH reading" : entry.kind === "check" ? "Check completed" : entry.kind === "status" ? "Status change" : entry.kind[0].toUpperCase() + entry.kind.slice(1)}</strong><span className="timeline-description">{timelineReading(entry, units) ? <><span className="sr-only">{timelineEntryText(entry, units)}</span><span aria-hidden="true" className="small-card-value">{timelineReading(entry, units)}</span></> : timelineEntryText(entry, units)}{entry.kind === "ph" && phZoneLabel(batch, entry.value) && <span className="zone">{phZoneLabel(batch, entry.value)}</span>}{entry.kind === "ph" && phWarning(entry.value) && <span className="warning">{phWarning(entry.value)}</span>}{entry.kind === "photo" && <span className="timeline-photo-frame user-photo bowed"><BatchImage key={entry.dataUrl} source={entry.dataUrl} description={entry.caption || entry.name} userPhoto retryable /></span>}</span></span>
-                  <time className="small-card-chip glass" dateTime={entry.date}>{shortDate(entry.date)}</time>
-                  <div className="timeline-entry-actions" hidden={!managementOpen}>
-                    {entry.kind !== "check" && entry.kind !== "measurement" && <button aria-label={`Edit ${entry.kind === "ph" ? "pH" : entry.kind} from ${entry.date}`} className="glass" onClick={() => editEntry(entry)} type="button">Edit</button>}
-                    <button aria-label={`Delete ${entry.kind} from ${entry.date}`} className="glass" onClick={() => { if (editing?.id === entry.id && !discardDraft()) return; onChange(deleteTimelineEntry(batch, entry.id, Date.now())); }} type="button">Delete</button>
-                  </div>
-                </div>
-              ))}
-              {batch.timelineTrash.length > 0 && <div className="timeline-trash bowed" hidden={!managementOpen}><strong>Recently deleted activity</strong>{batch.timelineTrash.map((entry) => <button key={entry.id} onClick={() => onChange(restoreTimelineEntry(batch, entry.id, Date.now()))} type="button">Restore {entry.kind} from {entry.date}</button>)}</div>}
-            </section>
-          </section>
-
         </div>
 
       </div>
-      <div className="design-detail-footer"><DesignIcon name="leaf" />Your observations, kept in one place.</div>
-      <div className="detail-photo-credits"><PhotoCredits /></div>
     </article>
   );
 }
@@ -2870,8 +2968,6 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
           );
         })}
       </div>}
-
-      {!editing && <PhotoCredits />}
 
       {message && <div className="profile-editor-toast" role="status">{message}</div>}
 

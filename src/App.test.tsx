@@ -394,7 +394,7 @@ describe("batch workflow", () => {
     } finally { read.mockRestore(); }
   });
 
-  it("retries detail and timeline photographs without replacing original bytes with stand-ins", () => {
+  it("retries detail and timeline photographs without replacing original bytes", () => {
     const today = localDateForTest();
     const batch = createBatch(createProfileState().profiles[0], { id: "jar", startDate: today });
     batch.timeline.push({ id: "photo", kind: "photo", date: today, name: "jar.jpg", caption: "My jar", mimeType: "image/jpeg", dataUrl: "data:image/jpeg;base64,cGhvdG8=" });
@@ -406,7 +406,6 @@ describe("batch workflow", () => {
     expect(retries).toHaveLength(2);
     for (const retry of retries) fireEvent.click(retry);
     expect(detail.getAllByRole("img").map((image) => image.getAttribute("src"))).toEqual([batch.timeline[0].kind === "photo" ? batch.timeline[0].dataUrl : "", "data:image/jpeg;base64,cGhvdG8="]);
-    expect(detail.queryByRole("img", { name: /stand-in/ })).toBeNull();
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toEqual(batch.timeline);
   });
 
@@ -450,7 +449,7 @@ describe("batch workflow", () => {
     const photo = card.getByRole("img", { name: "Batch photograph: My jar" });
     fireEvent.error(photo);
     expect(card.getByRole("img", { name: "Batch photograph unavailable; original retained" })).toBeTruthy();
-    expect(card.queryByRole("img", { name: /stand-in/ })).toBeNull();
+    expect(card.queryByRole("img", { name: / photograph$/ })).toBeNull();
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline[0].dataUrl).toBe("data:image/jpeg;base64,cGhvdG8=");
   });
 
@@ -574,7 +573,7 @@ describe("batch workflow", () => {
     const summary = detail.getByRole("button", { name: "More batch tools" });
     expect(summary.tagName).toBe("BUTTON"); // native keyboard activation, no custom key handling
     expect(summary.getAttribute("aria-expanded")).toBe("false");
-    expect(summary.closest(".timeline-panel-heading")).toBeTruthy();
+    expect(summary.closest(".design-detail-top")).toBeTruthy();
     expect(summary.getAttribute("aria-controls")).toBe("batch-management");
     for (const name of ["Take photo", "Delete batch", `Edit note from ${today}`, "Log activity"]) {
       expect(detail.queryByRole("button", { name })).toBeNull();
@@ -1092,7 +1091,7 @@ describe("batch workflow", () => {
     expect(dialog.textContent).not.toContain("Tea 3 L");
     expect(dialog.textContent).toContain("Snapshot guidance.");
     expect(fireEvent(dialog, new Event("cancel", { cancelable: true }))).toBe(false);
-    fireEvent.click(screen.getByRole("button", { name: "See fermentation profile" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Open .+ profile$/ }));
     dialog = screen.getByRole("dialog", { name: profile.name });
     expect(dialog.textContent).toContain("Snapshot guidance.");
     expect(dialog.textContent).toContain("7 days");
@@ -1516,6 +1515,17 @@ describe("batch workflow", () => {
     expect(cleanUnload.defaultPrevented).toBe(false);
   });
 
+  it("switches the start profile when the select fires input before change, as browsers do", () => {
+    const state = createProfileState();
+    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    const select = screen.getByLabelText("Fermentation profile") as HTMLSelectElement;
+    fireEvent.input(select, { target: { value: state.profiles[1].id } });
+    fireEvent.change(select);
+    expect(select.value).toBe(state.profiles[1].id);
+  });
+
   it("retains start inputs when switching profiles and discards them only after confirmation", () => {
     const state = createProfileState();
     state.profiles[0].inputs = [{ name: "water", unit: "l", defaultValue: 2 }];
@@ -1559,27 +1569,26 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "My batches" }));
     const detail = within(screen.getByRole("complementary", { name: "Selected batch" }));
     expect(detail.getByText("Original observation")).toBeTruthy();
-    fireEvent.click(detail.getByRole("button", { name: "See fermentation profile" }));
+    fireEvent.click(detail.getByRole("button", { name: "Open Kombucha F1 profile" }));
     const overview = within(screen.getByRole("dialog", { name: "Kombucha F1" }));
     expect(overview.getByText("Original method.")).toBeTruthy();
     expect(overview.getByText("Taste · every 2 days")).toBeTruthy();
     expect(overview.getByText("water 2 L")).toBeTruthy();
   });
 
-  it("labels profile stand-ins and offers a recoverable jar fallback without inventing profile facts", () => {
+  it("shows profile photographs and offers a recoverable jar fallback without inventing profile facts", () => {
     const state = createProfileState();
     state.profiles = [state.profiles[0], { ...state.profiles[0], id: "custom", name: "House culture" }];
     localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     const card = screen.getByRole("button", { name: "View Kombucha F1 guidance" }).closest("article")!;
-    expect(within(card).getByText("Stand-in")).toBeTruthy();
     expect(within(card).getByText("Duration not set")).toBeTruthy();
     expect(within(card).getByText("Temperature not set")).toBeTruthy();
-    fireEvent.error(within(card).getByAltText("Kombucha F1 stand-in photograph"));
-    expect(within(card).getByRole("img", { name: "Stand-in photograph unavailable" })).toBeTruthy();
+    fireEvent.error(within(card).getByAltText("Kombucha F1 photograph"));
+    expect(within(card).getByRole("img", { name: "Photograph unavailable" })).toBeTruthy();
     fireEvent.click(within(card).getByRole("button", { name: "Retry photograph" }));
-    expect(within(card).getByAltText("Kombucha F1 stand-in photograph")).toBeTruthy();
+    expect(within(card).getByAltText("Kombucha F1 photograph")).toBeTruthy();
     const custom = screen.getByRole("button", { name: "View House culture guidance" }).closest("article")!;
     expect(within(custom).queryByRole("img")).toBeNull();
     expect(custom.textContent).not.toMatch(/Day \d|Finish |Ready|°C/);
@@ -2575,12 +2584,13 @@ describe("batch workflow", () => {
     expect(stored.batches[1].timeline).toEqual([]);
   });
 
-  it("makes the bundled font and stand-in photograph credits reachable in Settings", () => {
+  it("makes the bundled font licenses reachable in Settings without stand-in photograph credits", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
-    expect(screen.getByRole("link", { name: "SIL Open Font License 1.1" }).getAttribute("href")).toContain("new-design/OFL.txt");
-    fireEvent.click(within(screen.getByRole("region", { name: "Settings" })).getByText("Stand-in photographs"));
-    expect(screen.getAllByText(/Kimchi, sauerkraut, sourdough and milk kefir/).length).toBeGreaterThan(0);
+    const settings = within(screen.getByRole("region", { name: "Settings" }));
+    expect(settings.getByRole("link", { name: "SIL Open Font License 1.1" }).getAttribute("href")).toContain("new-design/OFL.txt");
+    expect(settings.queryByText("Stand-in photographs")).toBeNull();
+    expect(settings.queryByText(/Kimchi, sauerkraut, sourdough and milk kefir/)).toBeNull();
   });
 
   it("starts a batch from other destinations through the same creation form", () => {
