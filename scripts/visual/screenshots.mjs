@@ -25,8 +25,9 @@ const viewports = [
 ];
 
 const detailBatch = "Napa cabbage kimchi";
+// A batch card opens only by a rightward swipe (a tap does nothing), so the flow drags its "Swipe for more" pill.
 const openDetail = [
-  { tap: `.design-batch-card[aria-label="Open ${detailBatch}"]` },
+  { swipe: `.design-batch-swipe[aria-label="Open ${detailBatch}"]` },
   { waitFor: ".design-detail .batch-workspace" },
 ];
 
@@ -579,6 +580,34 @@ async function tap(cdp, sessionId, viewport, selector) {
   }
 }
 
+async function swipe(cdp, sessionId, viewport, selector) {
+  // Press on the element, drag right in small steps (touch on mobile viewports, mouse otherwise), then release.
+  let point = await evaluate(cdp, sessionId, call(locate, selector), `locate ${selector}`);
+  if (point.error) {
+    await evaluate(cdp, sessionId, call(reveal, selector, "center"), `reveal ${selector}`);
+    point = await evaluate(cdp, sessionId, call(locate, selector), `locate ${selector}`);
+  }
+  if (point.error) throw new Error(point.error);
+  const end = Math.min(point.x + 240, viewport.width - 4);
+  const xs = Array.from({ length: 12 }, (_, index) => Math.round(point.x + (end - point.x) * (index + 1) / 12));
+  if (viewport.mobile) {
+    const at = (x) => [{ x, y: point.y, radiusX: 4, radiusY: 4, force: 1, id: 1 }];
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: at(point.x) }, sessionId);
+    for (const x of xs) await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: at(x) }, sessionId);
+    // Hold the finger still before lifting it: a lift at full speed starts a fling, and Chrome spends the flow's next
+    // tap stopping that fling instead of clicking. A person's thumb also comes to rest at the pill's end.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: at(end) }, sessionId);
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }, sessionId);
+  } else {
+    await cdp.send("Input.dispatchMouseEvent", { type: "mouseMoved", x: point.x, y: point.y }, sessionId);
+    await cdp.send("Input.dispatchMouseEvent", { type: "mousePressed", x: point.x, y: point.y, button: "left", buttons: 1, clickCount: 1 }, sessionId);
+    for (const x of xs) await cdp.send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y: point.y, button: "left", buttons: 1 }, sessionId);
+    await cdp.send("Input.dispatchMouseEvent", { type: "mouseReleased", x: end, y: point.y, button: "left", buttons: 0, clickCount: 1 }, sessionId);
+    await cdp.send("Input.dispatchMouseEvent", { type: "mouseMoved", x: viewport.width - 1, y: viewport.height - 1 }, sessionId);
+  }
+}
+
 function describeConsoleArgs(values = []) {
   return values.map((value) => value.value ?? value.description ?? value.unserializableValue ?? value.type).join(" ");
 }
@@ -639,6 +668,7 @@ async function capture(browser, base, surface, viewport, full = captureFull) {
         // An optional tap is skipped when nothing visible matches (a control that exists only at some widths).
         if (step.tap && step.optional) await tap(cdp, sessionId, viewport, step.tap).catch(() => undefined);
         else if (step.tap) await tap(cdp, sessionId, viewport, step.tap);
+        if (step.swipe) await swipe(cdp, sessionId, viewport, step.swipe);
         if (step.waitForStill && !await evaluate(cdp, sessionId, call(waitForStill, step.waitForStill, 10_000), `wait for ${step.waitForStill} to settle`)) {
           throw new Error(`${step.waitForStill} did not settle`);
         }

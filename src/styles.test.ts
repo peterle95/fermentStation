@@ -144,14 +144,14 @@ describe("Swipe-derived design contract", () => {
   });
 
   it("renews card anatomy and presents real statuses instead of a decorative progress gauge", () => {
-    expect(rule(".design-batch-card")).toContain("grid-template-columns:");
+    expect(rule(".design-batch-card")).toContain("aspect-ratio: var(--batch-shape)");
     const selected = rule(".design-batch-card.selected");
     // Selected keeps its pastel fill and image (user 2026-11-20); only the lime outline marks it.
     for (const declaration of ["--stroke: var(--colour-action)", "--stroke-w: var(--bowed-stroke)"]) expect(selected).toContain(declaration);
     expect(selected).not.toContain("--fill");
     expect(rule(".design-batch-photo img")).toContain("object-fit: contain");
     expect(app).toContain('className="design-batch-profile"');
-    expect(app).toContain('className="design-batch-next"');
+    expect(app).toContain('className="design-batch-progress" role="progressbar"');
     expect(app).not.toContain('strokeDasharray={`${batches.length ? 76');
     expect(app).toContain('<span className="summary-row-count glass">{dueChecks.length}</span>{" "}<span className="summary-row-label">checks due</span>');
     expect(app.replaceAll("©", "")).not.toMatch(/\p{Extended_Pictographic}/u);
@@ -990,7 +990,8 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
   const tokens = () => rootTokens();
   const percent = (token: string) => Number(tokens().get(token)!.match(/^(\d+(?:\.\d+)?)%$/)![1]);
   const ratio = (token: string) => { const [a, b] = tokens().get(token)!.split("/").map(Number); return a / b; };
-  const anatomy = /\.(?:design-batch-(?:card|copy|chips|pill|bottom|go|photo|next|meta)|design-empty-(?:batches|card)|card-action)\b/;
+  const anatomy = /\.(?:design-batch-(?:card|copy|chip|pill|bottom|go|photo|profile|progress|label|track|clip|swipe|words|circle)|design-empty-(?:batches|card)|card-action)\b/;
+  const px = (token: string) => Number(tokens().get(token)!.match(/^(-?\d+(?:\.\d+)?)px$/)![1]);
   const component = (name: string) => { const start = app.indexOf(`function ${name}`); return app.slice(start, start + app.slice(start).search(/\r?\n\}\r?\n/)); };
 
   it("carries the measured drink-card geometry in :root tokens, as fractions of the card's width", () => {
@@ -1027,22 +1028,30 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
         for (const literal of literals) expect(["100%", "50%", "-50%"], `${entry.selector} { ${property}: ${value} }`).toContain(literal);
       }
     }
+    // Pillow card (user 2026-11-24): a 1 / 1.12 bowed pillow with a tint-to-white fill; the copy runs top to bottom and
+    // the progress block sits above the swipe pill, which starts off the card's left edge and is clipped by the outline.
     const card = rule(".design-batch-card");
-    for (const declaration of [
-      "aspect-ratio: var(--batch-card-ratio)", "min-height: auto", "width: 100%",
-      "padding: var(--batch-card-inset-y) 0 var(--batch-pill-foot)",
-    ]) expect(card).toContain(declaration);
-    expect(tokens().get("--batch-pill-foot")).toBe("calc(var(--batch-pill-inset-bottom) + var(--batch-pill-reserve) + var(--space-3))");
-    expect(rule(".design-batch-copy > :not(.sr-only)")).toContain("margin-inline: var(--batch-card-inset-x)");
-    expect(rule(".design-batch-copy > .design-batch-chips")).toContain("margin-inline-start: var(--batch-chip-inset-x)");
-    expect(rule(":is(.design-batch-card, .design-detail-photo) .status")).toContain("min-height: var(--batch-chip-height)");
-    expect(app).toContain('<span className={`status status-${batch.status} glass`}>');
-    expect(rule(".design-batch-next")).toContain("border-radius: var(--radius-control)");
-    // Ticket 12: the chip row stays one line at every card width, so narrow cards keep the card ratio. The status chip
-    // keeps its size; the next-check chip shortens with an ellipsis (the card's sr-only line still reads the full next step).
-    expect(rule(".design-batch-chips")).not.toContain("flex-wrap: wrap");
-    expect(rule(":is(.design-batch-card, .design-detail-photo) .status")).toContain("flex: none");
-    for (const declaration of ["min-width: 0", "overflow: hidden", "text-overflow: ellipsis", "white-space: nowrap"]) expect(rule(".design-batch-next")).toContain(declaration);
+    for (const declaration of ["aspect-ratio: var(--batch-shape)", "min-height: auto", "width: 100%", "--bow: var(--batch-bow)", "touch-action: pan-y"]) expect(card).toContain(declaration);
+    expect(tokens().get("--batch-shape")).toBe("1 / 1.12");
+    expect(tokens().get("--batch-bow")).toBe("6px");
+    expect(rule(".design-batch-copy")).toContain("padding: var(--batch-inset-top) var(--batch-inset-x) 0");
+    const progress = rule(".design-batch-progress");
+    for (const declaration of ["width: var(--batch-progress-width)", "margin-top: auto", "margin-bottom: var(--batch-progress-foot)"]) expect(progress).toContain(declaration);
+    expect(tokens().get("--batch-progress-foot")).toBe("116px");
+    const swipe = rule(".design-batch-swipe");
+    for (const declaration of ["position: absolute", "left: var(--batch-swipe-left)", "bottom: var(--batch-swipe-bottom)", "height: var(--batch-swipe-height)", "border-radius: var(--radius-control)", "touch-action: pan-y"]) expect(swipe).toContain(declaration);
+    for (const [token, value] of [["--batch-swipe-left", "-34px"], ["--batch-swipe-bottom", "22px"], ["--batch-swipe-height", "72px"], ["--batch-circle", "56px"]]) expect(tokens().get(token), token).toBe(value);
+    // The circle rests at the pill's left end, fully inside the card's edge: only the pill's glass runs off it.
+    const swipePadding = tokens().get("--batch-swipe-padding")!.match(/^0 (\d+)px 0 (\d+)px$/)!;
+    expect(Number(swipePadding[2]) + px("--batch-swipe-left")).toBeGreaterThan(0);
+    expect(rule(".design-batch-circle")).toContain("z-index: 1");
+    // The pill's foot (22 + 72) stays below the progress block's foot, so the pill never covers the bar.
+    expect(px("--batch-swipe-bottom") + px("--batch-swipe-height")).toBeLessThan(px("--batch-progress-foot"));
+    expect(rule(".design-batch-card > .design-batch-clip")).toContain("pointer-events: none");
+    expect(rule(".design-batch-words")).toContain("opacity: calc(1 - var(--swipe-progress, 0))");
+    expect(rule(".design-batch-circle")).toContain("translate: var(--swipe-x, 0) 0");
+    // The detail photo keeps the status chip; the card does not.
+    expect(rule(".design-detail-photo .status")).toContain("min-height: var(--batch-chip-height)");
     const pill = rule(".design-batch-pill");
     for (const declaration of [
       "position: absolute", "left: var(--batch-pill-inset-x)", "bottom: 0", "margin-bottom: var(--batch-pill-inset-bottom)", "width: var(--batch-pill-width)",
@@ -1082,13 +1091,27 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
     expect(membership.get(".design-batch-pill")).toBe("fill");
     expect(membership.get(".design-batch-go")).toBe("ground");
     expect(membership.get(".design-empty-card")).toBe("fill");
+    expect(membership.get(".design-batch-circle")).toBe("ground");
+    expect(roleOf(".design-batch-words strong")).toBe("subheading");
+    expect(roleOf(".design-batch-words > span")).toBe("row");
     // The glass chip's contrast over the selected card's black is covered by the glass primitive's tests.
   });
 
-  it("builds the card from title pair, meta, chips, pill and photo, and keeps it one button", () => {
+  it("builds the card from title pair, progress, photo and swipe pill (no chips), and keeps the pill its one button", () => {
     const card = component("CompactBatchCard");
     expect(card.match(/<button\b/g)).toHaveLength(1);
-    const order = ["<h3>", 'className="design-batch-profile"', "<BatchMeta", 'className="design-batch-chips"', "className={`status", 'className="design-batch-next"', 'className="design-batch-pill"', 'className="design-batch-go" aria-hidden="true"', "<BatchPhoto"];
+    // The card is an article, not a button, and has no click handler: only a swipe (or the pill's keyboard activation) opens it.
+    expect(card).toContain('<article className={`design-batch-card bowed');
+    expect(card.slice(card.indexOf("<article"), card.indexOf('<div className="design-batch-copy">'))).not.toContain("onClick");
+    expect(card).toContain("if (event.detail === 0 || !pressed.current) onOpen(batch.id);");
+    expect(card).toContain("aria-pressed={selected}");
+    // User 2026-11-24: no chips on the card; the pill's circle sits at its left end, the words to its right.
+    expect(card).not.toContain("design-batch-chip");
+    expect(card).not.toContain("<span className={`status");
+    // Slide to unlock: the pill (not the card) takes the drag, and only a release at 90 % of the circle's travel opens.
+    expect(app).toContain("const swipeOpenShare = 0.9;");
+    expect(card.slice(card.indexOf("<article"), card.indexOf('<div className="design-batch-copy">'))).not.toContain("onPointer");
+    const order = ["<h3>", 'className="design-batch-profile"', 'className="design-batch-progress"', "<BatchPhoto", 'className="design-batch-clip bowed-media"', 'className="design-batch-swipe glass"', "onPointerDown=", 'className="design-batch-circle"', 'className="design-batch-words"'];
     const positions = order.map((part) => card.indexOf(part));
     expect(positions.every((position) => position >= 0), order.filter((_, index) => positions[index] < 0).join()).toBe(true);
     expect([...positions].sort((a, b) => a - b)).toEqual(positions);
@@ -1102,7 +1125,7 @@ describe("batch card anatomy and the card's primary action (swipe-rework-log.md,
 
   it("clips stand-ins by the outline but never a user photo, and puts the new cutouts only on pastel cards", () => {
     const photo = component("BatchPhoto");
-    expect(photo).toContain('const card = detail ? " bowed" : photo ? "" : ` bowed-media${visual.pastelOnly ? " pastel-only" : ""}`;');
+    expect(photo).toContain('const card = detail ? " bowed" : photo ? " bowed-media" : visual.pastelOnly ? " pastel-only" : "";');
     const visuals = app.slice(app.indexOf("function profileVisual"), app.indexOf("function BatchPhoto"));
     for (const [cutout, colour] of [["grapefruit-spritz", "accent"], ["fruit-still-life", "action"]]) {
       expect(visuals).toContain(`{ photo: "${cutout}", color: "var(--colour-${colour})", pastelOnly: true }`);
@@ -1790,7 +1813,7 @@ describe("last small boxes on board primitives, one-line sidebar label, selected
   });
 
   it("frames photos in bowed boxes and puts the detail status on the glass chip", () => {
-    expect(app).toContain('const card = detail ? " bowed" : photo ? "" :');
+    expect(app).toContain('const card = detail ? " bowed" : photo ? " bowed-media" :');
     expect(app).toContain('{detail && <span className={`status status-${batch.status} glass`}>');
     expect(rule(".design-detail-photo.user-photo")).toBe(" --fill: var(--colour-row); ");
     // A photo entry's frame has its own class; .timeline-photo is the entry (timeline-${kind}) and stays a small card.

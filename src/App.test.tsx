@@ -446,12 +446,76 @@ describe("batch workflow", () => {
     batch.timeline.push({ id: "photo", kind: "photo", date: localDateForTest(), name: "my-jar.jpg", mimeType: "image/jpeg", caption: "My jar", dataUrl: "data:image/jpeg;base64,cGhvdG8=" });
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
     render(<App />);
-    const card = within(screen.getByRole("button", { name: "Open Photo jar" }));
+    const card = within(screen.getByRole("button", { name: "Open Photo jar" }).closest("article")!);
     const photo = card.getByRole("img", { name: "Batch photograph: My jar" });
     fireEvent.error(photo);
     expect(card.getByRole("img", { name: "Batch photograph unavailable; original retained" })).toBeTruthy();
     expect(card.queryByRole("img", { name: /stand-in/ })).toBeNull();
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline[0].dataUrl).toBe("data:image/jpeg;base64,cGhvdG8=");
+  });
+
+  it("opens a batch card only by sliding its pill's circle to the end or by the keyboard, never by a click or tap", () => {
+    const profile = createProfileState().profiles[0];
+    const today = localDateForTest();
+    const first = createBatch(profile, { id: "first", name: "First jar", startDate: today, today });
+    const second = createBatch(profile, { id: "second", name: "Second jar", startDate: today, today });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([first, second])));
+    render(<App />);
+    const pill = () => screen.getByRole("button", { name: "Open Second jar" });
+    const card = () => pill().closest("article")!;
+    const opened = () => pill().getAttribute("aria-pressed") === "true";
+    expect(card().tagName).toBe("ARTICLE");
+    expect(opened()).toBe(false);
+    // A pointer tap on the pill, and a click anywhere on the card, do nothing.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.pointerUp(pill(), { button: 0, pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.click(pill(), { detail: 1 });
+    fireEvent.click(within(card()).getByRole("heading", { name: "Second jar" }), { detail: 1 });
+    expect(opened()).toBe(false);
+    // The card has no chips: only the name, profile, progress, photo and pill.
+    expect(card().querySelector(".design-batch-chip, .status")).toBeNull();
+    // A vertical drag on the pill is the page's scroll, not a slide; a drag on the card body outside the pill does nothing.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 2, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(pill(), { pointerId: 2, clientX: 4, clientY: 120 });
+    fireEvent.pointerUp(pill(), { pointerId: 2, clientX: 4, clientY: 120 });
+    expect(opened()).toBe(false);
+    fireEvent.pointerDown(card(), { button: 0, pointerId: 5, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(card(), { pointerId: 5, clientX: 100, clientY: 0 });
+    fireEvent.pointerUp(card(), { pointerId: 5, clientX: 100, clientY: 0 });
+    expect(opened()).toBe(false);
+    expect(card().classList.contains("dragging")).toBe(false);
+    // A short slide fades "Swipe for more" in proportion and moves the circle, then springs back without opening.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 3, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(pill(), { pointerId: 3, clientX: 12, clientY: 1 });
+    expect(card().classList.contains("dragging")).toBe(true);
+    expect(card().style.getPropertyValue("--swipe-x")).toBe("12px");
+    expect(Number(card().style.getPropertyValue("--swipe-progress"))).toBeCloseTo(0.25, 2);
+    fireEvent.pointerUp(pill(), { pointerId: 3, clientX: 12, clientY: 1 });
+    expect(opened()).toBe(false);
+    expect(card().classList.contains("dragging")).toBe(false);
+    expect(card().style.getPropertyValue("--swipe-x")).toBe("0px");
+    // Slide to unlock: released at 40 of 48 (83 %, short of the 90 % threshold) the circle springs back without opening.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 6, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(pill(), { pointerId: 6, clientX: 40, clientY: 1 });
+    expect(Number(card().style.getPropertyValue("--swipe-progress"))).toBeCloseTo(40 / 48, 2);
+    fireEvent.pointerUp(pill(), { pointerId: 6, clientX: 40, clientY: 1 });
+    expect(opened()).toBe(false);
+    expect(card().style.getPropertyValue("--swipe-x")).toBe("0px");
+    // Slid to the pill's end (the track is clamped there), the release opens the batch.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 4, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(pill(), { pointerId: 4, clientX: 100, clientY: 2 });
+    // A touch's implicit capture on the circle moving to the pill fires a bubbling lostpointercapture; the slide survives it.
+    fireEvent.lostPointerCapture(pill().querySelector(".design-batch-circle")!, { pointerId: 4 });
+    expect(Number(card().style.getPropertyValue("--swipe-progress"))).toBe(1);
+    fireEvent.pointerUp(pill(), { pointerId: 4, clientX: 100, clientY: 2 });
+    expect(opened()).toBe(true);
+    // Keyboard activation of the focusable pill (Enter or Space fire a click with detail 0) opens a batch too.
+    const firstPill = screen.getByRole("button", { name: "Open First jar" });
+    firstPill.focus();
+    expect(document.activeElement).toBe(firstPill);
+    fireEvent.click(firstPill, { detail: 0 });
+    expect(firstPill.getAttribute("aria-pressed")).toBe("true");
+    expect(opened()).toBe(false);
   });
 
   it("returns from a calendar batch to its original month and from a check to Checks", async () => {

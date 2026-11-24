@@ -115,7 +115,7 @@ function NavIcon({ destination }: { destination: Destination }) {
   return <DesignIcon name="user" />;
 }
 
-function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus" | "bell" | "user" | "sparkles" | "temp" | "clock" | "back" | "check" | "book" | "drop" | "settings" | "close" }) {
+function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus" | "bell" | "user" | "sparkles" | "temp" | "clock" | "back" | "check" | "book" | "drop" | "settings" | "close" | "arrow" }) {
   const paths = {
     leaf: "M19 3C9 3 3 7 5 14c2 6 12 6 14-11ZM4 21 15 9m-6 6 6 1",
     jar: "M7 7c0 3-2 3-2 6v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6c0-3-2-3-2-6M5 12h14M5 16h14",
@@ -128,6 +128,7 @@ function DesignIcon({ name }: { name: "leaf" | "jar" | "search" | "sort" | "plus
     temp: "M9 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0ZM12 8v9",
     clock: "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 7v5l3 2",
     back: "m14 5-7 7 7 7",
+    arrow: "M5 12h14M13 6l6 6-6 6",
     check: "m5 12 4 4L19 6",
     close: "m6 6 12 12M6 18 18 6",
     book: "M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Zm0 0v15",
@@ -232,13 +233,13 @@ function BatchPhoto({ batch, detail = false }: { batch: Batch; detail?: boolean 
   const visual = profileVisual(batch.profileSnapshot);
   const photo = batch.timeline.filter((entry) => entry.kind === "photo").at(-1);
   const source = photo?.dataUrl ?? (visual.photo ? `${import.meta.env.BASE_URL}new-design/${visual.photo}.webp` : null);
-  // On the batch card a stand-in is a cutout clipped by the card outline; a user photo stays a rectangle (#53).
-  const card = detail ? " bowed" : photo ? "" : ` bowed-media${visual.pastelOnly ? " pastel-only" : ""}`;
+  // On the batch card a stand-in cut-out spills over the card edge; a user photo stays clipped by the card outline.
+  const card = detail ? " bowed" : photo ? " bowed-media" : visual.pastelOnly ? " pastel-only" : "";
   return <div className={`${detail ? "design-detail-photo" : "design-batch-photo"}${photo ? " user-photo" : ""}${card}`} style={detail && !photo ? { "--fill": visual.color } as CSSProperties : undefined}>
     {source ? <BatchImage key={source} source={source} userPhoto={!!photo} retryable={detail} description={photo ? `Batch photograph: ${photo.caption || photo.name}` : `${batch.profileSnapshot.name} stand-in photograph`} />
       : <DesignIcon name="jar" />}
     {detail && <span className={`status status-${batch.status} glass`}>{statusLabel(batch.status)}</span>}
-    <span className="design-photo-label glass">{batch.status === "to-fridge" ? "In the fridge" : batch.status === "ready" && !detail ? batch.finishDate === localDate() ? "Ready today" : "Ready to enjoy" : batch.finishDate ? `Finish ${shortDate(batch.finishDate)}` : "No finish date"}</span>
+    {detail && <span className="design-photo-label glass">{batch.status === "to-fridge" ? "In the fridge" : batch.finishDate ? `Finish ${shortDate(batch.finishDate)}` : "No finish date"}</span>}
   </div>;
 }
 
@@ -258,23 +259,6 @@ function batchDay(batch: Batch) {
 
 function shortDate(date: string) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(`${date}T12:00:00`));
-}
-
-function BatchMeta({ batch, units, guidance = false }: { batch: Batch; units: ShellPreferences["units"]; guidance?: boolean }) {
-  const temperature = batch.timeline.filter((entry) => entry.kind === "temperature").at(-1);
-  const input = batch.profileSnapshot.inputs.find(({ name }) => batch.inputValues[name] !== undefined);
-  const value = input && batch.inputValues[input.name];
-  const volume = input && (input.unit === "ml" || input.unit === "l");
-  const amount = value !== undefined && input ? units === "imperial" && volume
-    ? `${formatCalculationValue(value * (input.unit === "ml" ? 0.001 : 1) / 0.946352946)} qt`
-    : `${formatCalculationValue(value)} ${input.unit === "l" ? "L" : input.unit === "ml" ? "mL" : input.unit}` : null;
-  const saltFormula = batch.profileSnapshot.calculations.find(({ name }) => name.toLowerCase() === "salt");
-  const salt = saltFormula && parseSimpleFormula(saltFormula.formula);
-  return <div className="design-batch-meta">
-    <span><DesignIcon name="temp" />{temperature ? `${displayTemperature(temperature.value, units)} °${units === "imperial" ? "F" : "C"}` : "No reading"}</span>
-    {amount && <span><DesignIcon name="jar" />{amount}</span>}
-    {guidance && salt?.percentage && salt.operator === "*" && <span title="Profile formula percentage">Salt {salt.operand}%</span>}
-  </div>;
 }
 
 function PhotoCredits() {
@@ -1680,9 +1664,9 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, pan
           {batches.length === 0 && profiles.length > 0 && <button className="primary-action card-action" onClick={() => onDialog({ kind: "start" })} type="button"><DesignIcon name="plus" /><span>Start your first batch</span></button>}
         </div></section>
       ) : (
-        <section aria-label="Batch overview">
+        <section aria-label="Batch overview" className="batch-overview-frame">
           <div className="batch-overview">
-            {visible.map((batch) => <CompactBatchCard batch={batch} key={batch.id} onOpen={onOpen} selected={batch.id === openBatchId} units={units} />)}
+            {visible.map((batch) => <CompactBatchCard batch={batch} key={batch.id} onOpen={onOpen} selected={batch.id === openBatchId} />)}
           </div>
         </section>
       )}
@@ -1700,19 +1684,95 @@ function BatchView({ beforeBatchReplace, visible: workspaceVisible, batches, pan
   );
 }
 
-function CompactBatchCard({ batch, selected, units, onOpen }: { batch: Batch; selected: boolean; units: ShellPreferences["units"]; onOpen(id: string): void }) {
-  const nextCheck = batch.status === "active" ? [...batch.checks].sort((left, right) => left.nextDueDate.localeCompare(right.nextDueDate))[0] : undefined;
-  const latestPh = latestPhReading(batch);
+/** The batch card's progress line: the day count against the planned length, or how the batch has finished. */
+function batchProgress(batch: Batch) {
   const day = batchDay(batch);
-  const next = nextCheck ? `${nextCheck.name} · ${nextCheck.nextDueDate}` : batch.finishDate ? `Finish · ${batch.finishDate}` : "Review timeline";
-  const isAttention = batch.status === "active" && dueBatchChecks(batch, localDate()).length > 0;
-  const statusText = isAttention ? "Active · attention" : statusLabel(batch.status);
+  if (batch.status === "to-fridge") return { label: "Finished", note: null, track: "done", value: 1 };
+  if (batch.status === "ready") return { label: `Day ${day}`, note: "done", track: "done", value: 1 };
+  if (!batch.finishDate) return { label: `Day ${day}`, note: "no end date", track: "open", value: null };
+  const total = Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000));
+  return { label: `Day ${day}`, note: `of ${total}`, track: "", value: Math.min(1, day / total) };
+}
+
+/** Share of the pill's track the circle must reach before a release opens the batch (slide to unlock). */
+const swipeOpenShare = 0.9;
+/** Pointer travel before the pill decides whether a gesture is a horizontal slide (its own) or a vertical scroll. */
+const swipeSlop = 8;
+/** Shortest swipe track, used when the card has no layout (tests) or is very narrow. */
+const swipeMinTrack = 48;
+
+interface SwipeGesture { pointer: number; x: number; y: number; axis: "x" | "y" | null; track: number; offset: number }
+
+/** A batch on the overview. Only sliding the pill's circle to the pill's right end (slide to unlock), or the keyboard
+ *  on the pill, opens it; a click or tap does nothing, so scrolling past cards never opens one by accident. */
+function CompactBatchCard({ batch, selected, onOpen }: { batch: Batch; selected: boolean; onOpen(id: string): void }) {
+  const [swipe, setSwipe] = useState({ offset: 0, track: swipeMinTrack, dragging: false });
+  const gesture = useRef<SwipeGesture | null>(null);
+  const pressed = useRef(false);
+  const circle = useRef<HTMLSpanElement>(null);
+  const progress = batchProgress(batch);
+  const release = () => {
+    gesture.current = null;
+    setSwipe((current) => ({ ...current, offset: 0, dragging: false }));
+    // The click that follows a pointer release must still see that a pointer was pressed.
+    window.setTimeout(() => { pressed.current = false; });
+  };
+  // The circle travels from its resting spot to the pill's right end, keeping the same inset it has from the pill's edges.
+  const measure = (pill: HTMLElement) => {
+    const edge = pill.getBoundingClientRect();
+    const dot = circle.current?.getBoundingClientRect();
+    return dot && edge.width ? Math.max(swipeMinTrack, edge.right - (edge.height - dot.height) / 2 - dot.right) : swipeMinTrack;
+  };
   return (
-    <button aria-label={`Open ${batch.name}`} aria-pressed={selected} className={`design-batch-card bowed${selected ? " selected" : ""}`} style={{ "--batch-colour": profileVisual(batch.profileSnapshot).color } as CSSProperties} onClick={() => onOpen(batch.id)} type="button">
-      <div className="design-batch-copy"><h3>{batch.name}</h3><p className="design-batch-profile">{batch.profileSnapshot.name}</p><BatchMeta batch={batch} units={units} /><div className="design-batch-chips"><span className={`status status-${batch.status} glass`}>{statusText}</span><p className="design-batch-next">{nextCheck ? `${nextCheck.name} · ${shortDate(nextCheck.nextDueDate)}` : batch.finishDate ? `Finish · ${shortDate(batch.finishDate)}` : "No finish date"}</p></div><span className="sr-only">{latestPh && `pH ${latestPh.value}.`} Next: {next}</span></div>
-      <div className="design-batch-pill"><div className="design-batch-bottom"><strong>{batch.status === "to-fridge" ? "Chilled" : `Day ${day}`}</strong>{batch.status !== "to-fridge" && batch.finishDate && <span>/ {Math.max(1, Math.round((Date.parse(batch.finishDate) - Date.parse(batch.startDate)) / 86_400_000))} days</span>}</div><span className="design-batch-go" aria-hidden="true"><DesignIcon name="back" /></span></div>
+    <article className={`design-batch-card bowed${selected ? " selected" : ""}${swipe.dragging ? " dragging" : ""}`}
+      style={{ "--tint": profileVisual(batch.profileSnapshot).color, "--swipe-x": `${swipe.offset}px`, "--swipe-progress": Math.min(1, swipe.offset / swipe.track) } as CSSProperties}
+      onDragStart={(event) => event.preventDefault()}>
+      <div className="design-batch-copy">
+        <h3>{batch.name}</h3>
+        <p className="design-batch-profile">{batch.profileSnapshot.name}</p>
+        <div className="design-batch-progress" role="progressbar" aria-label={`${batch.name} progress`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.value === null ? undefined : Math.round(progress.value * 100)} aria-valuetext={progress.note ? `${progress.label} ${progress.note}` : progress.label}>
+          <p className="design-batch-label"><span>{progress.label}</span>{progress.note && <em>{progress.note}</em>}</p>
+          <div className={`design-batch-track${progress.track ? ` ${progress.track}` : ""}`}><i style={{ width: `${(progress.value ?? 1) * 100}%` }} /></div>
+        </div>
+      </div>
       <BatchPhoto batch={batch} />
-    </button>
+      <div className="design-batch-clip bowed-media">
+        {/* A pointer click or tap never opens the batch; keyboard and assistive-technology activation do. */}
+        <button aria-label={`Open ${batch.name}`} aria-pressed={selected} className="design-batch-swipe glass" type="button"
+          onClick={(event) => { if (event.detail === 0 || !pressed.current) onOpen(batch.id); }}
+          onPointerDown={(event) => {
+            if (event.button !== 0) return;
+            pressed.current = true;
+            gesture.current = { pointer: event.pointerId, x: event.clientX, y: event.clientY, axis: null, track: measure(event.currentTarget), offset: 0 };
+          }}
+          onPointerMove={(event) => {
+            const current = gesture.current;
+            if (!current || current.pointer !== event.pointerId || current.axis === "y") return;
+            const dx = event.clientX - current.x;
+            const dy = event.clientY - current.y;
+            if (!current.axis) {
+              if (Math.hypot(dx, dy) < swipeSlop) return;
+              current.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+              if (current.axis === "y") return;
+              try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* the pointer may already be gone */ }
+            }
+            current.offset = Math.min(current.track, Math.max(0, dx));
+            setSwipe({ offset: current.offset, track: current.track, dragging: true });
+          }}
+          onPointerUp={(event) => {
+            const current = gesture.current;
+            if (current?.pointer === event.pointerId && current.axis === "x" && current.offset >= current.track * swipeOpenShare) onOpen(batch.id);
+            release();
+          }}
+          onPointerCancel={release}
+          // Touch captures the pointer to the inner span; moving that capture to the pill fires a bubbling lostpointercapture
+          // from the span, which must not end the slide. Only the pill itself losing capture does.
+          onLostPointerCapture={(event) => { if (event.target === event.currentTarget && gesture.current) release(); }}>
+          <span className="design-batch-circle" aria-hidden="true" ref={circle}><DesignIcon name="arrow" /></span>
+          <span className="design-batch-words"><span>Swipe</span><strong>for more</strong></span>
+        </button>
+      </div>
+    </article>
   );
 }
 
