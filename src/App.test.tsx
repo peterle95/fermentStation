@@ -394,7 +394,7 @@ describe("batch workflow", () => {
     } finally { read.mockRestore(); }
   });
 
-  it("retries detail and timeline photographs without replacing original bytes with stand-ins", () => {
+  it("retries detail and timeline photographs without replacing original bytes", () => {
     const today = localDateForTest();
     const batch = createBatch(createProfileState().profiles[0], { id: "jar", startDate: today });
     batch.timeline.push({ id: "photo", kind: "photo", date: today, name: "jar.jpg", caption: "My jar", mimeType: "image/jpeg", dataUrl: "data:image/jpeg;base64,cGhvdG8=" });
@@ -406,7 +406,6 @@ describe("batch workflow", () => {
     expect(retries).toHaveLength(2);
     for (const retry of retries) fireEvent.click(retry);
     expect(detail.getAllByRole("img").map((image) => image.getAttribute("src"))).toEqual([batch.timeline[0].kind === "photo" ? batch.timeline[0].dataUrl : "", "data:image/jpeg;base64,cGhvdG8="]);
-    expect(detail.queryByRole("img", { name: /stand-in/ })).toBeNull();
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toEqual(batch.timeline);
   });
 
@@ -446,12 +445,76 @@ describe("batch workflow", () => {
     batch.timeline.push({ id: "photo", kind: "photo", date: localDateForTest(), name: "my-jar.jpg", mimeType: "image/jpeg", caption: "My jar", dataUrl: "data:image/jpeg;base64,cGhvdG8=" });
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
     render(<App />);
-    const card = within(screen.getByRole("button", { name: "Open Photo jar" }));
+    const card = within(screen.getByRole("button", { name: "Open Photo jar" }).closest("article")!);
     const photo = card.getByRole("img", { name: "Batch photograph: My jar" });
     fireEvent.error(photo);
     expect(card.getByRole("img", { name: "Batch photograph unavailable; original retained" })).toBeTruthy();
-    expect(card.queryByRole("img", { name: /stand-in/ })).toBeNull();
+    expect(card.queryByRole("img", { name: / photograph$/ })).toBeNull();
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline[0].dataUrl).toBe("data:image/jpeg;base64,cGhvdG8=");
+  });
+
+  it("opens a batch card only by sliding its pill's circle to the end or by the keyboard, never by a click or tap", () => {
+    const profile = createProfileState().profiles[0];
+    const today = localDateForTest();
+    const first = createBatch(profile, { id: "first", name: "First jar", startDate: today, today });
+    const second = createBatch(profile, { id: "second", name: "Second jar", startDate: today, today });
+    localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([first, second])));
+    render(<App />);
+    const pill = () => screen.getByRole("button", { name: "Open Second jar" });
+    const card = () => pill().closest("article")!;
+    const opened = () => pill().getAttribute("aria-pressed") === "true";
+    expect(card().tagName).toBe("ARTICLE");
+    expect(opened()).toBe(false);
+    // A pointer tap on the pill, and a click anywhere on the card, do nothing.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.pointerUp(pill(), { button: 0, pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.click(pill(), { detail: 1 });
+    fireEvent.click(within(card()).getByRole("heading", { name: "Second jar" }), { detail: 1 });
+    expect(opened()).toBe(false);
+    // The card has no chips: only the name, profile, progress, photo and pill.
+    expect(card().querySelector(".design-batch-chip, .status")).toBeNull();
+    // A vertical drag on the pill is the page's scroll, not a slide; a drag on the card body outside the pill does nothing.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 2, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(pill(), { pointerId: 2, clientX: 4, clientY: 120 });
+    fireEvent.pointerUp(pill(), { pointerId: 2, clientX: 4, clientY: 120 });
+    expect(opened()).toBe(false);
+    fireEvent.pointerDown(card(), { button: 0, pointerId: 5, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(card(), { pointerId: 5, clientX: 100, clientY: 0 });
+    fireEvent.pointerUp(card(), { pointerId: 5, clientX: 100, clientY: 0 });
+    expect(opened()).toBe(false);
+    expect(card().classList.contains("dragging")).toBe(false);
+    // A short slide fades "Swipe for more" in proportion and moves the circle, then springs back without opening.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 3, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(pill(), { pointerId: 3, clientX: 12, clientY: 1 });
+    expect(card().classList.contains("dragging")).toBe(true);
+    expect(card().style.getPropertyValue("--swipe-x")).toBe("12px");
+    expect(Number(card().style.getPropertyValue("--swipe-progress"))).toBeCloseTo(0.25, 2);
+    fireEvent.pointerUp(pill(), { pointerId: 3, clientX: 12, clientY: 1 });
+    expect(opened()).toBe(false);
+    expect(card().classList.contains("dragging")).toBe(false);
+    expect(card().style.getPropertyValue("--swipe-x")).toBe("0px");
+    // Slide to unlock: released at 40 of 48 (83 %, short of the 90 % threshold) the circle springs back without opening.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 6, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(pill(), { pointerId: 6, clientX: 40, clientY: 1 });
+    expect(Number(card().style.getPropertyValue("--swipe-progress"))).toBeCloseTo(40 / 48, 2);
+    fireEvent.pointerUp(pill(), { pointerId: 6, clientX: 40, clientY: 1 });
+    expect(opened()).toBe(false);
+    expect(card().style.getPropertyValue("--swipe-x")).toBe("0px");
+    // Slid to the pill's end (the track is clamped there), the release opens the batch.
+    fireEvent.pointerDown(pill(), { button: 0, pointerId: 4, clientX: 0, clientY: 0 });
+    fireEvent.pointerMove(pill(), { pointerId: 4, clientX: 100, clientY: 2 });
+    // A touch's implicit capture on the circle moving to the pill fires a bubbling lostpointercapture; the slide survives it.
+    fireEvent.lostPointerCapture(pill().querySelector(".design-batch-circle")!, { pointerId: 4 });
+    expect(Number(card().style.getPropertyValue("--swipe-progress"))).toBe(1);
+    fireEvent.pointerUp(pill(), { pointerId: 4, clientX: 100, clientY: 2 });
+    expect(opened()).toBe(true);
+    // Keyboard activation of the focusable pill (Enter or Space fire a click with detail 0) opens a batch too.
+    const firstPill = screen.getByRole("button", { name: "Open First jar" });
+    firstPill.focus();
+    expect(document.activeElement).toBe(firstPill);
+    fireEvent.click(firstPill, { detail: 0 });
+    expect(firstPill.getAttribute("aria-pressed")).toBe("true");
+    expect(opened()).toBe(false);
   });
 
   it("returns from a calendar batch to its original month and from a check to Checks", async () => {
@@ -510,7 +573,7 @@ describe("batch workflow", () => {
     const summary = detail.getByRole("button", { name: "More batch tools" });
     expect(summary.tagName).toBe("BUTTON"); // native keyboard activation, no custom key handling
     expect(summary.getAttribute("aria-expanded")).toBe("false");
-    expect(summary.closest(".timeline-panel-heading")).toBeTruthy();
+    expect(summary.closest(".design-detail-top")).toBeTruthy();
     expect(summary.getAttribute("aria-controls")).toBe("batch-management");
     for (const name of ["Take photo", "Delete batch", `Edit note from ${today}`, "Log activity"]) {
       expect(detail.queryByRole("button", { name })).toBeNull();
@@ -1028,7 +1091,7 @@ describe("batch workflow", () => {
     expect(dialog.textContent).not.toContain("Tea 3 L");
     expect(dialog.textContent).toContain("Snapshot guidance.");
     expect(fireEvent(dialog, new Event("cancel", { cancelable: true }))).toBe(false);
-    fireEvent.click(screen.getByRole("button", { name: "See fermentation profile" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Open .+ profile$/ }));
     dialog = screen.getByRole("dialog", { name: profile.name });
     expect(dialog.textContent).toContain("Snapshot guidance.");
     expect(dialog.textContent).toContain("7 days");
@@ -1452,6 +1515,17 @@ describe("batch workflow", () => {
     expect(cleanUnload.defaultPrevented).toBe(false);
   });
 
+  it("switches the start profile when the select fires input before change, as browsers do", () => {
+    const state = createProfileState();
+    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
+    const select = screen.getByLabelText("Fermentation profile") as HTMLSelectElement;
+    fireEvent.input(select, { target: { value: state.profiles[1].id } });
+    fireEvent.change(select);
+    expect(select.value).toBe(state.profiles[1].id);
+  });
+
   it("retains start inputs when switching profiles and discards them only after confirmation", () => {
     const state = createProfileState();
     state.profiles[0].inputs = [{ name: "water", unit: "l", defaultValue: 2 }];
@@ -1495,27 +1569,26 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "My batches" }));
     const detail = within(screen.getByRole("complementary", { name: "Selected batch" }));
     expect(detail.getByText("Original observation")).toBeTruthy();
-    fireEvent.click(detail.getByRole("button", { name: "See fermentation profile" }));
+    fireEvent.click(detail.getByRole("button", { name: "Open Kombucha F1 profile" }));
     const overview = within(screen.getByRole("dialog", { name: "Kombucha F1" }));
     expect(overview.getByText("Original method.")).toBeTruthy();
     expect(overview.getByText("Taste · every 2 days")).toBeTruthy();
     expect(overview.getByText("water 2 L")).toBeTruthy();
   });
 
-  it("labels profile stand-ins and offers a recoverable jar fallback without inventing profile facts", () => {
+  it("shows profile photographs and offers a recoverable jar fallback without inventing profile facts", () => {
     const state = createProfileState();
     state.profiles = [state.profiles[0], { ...state.profiles[0], id: "custom", name: "House culture" }];
     localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     const card = screen.getByRole("button", { name: "View Kombucha F1 guidance" }).closest("article")!;
-    expect(within(card).getByText("Stand-in")).toBeTruthy();
     expect(within(card).getByText("Duration not set")).toBeTruthy();
     expect(within(card).getByText("Temperature not set")).toBeTruthy();
-    fireEvent.error(within(card).getByAltText("Kombucha F1 stand-in photograph"));
-    expect(within(card).getByRole("img", { name: "Stand-in photograph unavailable" })).toBeTruthy();
+    fireEvent.error(within(card).getByAltText("Kombucha F1 photograph"));
+    expect(within(card).getByRole("img", { name: "Photograph unavailable" })).toBeTruthy();
     fireEvent.click(within(card).getByRole("button", { name: "Retry photograph" }));
-    expect(within(card).getByAltText("Kombucha F1 stand-in photograph")).toBeTruthy();
+    expect(within(card).getByAltText("Kombucha F1 photograph")).toBeTruthy();
     const custom = screen.getByRole("button", { name: "View House culture guidance" }).closest("article")!;
     expect(within(custom).queryByRole("img")).toBeNull();
     expect(custom.textContent).not.toMatch(/Day \d|Finish |Ready|°C/);
@@ -2511,12 +2584,13 @@ describe("batch workflow", () => {
     expect(stored.batches[1].timeline).toEqual([]);
   });
 
-  it("makes the bundled font and stand-in photograph credits reachable in Settings", () => {
+  it("makes the bundled font licenses reachable in Settings without stand-in photograph credits", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
-    expect(screen.getByRole("link", { name: "SIL Open Font License 1.1" }).getAttribute("href")).toContain("new-design/OFL.txt");
-    fireEvent.click(within(screen.getByRole("region", { name: "Settings" })).getByText("Stand-in photographs"));
-    expect(screen.getAllByText(/Kimchi, sauerkraut, sourdough and milk kefir/).length).toBeGreaterThan(0);
+    const settings = within(screen.getByRole("region", { name: "Settings" }));
+    expect(settings.getByRole("link", { name: "SIL Open Font License 1.1" }).getAttribute("href")).toContain("new-design/OFL.txt");
+    expect(settings.queryByText("Stand-in photographs")).toBeNull();
+    expect(settings.queryByText(/Kimchi, sauerkraut, sourdough and milk kefir/)).toBeNull();
   });
 
   it("starts a batch from other destinations through the same creation form", () => {

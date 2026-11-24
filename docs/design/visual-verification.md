@@ -52,7 +52,7 @@ Surfaces (`-s`):
 | Name | What it shows | How it is reached |
 | --- | --- | --- |
 | `overview` | Batch overview (My batches) | app start |
-| `batch-detail` | Batch detail for "Napa cabbage kimchi" | tap its card |
+| `batch-detail` | Batch detail for "Napa cabbage kimchi" | slide its card's pill circle to the pill's right end (a tap does not open a card) |
 | `observation-logger` | Batch detail with the Add observation logger open | tap "Add observation" |
 | `batch-tools` | Batch tools, scrolled into view | tap "More batch tools" |
 | `upcoming-strip` | Checks view scrolled to the Upcoming · next 7 days strip (added in ticket 11; no baseline capture, the pre-rework baseline predates it) | navigate to Checks |
