@@ -43,28 +43,3 @@ export const pwaManifest: PwaManifest = {
 export function shouldRegisterServiceWorker(input: { native: boolean }): boolean {
   return !input.native;
 }
-
-export interface ViewportSample {
-  /** navigator.standalone: true only in an iOS home-screen web app. */
-  iosStandalone: boolean;
-  innerWidth: number;
-  innerHeight: number;
-  screenWidth: number;
-  screenHeight: number;
-}
-
-/**
- * Pixels the layout viewport falls short of the screen in an iOS home-screen web app.
- * iOS 26 standalone web apps can report innerHeight (and so 100vh/100dvh) about one status bar
- * shorter than the screen they actually paint, which lifts bottom-anchored UI off the home
- * indicator (WebKit bug 316008). There the app always fills the screen, so the screen's long or
- * short side (iOS keeps screen.width/height in portrait) is the true height. Elsewhere: 0.
- */
-export function viewportShortfall(sample: ViewportSample): number {
-  if (!sample.iosStandalone) return 0;
-  const landscape = sample.innerWidth > sample.innerHeight;
-  const screenHeight = landscape
-    ? Math.min(sample.screenWidth, sample.screenHeight)
-    : Math.max(sample.screenWidth, sample.screenHeight);
-  return Math.max(0, Math.round(screenHeight - sample.innerHeight));
-}
