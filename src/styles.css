@@ -352,6 +352,13 @@
    rubber-band the whole document, carrying the top bar and the nav away with it. */
 html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 body { margin: 0; }
+/* iOS 26 home-screen apps installed with the translucent status bar report a viewport that is short by the status
+   bar height while the document is no taller than that viewport (WebKit 301108), which lifts the fixed shell and
+   the nav off the bottom edge. A document at least screen-tall makes iOS hand over the full screen. Where the
+   viewport is already right, 100% + the top inset exceeds 100lvh and min() keeps the page at 100lvh. */
+@media (display-mode: standalone) {
+  html { min-height: min(100lvh, calc(100% + env(safe-area-inset-top, 0px))); }
+}
 button, input, select, textarea { font: inherit; letter-spacing: inherit; }
 button, a, input, select, textarea, summary { touch-action: manipulation; }
 button, summary { cursor: pointer; }
