@@ -337,6 +337,11 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
+  /* iOS 26 home-screen apps can size the viewport (and 100dvh) a status bar short of the screen they paint,
+     lifting the phone nav and bottom sheets off the home indicator. updateViewportShortfall (src/main.tsx) sets
+     the missing pixels here; 0 everywhere else. */
+  --viewport-shortfall: 0px;
+  --app-height: calc(100dvh + var(--viewport-shortfall));
   --mobile-nav-height: calc(var(--nav-circle) + 2 * var(--space-2));
   color-scheme: light;
   color: var(--ink);
@@ -390,6 +395,11 @@ input, select, textarea {
 :where(input, select, textarea):disabled { cursor: not-allowed; }
 input::placeholder, textarea::placeholder { color: var(--ink-meta); opacity: 1; }
 input[type="file"] { border-radius: var(--radius-line); overflow: hidden; }
+/* iOS WebKit draws date and time inputs as a native control that ignores width, height and min-width (so it
+   overflows its card) and centres its value. Dropping the native appearance makes them size like any field;
+   the picker still opens on tap. */
+input:is([type="date"], [type="time"], [type="datetime-local"]) { display: block; -webkit-appearance: none; appearance: none; text-align: start; }
+input::-webkit-date-and-time-value { margin: 0; text-align: start; }
 input::file-selector-button { min-height: var(--target-min); margin-right: var(--space-2); border: 0; border-radius: var(--radius-control); padding: var(--space-2) var(--space-4); background: var(--colour-action); font: inherit; cursor: pointer; }
 textarea { min-height: 128px; border-radius: var(--radius-line); resize: vertical; }
 label { min-width: 0; }
@@ -660,7 +670,7 @@ button.glass:hover:not(:disabled) { --glass: var(--colour-surface); }
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
   max-width: var(--layout-container);
-  height: 100dvh;
+  height: var(--app-height);
   margin-inline: auto;
   background: var(--colour-surface-inverse);
 }
@@ -1403,7 +1413,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 }
 
 @media (max-width: 599px) {
-  .app-shell { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; height: 100dvh; }
+  .app-shell { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; height: var(--app-height); }
   .sidebar { display: contents; }
   .brand, .design-sidebar-bottom { display: none; }
   /* Phone bottom row (spec §1.5): bare white circles on the ground, no bar fill; the current destination
@@ -1458,7 +1468,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .calendar-screen, .design-checks-view, .settings-screen, .profiles-screen { padding: 0; }
   /* Bottom sheet: full width, anchored to the bottom edge, bowed top and a flat bottom; the scrim stays
      visible above it. */
-  .station-dialog { --r-end: 0px; --bow-end: 0px; width: 100%; max-height: calc(100dvh - var(--space-12) - var(--safe-top)); margin: auto 0 0; padding-bottom: calc(var(--sheet-inset) + var(--safe-bottom)); }
+  .station-dialog { --r-end: 0px; --bow-end: 0px; width: 100%; max-height: calc(var(--app-height) - var(--space-12) - var(--safe-top)); margin: auto 0 calc(-1 * var(--viewport-shortfall)); padding-bottom: calc(var(--sheet-inset) + var(--safe-bottom)); }
   .navigation button { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
   .navigation button[aria-current="page"] { font-weight: var(--type-title-weight); }
   .calendar-head h2 { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }

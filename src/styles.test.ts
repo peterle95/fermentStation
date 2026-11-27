@@ -839,7 +839,7 @@ describe("sheet and field on black (swipe-rework-log.md, ticket 5; spec §1.7, g
 
   it("anchors the phone sheet to the bottom edge with a bowed top and a flat bottom", () => {
     const phone = rule(".station-dialog", mobile);
-    for (const declaration of ["--r-end: 0px", "--bow-end: 0px", "width: 100%", "margin: auto 0 0", "padding-bottom: calc(var(--sheet-inset) + var(--safe-bottom))"]) expect(phone).toContain(declaration);
+    for (const declaration of ["--r-end: 0px", "--bow-end: 0px", "width: 100%", "margin: auto 0 calc(-1 * var(--viewport-shortfall))", "padding-bottom: calc(var(--sheet-inset) + var(--safe-bottom))"]) expect(phone).toContain(declaration);
     expect(phone).not.toMatch(/(?:^|;)\s*--(?:r|bow):/);
   });
 

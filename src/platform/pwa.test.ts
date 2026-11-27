@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pwaManifest, shouldRegisterServiceWorker } from "./pwa";
+import { pwaManifest, shouldRegisterServiceWorker, viewportShortfall } from "./pwa";
 import { readFileSync } from "node:fs";
 import { inflateSync } from "node:zlib";
 import { createHash } from "node:crypto";
@@ -83,5 +83,25 @@ describe("service worker registration", () => {
 
   it("registers on web builds", () => {
     expect(shouldRegisterServiceWorker({ native: false })).toBe(true);
+  });
+});
+
+describe("viewportShortfall", () => {
+  const iphone = { screenWidth: 393, screenHeight: 852, innerWidth: 393 };
+
+  it("measures how far an iOS home-screen app's viewport falls short of the screen", () => {
+    expect(viewportShortfall({ ...iphone, iosStandalone: true, innerHeight: 793 })).toBe(59);
+  });
+
+  it("is zero when the iOS viewport already fills the screen", () => {
+    expect(viewportShortfall({ ...iphone, iosStandalone: true, innerHeight: 852 })).toBe(0);
+  });
+
+  it("uses the screen's short side in landscape", () => {
+    expect(viewportShortfall({ screenWidth: 393, screenHeight: 852, iosStandalone: true, innerWidth: 852, innerHeight: 373 })).toBe(20);
+  });
+
+  it("never corrects a browser tab, Android or desktop", () => {
+    expect(viewportShortfall({ ...iphone, iosStandalone: false, innerHeight: 700 })).toBe(0);
   });
 });
