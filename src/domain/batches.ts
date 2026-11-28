@@ -45,7 +45,8 @@ export interface Batch {
   timeline: TimelineEntry[];
   timelineTrash: TrashedTimelineEntry[];
   inputValues: Record<string, number | undefined>;
-  calculationValues: Record<string, { suggested: number | null; override?: number }>;
+  /** Amounts worked out from the inputs. They always follow the inputs; there are no per-batch overrides. */
+  calculationValues: Record<string, { suggested: number | null }>;
   finishDate?: string;
   checks: BatchCheck[];
   checksPausedAt?: string;
@@ -75,7 +76,7 @@ export function createBatch(
   const profileSnapshot = cloneProfile(profile);
   const values = Object.fromEntries(profile.inputs.map((input) => [
     input.name,
-    inputValues[input.name] ?? input.defaultValue,
+    inputValues[input.name],
   ]));
   for (const [inputName, value] of Object.entries(values)) {
     if (value !== undefined && (!Number.isFinite(value) || value < 0)) {
@@ -132,24 +133,11 @@ export function setBatchInput(batch: Batch, name: string, value?: number): Batch
   if (!batch.profileSnapshot.inputs.some((input) => input.name === name)) {
     throw new Error(`Unknown input ${name}`);
   }
-  if (value !== undefined && value < 0) throw new Error(`${name} cannot be negative`);
+  if (value !== undefined && (!Number.isFinite(value) || value < 0)) throw new Error(`${name} cannot be negative`);
   return recalculateBatch({
     ...batch,
     inputValues: { ...batch.inputValues, [name]: value },
   });
-}
-
-export function overrideBatchCalculation(batch: Batch, name: string, value: number): Batch {
-  if (value < 0) throw new Error(`${name} cannot be negative`);
-  const calculation = batch.calculationValues[name];
-  if (!calculation) throw new Error(`Unknown calculation ${name}`);
-  return {
-    ...batch,
-    calculationValues: {
-      ...batch.calculationValues,
-      [name]: { ...calculation, override: value },
-    },
-  };
 }
 
 export function setFinishDate(batch: Batch, finishDate: string, today: string): Batch {
@@ -327,21 +315,8 @@ export function calendarEvents(batches: Batch[]): CalendarEvent[] {
 function recalculateBatch(batch: Batch): Batch {
   return {
     ...batch,
-    calculationValues: Object.fromEntries(batch.profileSnapshot.calculations.map((calculation) => {
-      const current = batch.calculationValues[calculation.name];
-      if (current?.override !== undefined) return [calculation.name, current];
-      try {
-        return [calculation.name, {
-          suggested: calculateProfileValue(
-            batch.profileSnapshot,
-            calculation,
-            batch.inputValues,
-          ),
-        }];
-      } catch {
-        return [calculation.name, { suggested: null }];
-      }
-    })),
+    calculationValues: Object.fromEntries(batch.profileSnapshot.calculations.map((calculation) =>
+      [calculation.name, { suggested: calculateProfileValue(calculation, batch.inputValues[calculation.input]) }])),
   };
 }
 

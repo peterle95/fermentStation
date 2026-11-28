@@ -24,18 +24,32 @@ export interface PhZone {
 }
 
 export interface ProfileInput {
+  /** Display name, such as "Cabbage weight"; also the key for a batch's input values. */
   name: string;
   unit: MetricUnit;
-  defaultValue?: number;
 }
 
+/**
+ * A fixed ratio: `amount` of `unit` for every `per` of the input's unit.
+ * Supplied with starter profiles; users never author these.
+ */
 export interface ProfileCalculation {
   name: string;
   unit: MetricUnit;
-  formula: string;
+  /** Name of the profile input this ratio is based on. */
+  input: string;
+  amount: number;
+  per: number;
+  /** Plain-language instruction; `{input}` is replaced by the entered amount, such as "1 kg". */
+  instruction: string;
+  /** Short explanation of the ratio, such as "2% of the cabbage weight". */
+  reason: string;
 }
 
 export type MetricUnit = "g" | "kg" | "ml" | "l";
+
+export const metricUnits: MetricUnit[] = ["g", "kg", "ml", "l"];
+const units = new Set<string>(metricUnits);
 
 export interface ProfileState {
   profiles: FermentationProfile[];
@@ -52,6 +66,41 @@ const starterProfiles: FermentationProfile[] = [
       "Taste after 7 days, then bottle when pleasantly tart.",
     ],
     ...emptyProfileFields,
+    inputs: [{ name: "Water volume", unit: "l" }],
+    calculations: [
+      {
+        name: "Sugar", unit: "g", input: "Water volume", amount: 70, per: 1,
+        instruction: "Dissolve it in your {input} of hot water.",
+        reason: "70 g for each litre of water",
+      },
+      {
+        name: "Tea", unit: "g", input: "Water volume", amount: 5, per: 1,
+        instruction: "Steep it in your {input} of hot water, then take it out.",
+        reason: "5 g for each litre of water",
+      },
+      {
+        name: "Starter liquid", unit: "ml", input: "Water volume", amount: 100, per: 1,
+        instruction: "Add it once your {input} of sweet tea has cooled.",
+        reason: "100 ml for each litre of water",
+      },
+    ],
+  },
+  {
+    id: "starter-kombucha-f2",
+    name: "Kombucha F2",
+    guidance: [
+      "Bottle finished kombucha with fruit juice and close the bottles tightly.",
+      "Open one bottle after 2 days to check the fizz, then refrigerate.",
+    ],
+    ...emptyProfileFields,
+    inputs: [{ name: "Kombucha volume", unit: "l" }],
+    calculations: [
+      {
+        name: "Fruit juice", unit: "ml", input: "Kombucha volume", amount: 100, per: 1,
+        instruction: "Share it between the bottles for your {input} of kombucha.",
+        reason: "10% of the kombucha volume",
+      },
+    ],
   },
   {
     id: "starter-kimchi",
@@ -61,6 +110,14 @@ const starterProfiles: FermentationProfile[] = [
       "Ferment warm briefly, then move to the fridge when the pH reaches 4.2.",
     ],
     ...emptyProfileFields,
+    inputs: [{ name: "Vegetable weight", unit: "kg" }],
+    calculations: [
+      {
+        name: "Salt", unit: "g", input: "Vegetable weight", amount: 20, per: 1,
+        instruction: "Mix it into your {input} of chopped vegetables.",
+        reason: "2% of the vegetable weight",
+      },
+    ],
   },
   {
     id: "starter-sauerkraut",
@@ -70,6 +127,31 @@ const starterProfiles: FermentationProfile[] = [
       "Pack tightly, weight the cabbage, and taste after 7 days.",
     ],
     ...emptyProfileFields,
+    inputs: [{ name: "Cabbage weight", unit: "kg" }],
+    calculations: [
+      {
+        name: "Salt", unit: "g", input: "Cabbage weight", amount: 20, per: 1,
+        instruction: "Mix it into your {input} of shredded cabbage.",
+        reason: "2% of the cabbage weight",
+      },
+    ],
+  },
+  {
+    id: "starter-vegetable-brine",
+    name: "Vegetables in brine",
+    guidance: [
+      "Pack the vegetables into a jar and pour the brine over them.",
+      "Keep everything below the brine and taste after 5 days.",
+    ],
+    ...emptyProfileFields,
+    inputs: [{ name: "Water volume", unit: "l" }],
+    calculations: [
+      {
+        name: "Salt", unit: "g", input: "Water volume", amount: 30, per: 1,
+        instruction: "Dissolve it in your {input} of water to make the brine.",
+        reason: "3% of the water volume",
+      },
+    ],
   },
   {
     id: "starter-milk-kefir",
@@ -79,6 +161,14 @@ const starterProfiles: FermentationProfile[] = [
       "Keep the grains and refrigerate the strained kefir.",
     ],
     ...emptyProfileFields,
+    inputs: [{ name: "Milk volume", unit: "l" }],
+    calculations: [
+      {
+        name: "Kefir grains", unit: "g", input: "Milk volume", amount: 50, per: 1,
+        instruction: "Add them to your {input} of milk.",
+        reason: "50 g for each litre of milk",
+      },
+    ],
   },
   {
     id: "starter-sourdough",
@@ -88,8 +178,34 @@ const starterProfiles: FermentationProfile[] = [
       "Feed equal weights flour and water; use when doubled and bubbly.",
     ],
     ...emptyProfileFields,
+    inputs: [{ name: "Starter weight", unit: "g" }],
+    calculations: [
+      {
+        name: "Flour", unit: "g", input: "Starter weight", amount: 1, per: 1,
+        instruction: "Stir it into the {input} of starter you keep.",
+        reason: "The same weight as the starter",
+      },
+      {
+        name: "Water", unit: "g", input: "Starter weight", amount: 1, per: 1,
+        instruction: "Stir it into the {input} of starter together with the flour.",
+        reason: "The same weight as the starter",
+      },
+    ],
   },
 ];
+
+export const starterProfileIds: readonly string[] = starterProfiles.map(({ id }) => id);
+
+/**
+ * Starter calculations are locked, so code is their source of truth: a stored starter profile keeps its editable
+ * fields but always takes the current measurement and amounts. Other profiles are returned unchanged.
+ */
+export function withStarterAmounts(profile: FermentationProfile): FermentationProfile {
+  const starter = starterProfiles.find(({ id }) => id === profile.id);
+  if (!starter) return profile;
+  const { inputs, calculations } = cloneProfile(starter);
+  return { ...profile, inputs, calculations };
+}
 
 export function createProfileState(): ProfileState {
   return { profiles: starterProfiles.map(cloneProfile) };
@@ -131,82 +247,72 @@ export function normalizeProfileChecks(checks: ProfileCheck[], prefix = "profile
   });
 }
 
-interface Quantity {
-  value: number;
-  family: "mass" | "volume" | "scalar";
+/** Formats an amount for reading: at most two decimals, no trailing zeros. */
+export function formatAmount(value: number): string {
+  return String(Number(value.toFixed(2)));
 }
 
-const units: Record<MetricUnit, { family: Quantity["family"]; scale: number }> = {
-  g: { family: "mass", scale: 1 },
-  kg: { family: "mass", scale: 1000 },
-  ml: { family: "volume", scale: 1 },
-  l: { family: "volume", scale: 1000 },
-};
-
-export function parseSimpleFormula(formula: string): {
-  source: string;
-  operator: "+" | "-" | "*" | "/";
-  operand: string;
-  percentage: boolean;
-} | null {
-  const match = formula.match(/^([A-Za-z][A-Za-z0-9_]*)\s*([+\-*/])\s*((?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+\-]?\d+)?)(%)?$/);
-  return match ? {
-    source: match[1],
-    operator: match[2] as "+" | "-" | "*" | "/",
-    operand: match[3],
-    percentage: Boolean(match[4]),
-  } : null;
-}
-
+/** The amount a calculation suggests for an input value, or null while the input is empty. */
 export function calculateProfileValue(
+  calculation: ProfileCalculation,
+  inputValue: number | undefined,
+): number | null {
+  if (inputValue === undefined || !Number.isFinite(inputValue)) return null;
+  return inputValue * calculation.amount / calculation.per;
+}
+
+/** The input a calculation is based on. */
+export function calculationInput(
   profile: FermentationProfile,
   calculation: ProfileCalculation,
-  values: Record<string, number | undefined>,
-): number | null {
-  const simple = parseSimpleFormula(calculation.formula);
-  if (simple) {
-    const input = profile.inputs.find(({ name }) => name === simple.source);
-    if (!input) throw new Error(`Unknown input ${simple.source}`);
-    const value = values[input.name] ?? input.defaultValue;
-    if (value === undefined) return null;
-    let operand = Number(simple.operand);
-    if (simple.percentage) {
-      if (operand > 100) throw new Error("Percentage must be between 0% and 100%");
-      operand /= 100;
-    }
-    if (simple.operator === "/" && operand === 0) throw new Error("Formula cannot divide by zero");
-    const source = value * units[input.unit].scale;
-    const result = simple.operator === "+" ? source + operand
-      : simple.operator === "-" ? source - operand
-      : simple.operator === "*" ? source * operand
-      : source / operand;
-    if (result < 0) throw new Error("Calculation cannot be negative");
-    return result / units[calculation.unit].scale;
-  }
-  const variables = new Map(profile.inputs.map((input) => {
-    const value = values[input.name] ?? input.defaultValue;
-    const unit = units[input.unit];
-    return [input.name, value === undefined ? null : {
-      value: value * unit.scale, family: unit.family,
-    }] as const;
-  }));
-  const result = evaluateFormula(calculation.formula, variables);
-  if (!result) return null;
-  const output = units[calculation.unit];
-  if (result.family !== output.family) throw new Error("Calculation unit is incompatible with its formula");
-  return result.value / output.scale;
+): ProfileInput | undefined {
+  return profile.inputs.find(({ name }) => name === calculation.input);
+}
+
+/** The instruction with the entered input filled in, such as "Mix it into your 1 kg of shredded cabbage." */
+export function calculationInstruction(
+  calculation: ProfileCalculation,
+  input: ProfileInput,
+  inputValue: number,
+): string {
+  return calculation.instruction.replaceAll("{input}", `${formatAmount(inputValue)} ${input.unit}`);
+}
+
+/**
+ * The whole result as one sentence, for screen readers, such as
+ * "20 g salt: mix it into your 1 kg of shredded cabbage (2% of the cabbage weight)."
+ */
+export function calculationSentence(
+  calculation: ProfileCalculation,
+  input: ProfileInput,
+  inputValue: number,
+  value: number,
+): string {
+  const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1);
+  const instruction = lowerFirst(calculationInstruction(calculation, input, inputValue).trim().replace(/\.$/, ""));
+  const reason = calculation.reason.trim() ? ` (${lowerFirst(calculation.reason.trim().replace(/\.$/, ""))})` : "";
+  return `${formatAmount(value)} ${calculation.unit} ${calculation.name.toLowerCase()}: ${instruction}${reason}.`;
+}
+
+/** The prompt shown until the input is entered. */
+export function calculationPrompt(calculation: ProfileCalculation, input: ProfileInput): string {
+  return `Enter the ${input.name.toLowerCase()} to see how much ${calculation.name.toLowerCase()} to use.`;
+}
+
+/** A worked example of the ratio, such as "20 g for 1 kg". */
+export function calculationExample(calculation: ProfileCalculation, input: ProfileInput): string {
+  return `${formatAmount(calculation.amount)} ${calculation.unit} for ${formatAmount(calculation.per)} ${input.unit}`;
 }
 
 export function validateProfile(profile: FermentationProfile): string[] {
   const errors: string[] = [];
   const names = new Set<string>();
   for (const input of profile.inputs) {
-    if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(input.name) || names.has(input.name)) {
-      errors.push(`Input name ${input.name || "(blank)"} must be unique and use letters, numbers, or underscores.`);
+    if (!input.name.trim() || names.has(input.name)) {
+      errors.push("Input names must be present and unique.");
     }
     names.add(input.name);
-    if (!units[input.unit]) errors.push(`${input.name} must use g, kg, ml, or l.`);
-    if (input.defaultValue !== undefined && (!Number.isFinite(input.defaultValue) || input.defaultValue < 0)) errors.push(`${input.name} cannot be negative.`);
+    if (!units.has(input.unit)) errors.push(`${input.name} must use g, kg, ml, or l.`);
   }
   if (profile.expectedDurationDays !== undefined &&
       (!Number.isInteger(profile.expectedDurationDays) || profile.expectedDurationDays < 1)) {
@@ -221,24 +327,23 @@ export function validateProfile(profile: FermentationProfile): string[] {
     errors.push("Temperature range must include both values between 0 and 100°C, with the minimum no greater than the maximum.");
   }
   const calculationNames = new Set<string>();
+  const usedInputs = new Set<string>();
   for (const calculation of profile.calculations) {
-    if (!calculation.name || calculationNames.has(calculation.name)) {
+    if (!calculation.name.trim() || calculationNames.has(calculation.name)) {
       errors.push("Calculation names must be present and unique.");
     }
     calculationNames.add(calculation.name);
-    if (!units[calculation.unit]) {
-      errors.push(`${calculation.name} must use g, kg, ml, or l.`);
-      continue;
+    usedInputs.add(calculation.input);
+    if (!units.has(calculation.unit)) errors.push(`${calculation.name} must use g, kg, ml, or l.`);
+    if (!names.has(calculation.input)) errors.push(`${calculation.name} is based on a missing input.`);
+    if (!(Number.isFinite(calculation.amount) && calculation.amount > 0 &&
+          Number.isFinite(calculation.per) && calculation.per > 0)) {
+      errors.push(`${calculation.name} must use a positive ratio.`);
     }
-    try {
-      calculateProfileValue(
-        profile,
-        calculation,
-        Object.fromEntries(profile.inputs.map((input) => [input.name, 1])),
-      );
-    } catch (error) {
-      errors.push(`${calculation.name}: ${(error as Error).message}`);
-    }
+    if (!calculation.instruction.trim()) errors.push(`${calculation.name} needs an instruction.`);
+  }
+  for (const input of profile.inputs) {
+    if (!usedInputs.has(input.name)) errors.push(`${input.name} is not used by any calculation.`);
   }
   const checkNames = new Set<string>();
   for (const check of profile.checks) {
@@ -270,66 +375,6 @@ export function validateProfile(profile: FermentationProfile): string[] {
 function assertValidProfile(profile: FermentationProfile): void {
   const errors = validateProfile(profile);
   if (errors.length > 0) throw new Error(errors.join(" "));
-}
-
-function evaluateFormula(formula: string, variables: Map<string, Quantity | null>): Quantity | null {
-  const tokens = formula.match(/\d+(?:\.\d+)?%?|[A-Za-z][A-Za-z0-9_]*|[()+\-*/]/g) ?? [];
-  if (tokens.join("") !== formula.replace(/\s/g, "")) throw new Error("Formula contains unsupported syntax");
-  let index = 0;
-  const expression = (): Quantity | null => {
-    let value = term();
-    while (tokens[index] === "+" || tokens[index] === "-") {
-      const operator = tokens[index++];
-      const right = term();
-      if (!value || !right) value = null;
-      else {
-        if (value.family !== right.family) throw new Error("Formula combines incompatible units");
-        value = { ...value, value: operator === "+" ? value.value + right.value : value.value - right.value };
-      }
-    }
-    return value;
-  };
-  const term = (): Quantity | null => {
-    let value = factor();
-    while (tokens[index] === "*" || tokens[index] === "/") {
-      const operator = tokens[index++];
-      const right = factor();
-      if (!value || !right) value = null;
-      else if (operator === "*") {
-        if (value.family !== "scalar" && right.family !== "scalar") throw new Error("Formula cannot multiply two metric quantities");
-        value = {
-          value: value.value * right.value,
-          family: value.family === "scalar" ? right.family : value.family,
-        };
-      } else {
-        if (right.value === 0) throw new Error("Formula cannot divide by zero");
-        if (right.family === "scalar") value = { ...value, value: value.value / right.value };
-        else if (value.family === right.family) value = { value: value.value / right.value, family: "scalar" };
-        else throw new Error("Formula divides incompatible units");
-      }
-    }
-    return value;
-  };
-  const factor = (): Quantity | null => {
-    const token = tokens[index++];
-    if (token === "(") {
-      const value = expression();
-      if (tokens[index++] !== ")") throw new Error("Formula has unmatched parentheses");
-      return value;
-    }
-    if (/^\d/.test(token ?? "")) {
-      const percentage = token.endsWith("%");
-      const value = Number(token.replace("%", ""));
-      if (percentage && (value < 0 || value > 100)) throw new Error("Percentage must be between 0% and 100%");
-      return { value: percentage ? value / 100 : value, family: "scalar" };
-    }
-    if (!variables.has(token)) throw new Error(`Unknown input ${token ?? "(missing)"}`);
-    return variables.get(token) ?? null;
-  };
-  const result = expression();
-  if (index !== tokens.length) throw new Error("Formula is invalid");
-  if (result && result.value < 0) throw new Error("Calculation cannot be negative");
-  return result;
 }
 
 export function addProfile(
@@ -364,4 +409,19 @@ export function deleteProfile(
   id: string,
 ): ProfileState {
   return { ...state, profiles: state.profiles.filter((candidate) => candidate.id !== id) };
+}
+
+/** Re-adds deleted starter profiles with their original values; never replaces a profile that still exists. */
+export function restoreStarterProfiles(state: ProfileState): { state: ProfileState; restored: string[] } {
+  const existing = new Set(state.profiles.map(({ id }) => id));
+  const missing = starterProfiles.filter(({ id }) => !existing.has(id)).map(cloneProfile);
+  return {
+    state: missing.length ? { ...state, profiles: [...state.profiles, ...missing] } : state,
+    restored: missing.map(({ name }) => name),
+  };
+}
+
+/** A copy of a profile under a new id; a copied starter profile keeps its calculations. */
+export function duplicateProfile(profile: FermentationProfile, id: string, name: string): FermentationProfile {
+  return { ...cloneProfile(profile), id, name };
 }

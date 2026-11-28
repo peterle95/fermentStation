@@ -43,3 +43,24 @@ export const pwaManifest: PwaManifest = {
 export function shouldRegisterServiceWorker(input: { native: boolean }): boolean {
   return !input.native;
 }
+
+/**
+ * Waiting-update state shared by the service-worker registration (main.tsx) and UpdatePrompt.
+ * offer() is called when a new version has installed beside the active one; apply() activates it and reloads.
+ */
+let applyWaitingUpdate: (() => Promise<void>) | null = null;
+const updateListeners = new Set<() => void>();
+
+export const pwaUpdate = {
+  subscribe(listener: () => void): () => void {
+    updateListeners.add(listener);
+    return () => updateListeners.delete(listener);
+  },
+  isAvailable: (): boolean => applyWaitingUpdate !== null,
+  offer(apply: () => Promise<void>): void {
+    applyWaitingUpdate = apply;
+    updateListeners.forEach((listener) => listener());
+  },
+  apply: (): Promise<void> => applyWaitingUpdate?.() ?? Promise.resolve(),
+};
+

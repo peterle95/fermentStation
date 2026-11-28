@@ -246,8 +246,7 @@ function validateImportedRecords(profiles: ProfileState, batches: BatchState): v
     }
     if (Object.values(batch.calculationValues).some((value) =>
       !value || typeof value !== "object" ||
-      value.suggested !== null && !nonnegative(value.suggested) ||
-      value.override !== undefined && !nonnegative(value.override))) {
+      value.suggested !== null && !nonnegative(value.suggested))) {
       throw new Error("Archive contains an invalid batch calculation");
     }
     const checkNames = new Set<string>();

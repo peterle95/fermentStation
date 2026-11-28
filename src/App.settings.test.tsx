@@ -138,9 +138,9 @@ describe("Settings and data feedback", () => {
     expect(document.querySelector("#batch-activity-form")).toBeNull();
   });
 
-  it("exposes named groups, dark-selection semantics, formula feedback and bundled licenses", async () => {
+  it("exposes named groups, dark-selection semantics, starter restore feedback and bundled licenses", async () => {
     const settings = await openSettings();
-    for (const name of ["Household preferences", "Notifications", "Data storage", "Data exchange", "Recently deleted batches", "Formula dropdown terms", "About FermentStation", "Credits and licenses"]) {
+    for (const name of ["Household preferences", "Notifications", "Data storage", "Data exchange", "Recently deleted batches", "Starter profiles", "About FermentStation", "Credits and licenses"]) {
       expect(settings.getByRole("region", { name })).toBeTruthy();
       expect(settings.getByRole("heading", { name, level: 2 })).toBeTruthy();
     }
@@ -158,16 +158,16 @@ describe("Settings and data feedback", () => {
     expect(JSON.parse(localStorage.getItem("fermentstation.shell")!)).toMatchObject({ suggestions: false });
     expect(settings.queryByRole("button", { name: "Choose folder" })).toBeNull();
 
-    const term = settings.getByLabelText("New formula term");
-    fireEvent.change(term, { target: { value: "bad term" } });
-    fireEvent.click(settings.getByRole("button", { name: "Add term" }));
-    expect(settings.getByText(/Formula terms must start with a letter/).closest('[role="alert"]')).toBeTruthy();
-    expect(term.getAttribute("aria-describedby")).toContain("formula-term-error");
-    fireEvent.change(term, { target: { value: "starterLiquid" } });
-    fireEvent.click(settings.getByRole("button", { name: "Add term" }));
-    fireEvent.click(settings.getByRole("button", { name: "Save formula terms" }));
-    expect(JSON.parse(localStorage.getItem("fermentstation.shell")!).formulaTerms).toContain("starterLiquid");
-    expect(settings.getByText("Formula terms saved on this device.").closest('[role="status"]')).toBeTruthy();
+    expect(JSON.parse(localStorage.getItem("fermentstation.shell")!)).not.toHaveProperty("formulaTerms");
+
+    // Restoring re-adds the deleted starters after the kept one and never replaces it.
+    const restore = settings.getByRole("button", { name: "Restore starter profiles" });
+    await act(async () => { fireEvent.click(restore); });
+    expect(settings.getByText("Restored Kombucha F2, Kimchi, Sauerkraut, Vegetables in brine, Milk kefir, Sourdough starter.").closest('[role="status"]')).toBeTruthy();
+    const restored = JSON.parse(localStorage.getItem("fermentstation.profiles")!).profiles as { id: string }[];
+    expect(restored.map(({ id }) => id)).toEqual(createProfileState().profiles.map(({ id }) => id));
+    await act(async () => { fireEvent.click(restore); });
+    expect(settings.getByText("All starter profiles are already in your profiles. Nothing was changed.")).toBeTruthy();
     expect(settings.getByRole("link", { name: "Unique end-user license" }).getAttribute("href")).toContain("fonts/unique/License.pdf");
     expect(settings.getByRole("link", { name: "Sofia Sans Open Font License" }).getAttribute("href")).toContain("SofiaSansExtraCondensed-OFL.txt");
   });

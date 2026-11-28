@@ -344,7 +344,7 @@ describe("bowed outline primitive (docs/design/swipe-component-spec.md §2)", ()
     "profile-editor-head", "calendar-panel", "settings-card", "batch-component-card", "summary-row", "small-card",
     // Ticket 12: the former rounded rectangles.
     "app-loading", "empty-state", "ios-install-guide", "design-tip", "design-input-summary", "next-action", "wb-panel",
-    "batch-tools-danger", "profile-overview-intro", "start-batch-basics", "start-profile-summary", "profile-editor-card",
+    "batch-tools-danger", "profile-overview-intro", "start-batch-basics", "profile-editor-card",
     // Ticket 13: the inline observation logger's card (bowed only while inline).
     "activity-logger-card",
     // Variant B batch details (prototypes/batch_details): the due check, the pH card and the two mini readings.
@@ -883,7 +883,7 @@ describe("sheet and field on black (swipe-rework-log.md, ticket 5; spec §1.7, g
 
   it("keeps pastel boxes and pressed chips inside the sheet readable with ink", () => {
     const membership = inkMembership();
-    for (const selector of [".profile-overview-intro", ".start-batch-basics", ".start-profile-summary", '.station-dialog .quick-log-types button[aria-pressed="true"]']) {
+    for (const selector of [".profile-overview-intro", ".start-batch-basics", '.station-dialog .quick-log-types button[aria-pressed="true"]']) {
       expect(membership.get(selector), selector).toBe("fill");
     }
     expect(rule('.station-dialog .quick-log-types button[aria-pressed="true"]')).toContain("background: var(--colour-action)");
@@ -1789,20 +1789,21 @@ describe("last small boxes on board primitives, one-line sidebar label, selected
     for (const selector of [".design-skip-link", "kbd"]) expect(rule(selector), selector).toContain("border-radius: var(--radius-control)");
   });
 
-  it("makes the measurement tiles, formula rows and legacy formulas small cards", () => {
+  it("makes the measurement tiles small cards", () => {
     expect(app).toContain('<div className={`meas small-card bowed${phOutsideZone ? " meas-alert" : ""}`}>');
     expect(app).toContain('<div className={`meas small-card bowed${temperatureAlert}`}>');
     expect(app).toContain('" meas-cool small-card-blue"');
-    expect(app).toContain('return <div className="meas small-card bowed" key={calculation.name}>');
+    // The calculated amounts moved to the Recipe; Key measurements has no calculation tiles.
+    expect(app).not.toContain('className="meas small-card bowed" key={calculation.name}');
     expect(app).not.toMatch(/className="meas"/);
     expect(rule(".meas-alert")).toBe(" --fill: var(--colour-surface); ");
     expect(rules().some((entry) => entry.selectors.some((selector) => /^\.meas(?:-cool)?$/.test(selector)))).toBe(false);
     expect(rule(".meas-grid")).toContain("gap: var(--small-card-spacing)");
-    expect(app).toContain('<div className="legacy-formula small-card bowed" key={row.id}>');
-    expect(app).toContain('<div className="profile-editor-formula-row small-card bowed" key={row.id}>');
-    expect(rule(".profile-editor-formula-row")).toBe(" grid-template-columns: repeat(2, minmax(0, 1fr)); ");
-    // Only its type role names .legacy-formula now; the small card paints it.
-    for (const entry of rules()) if (entry.selectors.includes(".legacy-formula")) for (const [property] of entry.declarations) expect(property).not.toMatch(/^(?:background|border|padding|display)/);
+    expect(app).toContain('className={`calculation-card small-card bowed${amount === null ? " calculation-card-empty" : ""}`}');
+    // The formula builder is gone: no rule styles its rows or legacy formulas any more.
+    expect(rules().some((entry) => entry.selectors.some((selector) => /legacy-formula|profile-editor-formula-row/.test(selector)))).toBe(false);
+    // The small card paints the result card; its own rules only lay it out.
+    for (const entry of rules()) if (entry.selectors.includes(".calculation-card")) for (const [property] of entry.declarations) expect(property).not.toMatch(/^(?:background|border)/);
   });
 
   it("frames photos in bowed boxes and puts the detail status on the glass chip", () => {

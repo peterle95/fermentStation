@@ -23,7 +23,6 @@ import {
   phZoneLabel,
   restoreBatch,
   restoreTimelineEntry,
-  overrideBatchCalculation,
   setBatchInput,
   setFinishDate,
   statusLabel,
@@ -53,23 +52,20 @@ describe("batches", () => {
       notificationsMuted: false,
       timeline: [],
       timelineTrash: [],
-      inputValues: {},
-      calculationValues: {},
+      inputValues: { "Water volume": undefined },
+      calculationValues: {
+        Sugar: { suggested: null },
+        Tea: { suggested: null },
+        "Starter liquid": { suggested: null },
+      },
       checks: [],
       finishDate: undefined,
       profileSnapshot: {
-        id: "starter-kombucha-f1",
+        ...createProfileState().profiles[0],
         name: "Kombucha F1",
-        guidance: [
-          "Keep at room temperature and cover with a breathable cloth.",
-          "Taste after 7 days, then bottle when pleasantly tart.",
-        ],
-        inputs: [],
-        calculations: [],
-        checks: [],
-        phZones: [],
       },
     });
+    expect(batch.profileSnapshot.calculations).not.toBe(source.calculations);
   });
 
   it("uses the profile name when the optional batch name is blank", () => {
@@ -151,41 +147,32 @@ describe("batches", () => {
     expect(deleteTimelineEntry(ready, "ready", 1).status).toBe("active");
   });
 
-  it("snapshots inputs, updates decimal suggestions, and freezes overrides per batch", () => {
-    const source = {
-      ...profile(),
-      inputs: [{ name: "cabbage", unit: "kg" as const, defaultValue: 2 }],
-      calculations: [{ name: "salt", unit: "g" as const, formula: "cabbage * 2%" }],
-    };
+  it("snapshots calculations and recalculates every amount from the inputs", () => {
+    const source = createProfileState().profiles.find(({ id }) => id === "starter-sauerkraut")!;
     const first = createBatch(source, { id: "first", startDate: "2026-08-01" });
-    const second = createBatch(source, { id: "second", startDate: "2026-08-01" });
-    const changed = setBatchInput(first, "cabbage", 1.25);
-    const overridden = overrideBatchCalculation(changed, "salt", 26.5);
-    const changedAgain = setBatchInput(overridden, "cabbage", 3);
+    const second = createBatch(source, { id: "second", startDate: "2026-08-01", inputValues: { "Cabbage weight": 2 } });
+    const changed = setBatchInput(first, "Cabbage weight", 1.25);
+    const changedAgain = setBatchInput(changed, "Cabbage weight", 3);
+    const cleared = setBatchInput(changedAgain, "Cabbage weight");
 
-    source.inputs[0].defaultValue = 5;
-    expect(changed.calculationValues.salt.suggested).toBe(25);
-    expect(changedAgain.calculationValues.salt).toEqual({ suggested: 25, override: 26.5 });
-    expect(second.calculationValues.salt.suggested).toBe(40);
-    expect(first.profileSnapshot.inputs[0].defaultValue).toBe(2);
+    source.calculations[0].amount = 50;
+    expect(first.calculationValues.Salt).toEqual({ suggested: null });
+    expect(changed.calculationValues.Salt.suggested).toBe(25);
+    expect(changedAgain.calculationValues.Salt).toEqual({ suggested: 60 });
+    expect(cleared.calculationValues.Salt).toEqual({ suggested: null });
+    expect(second.calculationValues.Salt.suggested).toBe(40);
+    expect(first.profileSnapshot.calculations[0].amount).toBe(20);
   });
 
-  it("leaves runtime-invalid suggestions incomplete and preserves overrides", () => {
-    const source = {
-      ...profile(),
-      inputs: [{ name: "weight", unit: "kg" as const, defaultValue: 1 }],
-      calculations: [{ name: "remainder", unit: "g" as const, formula: "weight - 1000" }],
-    };
+  it("clears a suggestion when the input is emptied and rejects invalid inputs", () => {
+    const source = createProfileState().profiles.find(({ id }) => id === "starter-sauerkraut")!;
+    const batch = createBatch(source, { id: "batch", startDate: "2026-08-01", inputValues: { "Cabbage weight": 1 } });
 
     expect(validateProfile(source)).toEqual([]);
-    const batch = createBatch(source, {
-      id: "runtime-negative", startDate: "2026-08-01", inputValues: { weight: 0.5 },
-    });
-    expect(batch.calculationValues.remainder.suggested).toBeNull();
-
-    const overridden = overrideBatchCalculation(batch, "remainder", 10);
-    expect(setBatchInput(overridden, "weight", 0.25).calculationValues.remainder)
-      .toEqual({ suggested: null, override: 10 });
+    expect(setBatchInput(batch, "Cabbage weight").calculationValues.Salt).toEqual({ suggested: null });
+    expect(() => setBatchInput(batch, "Cabbage weight", -1)).toThrow("cannot be negative");
+    expect(() => setBatchInput(batch, "Cabbage weight", Number.NaN)).toThrow("cannot be negative");
+    expect(() => setBatchInput(batch, "Water volume", 1)).toThrow("Unknown input");
   });
 
   it("uses calendar finish dates for automatic and manual status transitions", () => {

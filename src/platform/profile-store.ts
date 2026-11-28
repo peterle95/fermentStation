@@ -1,6 +1,7 @@
 import {
   normalizeProfile,
   normalizeProfileChecks,
+  withStarterAmounts,
   type FermentationProfile,
   type ProfileRecord,
   type ProfileState,
@@ -35,12 +36,12 @@ function isProfile(value: unknown): value is ProfileRecord {
   return ["id", "name"].every((key) => typeof profile[key] === "string") && hasGuidance && Array.isArray(inputs) && inputs.every((input) => {
     if (!input || typeof input !== "object") return false;
     const candidate = input as Record<string, unknown>;
-    return typeof candidate.name === "string" && ["g", "kg", "ml", "l"].includes(String(candidate.unit)) &&
-      (candidate.defaultValue === undefined || typeof candidate.defaultValue === "number");
+    return typeof candidate.name === "string" && ["g", "kg", "ml", "l"].includes(String(candidate.unit));
   }) && Array.isArray(calculations) && calculations.every((calculation) => {
     if (!calculation || typeof calculation !== "object") return false;
     const candidate = calculation as Record<string, unknown>;
-    return ["name", "formula"].every((key) => typeof candidate[key] === "string") &&
+    return ["name", "input", "instruction", "reason"].every((key) => typeof candidate[key] === "string") &&
+      ["amount", "per"].every((key) => typeof candidate[key] === "number") &&
       ["g", "kg", "ml", "l"].includes(String(candidate.unit));
   }) &&
     Array.isArray(checks) && checks.every((check) => {
@@ -60,13 +61,13 @@ function isProfile(value: unknown): value is ProfileRecord {
 }
 
 function normalizeStoredProfile(profile: ProfileRecord): FermentationProfile {
-  return {
+  return withStarterAmounts({
     ...normalizeProfile(profile),
     inputs: profile.inputs ?? [],
     calculations: profile.calculations ?? [],
     checks: normalizeProfileChecks(profile.checks ?? [], `profile-check-${profile.id}`),
     phZones: profile.phZones ?? [],
-  };
+  });
 }
 
 function isProfileState(value: unknown): value is { profiles: ProfileRecord[] } {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createShellState, defaultFormulaTerms } from "../domain/shell";
+import { createShellState } from "../domain/shell";
 import { browserShellStore, createShellStore } from "./shell-store";
 
 describe("shell store", () => {
@@ -16,9 +16,9 @@ describe("shell store", () => {
       },
     });
 
-    browserShellStore.save({ destination: "calendar", formulaTerms: ["water", "tea"], units: "imperial", notificationMode: "off", suggestions: true });
+    browserShellStore.save({ destination: "calendar", units: "imperial", notificationMode: "off", suggestions: true });
 
-    expect(browserShellStore.load()).toEqual({ destination: "calendar", formulaTerms: ["water", "tea"], units: "imperial", notificationMode: "off", suggestions: true });
+    expect(browserShellStore.load()).toEqual({ destination: "calendar", units: "imperial", notificationMode: "off", suggestions: true });
   });
 
   it("round-trips a selected destination", () => {
@@ -28,18 +28,18 @@ describe("shell store", () => {
       setItem: (key, value) => values.set(key, value),
     });
 
-    store.save({ destination: "batches", formulaTerms: ["totalWeight", "salt"], units: "metric", notificationMode: "ready", suggestions: false });
+    store.save({ destination: "batches", units: "metric", notificationMode: "ready", suggestions: false });
 
-    expect(store.load()).toEqual({ destination: "batches", formulaTerms: ["totalWeight", "salt"], units: "metric", notificationMode: "ready", suggestions: false });
+    expect(store.load()).toEqual({ destination: "batches", units: "metric", notificationMode: "ready", suggestions: false });
   });
 
-  it("adds default formula terms to older persisted state", () => {
+  it("fills preference defaults for older persisted state", () => {
     const store = createShellStore({
       getItem: () => '{"destination":"profiles"}',
       setItem: () => undefined,
     });
 
-    expect(store.load()).toEqual({ destination: "profiles", formulaTerms: defaultFormulaTerms, units: "metric", notificationMode: "off", suggestions: true });
+    expect(store.load()).toEqual({ destination: "profiles", units: "metric", notificationMode: "off", suggestions: true });
   });
 
   it("migrates enabled legacy check reminders", () => {
@@ -54,20 +54,6 @@ describe("shell store", () => {
   it("ignores an invalid notification mode", () => {
     const store = createShellStore({
       getItem: () => '{"destination":"profiles","notificationMode":"loud"}',
-      setItem: () => undefined,
-    });
-
-    expect(store.load()).toBeNull();
-  });
-
-  it.each([
-    '[]',
-    '["water","water"]',
-    '["water weight"]',
-    '[42]',
-  ])("rejects malformed formula terms: %s", (formulaTerms) => {
-    const store = createShellStore({
-      getItem: () => `{"destination":"profiles","formulaTerms":${formulaTerms}}`,
       setItem: () => undefined,
     });
 

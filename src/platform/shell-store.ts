@@ -1,4 +1,4 @@
-import { defaultFormulaTerms, destinations, notificationModes, type ShellPreferences, type ShellState } from "../domain/shell";
+import { destinations, notificationModes, type ShellPreferences, type ShellState } from "../domain/shell";
 
 export interface ShellStore {
   load(): ShellState | null;
@@ -17,9 +17,8 @@ export function parseShellState(value: unknown): ShellState | null {
     return null;
   }
 
-  const { destination, formulaTerms, units, notificationMode, checkReminders, suggestions } = value as {
+  const { destination, units, notificationMode, checkReminders, suggestions } = value as {
     destination?: unknown;
-    formulaTerms?: unknown;
     units?: unknown;
     notificationMode?: unknown;
     // Legacy preference from the check-only notification implementation.
@@ -28,11 +27,6 @@ export function parseShellState(value: unknown): ShellState | null {
   };
 
   if (!destinations.some((validDestination) => validDestination === destination)) {
-    return null;
-  }
-  if (formulaTerms !== undefined && (!Array.isArray(formulaTerms) || formulaTerms.length === 0 ||
-      formulaTerms.some((term) => typeof term !== "string" || !/^[A-Za-z][A-Za-z0-9_]*$/.test(term)) ||
-      new Set(formulaTerms).size !== formulaTerms.length)) {
     return null;
   }
   if (units !== undefined && units !== "metric" && units !== "imperial") return null;
@@ -49,7 +43,6 @@ export function parseShellState(value: unknown): ShellState | null {
   };
   return {
     destination: destination as ShellState["destination"],
-    formulaTerms: formulaTerms ?? [...defaultFormulaTerms],
     ...preferences,
   };
 }

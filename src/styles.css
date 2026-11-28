@@ -355,7 +355,8 @@ body { margin: 0; }
 /* iOS 26 home-screen apps installed with the translucent status bar report a viewport that is short by the status
    bar height while the document is no taller than that viewport (WebKit 301108), which lifts the fixed shell and
    the nav off the bottom edge. A document at least screen-tall makes iOS hand over the full screen. Where the
-   viewport is already right, 100% + the top inset exceeds 100lvh and min() keeps the page at 100lvh. */
+   viewport is already right, 100% + the top inset exceeds 100lvh and min() keeps the page at 100lvh.
+   See docs/design/ios-home-screen-layout.md. */
 @media (display-mode: standalone) {
   html { min-height: min(100lvh, calc(100% + env(safe-area-inset-top, 0px))); }
 }
@@ -484,7 +485,7 @@ input::file-selector-button,
 .activity-logger-card,
 .profile-overview-intro,
 .start-batch-basics,
-.start-profile-summary,
+.start-batch-inputs,
 .station-dialog .quick-log-types button[aria-pressed="true"],
 .profile-card,
 .profile-list .empty-state,
@@ -526,8 +527,8 @@ input::file-selector-button,
 .bd-done,
 .bd-link,
 .timeline-description:hover:not(:disabled),
-.component-calculation-value,
 .start-batch-basics legend,
+.start-batch-inputs legend,
 .profiles-screen,
 .calendar-screen,
 .calendar-day.selected,
@@ -553,9 +554,9 @@ h1 { font-size: var(--type-headline); font-weight: var(--type-headline-weight); 
 h2, h3, h4, .sm-panel-brand { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); }
 .design-tip h3, .design-batch-bottom strong, .design-batch-words strong, .design-detail-top h2, .bd-id h3, .bd-mini strong, .design-input-summary h4, .batch-component-header h4, .profile-editor-note h3, .station-dialog-body h3, .settings-card h3, .checks-paused-row strong, .upcoming-body b, .profile-mobile-bar strong { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
 .navigation button, .design-batch-bottom > span, .design-batch-words > span, .design-topbar-copy p, .design-check-copy strong, .toggle-row, .trash-item > span, .summary-row-label { font-size: var(--type-row); font-weight: var(--type-row-weight); line-height: var(--type-row-leading); letter-spacing: var(--type-row-tracking); }
-body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .design-ingredients p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .start-profile-summary p, .start-profile-summary summary, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
-button, .small-card-tag, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .calendar-day, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .bd-ring b, .design-ingredients > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
-small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-label, .design-photo-label, .design-check-copy > span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .detail-check-state, .bd-id p, .bd-kick, .bd-chip, .bd-safe, .bd-axis, .bd-empty, .bd-mini time, .bd-label, .bd-quick-item span, .bd-ring small, .timeline-description, .timeline-entry > time, .bd-steps, .wb-panel > h4 > span, .meas-label, .meas-note, .component-calculation-value > span, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .legacy-formula, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
+body, input, select, textarea, .station-dialog, .design-view-heading p, .screen-intro, .design-empty-checks, .checks-caught-up, .checks-paused p, .design-tip p, .timeline-entry, .batch-tools-heading p, .batch-tool-feedback, .batch-tools-danger p, .next-action p, .component-check-state, .station-dialog-body dd, .profile-card-guidance, .profile-editor-intro, .profile-editor-check-empty, .profile-editor-card > p, .calendar-helper, .calendar-empty, .settings-recovery ul, .settings-card p { font-size: var(--type-body); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); }
+button, .small-card-tag, summary, .summary-row-count, .station-dialog-heading h2, .section-label a, .field-error, .calendar-day, .design-toast, .profile-editor-toast, .status, .design-badge, .zone, .bd-ring b, .recipe-measure > span, .batch-component-step, .component-field, .component-check-status, .station-field, .quick-log-fields label, .profile-facts, .profile-editor-status, .profile-editor-field, .profile-editor-check-row label, .profile-editor-guidance-head, .profile-editor-guidance-row, .settings-state-label, .settings-card label, .settings-exchange input[type="file"] { font-size: var(--type-label); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); }
+small, .small-card-chip, .optional, .hint, .muted-copy, .eyebrow, .big-number-caption, .design-summary-label p, .design-stat-row > div:first-child, .design-stat-number > span, .design-section-head > span:not(.design-badge), .design-batch-label, .design-photo-label, .design-check-copy > span, .checks-paused-row > span > span, .upcoming-strip time, .upcoming-strip button > div, .detail-check-state, .bd-id p, .bd-kick, .bd-chip, .bd-safe, .bd-axis, .bd-empty, .bd-mini time, .bd-label, .bd-quick-item span, .bd-ring small, .timeline-description, .timeline-entry > time, .bd-steps, .wb-panel > h4 > span, .meas-label, .meas-note, .component-pair-label, .component-empty, .station-dialog-body dl, .station-helper, .station-options, .quick-log-actions > span, .logger-options, .profile-toolbar, .profile-card-link, .profile-editor-eyebrow, .profile-editor-kicker, .profile-editor-suffix i, .profile-editor-check-unit, .calculation-reason, .profile-editor-meta > div, .calendar-weekdays, .calendar-legend, .upcoming-date span, .upcoming-body p, .setting-export, .settings-version { font-size: var(--type-meta); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); color: var(--ink-meta); }
 strong, b, .warning { font-weight: var(--type-title-weight); }
 
 /* Bowed outline (spec §2.3): the one silhouette for every large card. Straight sides, top and
@@ -943,10 +944,15 @@ button.design-batch-swipe.glass:hover:not(:disabled) { --glass: var(--batch-swip
 .batch-photo-retry { position: absolute; bottom: var(--space-12); z-index: 1; background: var(--colour-background); padding: var(--space-2) var(--space-3); }
 .design-detail-photo .batch-photo-retry { bottom: var(--space-1); min-height: var(--target-min); padding: 0 var(--space-2); }
 .design-detail-photo > svg { width: 40px; height: 56px; }
+/* In the detail header the frame is a 96px circle (--r of 50%, no bow, the circle's curve constant) and the
+   illustration keeps its whole picture inside: the padding fits its square within the circle, on the profile
+   colour. A user photo still fills the circle. */
+.bd-head .design-detail-photo { width: 96px; height: 96px; --r: 50%; --bow: 0px; --bow-end: 0px; --k: 0.448; }
+.bd-head .design-detail-photo:not(.user-photo) img { padding: 14px; }
 .bd-id { flex: 1; min-width: 0; }
 .bd-id :is(h3, p) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bd-id p { margin-top: var(--space-1); }
-.bd-ring { position: relative; display: grid; place-items: center; flex: none; width: 78px; height: 78px; }
+.bd-ring { position: relative; display: grid; place-items: center; flex: none; width: 96px; height: 96px; }
 .bd-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
 .bd-ring p { display: grid; justify-items: center; }
 .bd-panes { display: grid; gap: var(--space-3); align-content: start; }
@@ -1018,11 +1024,17 @@ button.design-batch-swipe.glass:hover:not(:disabled) { --glass: var(--batch-swip
 .timeline-entry-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); padding-top: var(--space-2); }
 .timeline-entry-actions button { min-height: var(--target-min); padding: var(--space-2) var(--space-4); border-color: transparent; }
 .timeline-trash { display: grid; gap: var(--space-3); margin-top: var(--space-4); padding: var(--card-padding); --fill: var(--colour-surface-inverse); --stroke: currentColor; --stroke-w: var(--stroke-width); }
-/* Recipe: the peach card with the inputs, the guidance steps and the profile link. */
-.design-input-summary { display: grid; gap: var(--space-4); padding: var(--space-6); --r: 36px; --fill: var(--colour-avatar-peach); }
-.design-input-summary .design-section-head { margin-bottom: 0; }
-.design-ingredients { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.design-ingredients > span { display: inline-flex; align-items: center; min-height: 34px; padding: 0 var(--space-3); border-radius: var(--radius-control); background: var(--colour-chip); }
+/* Recipe: the peach card with the measurements, their amounts and how to use them, the guidance steps and the
+   profile link. */
+.design-input-summary { display: grid; align-content: start; gap: var(--space-4); padding: var(--space-6); --r: 36px; --fill: var(--colour-avatar-peach); }
+/* One compact row per measurement (name, number, unit) and one line per amount; the error spans the row. */
+.recipe-measures, .recipe-amounts { display: grid; gap: var(--space-2); }
+.recipe-measure { display: grid; grid-template-columns: minmax(0, 1fr) minmax(5.5rem, 8rem) auto; align-items: center; gap: var(--space-2) var(--space-3); }
+.recipe-measure input { min-height: var(--target-min); padding-block: var(--space-1); background: var(--colour-surface); text-align: right; }
+.recipe-measure .field-error { grid-column: 1 / -1; }
+.recipe-amounts { padding: 0; list-style: none; }
+.design-input-summary :is(ul, ol) { margin: 0; }
+.recipe-amounts li { display: flex; align-items: baseline; gap: var(--space-3); }
 .bd-steps { display: grid; gap: var(--space-2); padding-left: 1.3em; }
 .bd-link { display: inline-flex; align-items: center; justify-self: start; gap: var(--space-2); min-height: var(--target-min); padding: 0 var(--space-4); border: 0; background: var(--colour-surface-inverse); }
 .bd-link svg { width: 18px; height: 18px; }
@@ -1074,10 +1086,7 @@ button.design-batch-swipe.glass:hover:not(:disabled) { --glass: var(--batch-swip
 .batch-component-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-bottom: var(--space-4); }
 .batch-component-header h4 { flex: 1; }
 .batch-component-step { display: grid; place-items: center; flex: 0 0 var(--target-min); width: var(--target-min); height: var(--target-min); border: 1px solid currentColor; border-radius: 50%; }
-.component-field, .component-inputs, .component-input-fields, .component-calculation, .component-check { display: grid; gap: var(--space-3); }
-.component-calculation + .component-calculation { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--component-border); }
-.component-calculation-value { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-control); background: var(--colour-surface-inverse); }
-.component-override { display: grid; gap: var(--space-3); }
+.component-field, .component-check { display: grid; gap: var(--space-3); }
 .component-check { padding-block: var(--space-4); border-top: 1px solid var(--component-border); }
 .component-check-meta { display: grid; gap: var(--space-3); }
 .component-check-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
@@ -1132,10 +1141,9 @@ button.design-batch-swipe.glass:hover:not(:disabled) { --glass: var(--batch-swip
 .profile-overview { display: grid; gap: var(--space-4); }
 .profile-overview-intro { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(100px, 0.6fr); gap: var(--space-4); padding: var(--space-4); --fill: var(--colour-surface); }
 .profile-guidance-steps { display: grid; gap: var(--space-3); padding-left: var(--space-6); margin-block: var(--space-4); overflow-wrap: anywhere; }
-.start-batch-basics { padding: var(--space-4); margin-top: var(--space-6); --fill: var(--colour-accent); }
-.start-batch-basics legend { border-radius: var(--radius-control); padding: var(--space-1) var(--space-4); background: var(--colour-surface-inverse); color: var(--ink-accent); }
-.start-batch-basics .station-field:first-of-type { margin-top: 0; }
-.start-profile-summary { margin-top: var(--space-6); padding: var(--space-4); --fill: var(--colour-surface); }
+.start-batch-basics, .start-batch-inputs { padding: var(--space-4); margin-top: var(--space-6); --fill: var(--colour-accent); }
+.start-batch-basics legend, .start-batch-inputs legend { border-radius: var(--radius-control); padding: var(--space-1) var(--space-4); background: var(--colour-surface-inverse); color: var(--ink-accent); }
+.start-batch-basics .station-field:first-of-type, .start-batch-inputs .station-field:first-of-type { margin-top: 0; }
 .observation-fields, .observation-actions { display: contents; }
 .observation-form { margin: 0; padding: 0; }
 .quick-log-form { display: grid; gap: var(--space-6); margin-top: var(--space-6); }
@@ -1210,7 +1218,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 .profile-editor-section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-6); }
 .profile-editor-intro { margin-top: var(--space-3); }
 .profile-editor-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
-.profile-editor-field, .profile-editor-check-row label, .profile-editor-formula-row label { display: grid; gap: var(--space-2); }
+.profile-editor-field, .profile-editor-check-row label { display: grid; gap: var(--space-2); }
 .profile-editor-field.wide, .profile-editor-guidance { grid-column: 1 / -1; }
 .profile-editor-guidance, .profile-editor-guidance-rows, .profile-editor-checks { display: grid; gap: var(--space-4); }
 .profile-editor-guidance-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); }
@@ -1221,10 +1229,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 .profile-editor-suffix i { position: absolute; top: 50%; right: var(--space-4); transform: translateY(-50%); pointer-events: none; font-style: normal; }
 .profile-editor-check-row { display: grid; align-items: end; gap: var(--space-3); grid-template-columns: minmax(0, 1fr) 88px auto var(--target-min); padding-block: var(--space-4); border-top: 1px solid var(--editor-border); }
 .profile-editor-check-unit { align-self: center; }
-.profile-editor-formula { display: grid; gap: var(--space-4); border: 0; padding: 0; }
-/* Formula rows are small cards (lilac gradient, bowed by the small-component rule). */
-.profile-editor-formula-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.profile-editor-formula-row button { grid-column: 1 / -1; }
 .profile-editor-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-6); padding-bottom: var(--space-6); }
 .profile-editor-actions > div { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .profile-editor-button { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); }
@@ -1337,8 +1341,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
 [aria-checked="true"] > .toggle-switch::after { transform: translateX(calc(var(--switch-width) - var(--switch-height))); }
 .settings .form-actions > button { flex: 1 1 160px; }
 .settings button:disabled { opacity: 1; border-style: dashed; background: var(--colour-background); }
-.settings-exchange label, .formula-term label { display: grid; gap: var(--space-2); }
-.formula-term { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--space-3); }
+.settings-exchange label { display: grid; gap: var(--space-2); }
 .settings-trash-toggle { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); width: 100%; text-align: left; background: var(--colour-surface-inverse); }
 .settings-count { display: grid; place-items: center; flex: none; min-width: var(--target-min); min-height: var(--target-min); padding-inline: var(--space-2); border-radius: var(--radius-control); background: var(--colour-action); }
 .deleted-batches-panel { display: grid; gap: var(--space-3); }
@@ -1455,7 +1458,7 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .queue-icon svg { width: 20px; height: 20px; }
   .station-dialog-body dl { grid-template-columns: minmax(0, 1fr); }
   .station-dialog-body dd { margin-bottom: var(--space-2); }
-  .profile-editor-fields, .profile-editor-formula-row { grid-template-columns: minmax(0, 1fr); }
+  .profile-editor-fields { grid-template-columns: minmax(0, 1fr); }
   .profile-editor-check-row { grid-template-columns: minmax(0, 1fr) auto var(--target-min); }
   .profile-editor-check-row label:first-child { grid-column: 1 / -1; }
   .profile-editor-head { display: grid; }
@@ -1466,7 +1469,6 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   .profile-editor-shell .navigation { display: none; }
   .setting-row { align-items: stretch; flex-direction: column; }
   .setting-body { min-width: 0; }
-  .formula-term { grid-template-columns: minmax(0, 1fr); }
   .settings-card > button { justify-self: stretch; }
   .calendar-panel { padding: var(--space-4) 0; }
   .calendar-head, .calendar-legend, .calendar-helper { padding-inline: var(--space-4); }
@@ -1587,3 +1589,23 @@ kbd { border: 1px solid var(--colour-border); border-radius: var(--radius-contro
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   button:hover, button:active, .design-batch-card:hover img, .design-batch-card:hover .design-batch-circle, .profile-card:hover img { transform: none !important; }
 }
+
+/* Fixed profile calculations (ADR 0002): a result is a small card read amount first, then what it is, what to do
+   with it, and why. The visible parts are aria-hidden; screen readers get one sentence from the card's .sr-only. */
+.calculation-cards { display: grid; gap: var(--small-card-spacing); margin-top: var(--space-4); }
+.calculation-card > div { display: grid; gap: var(--space-2); }
+.calculation-card p { margin: 0; }
+.calculation-amount { font-size: var(--type-heading); font-weight: var(--type-heading-weight); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); font-variant-numeric: tabular-nums; }
+.calculation-amount small { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); color: inherit; }
+.calculation-name { font-size: var(--type-subheading); font-weight: var(--type-subheading-weight); line-height: var(--type-subheading-leading); letter-spacing: var(--type-subheading-tracking); }
+.calculation-list { display: grid; gap: var(--space-2); margin: 0; padding-left: var(--space-6); overflow-wrap: anywhere; }
+.batch-components-shell .calculation-card { margin-top: var(--space-3); }
+.starter-profile-settings > button { justify-self: start; }
+/* Duplicate stacks directly above Delete at the card's right inset: beside the Edit pill there is room for one word,
+   not two. It keeps the minimum target height; DOM order (Edit, Duplicate, Delete) follows the reading order. */
+.profile-card-duplicate { position: absolute; right: var(--batch-card-inset-x); bottom: 0; min-height: var(--target-min); margin-bottom: calc(var(--batch-pill-inset-bottom) + (var(--batch-pill-reserve) - var(--button-height)) / 2 + var(--button-height)); }
+
+/* PWA update toast: floats above the phone nav and the safe area; glass fill like the nav capsule. */
+.update-prompt { position: fixed; left: 50%; bottom: calc(var(--nav-height) + var(--safe-bottom) + var(--space-6)); transform: translateX(-50%); z-index: 60; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-3) var(--space-4); width: max-content; max-width: calc(100% - 32px); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-6); border-radius: var(--radius-control); color: var(--ink); color-scheme: dark; }
+.update-prompt p { margin: 0; }
+.update-prompt-actions { display: flex; gap: var(--space-2); }

@@ -58,4 +58,17 @@ describe("profile store", () => {
 
     expect(store.load()?.profiles[0].guidance).toEqual(profile.guidance);
   });
+
+  it("loads a stored starter profile with the current amounts but keeps its edits", () => {
+    const [kombucha, kimchi] = createProfileState().profiles.filter(({ id }) => id === "starter-kombucha-f1" || id === "starter-kimchi");
+    const custom = { ...kimchi, id: "my-kimchi", inputs: [], calculations: [] };
+    const store = createProfileStore({
+      getItem: () => JSON.stringify({ profiles: [{ ...kombucha, name: "House kombucha", expectedDurationDays: 7, inputs: [], calculations: [] }, custom] }),
+      setItem: () => undefined,
+    });
+
+    const [loaded, loadedCustom] = store.load()?.profiles ?? [];
+    expect(loaded).toMatchObject({ name: "House kombucha", expectedDurationDays: 7, inputs: kombucha.inputs, calculations: kombucha.calculations });
+    expect(loadedCustom).toMatchObject({ inputs: [], calculations: [] });
+  });
 });

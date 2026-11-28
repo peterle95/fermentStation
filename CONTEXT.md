@@ -9,7 +9,7 @@ A single preparation of a fermenting product, tracked from its actual start thro
 _Avoid_: Project, process
 
 **Fermentation profile**:
-The reusable method, recipe inputs, quantities, and conditions used to start a batch, such as kombucha F1, kombucha F2, sauerkraut, anaerobic fermentation, or sourdough. Profiles are user-managed and may be created, modified, or deleted.
+The reusable method, recipe inputs, quantities, and conditions used to start a batch, such as kombucha F1, kombucha F2, sauerkraut, anaerobic fermentation, or sourdough. Profiles are user-managed and may be created, modified, or deleted, but users cannot author profile calculations. A profile the user creates has none unless it starts as a copy of a starter profile, which keeps that profile's calculations.
 _Avoid_: Typology, technique
 
 **Expected fermentation duration**:
@@ -19,7 +19,7 @@ The whole-number count of days a fermentation profile uses to suggest a batch's 
 The date a batch is expected to finish. A batch becomes `ready` automatically on this date; changing the finish date to a future date makes the batch `active` again.
 
 **Profile input**:
-A value the user supplies for a batch, such as water volume, cabbage weight, or flour weight.
+The quantity a profile calculation is based on, which the user supplies for a batch, such as water volume, cabbage weight, or flour weight. A profile without calculations has no inputs. It may be left empty when the batch starts and filled in later; until then, calculations based on it give no suggested value.
 
 **Profile guidance**:
 A fixed condition or recommendation supplied by a fermentation profile, such as temperature or salt percentage.
@@ -43,13 +43,14 @@ The next date on which a batch check should be noticed. A copied check first fal
 A dated timeline event recording that a batch check was completed. Completion is immediate and does not require a note, measurement, or photo; those observations may be recorded separately.
 
 **Profile calculation**:
-A user-defined formula in a fermentation profile that derives a value from one or more batch inputs. Fermentation quantities use metric units.
+A fixed ratio supplied with a starter profile, or a copy of one, that turns one profile input into an amount to use, such as salt at 2% of cabbage weight or sugar at 70 g per litre of water. Users cannot create or change profile calculations; they enter the input, on Start or later in the batch's Recipe, and the amount always follows it; there are no per-batch overrides. Fermentation quantities use metric units.
+_Avoid_: Formula, formula term
 
 **Suggested value**:
 A profile-provided or calculated recommendation for a batch. It can be overridden without changing the profile and is distinct from what the user actually used or observed.
 
 **Starter profile**:
-An initial fermentation profile supplied to help a user begin tracking common fermentation methods. It is otherwise an ordinary user-managed profile and may be modified or deleted.
+An initial fermentation profile supplied to help a user begin tracking common fermentation methods. Its profile calculations are fixed; its other values may be modified, and the profile may be deleted. A deleted starter profile can be restored with its original values; restoring never replaces a starter profile that still exists.
 
 **Timeline entry**:
 A dated observation attached to a batch, such as a photo, note, measurement, temperature reading, check completion, or status change.

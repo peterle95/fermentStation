@@ -25,7 +25,6 @@ import {
   phWarning,
   restoreBatch,
   restoreTimelineEntry,
-  overrideBatchCalculation,
   setBatchInput,
   setFinishDate,
   statusLabel,
@@ -42,13 +41,21 @@ import {
 import {
   addProfile,
   createProfileState,
+  calculationExample,
+  calculationInput,
+  calculationInstruction,
+  calculationPrompt,
+  calculationSentence,
+  calculateProfileValue,
   deleteProfile,
-  parseSimpleFormula,
+  duplicateProfile,
+  formatAmount,
+  restoreStarterProfiles,
   updateProfile,
   validateProfile,
   type FermentationProfile,
-  type MetricUnit,
   type ProfileCalculation,
+  type ProfileInput,
 } from "./domain/profiles";
 import {
   createShellState,
@@ -275,7 +282,7 @@ function StatusIcon({ status }: { status: BatchStatus | "attention" }) {
 type StationDialogState =
   | { kind: "start"; profile?: FermentationProfile }
   | { kind: "profile"; profile: FermentationProfile }
-  | { kind: "dates" | "inputs"; batch: Batch }
+  | { kind: "dates"; batch: Batch }
   | { kind: "info" };
 
 function StationDialog({ title, mode, returnFocus, onClose, children }: { title: string; mode: string; returnFocus: HTMLElement | null; onClose(): void; children: ReactNode }) {
@@ -298,17 +305,110 @@ function StationDialog({ title, mode, returnFocus, onClose, children }: { title:
 }
 
 function profileInputsText(profile: FermentationProfile) {
-  return profile.inputs.map(({ name, unit, defaultValue }) => `${name}${defaultValue === undefined ? "" : ` ${formatNumber(defaultValue)} ${unit === "l" ? "L" : unit === "ml" ? "mL" : unit}`}`).join(" · ") || "No profile inputs.";
+  return profile.inputs.map(({ name, unit }) => `${name} (${unit})`).join(" · ") || "No profile inputs.";
+}
+
+/** The number in a typed input draft, or undefined while it is empty or not usable yet. */
+function draftInputValue(raw: string | undefined) {
+  if (raw === undefined || raw.trim() === "") return undefined;
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= 0 ? value : undefined;
+}
+
+/** A ratio as a sentence, such as "Salt: 2% of the cabbage weight, e.g. 20 g for 1 kg". */
+function calculationSummary(profile: FermentationProfile, calculation: ProfileCalculation) {
+  const input = calculationInput(profile, calculation);
+  const reason = calculation.reason.trim() ? `: ${calculation.reason.trim().replace(/\.$/, "")}` : "";
+  return `${calculation.name}${reason}${input ? `, e.g. ${calculationExample(calculation, input)}` : ""}`;
+}
+
+function CalculationList({ profile }: { profile: FermentationProfile }) {
+  return <ul className="calculation-list">{profile.calculations.map((calculation) => <li key={calculation.name}>{calculationSummary(profile, calculation)}</li>)}</ul>;
+}
+
+/**
+ * One calculation result: the amount first, then what it is, what to do with it, and why.
+ * Screen readers get the whole result as one sentence.
+ */
+function CalculationCard({ profile, calculation, inputValue }: {
+  profile: FermentationProfile;
+  calculation: ProfileCalculation;
+  inputValue: number | undefined;
+}) {
+  const input: ProfileInput = calculationInput(profile, calculation) ?? { name: calculation.input, unit: calculation.unit };
+  const amount = calculateProfileValue(calculation, inputValue);
+  const entered = inputValue !== undefined && Number.isFinite(inputValue) ? inputValue : undefined;
+  const spoken = amount === null
+    ? calculationPrompt(calculation, input)
+    : entered === undefined
+      ? `${formatAmount(amount)} ${calculation.unit} ${calculation.name.toLowerCase()}.`
+      : calculationSentence(calculation, input, entered, amount);
+  return <div className={`calculation-card small-card bowed${amount === null ? " calculation-card-empty" : ""}`}>
+    <p className="sr-only">{spoken}</p>
+    <div aria-hidden="true">
+      {amount !== null && <p className="calculation-amount">{formatAmount(amount)} <small>{calculation.unit}</small></p>}
+      <p className="calculation-name">{calculation.name}</p>
+      {amount === null
+        ? <p className="calculation-instruction">{calculationPrompt(calculation, input)}</p>
+        : <>{entered !== undefined && <p className="calculation-instruction">{calculationInstruction(calculation, input, entered)}</p>}{calculation.reason.trim() && <p className="calculation-reason">{calculation.reason}</p>}</>}
+    </div>
+  </div>;
+}
+
+/**
+ * The Recipe measurements: one number field per profile input that saves as you type, the amounts they work out,
+ * and one step per amount saying how to use it. A value that is not a usable number stays in its field, marked
+ * invalid, and is not saved; leaving the field shows the saved value again.
+ */
+function RecipeMeasurements({ batch, onChange }: { batch: Batch; onChange(batch: Batch): void }) {
+  const { inputs, calculations } = batch.profileSnapshot;
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [invalid, setInvalid] = useState<Record<string, boolean>>({});
+  function change(name: string, field: HTMLInputElement) {
+    const raw = field.value;
+    const value = draftInputValue(raw);
+    const bad = field.validity.badInput || raw.trim() !== "" && value === undefined;
+    setDrafts((current) => ({ ...current, [name]: raw }));
+    setInvalid((current) => ({ ...current, [name]: bad }));
+    if (!bad && value !== batch.inputValues[name]) onChange(setBatchInput(batch, name, value));
+  }
+  function leave(name: string) {
+    setDrafts(({ [name]: _left, ...rest }) => rest);
+    setInvalid(({ [name]: _left, ...rest }) => rest);
+  }
+  const amounts = calculations.map((calculation) => ({ calculation, amount: calculateProfileValue(calculation, batch.inputValues[calculation.input]) }));
+  return <>
+    <h4>Measurements</h4>
+    {inputs.length > 0 ? <div className="recipe-measures">{inputs.map((input, index) => {
+      const errorId = `recipe-input-${index}-error`;
+      return <label className="recipe-measure" key={input.name}>
+        <span>{input.name}</span>
+        <input aria-describedby={invalid[input.name] ? errorId : undefined} aria-invalid={invalid[input.name] || undefined} aria-label={`${input.name} (${input.unit})`} inputMode="decimal" min="0" onBlur={() => leave(input.name)} onChange={(event) => change(input.name, event.currentTarget)} step="any" type="number" value={drafts[input.name] ?? batch.inputValues[input.name] ?? ""} />
+        <span aria-hidden="true">{input.unit}</span>
+        {invalid[input.name] && <span className="field-error" id={errorId}>Enter a number of 0 or more.</span>}
+      </label>;
+    })}</div> : <p>This profile has nothing to measure.</p>}
+    {amounts.length > 0 && <ul aria-label="Amounts" aria-live="polite" className="recipe-amounts">{amounts.map(({ calculation, amount }) => <li key={calculation.name}>
+      <b>{amount === null ? "—" : `${formatAmount(amount)} ${calculation.unit}`}</b><span>{calculation.name}</span>
+    </li>)}</ul>}
+    {amounts.length > 0 && <>
+      <h4>How to use the amounts</h4>
+      <ol className="bd-steps">{amounts.map(({ calculation, amount }) => {
+        const input = calculationInput(batch.profileSnapshot, calculation) ?? { name: calculation.input, unit: calculation.unit };
+        const entered = batch.inputValues[calculation.input];
+        return <li key={calculation.name}>{amount === null || entered === undefined ? calculationPrompt(calculation, input) : calculationSentence(calculation, input, entered, amount)}</li>;
+      })}</ol>
+    </>}
+  </>;
 }
 
 function ProfileOverview({ profile, onStart }: { profile: FermentationProfile; onStart(): void }) {
-  const salt = parseSimpleFormula(profile.calculations.find(({ name }) => name.toLowerCase() === "salt")?.formula ?? "");
   return <div className="station-dialog-body profile-overview">
     <div className="profile-overview-intro bowed"><div><p className="eyebrow">Reusable fermentation profile</p><ProfileGuidance profile={profile} /></div><ProfilePhoto profile={profile} /></div>
-    <dl><dt>Expected fermentation duration</dt><dd>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "Not set"}</dd><dt>Profile temperature range</dt><dd>{profile.temperatureMinC !== undefined && profile.temperatureMaxC !== undefined ? `${profile.temperatureMinC}–${profile.temperatureMaxC} °C` : "Not set"}</dd>{salt?.percentage && salt.operator === "*" && <><dt>Salt guidance</dt><dd>{salt.operand}%</dd></>}</dl>
+    <dl><dt>Expected fermentation duration</dt><dd>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "Not set"}</dd><dt>Profile temperature range</dt><dd>{profile.temperatureMinC !== undefined && profile.temperatureMaxC !== undefined ? `${profile.temperatureMinC}–${profile.temperatureMaxC} °C` : "Not set"}</dd></dl>
     {profile.phZones.length > 0 && <section><h3>pH conditions</h3><ul>{profile.phZones.map((zone, index) => <li key={index}>{zone.label}: {zone.min}–{zone.max}</li>)}</ul></section>}
-    <h3>Profile inputs</h3><p>{profileInputsText(profile)}</p>
-    <h3>Profile calculations</h3>{profile.calculations.length ? <ul>{profile.calculations.map((calculation) => <li key={calculation.name}>{calculation.name} = {calculation.formula} ({calculation.unit})</li>)}</ul> : <p>No calculations defined.</p>}
+    <h3>What you measure</h3><p>{profileInputsText(profile)}</p>
+    <h3>Amounts it works out</h3>{profile.calculations.length ? <CalculationList profile={profile} /> : <p>This profile does not work out any amounts.</p>}
     <h3>Profile checks</h3><p>{profile.checks.map(({ name, intervalDays }) => `${name} · every ${intervalDays} ${intervalDays === 1 ? "day" : "days"}`).join(" · ") || "No recurring checks."}</p>
     <p className="station-helper">Starting a batch copies this profile. Later edits or deletion will not change that batch.</p>
     <div className="station-dialog-actions"><button className="station-primary card-action card-action-foot" onClick={onStart} type="button">Start a batch</button></div>
@@ -329,7 +429,7 @@ function StartBatchForm({ profiles, initialProfile, onCreate, onCancel, onDirty,
     ? profiles.map((profile) => profile.id === initialProfile.id ? initialProfile : profile)
     : [...profiles, initialProfile] : profiles);
   const [profileId, setProfileId] = useState(initialProfile?.id ?? profiles[0]?.id ?? "");
-  const inputDrafts = useRef<Record<string, Record<string, string>>>({});
+  const [inputDrafts, setInputDrafts] = useState<Record<string, Record<string, string>>>({});
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const profile = available.find(({ id }) => id === profileId);
@@ -357,14 +457,16 @@ function StartBatchForm({ profiles, initialProfile, onCreate, onCancel, onDirty,
   // A select's input event fires before its change event; re-rendering here would reset the controlled select to the
   // old profile before onChange could read the new one, so the select clears errors in its own onChange instead.
   return <form onChange={onDirty} onInput={(event) => { if (event.target instanceof HTMLSelectElement) return; setError(""); setFieldErrors({}); }}onInvalid={(event) => captureFieldError(event, (id, message) => setFieldErrors((previous) => ({ ...previous, [id]: message })))} onSubmit={save}>
-    <p className="station-helper">Choose a reusable method. This batch will keep its own copy.</p>
     <fieldset className="start-batch-basics bowed"><legend>Your batch</legend>
     <label className="station-field">Batch name<input {...fieldErrorProps(fieldErrors, "start-name")} aria-label="Batch name" className="dark-field" autoComplete="off" maxLength={60} name="name" placeholder="e.g. My weekend kimchi" title="Optional; uses the profile name if blank" /><FieldError errors={fieldErrors} id="start-name" /></label>
     <label className="station-field">Fermentation profile<select {...fieldErrorProps(fieldErrors, "start-profile")} aria-label="Fermentation profile" className="dark-field" name="profileId" onChange={(event) => { setProfileId(event.target.value); setError(""); setFieldErrors({}); }} required value={profileId}>{available.map((profile) => <option key={profile.id} value={profile.id}>{profile.name} · {profile.expectedDurationDays ? `${profile.expectedDurationDays} days` : "duration not set"}</option>)}</select><FieldError errors={fieldErrors} id="start-profile" /></label>
     <label className="station-field">Start date<input {...fieldErrorProps(fieldErrors, "start-date")} aria-label="Start date" className="dark-field" defaultValue={localDate()} max={localDate()} name="startDate" required type="date" /><FieldError errors={fieldErrors} id="start-date" /></label>
     </fieldset>
-    {profile && <section className="start-profile-summary bowed" aria-label="Selected profile guidance"><h3>{profile.name}</h3><p>{profile.expectedDurationDays ? `${profile.expectedDurationDays} days expected fermentation` : "Expected duration not set"}{profile.temperatureMinC !== undefined && profile.temperatureMaxC !== undefined ? ` · ${profile.temperatureMinC}–${profile.temperatureMaxC} °C` : ""}</p><details><summary>Profile guidance and checks</summary><ProfileGuidance profile={profile} /><p>{profile.checks.map((check) => `${check.name} · ${formatCheckInterval(check.intervalDays)}`).join(" · ") || "No recurring checks."}</p></details></section>}
-    {profile && profile.inputs.length > 0 ? <details className="station-options"><summary><span>Batch input options</span> · name is optional</summary><div key={profile.id}>{profile.inputs.map((input, index) => <label className="station-field" key={input.name}>{input.name} ({input.unit})<input {...fieldErrorProps(fieldErrors, `start-input-${index}`)} aria-label={`${input.name} (${input.unit})`} className="dark-field" defaultValue={inputDrafts.current[profile.id]?.[input.name] ?? input.defaultValue} onChange={(event) => { inputDrafts.current[profile.id] = { ...inputDrafts.current[profile.id], [input.name]: event.target.value }; }} min="0" name={`input.${input.name}`} step="any" type="number" /><FieldError errors={fieldErrors} id={`start-input-${index}`} /></label>)}<p>Blank inputs use profile defaults. Changes are saved on this device when you start the batch.</p></div></details> : <p className="station-helper">Saved on this device · name is optional.</p>}
+    {profile && profile.inputs.length > 0 && <fieldset className="start-batch-inputs bowed" key={profile.id}><legend>What you measured</legend>
+      {profile.inputs.map((input, index) => <label className="station-field" key={input.name}>{input.name} ({input.unit})<input {...fieldErrorProps(fieldErrors, `start-input-${index}`)} aria-label={`${input.name} (${input.unit})`} className="dark-field" inputMode="decimal" min="0" name={`input.${input.name}`} onChange={(event) => { const value = event.target.value; setInputDrafts((previous) => ({ ...previous, [profile.id]: { ...previous[profile.id], [input.name]: value } })); }} step="any" type="number" value={inputDrafts[profile.id]?.[input.name] ?? ""} /><FieldError errors={fieldErrors} id={`start-input-${index}`} /></label>)}
+      <div aria-live="polite" className="calculation-cards">{profile.calculations.map((calculation) => <CalculationCard calculation={calculation} inputValue={draftInputValue(inputDrafts[profile.id]?.[calculation.input])} key={calculation.name} profile={profile} />)}</div>
+      <p className="station-helper">You can leave this empty and fill it in later on the batch page.</p>
+    </fieldset>}
     {error && <p role="alert">{error}</p>}
     <div className="station-dialog-actions"><button className="station-secondary" onClick={onCancel} type="button">Cancel</button><button className="station-primary card-action card-action-foot" disabled={!profile} type="submit">Start a batch</button></div>
   </form>;
@@ -831,7 +933,7 @@ export function App() {
                 onObservationAdded={() => setAnnouncement({ message: "Observation added" })}
                 profilePane={shell.destination === "profiles" && <section className="profiles-screen" aria-label="Fermentation profiles">
                   {!editingProfileId && <div className="design-view-heading"><h1>Fermentation profiles</h1><p>The methods, inputs, and guidance behind your batches.</p></div>}
-                  <Profiles draft={profileDraft} formulaTerms={shell.formulaTerms} profiles={profileState.profiles} onDelete={(id) => saveProfiles(deleteProfile(profileState, id))} onSave={handleProfile} onEditingChange={setEditingProfileId} onView={(profile) => showDialog({ kind: "profile", profile })} />
+                  <Profiles draft={profileDraft} profiles={profileState.profiles} onDelete={(id) => saveProfiles(deleteProfile(profileState, id))} onSave={handleProfile} onEditingChange={setEditingProfileId} onView={(profile) => showDialog({ kind: "profile", profile })} />
                 </section>}
                 onDialog={showDialog}
                 batchListVersion={batchListVersion}
@@ -867,15 +969,12 @@ export function App() {
               </div>
             <SettingsView
               batchState={batchState}
-              formulaTerms={shell.formulaTerms}
               preferences={shell}
               profileState={profileState}
-               onFormulaTermsChange={(formulaTerms) => {
-                 browserHadData.current = true;
-                const next = { ...shell, formulaTerms };
-                 if (webStorage.current === "fallback") browserShellStore.save(next);
-                 setShell(next);
-                 persistShared(sharedDataStore.saveShell(next));
+               onRestoreProfiles={() => {
+                 const { state, restored } = restoreStarterProfiles(stateRef.current.profileState);
+                 if (restored.length) saveProfiles(state);
+                 return restored;
                }}
                onPreferencesChange={updatePreferences}
                onImport={(profiles, importedBatches) => {
@@ -896,7 +995,7 @@ export function App() {
           ) : null}
         </main>
       </div>
-      {dialog && <StationDialog mode={dialog.kind} title={dialog.kind === "start" ? "Start a batch" : dialog.kind === "profile" ? dialog.profile.name : dialog.kind === "dates" ? "Batch dates" : dialog.kind === "inputs" ? "Profile inputs" : "Your fermentation station"} returnFocus={dialogTrigger.current} onClose={closeDialog}>
+      {dialog && <StationDialog mode={dialog.kind} title={dialog.kind === "start" ? "Start a batch" : dialog.kind === "profile" ? dialog.profile.name : dialog.kind === "dates" ? "Batch dates" : "Your fermentation station"} returnFocus={dialogTrigger.current} onClose={closeDialog}>
         {dialog.kind === "start" && <StartBatchForm profiles={profileState.profiles} initialProfile={dialog.profile} onProfiles={() => navigate("profiles")} onDirty={() => { startDraft.dirty.current = true; }} onCancel={closeDialog} onCreate={(batch) => {
           if (beforeBatchReplace.current?.() === false || !profileDraft.confirmDiscard()) return;
           profileDraft.dirty.current = false;
@@ -912,7 +1011,6 @@ export function App() {
         }} />}
         {dialog.kind === "profile" && <ProfileOverview profile={dialog.profile} onStart={() => showDialog({ kind: "start", profile: dialog.profile })} />}
         {dialog.kind === "dates" && <div className="station-dialog-body"><dl><dt>Start date</dt><dd>{shortDate(dialog.batch.startDate)}</dd><dt>Finish date</dt><dd>{dialog.batch.finishDate ? shortDate(dialog.batch.finishDate) : "Not set"}</dd><dt>Batch status</dt><dd>{statusLabel(dialog.batch.status)}</dd></dl><p>A batch becomes ready on its finish date. Moving it to the fridge slows fermentation.</p></div>}
-        {dialog.kind === "inputs" && <div className="station-dialog-body"><p>{profileInputsText(dialog.batch.profileSnapshot)}</p><h3>Profile guidance</h3><p><RichProfileText value={dialog.batch.profileSnapshot.guidance.join(" ") || "No guidance defined yet."} /></p></div>}
         {dialog.kind === "info" && <div className="station-dialog-body"><p>A local fermentation journal for tracking household fermentation batches.</p><h3>Try it out</h3><p>Filter and search batches, open batch details, complete a check, or add an observation. Start a batch from any fermentation profile.</p><h3>Your data</h3><p>Data is saved on this device. Manage backups, shared folders, and credits in <button className="station-text-action" onClick={() => navigate("settings")} type="button">Settings</button>.</p></div>}
       </StationDialog>}
       <div aria-atomic="true" aria-live="polite" className="sr-only" role={announcement ? "status" : undefined}>{announcement?.message}</div>
@@ -926,16 +1024,12 @@ function formatToday() {
     .format(new Date(`${localDate()}T12:00:00`)).replace(/^(\w+) /, "$1, ");
 }
 
-function validFormulaTerm(term: string) {
-  return /^[A-Za-z][A-Za-z0-9_]*$/.test(term);
-}
-
 interface SettingsViewProps {
   batchState: BatchState;
-  formulaTerms: string[];
   preferences: ShellPreferences;
   profileState: ReturnType<typeof createProfileState>;
-  onFormulaTermsChange(formulaTerms: string[]): void;
+  /** Re-adds missing starter profiles and returns the names it restored. */
+  onRestoreProfiles(): string[];
   onPreferencesChange(preferences: ShellPreferences, requestNotificationPermission?: boolean): void;
   onImport(profiles: ReturnType<typeof createProfileState>, batches: BatchState): void;
   onRestoreBatch(id: string): boolean;
@@ -945,7 +1039,7 @@ interface SettingsViewProps {
   onResolveStorage(choice: "shared" | "device"): Promise<void>;
 }
 
-function SettingsView({ batchState, formulaTerms, preferences, profileState, onFormulaTermsChange, onPreferencesChange, onImport, onRestoreBatch, storageStatus, onChooseStorage, onReloadStorage, onResolveStorage }: SettingsViewProps) {
+function SettingsView({ batchState, preferences, profileState, onRestoreProfiles, onPreferencesChange, onImport, onRestoreBatch, storageStatus, onChooseStorage, onReloadStorage, onResolveStorage }: SettingsViewProps) {
   const [message, setMessage] = useState("");
   const [exchangeError, setExchangeError] = useState("");
   const [storageError, setStorageError] = useState("");
@@ -957,11 +1051,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
   const collisionHeading = useRef<HTMLHeadingElement>(null);
   const [showDeletedBatches, setShowDeletedBatches] = useState(false);
   const [restoreMessage, setRestoreMessage] = useState("");
-  const [terms, setTerms] = useState(formulaTerms);
-  const [newTerm, setNewTerm] = useState("");
-  const [termError, setTermError] = useState("");
-  const [termErrorSource, setTermErrorSource] = useState<"new" | "terms">("new");
-  const [termMessage, setTermMessage] = useState("");
+  const [starterMessage, setStarterMessage] = useState("");
   const dataChoicePending = !!operation || !!pendingImport;
   const storageLabels: Record<SharedStorageStatus["state"], string> = {
     unavailable: "Device storage", unconfigured: "No shared folder", ready: "Folder connected",
@@ -1000,34 +1090,11 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
     }
   }
 
-  function formulaTermError(next: string[]) {
-    if (next.length === 0) return "At least one formula term is required.";
-    if (next.some((term) => !validFormulaTerm(term))) {
-      return "Formula terms must start with a letter and use only letters, numbers, or underscores.";
-    }
-    if (new Set(next).size !== next.length) return "Formula terms must be unique.";
-    return "";
-  }
-
-  function addFormulaTerm() {
-    setTermMessage("");
-    setTermErrorSource("new");
-    const next = [...terms, newTerm.trim()];
-    const error = formulaTermError(next);
-    if (error) return setTermError(error);
-    setTerms(next);
-    setNewTerm("");
-    setTermError("");
-  }
-
-  function saveFormulaTerms() {
-    setTermMessage("");
-    setTermErrorSource("terms");
-    const error = formulaTermError(terms);
-    if (error) return setTermError(error);
-    onFormulaTermsChange(terms);
-    setTermError("");
-    setTermMessage("Formula terms saved on this device.");
+  function restoreStarters() {
+    const restored = onRestoreProfiles();
+    setStarterMessage(restored.length
+      ? `Restored ${restored.join(", ")}.`
+      : "All starter profiles are already in your profiles. Nothing was changed.");
   }
 
   async function downloadArchive() {
@@ -1114,7 +1181,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
             <span className="toggle-avatar"><DesignIcon name="sparkles" /></span><span className="toggle-label">Suggestions</span><span className="toggle-switch" />
           </button>
         </div>
-        <p>Preferences save automatically. Formula terms are saved separately below.</p>
+        <p>Preferences save automatically.</p>
       </section>
       <section className="settings-card bowed settings-notifications" aria-labelledby="notifications-heading">
         <div className="settings-card-heading"><span className="toggle-avatar"><DesignIcon name="bell" /></span><h2 id="notifications-heading">Notifications</h2></div>
@@ -1158,7 +1225,7 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
       <section className="settings-card bowed settings-exchange" aria-labelledby="exchange-heading">
         <div className="settings-card-heading"><span className="toggle-avatar"><DesignIcon name="book" /></span><h2 id="exchange-heading">Data exchange</h2></div>
         <p>Archives are explicit local exchange files. Live databases and app-private directories are never synchronized.</p>
-        <p>Archives contain profiles, batches (including trash), and photos, up to 200 MB zipped (250 MB expanded). They do not include app settings such as destination, units, notifications, suggestions, or formula terms.</p>
+        <p>Archives contain profiles, batches (including trash), and photos, up to 200 MB zipped (250 MB expanded). They do not include app settings such as destination, units, notifications, or suggestions.</p>
         <div className="form-actions">
           <button className="primary-action card-action" disabled={!!operation} onClick={() => void runOperation("exchange", "Preparing ZIP archive…", downloadArchive)} type="button">Export ZIP archive</button>
           {isNativeTransferAvailable() && <button disabled={dataChoicePending} onClick={() => void runOperation("exchange", "Choosing and checking archive…", pickArchive)} type="button">Choose ZIP from device</button>}
@@ -1209,23 +1276,11 @@ function SettingsView({ batchState, formulaTerms, preferences, profileState, onF
         <div aria-atomic="true" className="settings-live" role="status">{restoreMessage && <p className="notice">{restoreMessage}</p>}</div>
         {dataChoicePending && <p>Finish the current transfer or import choice before restoring a batch.</p>}
       </section>
-      <section className="settings-card bowed formula-term-settings" aria-labelledby="formula-terms-heading">
-        <div className="settings-card-heading"><span className="toggle-avatar"><DesignIcon name="plus" /></span><h2 id="formula-terms-heading">Formula dropdown terms</h2></div>
-        <p>These names are stored in the shared folder when configured and are not included in archives.</p>
-        <p id="formula-term-help">Start with a letter; use letters, numbers, or underscores. Keep at least one unique term.</p>
-        {terms.map((term, index) => (
-          <div className="formula-term" key={index}>
-            <label>Formula term {index + 1}<input aria-describedby={termError ? "formula-term-help formula-term-error" : "formula-term-help"} aria-invalid={termError && termErrorSource === "terms" && (!validFormulaTerm(term) || terms.indexOf(term) !== terms.lastIndexOf(term)) ? true : undefined} onChange={(event) => { setTerms(terms.map((value, termIndex) => termIndex === index ? event.target.value : value)); setTermMessage(""); setTermError(""); }} value={term} /></label>
-            <button aria-label={`Remove formula term ${index + 1}: ${term}`} disabled={terms.length === 1} onClick={() => { setTerms(terms.filter((_, termIndex) => termIndex !== index)); setTermMessage(""); }} type="button">Remove</button>
-          </div>
-        ))}
-        <div className="formula-term">
-          <label>New formula term<input aria-describedby={termError ? "formula-term-help formula-term-error" : "formula-term-help"} aria-invalid={termError && termErrorSource === "new" ? true : undefined} onChange={(event) => { setNewTerm(event.target.value); setTermError(""); }} value={newTerm} /></label>
-          <button onClick={addFormulaTerm} type="button">Add term</button>
-        </div>
-        <div aria-atomic="true" aria-live="assertive" className="settings-live" id="formula-term-error" role={termError ? "alert" : undefined}>{termError && <p>{termError}</p>}</div>
-        <button className="primary-action" onClick={saveFormulaTerms} type="button">Save formula terms</button>
-        <div aria-atomic="true" className="settings-live" role="status">{termMessage && <p className="notice">{termMessage}</p>}</div>
+      <section className="settings-card bowed starter-profile-settings" aria-labelledby="starter-profiles-heading">
+        <div className="settings-card-heading"><span className="toggle-avatar"><DesignIcon name="jar" /></span><h2 id="starter-profiles-heading">Starter profiles</h2></div>
+        <p>Brings back any starter profile you deleted, with its original amounts and guidance. Profiles you still have, including edited starter profiles, are never replaced.</p>
+        <button className="primary-action" onClick={restoreStarters} type="button">Restore starter profiles</button>
+        <div aria-atomic="true" className="settings-live" role="status">{starterMessage && <p className="notice">{starterMessage}</p>}</div>
       </section>
       <section className="settings-card bowed settings-about" aria-labelledby="about-heading">
         <div className="settings-card-heading"><StationLogo /><h2 id="about-heading">About FermentStation</h2></div>
@@ -1837,9 +1892,7 @@ function BatchCard({ backLabel, onBack, beforeBatchReplace, batch, visible, onCh
       const next = nextBatches?.find(({ id }) => id === batch.id);
       const losesObservation = !next || !!editing && !next.timeline.some(({ id }) => id === editing.id);
       const lostEditors = [...managementDrafts.current].filter((key) => !next ||
-        key.startsWith("check:") && !next.checks.some(({ id }) => key === `check:${id}`) ||
-        key.startsWith("calculation:") && !next.profileSnapshot.calculations.some(({ name }) => key === `calculation:${name}`) ||
-        key === "inputs" && !batch.profileSnapshot.inputs.every(({ name }) => next.profileSnapshot.inputs.some((input) => input.name === name)));
+        key.startsWith("check:") && !next.checks.some(({ id }) => key === `check:${id}`));
       if ((losesObservation && dirty.current || lostEditors.length > 0) && !window.confirm("Discard unsaved batch work? Notes, selected photos and editor changes that have not been saved will be lost.")) return false;
       if (next) {
         for (const key of lostEditors) managementDrafts.current.delete(key);
@@ -2099,20 +2152,6 @@ function BatchCard({ backLabel, onBack, beforeBatchReplace, batch, visible, onCh
     finish();
   }
 
-  function saveInputs(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!event.currentTarget.reportValidity()) return;
-    const data = new FormData(event.currentTarget);
-    let next = batch;
-    for (const input of batch.profileSnapshot.inputs) {
-      const raw = String(data.get(input.name) ?? "");
-      next = setBatchInput(next, input.name, raw === "" ? undefined : Number(raw));
-    }
-    onChange(next);
-    managementDrafts.current.delete("inputs");
-    setToolFeedback("Batch inputs saved. Non-overridden suggestions recalculated; overrides and their saved suggestions kept.");
-  }
-
   function discardToolChanges(event: React.MouseEvent<HTMLButtonElement>) {
     if (managementDrafts.current.size && !window.confirm("Discard unsaved tool changes? Saved batch values and observations will stay intact.")) return;
     managementRef.current?.querySelectorAll("form").forEach((form) => form.reset());
@@ -2337,8 +2376,7 @@ function BatchCard({ backLabel, onBack, beforeBatchReplace, batch, visible, onCh
         </section>
         <section aria-labelledby="bd-tab-recipe" className="bd-pane" data-pane="recipe" id="bd-pane-recipe" role="tabpanel">
           <section className="design-input-summary bowed" aria-label="Recipe">
-            <div className="design-section-head"><h4>Inputs</h4><button className="design-quiet" onClick={() => onDialog({ kind: "inputs", batch })} type="button">See all</button></div>
-            <div className="design-ingredients">{batch.profileSnapshot.inputs.map((input) => <span key={input.name}>{input.name}</span>)}{batch.profileSnapshot.inputs.length === 0 && <p>No profile inputs.</p>}</div>
+            <RecipeMeasurements batch={batch} onChange={onChange} />
             <h4>Guidance</h4>
             {batch.profileSnapshot.guidance.length > 0 ? <ol className="bd-steps">{batch.profileSnapshot.guidance.map((guidance, index) => <li key={`${guidance}-${index}`}><RichProfileText value={guidance} /></li>)}</ol> : <p>No active guidance in this profile snapshot.</p>}
             <button className="bd-link" onClick={() => onDialog({ kind: "profile", profile: batch.profileSnapshot })} type="button">Open {batch.profileSnapshot.name} profile<DesignIcon name="arrow" /></button><p className="snapshot-line sr-only"><strong>Profile snapshot:</strong> {batch.profileSnapshot.name}</p>
@@ -2351,7 +2389,6 @@ function BatchCard({ backLabel, onBack, beforeBatchReplace, batch, visible, onCh
       <header className="batch-tools-heading"><div><p className="eyebrow">This batch only</p><h3>Batch tools</h3><p>Adjust this preparation without changing its profile.</p></div><button className="design-quiet" onClick={discardToolChanges} type="button">Discard tool changes</button></header>
       <div className="batch-tools-shortcuts" role="group" aria-label="Batch tool shortcuts">
         <button onClick={() => revealManagementSection("batch-date-editor")} type="button">Edit batch dates</button>
-        <button onClick={() => revealManagementSection("batch-input-editor")} type="button">Edit batch inputs and calculations</button>
         <button onClick={() => revealManagementSection("batch-check-editor")} type="button">Edit recurring checks</button>
       </div>
       <p className="batch-tool-feedback" role="status">{toolFeedback}</p>
@@ -2402,20 +2439,7 @@ function BatchCard({ backLabel, onBack, beforeBatchReplace, batch, visible, onCh
                 <strong className="meas-value">{day}</strong>
                 <p className="meas-note">{nextCheck ? `Check cadence · every ${nextCheck.intervalDays} days` : "No recurring check set"}</p>
               </div>
-              {batch.profileSnapshot.calculations.length > 0 ? batch.profileSnapshot.calculations.map((calculation) => {
-                const value = batch.calculationValues[calculation.name];
-                return <div className="meas small-card bowed" key={calculation.name}>
-                  <div className="meas-label"><span>Profile calculation</span></div>
-                  <strong className="meas-value meas-value-small">{formatCalculationValue(value?.override ?? value?.suggested)}<small>{calculation.unit}</small></strong>
-                  <p className="meas-note">{calculation.name}</p>
-                </div>;
-              }) : <div className="meas small-card bowed">
-                <div className="meas-label"><span>Profile calculation</span></div>
-                <strong className="meas-value meas-value-small">—<small>incomplete</small></strong>
-                <p className="meas-note">No calculation defined</p>
-              </div>}
             </div>
-            <p className="hint">Suggested values recalculate from the profile snapshot. Overrides and input editing remain available below.</p>
           </section>
 
         <section className="batch-components-shell" aria-label="Batch configuration components">
@@ -2425,43 +2449,6 @@ function BatchCard({ backLabel, onBack, beforeBatchReplace, batch, visible, onCh
               <p className="component-empty">Started <time dateTime={batch.startDate}>{shortDate(batch.startDate)}</time> · {statusLabel(batch.status)}</p>
               <label className="component-field"><span>Finish date</span><input {...fieldErrorProps(toolErrors, "batch-finish-date")} onChange={(event) => { if (event.target.reportValidity()) { onChange(setFinishDate(batch, event.target.value, localDate())); setToolFeedback("Finish date saved. Batch status and check scheduling updated."); } }} required type="date" value={batch.finishDate ?? ""} /><FieldError errors={toolErrors} id="batch-finish-date" /></label>
               <p className="component-empty">Saves immediately. A future finish date returns this batch to active; on its finish date it becomes ready.</p>
-            </article>
-
-            <article className="batch-component-card bowed" aria-labelledby="inputs-heading" id="batch-input-editor">
-              <header className="batch-component-header"><h4 id="inputs-heading">Profile inputs</h4><span className="batch-component-step" aria-hidden="true">02</span></header>
-              {batch.profileSnapshot.inputs.length > 0 ? <form className="component-inputs" onChange={() => managementDrafts.current.add("inputs")} onSubmit={saveInputs}>
-                <div className="component-input-fields">
-                  {batch.profileSnapshot.inputs.map((input, index) => (
-                    <label className="component-field" key={input.name}><span>{input.name} ({input.unit})</span><input {...fieldErrorProps(toolErrors, `batch-input-${index}`)} defaultValue={batch.inputValues[input.name]} min="0" name={input.name} step="any" type="number" /><FieldError errors={toolErrors} id={`batch-input-${index}`} /></label>
-                  ))}
-                </div>
-                <button className="component-button component-button-primary" type="submit">Update inputs</button>
-                <p className="component-empty">Blank values remain unset. Suggestions use this batch’s saved profile snapshot.</p>
-              </form> : <p className="component-empty">No profile inputs.</p>}
-            </article>
-
-            <article className="batch-component-card bowed" aria-labelledby="calculations-heading">
-              <header className="batch-component-header"><h4 id="calculations-heading">Profile calculations</h4><span className="batch-component-step" aria-hidden="true">03</span></header>
-              {batch.profileSnapshot.calculations.length > 0 ? batch.profileSnapshot.calculations.map((calculation, index) => {
-                const value = batch.calculationValues[calculation.name];
-                return (
-                  <div className="component-calculation" key={calculation.name}>
-                    <span className="component-pair-label">{calculation.name}:</span>
-                    <div className="component-calculation-value"><strong>{formatCalculationValue(value?.override ?? value?.suggested)} {calculation.unit}</strong><span>{value?.override !== undefined ? " (overridden)" : " suggested"}</span></div>
-                    <span className="sr-only">{formatCalculationValue(value?.override ?? value?.suggested)} {calculation.unit}{value?.override !== undefined ? " (overridden)" : " suggested"}</span>
-                    <p className="component-empty">{value?.override !== undefined ? "Suggestion saved before override" : "Suggested"}: {formatCalculationValue(value?.suggested)} {calculation.unit}{value?.suggested == null ? value?.override !== undefined ? " · No suggestion was available before this override." : " · Add the required inputs to calculate." : ""}</p>
-                    <form className="component-override" onChange={() => managementDrafts.current.add(`calculation:${calculation.name}`)} onSubmit={(event) => {
-                      event.preventDefault();
-                      if (!event.currentTarget.reportValidity()) return;
-                      const raw = String(new FormData(event.currentTarget).get("override") ?? "");
-                      if (raw !== "") { onChange(overrideBatchCalculation(batch, calculation.name, Number(raw))); managementDrafts.current.delete(`calculation:${calculation.name}`); event.currentTarget.reset(); setToolFeedback(`${calculation.name} override saved for this batch.`); }
-                    }}>
-                      <label className="component-field"><span>Override</span><input {...fieldErrorProps(toolErrors, `batch-override-${index}`)} aria-label={`Override ${calculation.name}`} min="0" name="override" required step="any" type="number" /><FieldError errors={toolErrors} id={`batch-override-${index}`} /></label>
-                      <button className="component-button" type="submit">Override</button>
-                    </form>
-                  </div>
-                );
-              }) : <p className="component-empty">No calculations.</p>}
             </article>
 
             <article className="batch-component-card bowed" aria-label={`${batch.name} checks`} id="batch-check-editor" tabIndex={-1}>
@@ -2540,7 +2527,6 @@ function BatchCard({ backLabel, onBack, beforeBatchReplace, batch, visible, onCh
 
 interface ProfilesProps {
   draft: ReturnType<typeof useUnsavedChanges>;
-  formulaTerms: string[];
   profiles: FermentationProfile[];
   onDelete(id: string): void;
   onSave(profile: FermentationProfile): void;
@@ -2586,18 +2572,12 @@ function presentationFor(profile: FermentationProfile): ProfilePresentation {
       [cadence, "check cadence"],
     ],
     inputs: profile.inputs.map(({ name }) => name).join(", ") || "None defined",
-    calculations: profile.calculations
-      .filter(({ formula }) => parseSimpleFormula(formula))
-      .map(({ name, formula, unit }) => `${name} = ${formula} (${unit})`),
+    calculations: profile.calculations.map((calculation) => calculationSummary(profile, calculation)),
   };
 }
 
 function formatNumber(value: number) {
   return Number.isInteger(value) ? String(value) : String(value).replace(/0+$/, "").replace(/\.$/, "");
-}
-
-function formatCalculationValue(value: number | null | undefined) {
-  return value === null || value === undefined ? "Incomplete" : formatNumber(Number(value.toFixed(2)));
 }
 
 function displayTemperature(celsius: number, units: ShellPreferences["units"]): string {
@@ -2615,52 +2595,8 @@ function RichProfileText({ value }: { value: string }) {
   return <>{value.split(/(<b>.*?<\/b>)/g).map((part, index) => part.startsWith("<b>") ? <strong key={index}>{part.slice(3, -4)}</strong> : part)}</>;
 }
 
-interface StructuredFormulaRow {
-  id: string;
-  kind: "structured";
-  source: string;
-  sourceUnit: MetricUnit;
-  sourceUnitTouched: boolean;
-  operator: "+" | "-" | "*" | "/";
-  operand: string;
-  operandType: "number" | "percentage";
-  result: string;
-  resultUnit: MetricUnit;
-}
-
-interface LegacyFormulaRow {
-  id: string;
-  kind: "legacy";
-  calculation: ProfileCalculation;
-}
-
-type FormulaRow = StructuredFormulaRow | LegacyFormulaRow;
-
-const metricUnits: MetricUnit[] = ["g", "kg", "ml", "l"];
-
-function formulaRows(profile: FermentationProfile): FormulaRow[] {
-  return profile.calculations.map((calculation) => {
-    const parsed = parseSimpleFormula(calculation.formula);
-    if (!parsed) return { id: createClientId(), kind: "legacy", calculation };
-    const input = profile.inputs.find(({ name }) => name === parsed.source);
-    return {
-      id: createClientId(),
-      kind: "structured",
-      source: parsed.source,
-      sourceUnit: input?.unit ?? "g",
-      sourceUnitTouched: false,
-      operator: parsed.operator,
-      operand: parsed.operand,
-      operandType: parsed.percentage ? "percentage" : "number",
-      result: calculation.name,
-      resultUnit: calculation.unit,
-    };
-  });
-}
-
-function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingChange, onView }: ProfilesProps) {
+function Profiles({ draft, profiles, onDelete, onSave, onEditingChange, onView }: ProfilesProps) {
   const [editing, setEditing] = useState<FermentationProfile | null>(null);
-  const [calculations, setCalculations] = useState<FormulaRow[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [checkRows, setCheckRows] = useState<ProfileCheckRow[]>([]);
@@ -2684,10 +2620,6 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
     setFocusCheckId(null);
   }, [checkRows, focusCheckId]);
 
-  function currentInputs() {
-    return editing?.inputs ?? [];
-  }
-
   function edit(profile: FermentationProfile) {
     draft.dirty.current = false;
     returnProfileId.current = profile.id;
@@ -2695,7 +2627,6 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
     setFieldErrors({});
     setMessage("");
     setEditing(profile);
-    setCalculations(formulaRows(profile));
     setGuidanceRows(profile.guidance);
     setCheckRows(profile.checks.map((check) => ({
       id: check.id ?? createClientId(), name: check.name, intervalDays: check.intervalDays,
@@ -2745,66 +2676,12 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
     setGuidanceRows(guidanceRows.filter((_, stepIndex) => stepIndex !== index));
   }
 
-  function addFormula() {
-    draft.dirty.current = true;
-    const terms = availableResultTerms(formulaTerms, editing, calculations);
-    const source = terms.includes("totalWeight") ? "totalWeight" : terms[0];
-    const matchingSource = calculations.find((row): row is StructuredFormulaRow => row.kind === "structured" && row.source === source);
-    const sourceUnit = matchingSource?.sourceUnit
-      ?? currentInputs().find(({ name }) => name === source)?.unit
-      ?? "g";
-    const usedResults = new Set(calculations.map((row) => row.kind === "structured" ? row.result : row.calculation.name));
-    const preferredResults = [...new Set([
-      ...["salt", "sugar", "tea"].filter((term) => terms.includes(term)),
-      ...terms,
-    ])];
-    setCalculations([...calculations, {
-      id: createClientId(),
-      kind: "structured",
-      source,
-      sourceUnit,
-      sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false,
-      operator: "*",
-      operand: "2",
-      operandType: "percentage",
-      result: preferredResults.find((term) => !usedResults.has(term)) ?? preferredResults[0],
-      resultUnit: "g",
-    }]);
-  }
-
-  function removeFormula(id: string) {
-    draft.dirty.current = true;
-    setCalculations(calculations.filter((row) => row.id !== id));
-  }
-
-  function updateFormula(id: string, update: Partial<StructuredFormulaRow>) {
-    setCalculations(calculations.map((row) => row.id === id && row.kind === "structured" ? { ...row, ...update } : row));
-  }
-
-  function updateSourceUnit(source: string, sourceUnit: MetricUnit) {
-    setCalculations(calculations.map((row) => row.kind === "structured" && row.source === source
-      ? { ...row, sourceUnit, sourceUnitTouched: true }
-      : row));
-  }
-
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     if (!editing) return;
     const originalPh = phRangeFor(editing);
     const phUnchanged = String(data.get("phMin") ?? "") === String(originalPh.min) && String(data.get("phMax") ?? "") === String(originalPh.max);
-    const inputs = editing?.inputs.map((input) => ({ ...input })) ?? [];
-    const structuredRows = calculations.filter((row): row is StructuredFormulaRow => row.kind === "structured");
-    const resultNames = new Set(calculations.map((row) => row.kind === "structured" ? row.result : row.calculation.name));
-    for (const source of new Set(structuredRows.map((row) => row.source))) {
-      const matchingRows = structuredRows.filter((row) => row.source === source);
-      const index = inputs.findIndex(({ name }) => name === source);
-      if (index === -1 && !resultNames.has(source)) inputs.push({ name: source, unit: matchingRows[0].sourceUnit });
-      else if (index !== -1) {
-        const touched = matchingRows.find(({ sourceUnitTouched }) => sourceUnitTouched);
-        if (touched) inputs[index] = { ...inputs[index], unit: touched.sourceUnit };
-      }
-    }
     const profile = {
       id: editing?.id ?? createClientId(),
       name: String(data.get("name") ?? "").trim(),
@@ -2819,12 +2696,9 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
       expectedDurationDays: data.get("expectedDurationDays")
         ? Number(data.get("expectedDurationDays"))
         : undefined,
-      inputs,
-      calculations: calculations.map((row) => row.kind === "legacy" ? row.calculation : {
-        name: row.result,
-        unit: row.resultUnit,
-        formula: `${row.source} ${row.operator} ${row.operand}${row.operandType === "percentage" ? "%" : ""}`,
-      }),
+      // Inputs and calculations come with the profile; the editor never changes them.
+      inputs: editing.inputs.map((input) => ({ ...input })),
+      calculations: editing.calculations.map((calculation) => ({ ...calculation })),
       checks: checkRows,
     };
 
@@ -2845,14 +2719,6 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
           mark([`profile-check-${check.id}-name`], nextErrors.filter((message) => message === "Check names must be present and unique."));
         }
         mark([`profile-check-${check.id}-interval`], nextErrors.filter((message) => message === `${check.name || "Check"} interval must be a positive whole number.`));
-      }
-      for (const row of calculations) {
-        if (row.kind !== "structured") continue;
-        mark([`profile-formula-${row.id}-source`], nextErrors.filter((message) => message.startsWith(`Input name ${row.source} `) || message === `${row.result}: Unknown input ${row.source}`));
-        mark([`profile-formula-${row.id}-operand`], nextErrors.filter((message) => message.startsWith(`${row.result}: `) && !message.includes("Unknown input")));
-        if (!row.result || profile.calculations.filter(({ name }) => name === row.result).length > 1) {
-          mark([`profile-formula-${row.id}-result`], nextErrors.filter((message) => message === "Calculation names must be present and unique."));
-        }
       }
       setFieldErrors(adjacent);
       return;
@@ -2917,33 +2783,17 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
                   </div>
                 </section>
 
-                <section className="profile-editor-section bowed">
-                  <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">03 / Calculations</p><h2>Formulas</h2></div></div>
-                  <fieldset className="profile-editor-formula"><legend className="sr-only">Formulas</legend>
-                    {calculations.map((row, index) => row.kind === "legacy" ? (
-                      <div className="legacy-formula small-card bowed" key={row.id}><p><strong>Legacy calculation {index + 1}: {row.calculation.name}</strong></p><p>This formula uses multiple operations or parentheses. It cannot be edited here, but will be kept when you save.</p><button onClick={() => removeFormula(row.id)} type="button">Remove calculation {index + 1}</button></div>
-                    ) : (
-                      <div className="profile-editor-formula-row small-card bowed" key={row.id}>
-                        <label>Source term row {index + 1}<select {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-source`)} aria-label={`Source term row ${index + 1}`} onChange={(event) => { const source = event.target.value; const matchingSource = calculations.find((candidate): candidate is StructuredFormulaRow => candidate.kind === "structured" && candidate.source === source); updateFormula(row.id, { source, sourceUnit: matchingSource?.sourceUnit ?? currentInputs().find(({ name }) => name === source)?.unit ?? row.sourceUnit, sourceUnitTouched: matchingSource?.sourceUnitTouched ?? false }); }} value={row.source}>{availableSourceTerms(formulaTerms, calculations, currentInputs()).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-source`} /></label>
-                        <label>Source unit row {index + 1}<select onChange={(event) => updateSourceUnit(row.source, event.target.value as MetricUnit)} value={row.sourceUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
-                        <label>Operator row {index + 1}<select onChange={(event) => updateFormula(row.id, { operator: event.target.value as StructuredFormulaRow["operator"] })} value={row.operator}><option value="+">+</option><option value="-">-</option><option value="*">×</option><option value="/">/</option></select></label>
-                        <label>Operand row {index + 1}<input {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-operand`)} aria-label={`Operand row ${index + 1}`} min="0" onChange={(event) => updateFormula(row.id, { operand: event.target.value })} required step="any" type="number" value={row.operand} /><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-operand`} /></label>
-                        <label>Operand type row {index + 1}<select onChange={(event) => updateFormula(row.id, { operandType: event.target.value as StructuredFormulaRow["operandType"] })} value={row.operandType}><option value="number">Number</option><option value="percentage">Percentage</option></select></label>
-                        <label>Result term row {index + 1}<select {...fieldErrorProps(fieldErrors, `profile-formula-${row.id}-result`)} aria-label={`Result term row ${index + 1}`} onChange={(event) => updateFormula(row.id, { result: event.target.value })} value={row.result}>{availableResultTerms(formulaTerms, editing, calculations).map((term) => <option key={term} value={term}>{formulaTermLabel(term)}</option>)}</select><FieldError errors={fieldErrors} id={`profile-formula-${row.id}-result`} /></label>
-                        <label>Result unit row {index + 1}<select onChange={(event) => updateFormula(row.id, { resultUnit: event.target.value as MetricUnit })} value={row.resultUnit}>{metricUnits.map((unit) => <option key={unit}>{unit}</option>)}</select></label>
-                        <button onClick={() => removeFormula(row.id)} type="button">Remove calculation {index + 1}</button>
-                      </div>
-                    ))}
-                    <button className="profile-editor-add-formula" onClick={addFormula} type="button">Add formula</button>
-                  </fieldset>
-                </section>
+                {editing.calculations.length > 0 && <section className="profile-editor-section bowed" aria-labelledby="profile-calculations-heading">
+                  <div className="profile-editor-section-head"><div><p className="profile-editor-kicker">03 / Amounts</p><h2 id="profile-calculations-heading">Amounts it works out</h2><p className="profile-editor-intro">These amounts come with the profile and stay the same. Enter what you measured when you start a batch to see how much to use.</p></div></div>
+                  <CalculationList profile={editing} />
+                </section>}
 
                 {errors.length > 0 && <div className="notice" role="alert">{errors.join(" ")}</div>}
                 <div className="profile-editor-actions"><button aria-label="Cancel" className="profile-editor-text-button" onClick={closeEditor} type="button">Cancel changes</button><button className="profile-editor-button primary" type="submit">Save profile <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M5 12h14M13 6l6 6-6 6" /></svg></button></div>
               </form>
 
                <aside className="profile-editor-aside" aria-label="Profile context">
-                 <article className="profile-editor-card bowed"><h2>Profile inputs</h2><p>{profileInputsText(editing)}</p><p>Formula sources add inputs. Existing inputs and defaults are kept; choose actual quantities when starting a batch.</p></article>
+                 <article className="profile-editor-card bowed"><h2>What you measure</h2><p>{profileInputsText(editing)}</p><p>{editing.calculations.length ? "Enter this when you start a batch to see the amounts to use." : "Profiles you create do not work out amounts. Duplicate a starter profile to keep its amounts."}</p></article>
                  <article className="profile-editor-card profile-editor-note bowed"><h2>Existing batches stay intact</h2><p>Saving or deleting a profile never changes the snapshots, checks or observations in batches you already started.</p></article>
                </aside>
             </div>
@@ -2963,7 +2813,7 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
                 <span className="profile-card-link">View guidance <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="m7 17 10-10M7 7h10v10" /></svg></span>
               </button>
               <ProfilePhoto profile={profile} />
-              <button aria-label={`Edit ${profile.name}`} className="design-batch-pill" ref={(button) => { editButtons.current[profile.id] = button; }} onClick={() => edit(profile)} type="button"><span className="design-batch-bottom"><strong>Edit</strong><span>profile</span></span><span className="design-batch-go" aria-hidden="true"><DesignIcon name="back" /></span></button><button aria-label={`Delete ${profile.name}`} className="design-quiet profile-card-delete" onClick={() => { if (window.confirm(`Delete ${profile.name}? This cannot be undone. Existing batches keep their profile snapshot.`)) { onDelete(profile.id); setMessage(`${profile.name} profile deleted. Existing batches are unchanged.`); addProfileRef.current?.focus(); } }} type="button">Delete</button>
+              <button aria-label={`Edit ${profile.name}`} className="design-batch-pill" ref={(button) => { editButtons.current[profile.id] = button; }} onClick={() => edit(profile)} type="button"><span className="design-batch-bottom"><strong>Edit</strong><span>profile</span></span><span className="design-batch-go" aria-hidden="true"><DesignIcon name="back" /></span></button><button aria-label={`Duplicate ${profile.name}`} className="design-quiet profile-card-duplicate" onClick={() => { const copy = duplicateProfile(profile, createClientId(), `${profile.name} copy`); onSave(copy); setMessage(`${copy.name} profile added.`); }} type="button">Duplicate</button><button aria-label={`Delete ${profile.name}`} className="design-quiet profile-card-delete" onClick={() => { if (window.confirm(`Delete ${profile.name}? This cannot be undone. Existing batches keep their profile snapshot.`)) { onDelete(profile.id); setMessage(`${profile.name} profile deleted. Existing batches are unchanged.`); addProfileRef.current?.focus(); } }} type="button">Delete</button>
             </article>
           );
         })}
@@ -2973,31 +2823,6 @@ function Profiles({ draft, formulaTerms, profiles, onDelete, onSave, onEditingCh
 
     </section>
   );
-}
-
-function availableResultTerms(formulaTerms: string[], editing: FermentationProfile | null, rows: FormulaRow[]) {
-  return [...new Set([
-    ...formulaTerms,
-    ...(editing?.inputs.map(({ name }) => name) ?? []),
-    ...(editing?.calculations.map(({ name }) => name) ?? []),
-    ...rows.flatMap((row) => row.kind === "structured" ? [row.source, row.result] : [row.calculation.name]),
-  ])];
-}
-
-function availableSourceTerms(formulaTerms: string[], rows: FormulaRow[], inputs: FermentationProfile["inputs"]) {
-  const explicitInputs = new Set(inputs.map(({ name }) => name));
-  const selectedSources = new Set(rows.flatMap((row) => row.kind === "structured" ? [row.source] : []));
-  const results = new Set(rows.map((row) => row.kind === "structured" ? row.result : row.calculation.name));
-  return [...new Set([
-    ...formulaTerms.filter((term) => !results.has(term) || explicitInputs.has(term) || selectedSources.has(term)),
-    ...explicitInputs,
-    ...selectedSources,
-  ])];
-}
-
-function formulaTermLabel(term: string) {
-  const words = term.replace(/_/g, " ").replace(/([a-z0-9])([A-Z])/g, "$1 $2");
-  return words ? words[0].toUpperCase() + words.slice(1) : term;
 }
 
 function phRangeFor(profile: FermentationProfile): { min: number | ""; max: number | "" } {

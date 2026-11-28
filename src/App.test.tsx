@@ -270,22 +270,19 @@ describe("batch workflow", () => {
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].timeline).toHaveLength(1);
   });
 
-  it("protects unsaved batch input edits but does not warn after those inputs are saved", () => {
+  it("saves Recipe measurements as you type, so switching batches never asks to discard them", () => {
     const today = localDateForTest();
-    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Tea", unit: "l" as const, defaultValue: 2 }] };
+    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Tea", unit: "l" as const }], calculations: [] };
     const batches = ["First", "Second"].map((name) => createBatch(profile, { id: name, name, startDate: today }));
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState(batches)));
     render(<App />);
-    openBatchTools();
-    fireEvent.change(screen.getByLabelText("Tea (l)"), { target: { value: "3" } });
-    vi.mocked(window.confirm).mockReturnValue(false);
+    fireEvent.click(screen.getByRole("button", { name: "Open First" }));
+    const recipe = within(screen.getByRole("region", { name: "Recipe" }));
+    fireEvent.change(recipe.getByLabelText("Tea (l)"), { target: { value: "3" } });
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches.find(({ id }: { id: string }) => id === "First").inputValues.Tea).toBe(3);
     fireEvent.click(screen.getByRole("button", { name: "Open Second" }));
-    expect((screen.getByLabelText("Tea (l)") as HTMLInputElement).value).toBe("3");
-    expect(window.confirm).toHaveBeenCalledOnce();
-    fireEvent.click(screen.getByRole("button", { name: "Update inputs" }));
-    fireEvent.click(screen.getByRole("button", { name: "Open Second" }));
-    expect(window.confirm).toHaveBeenCalledOnce();
-    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].inputValues.Tea).toBe(3);
+    expect(window.confirm).not.toHaveBeenCalled();
+    expect((within(screen.getByRole("region", { name: "Recipe" })).getByLabelText("Tea (l)") as HTMLInputElement).value).toBe("");
   });
 
   it("advances the same basic logger without losing its note, reading or chosen date", () => {
@@ -564,7 +561,7 @@ describe("batch workflow", () => {
 
   it("keeps advanced management out of the default accessibility tree and opens all tools explicitly", () => {
     const today = localDateForTest();
-    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Tea", unit: "l" as const, defaultValue: 2 }], calculations: [{ name: "Sugar", unit: "g" as const, formula: "Tea * 5" }], checks: [{ name: "Taste", intervalDays: 2 }] };
+    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Tea", unit: "l" as const }], calculations: [{ name: "Sugar", unit: "g" as const, input: "Tea", amount: 5, per: 1, instruction: "Dissolve it in your {input} of tea.", reason: "5 g for each litre of tea" }], checks: [{ name: "Taste", intervalDays: 2 }] };
     const batch = createBatch(profile, { id: "jar", startDate: today });
     batch.timeline.push({ id: "note", kind: "note", date: today, text: "Real note" });
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
@@ -592,7 +589,6 @@ describe("batch workflow", () => {
     }
     expect(detail.getByLabelText("Finish date")).toBeTruthy();
     expect(detail.getByLabelText("Tea (l)")).toBeTruthy();
-    expect(detail.getByLabelText("Override Sugar")).toBeTruthy();
     expect(detail.getByLabelText("Taste interval days")).toBeTruthy();
     expect(detail.getByRole("heading", { name: /Key measurements/ })).toBeTruthy();
     fireEvent.click(summary);
@@ -1040,16 +1036,17 @@ describe("batch workflow", () => {
     }
   });
 
-  it("hands a real profile to the same Start shell and preserves optional names and advanced inputs", () => {
+  it("hands a real profile to the same Start shell and works out its amounts live", () => {
     const state = createProfileState();
-    state.profiles[1] = { ...state.profiles[1], expectedDurationDays: 7, inputs: [{ name: "Cabbage", unit: "kg", defaultValue: 1 }], calculations: [{ name: "salt", unit: "g", formula: "Cabbage * 2%" }], checks: [{ name: "Brine", intervalDays: 1 }] };
+    state.profiles[2] = { ...state.profiles[2], expectedDurationDays: 7, checks: [{ name: "Brine", intervalDays: 1 }] };
     localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(screen.getByRole("button", { name: "View Kimchi guidance" }));
     const dialog = screen.getByRole("dialog", { name: "Kimchi" });
     expect(dialog.textContent).toContain("7 days");
-    expect(dialog.textContent).toContain("Cabbage 1 kg");
+    expect(dialog.textContent).toContain("Vegetable weight (kg)");
+    expect(dialog.textContent).toContain("Salt: 2% of the vegetable weight, e.g. 20 g for 1 kg");
     expect(dialog.textContent).toContain("Brine · every 1 day");
     expect(nativeShowModal).toHaveBeenCalledTimes(1);
     fireEvent.click(within(dialog).getByRole("button", { name: "Start a batch" }));
@@ -1057,22 +1054,22 @@ describe("batch workflow", () => {
     expect(nativeClose).toHaveBeenCalledTimes(1);
     expect(nativeShowModal).toHaveBeenCalledTimes(2);
     expect(nativeClose.mock.invocationCallOrder[0]).toBeLessThan(nativeShowModal.mock.invocationCallOrder[1]);
-    expect((screen.getByLabelText("Fermentation profile") as HTMLSelectElement).value).toBe(state.profiles[1].id);
+    expect((screen.getByLabelText("Fermentation profile") as HTMLSelectElement).value).toBe(state.profiles[2].id);
     expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "Close dialog" }));
-    const options = within(dialog).getByText("Batch input options").closest("details")!;
-    expect(options.open).toBe(false);
-    fireEvent.click(within(options).getByText("Batch input options"));
-    fireEvent.change(screen.getByLabelText("Cabbage (kg)"), { target: { value: "2.5" } });
+    const measured = within(dialog).getByRole("group", { name: "What you measured" });
+    expect(dialog.textContent).toContain("Enter the vegetable weight to see how much salt to use.");
+    fireEvent.change(within(measured).getByLabelText("Vegetable weight (kg)"), { target: { value: "2.5" } });
+    expect(within(dialog).getByText("50 g salt: mix it into your 2.5 kg of chopped vegetables (2% of the vegetable weight).")).toBeTruthy();
     fireEvent.click(within(dialog).getByRole("button", { name: "Start a batch" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     const stored = JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0];
     expect(nativeClose).toHaveBeenCalledTimes(2);
-    expect(stored).toMatchObject({ name: "Kimchi", inputValues: { Cabbage: 2.5 }, calculationValues: { salt: { suggested: 50 } }, profileSnapshot: { id: state.profiles[1].id } });
+    expect(stored).toMatchObject({ name: "Kimchi", inputValues: { "Vegetable weight": 2.5 }, calculationValues: { Salt: { suggested: 50 } }, profileSnapshot: { id: state.profiles[2].id } });
     expect(screen.getByRole("status").textContent).toBe("Batch started · Kimchi");
   });
 
   it("reads Dates, Inputs and guidance from the selected batch snapshot even after profile deletion", () => {
-    const profile = { ...createProfileState().profiles[0], guidance: ["Snapshot guidance."], inputs: [{ name: "Tea", unit: "l" as const, defaultValue: 2 }], expectedDurationDays: 7 };
+    const profile = { ...createProfileState().profiles[0], guidance: ["Snapshot guidance."], inputs: [{ name: "Tea", unit: "l" as const }], calculations: [], expectedDurationDays: 7 };
     const batch = createBatch(profile, { id: "jar", name: "Snapshot jar", startDate: localDateForTest(), inputValues: { Tea: 3 } });
     localStorage.setItem("fermentstation.profiles", JSON.stringify({ profiles: [] }));
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
@@ -1085,12 +1082,10 @@ describe("batch workflow", () => {
     expect(Array.from(dialog.querySelectorAll("dt")).map((e) => e.textContent)).toEqual(["Start date", "Finish date", "Batch status"]);
     expect(dialog.querySelectorAll("dd")[2].textContent).toBe("Active");
     fireEvent.click(within(dialog).getByRole("button", { name: "Close dialog" }));
-    fireEvent.click(within(document.querySelector(".design-input-summary")!).getByRole("button", { name: "See all" }));
-    dialog = screen.getByRole("dialog", { name: "Profile inputs" });
-    expect(dialog.textContent).toContain("Tea 2 L");
-    expect(dialog.textContent).not.toContain("Tea 3 L");
-    expect(dialog.textContent).toContain("Snapshot guidance.");
-    expect(fireEvent(dialog, new Event("cancel", { cancelable: true }))).toBe(false);
+    const recipe = screen.getByRole("region", { name: "Recipe" });
+    expect(within(recipe).getByLabelText("Tea (l)")).toBeTruthy();
+    expect(recipe.textContent).toContain("Snapshot guidance.");
+    expect(within(recipe).queryByRole("button", { name: "See all" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /^Open .+ profile$/ }));
     dialog = screen.getByRole("dialog", { name: profile.name });
     expect(dialog.textContent).toContain("Snapshot guidance.");
@@ -1101,7 +1096,7 @@ describe("batch workflow", () => {
     expect(localStorage.getItem("fermentstation.batches")).toBe(stored);
     openBatchTools();
     expect(screen.getByRole("button", { name: "Edit batch dates" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Edit batch inputs and calculations" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Edit batch inputs and calculations" })).toBeNull();
     expect(screen.getByRole("button", { name: "Edit recurring checks" })).toBeTruthy();
   });
 
@@ -1118,13 +1113,13 @@ describe("batch workflow", () => {
     expect(screen.getByRole("link", { name: "SIL Open Font License 1.1" })).toBeTruthy();
   });
 
-  it("validates Start dates without writes and keeps real input defaults after a canceled draft", () => {
+  it("validates Start dates without writes and discards a canceled input draft", () => {
     const state = createProfileState();
-    state.profiles[0].inputs = [{ name: "Tea", unit: "l", defaultValue: 2 }];
+    // A custom profile: starter profiles always load their measurement from code.
+    state.profiles[0] = { ...state.profiles[0], id: "custom-tea", inputs: [{ name: "Tea", unit: "l" }], calculations: [] };
     localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
-    fireEvent.click(screen.getByText("Batch input options"));
     fireEvent.change(screen.getByLabelText("Tea (l)"), { target: { value: "3" } });
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
@@ -1143,8 +1138,9 @@ describe("batch workflow", () => {
     }
     fireEvent.change(date, { target: { value: localDateForTest() } });
     fireEvent.change(within(dialog).getByLabelText("Batch name"), { target: { value: "   " } });
-    fireEvent.click(screen.getByText("Batch input options"));
-    expect((screen.getByLabelText("Tea (l)") as HTMLInputElement).value).toBe("2");
+    const tea = screen.getByLabelText("Tea (l)") as HTMLInputElement;
+    expect(tea.value).toBe("");
+    fireEvent.change(tea, { target: { value: "2" } });
     fireEvent.click(newBatchSubmit());
     expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0]).toMatchObject({ name: "Kombucha F1", inputValues: { Tea: 2 } });
   });
@@ -1528,29 +1524,25 @@ describe("batch workflow", () => {
 
   it("retains start inputs when switching profiles and discards them only after confirmation", () => {
     const state = createProfileState();
-    state.profiles[0].inputs = [{ name: "water", unit: "l", defaultValue: 2 }];
-    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
-    fireEvent.click(screen.getByText("Batch input options"));
-    fireEvent.change(screen.getByLabelText("water (l)"), { target: { value: "3.5" } });
+    fireEvent.change(screen.getByLabelText("Water volume (l)"), { target: { value: "3.5" } });
     fireEvent.change(screen.getByLabelText("Fermentation profile"), { target: { value: state.profiles[1].id } });
     fireEvent.change(screen.getByLabelText("Fermentation profile"), { target: { value: state.profiles[0].id } });
-    expect((screen.getByLabelText("water (l)") as HTMLInputElement).value).toBe("3.5");
+    expect((screen.getByLabelText("Water volume (l)") as HTMLInputElement).value).toBe("3.5");
     vi.mocked(window.confirm).mockReturnValue(false);
     fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
-    expect((screen.getByLabelText("water (l)") as HTMLInputElement).value).toBe("3.5");
+    expect((screen.getByLabelText("Water volume (l)") as HTMLInputElement).value).toBe("3.5");
     vi.mocked(window.confirm).mockReturnValue(true);
     fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Start a batch" }));
-    fireEvent.click(screen.getByText("Batch input options"));
-    expect((screen.getByLabelText("water (l)") as HTMLInputElement).value).toBe("2");
+    expect((screen.getByLabelText("Water volume (l)") as HTMLInputElement).value).toBe("");
   });
 
   it("keeps a batch's method, checks and observations after editing and deleting its source profile", () => {
     const state = createProfileState();
-    state.profiles[0] = { ...state.profiles[0], checks: [{ name: "Taste", intervalDays: 2 }], guidance: ["Original method."], inputs: [{ name: "water", unit: "l", defaultValue: 2 }], expectedDurationDays: 7 };
+    state.profiles[0] = { ...state.profiles[0], checks: [{ name: "Taste", intervalDays: 2 }], guidance: ["Original method."], expectedDurationDays: 7 };
     const batch = createBatch(state.profiles[0], { id: "snapshot", name: "Snapshot jar", startDate: localDateForTest() });
     batch.timeline.push({ id: "note", kind: "note", date: localDateForTest(), text: "Original observation" });
     localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
@@ -1573,7 +1565,8 @@ describe("batch workflow", () => {
     const overview = within(screen.getByRole("dialog", { name: "Kombucha F1" }));
     expect(overview.getByText("Original method.")).toBeTruthy();
     expect(overview.getByText("Taste · every 2 days")).toBeTruthy();
-    expect(overview.getByText("water 2 L")).toBeTruthy();
+    expect(overview.getByText("Water volume (l)")).toBeTruthy();
+    expect(overview.getByText("Sugar: 70 g for each litre of water, e.g. 70 g for 1 l")).toBeTruthy();
   });
 
   it("shows profile photographs and offers a recoverable jar fallback without inventing profile facts", () => {
@@ -1609,6 +1602,24 @@ describe("batch workflow", () => {
     expect(screen.queryByRole("button", { name: "View House culture guidance" })).toBeNull();
   });
 
+  it("duplicates a starter profile with its amounts and gives new profiles none", () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
+    fireEvent.click(profileManagementButton("Duplicate Kimchi"));
+    expect(screen.getByText("Kimchi copy profile added.")).toBeTruthy();
+    const kimchi = createProfileState().profiles.find(({ id }) => id === "starter-kimchi")!;
+    const copy = JSON.parse(localStorage.getItem("fermentstation.profiles")!).profiles.find(({ name }: { name: string }) => name === "Kimchi copy");
+    expect(copy.id).not.toBe(kimchi.id);
+    expect(copy).toMatchObject({ inputs: kimchi.inputs, calculations: kimchi.calculations });
+    fireEvent.click(profileManagementButton("Edit Kimchi copy"));
+    expect(screen.getByRole("heading", { name: "Amounts it works out" })).toBeTruthy();
+    expect(screen.getByText("Salt: 2% of the vegetable weight, e.g. 20 g for 1 kg")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    fireEvent.click(profileManagementButton("Add profile"));
+    expect(screen.queryByRole("heading", { name: "Amounts it works out" })).toBeNull();
+    expect(screen.getByText(/Profiles you create do not work out amounts/)).toBeTruthy();
+  });
+
   it("shows the profile cards and opens profile guidance", () => {
     render(<App />);
 
@@ -1626,9 +1637,9 @@ describe("batch workflow", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it.each(["name", "optimal range"])("preserves unrelated conditions, inputs and formulas when editing a profile's %s", (field) => {
+  it.each(["name", "optimal range"])("preserves unrelated conditions, inputs and amounts when editing a profile's %s", (field) => {
     const state = createProfileState();
-    state.profiles[0] = { ...state.profiles[0], inputs: [{ name: "water", unit: "g", defaultValue: 500 }], calculations: [{ name: "tea", unit: "g", formula: "water / (20 + 2)" }], phZones: [{ label: "danger", min: 0, max: 2 }, { label: "optimal", min: 3, max: 4.2 }, { label: "safe", min: 5, max: 7 }] };
+    state.profiles[0] = { ...state.profiles[0], phZones: [{ label: "danger", min: 0, max: 2 }, { label: "optimal", min: 3, max: 4.2 }, { label: "safe", min: 5, max: 7 }] };
     localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
@@ -1641,8 +1652,9 @@ describe("batch workflow", () => {
     expect(overview.getByText("danger: 0–2")).toBeTruthy();
     expect(overview.getByText(field === "optimal range" ? "optimal: 3–4.5" : "optimal: 3–4.2")).toBeTruthy();
     expect(overview.getByText("safe: 5–7")).toBeTruthy();
-    expect(overview.getByText("water 500 g")).toBeTruthy();
-    expect(overview.getByText("tea = water / (20 + 2) (g)")).toBeTruthy();
+    expect(overview.getByText("Water volume (l)")).toBeTruthy();
+    expect(overview.getByText("Tea: 5 g for each litre of water, e.g. 5 g for 1 l")).toBeTruthy();
+    expect(JSON.parse(localStorage.getItem("fermentstation.profiles")!).profiles[0].calculations).toEqual(createProfileState().profiles[0].calculations);
   });
 
   it("explains an empty profile list and keeps profile creation available", () => {
@@ -1707,7 +1719,7 @@ describe("batch workflow", () => {
     expect(localStorage.getItem("fermentstation.batches")).toBe(before);
   });
 
-  it.each(["name", "duration", "checks", "interval", "formula", "ph", "ph-incomplete"])("links profile %s errors to affected fields without writes", (kind) => {
+  it.each(["name", "duration", "checks", "interval", "ph", "ph-incomplete"])("links profile %s errors to affected fields without writes", (kind) => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
     fireEvent.click(profileManagementButton("Edit Kombucha F1"));
@@ -1727,11 +1739,6 @@ describe("batch workflow", () => {
         fields = [screen.getByLabelText("Check interval 1")];
         fireEvent.change(fields[0], { target: { value: "0" } });
       }
-    } else if (kind === "formula") {
-      fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
-      fireEvent.change(screen.getByLabelText("Operator row 1"), { target: { value: "/" } });
-      fields = [screen.getByLabelText("Operand row 1")];
-      fireEvent.change(fields[0], { target: { value: "0" } });
     } else {
       fields = [screen.getByLabelText("pH minimum"), screen.getByLabelText("pH maximum")];
       fireEvent.change(fields[0], { target: { value: kind === "ph-incomplete" ? "" : "10" } });
@@ -1884,84 +1891,43 @@ describe("batch workflow", () => {
     expect(detail.getByText("Tasted pleasantly tart")).toBeTruthy();
   });
 
-  it("uses profile calculations, batch overrides, and finish dates", () => {
+  it("uses profile calculations, recalculates them live from the Recipe, and sets finish dates", () => {
     render(<App />);
     const navigation = within(screen.getByRole("navigation", { name: "Primary navigation" }));
     const topbar = within(document.querySelector(".design-topbar")!);
     const detail = within(screen.getByRole("complementary", { name: "Selected batch" }));
     fireEvent.click(navigation.getByRole("button", { name: "Profiles" }));
-    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
-    let editor = within(document.getElementById("profile-editor-form")!);
+    fireEvent.click(profileManagementButton("Edit Sauerkraut"));
+    const editor = within(document.getElementById("profile-editor-form")!);
+    expect(editor.getByRole("heading", { name: "Amounts it works out" })).toBeTruthy();
+    expect(editor.getByText("Salt: 2% of the cabbage weight, e.g. 20 g for 1 kg")).toBeTruthy();
+    expect(editor.queryByRole("button", { name: "Add formula" })).toBeNull();
     fireEvent.change(editor.getByLabelText(/Expected duration/), { target: { value: "7" } });
-    fireEvent.click(editor.getByRole("button", { name: "Add formula" }));
-    fireEvent.change(editor.getByLabelText("Source unit row 1"), { target: { value: "kg" } });
-    expect((editor.getByLabelText("Source unit row 1") as HTMLSelectElement).value).toBe("kg");
-    fireEvent.click(editor.getByRole("button", { name: "Add formula" }));
-    fireEvent.change(editor.getByLabelText("Source term row 2"), { target: { value: "water" } });
-    fireEvent.change(editor.getByLabelText("Source unit row 2"), { target: { value: "l" } });
-    fireEvent.change(editor.getByLabelText("Operator row 2"), { target: { value: "/" } });
-    fireEvent.change(editor.getByLabelText("Operand row 2"), { target: { value: "17.63" } });
-    fireEvent.change(editor.getByLabelText("Operand type row 2"), { target: { value: "number" } });
-    fireEvent.change(editor.getByLabelText("Result term row 2"), { target: { value: "tea" } });
-    fireEvent.click(editor.getByRole("button", { name: "Add formula" }));
-    fireEvent.change(editor.getByLabelText("Source term row 3"), { target: { value: "water" } });
-    expect((editor.getByLabelText("Source unit row 3") as HTMLSelectElement).value).toBe("l");
-    fireEvent.change(editor.getByLabelText("Source unit row 2"), { target: { value: "ml" } });
-    expect((editor.getByLabelText("Source unit row 3") as HTMLSelectElement).value).toBe("ml");
-    fireEvent.change(editor.getByLabelText("Source unit row 2"), { target: { value: "l" } });
-    fireEvent.click(editor.getByRole("button", { name: "Remove calculation 3" }));
     fireEvent.click(editor.getByRole("button", { name: "Save profile" }));
-
-    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
-    editor = within(document.getElementById("profile-editor-form")!);
-    expect((editor.getByLabelText("Source term row 1") as HTMLSelectElement).value).toBe("totalWeight");
-    expect((editor.getByLabelText("Source unit row 1") as HTMLSelectElement).value).toBe("kg");
-    expect((editor.getByLabelText("Result term row 2") as HTMLSelectElement).value).toBe("tea");
-    expect(screen.queryByLabelText(/^Inputs/)).toBeNull();
-    fireEvent.click(editor.getByRole("button", { name: "Cancel" }));
+    const sauerkraut = createProfileState().profiles.find(({ id }) => id === "starter-sauerkraut")!;
+    expect(JSON.parse(localStorage.getItem("fermentstation.profiles")!).profiles.find(({ id }: { id: string }) => id === sauerkraut.id))
+      .toMatchObject({ expectedDurationDays: 7, inputs: sauerkraut.inputs, calculations: sauerkraut.calculations });
 
     fireEvent.click(navigation.getByRole("button", { name: "My batches" }));
     fireEvent.click(topbar.getByRole("button", { name: "Start a batch" }));
     const startDialog = within(screen.getByRole("dialog", { name: "Start a batch" }));
-    fireEvent.click(startDialog.getByText("Batch input options"));
-    fireEvent.change(startDialog.getByLabelText("totalWeight (kg)"), { target: { value: "1.25" } });
-    fireEvent.change(startDialog.getByLabelText("water (l)"), { target: { value: "1" } });
+    fireEvent.change(startDialog.getByLabelText("Fermentation profile"), { target: { value: sauerkraut.id } });
+    fireEvent.change(startDialog.getByLabelText("Cabbage weight (kg)"), { target: { value: "1.25" } });
+    expect(startDialog.getByText("25 g salt: mix it into your 1.25 kg of shredded cabbage (2% of the cabbage weight).")).toBeTruthy();
     fireEvent.click(newBatchSubmit());
+    const recipe = within(detail.getByRole("region", { name: "Recipe" }));
+    expect(recipe.getByRole("list", { name: "Amounts" }).textContent).toBe("25 gSalt");
+    expect(recipe.getByText("25 g salt: mix it into your 1.25 kg of shredded cabbage (2% of the cabbage weight).")).toBeTruthy();
+
+    fireEvent.change(recipe.getByLabelText("Cabbage weight (kg)"), { target: { value: "2.5" } });
+    expect(recipe.getByRole("list", { name: "Amounts" }).textContent).toBe("50 gSalt");
+    expect(recipe.getByText("50 g salt: mix it into your 2.5 kg of shredded cabbage (2% of the cabbage weight).")).toBeTruthy();
+    expect(JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0].calculationValues.Salt).toEqual({ suggested: 50 });
+    expect(detail.queryByLabelText("Override Salt")).toBeNull();
+
     openBatchTools();
-    expect(detail.getByText(/25 g suggested/)).toBeTruthy();
-    expect(detail.getByText("tea:").parentElement?.textContent).toContain("56.72 g suggested");
-    expect(detail.getByText("salt").closest(".meas")?.textContent).toContain("25g");
-    expect(detail.getByText("tea").closest(".meas")?.textContent).toContain("56.72g");
-
-    fireEvent.change(detail.getByLabelText("totalWeight (kg)"), { target: { value: "2.5" } });
-    fireEvent.click(detail.getByRole("button", { name: "Update inputs" }));
-    expect(detail.getByText(/50 g suggested/)).toBeTruthy();
-    const saltOverride = detail.getByLabelText("Override salt");
-    fireEvent.change(saltOverride, { target: { value: "55.5" } });
-    fireEvent.submit(saltOverride.closest("form")!);
-    expect(detail.getByText(/55.5 g \(overridden\)/)).toBeTruthy();
-
     fireEvent.change(detail.getByLabelText("Finish date"), { target: { value: "2026-08-08" } });
     expect(detail.getByText("Ready", { selector: ".status" })).toBeTruthy();
-  });
-
-  it("persists editable device formula terms and uses them in profile dropdowns", () => {
-    const view = render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
-    fireEvent.change(screen.getByLabelText("Formula term 1"), { target: { value: "starterLiquid" } });
-    expect(screen.getByRole("button", { name: "Remove formula term 1: starterLiquid" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Save formula terms" }));
-    expect(screen.getByText("Formula terms saved on this device.")).toBeTruthy();
-
-    view.unmount();
-    render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
-    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
-    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
-
-    const option = Array.from((screen.getByLabelText("Source term row 1") as HTMLSelectElement).options)
-      .find(({ value }) => value === "starterLiquid");
-    expect(option?.textContent).toBe("Starter Liquid");
   });
 
   it("persists the settings page preferences", () => {
@@ -1983,42 +1949,6 @@ describe("batch workflow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     expect(screen.getByRole("button", { name: "°F / qt" }).getAttribute("aria-pressed")).toBe("true");
     expect(within(screen.getByRole("group", { name: "Notifications" })).getByRole("button", { name: "Off" }).getAttribute("aria-pressed")).toBe("true");
-  });
-
-  it("keeps calculation-only results out of sources and chooses unused results", () => {
-    render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
-    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
-    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add formula" }));
-
-    expect((screen.getByLabelText("Result term row 1") as HTMLSelectElement).value).toBe("salt");
-    expect((screen.getByLabelText("Result term row 2") as HTMLSelectElement).value).not.toBe("salt");
-    expect(Array.from((screen.getByLabelText("Source term row 2") as HTMLSelectElement).options).map(({ value }) => value))
-      .not.toContain("salt");
-    expect(Array.from((screen.getByLabelText("Result term row 2") as HTMLSelectElement).options).map(({ value }) => value))
-      .toContain("salt");
-  });
-
-  it("keeps complex legacy calculations unless they are removed", () => {
-    const state = createProfileState();
-    state.profiles[0].inputs = [{ name: "water", unit: "g" }];
-    state.profiles[0].calculations = [{ name: "tea", unit: "g", formula: "water / (20 + 2)" }];
-    localStorage.setItem("fermentstation.profiles", JSON.stringify(state));
-    render(<App />);
-    fireEvent.click(screen.getByRole("button", { name: "Profiles" }));
-    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
-
-    expect(screen.getByText(/cannot be edited here, but will be kept/)).toBeTruthy();
-    expect(screen.queryByLabelText(/^Calculations/)).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
-    expect(JSON.parse(localStorage.getItem("fermentstation.profiles")!).profiles[0].calculations[0].formula)
-      .toBe("water / (20 + 2)");
-
-    fireEvent.click(profileManagementButton("Edit Kombucha F1"));
-    fireEvent.click(screen.getByRole("button", { name: "Remove calculation 1" }));
-    fireEvent.click(screen.getByRole("button", { name: "Save profile" }));
-    expect(JSON.parse(localStorage.getItem("fermentstation.profiles")!).profiles[0].calculations).toEqual([]);
   });
 
   it("surfaces recurring checks on Today and Calendar", () => {
@@ -2121,29 +2051,29 @@ describe("batch workflow", () => {
     expect(detail.getByRole("heading", { name: "First jar" })).toBeTruthy();
   });
 
-  it("validates batch inputs inline and protects drafts until an explicit discard", () => {
-    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Water", unit: "l" as const, defaultValue: 2 }], calculations: [{ name: "Sugar", unit: "g" as const, formula: "Water * 5" }] };
-    const batch = createBatch(profile, { id: "jar", startDate: localDateForTest() });
+  it("validates Recipe measurements inline and saves only usable numbers", () => {
+    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Water", unit: "l" as const }], calculations: [{ name: "Sugar", unit: "g" as const, input: "Water", amount: 5, per: 1, instruction: "Dissolve it in your {input} of water.", reason: "5 g for each litre of water" }] };
+    const batch = createBatch(profile, { id: "jar", startDate: localDateForTest(), inputValues: { Water: 2 } });
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
     render(<App />);
-    const tools = within(openBatchTools());
-    const input = tools.getByLabelText("Water (l)") as HTMLInputElement;
+    fireEvent.click(screen.getByRole("button", { name: `Open ${batch.name}` }));
+    const recipe = within(screen.getByRole("region", { name: "Recipe" }));
+    const input = recipe.getByLabelText("Water (l)") as HTMLInputElement;
+    const stored = () => JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0];
     fireEvent.change(input, { target: { value: "-1" } });
-    fireEvent.click(tools.getByRole("button", { name: "Update inputs" }));
     expect(input.getAttribute("aria-invalid")).toBe("true");
-    expect(document.getElementById(input.getAttribute("aria-describedby")!)?.textContent).toBeTruthy();
-    expect(tools.getByText(/10000 g suggested/)).toBeTruthy();
-    vi.mocked(window.confirm).mockReturnValue(false);
-    fireEvent.click(tools.getByRole("button", { name: "Discard tool changes" }));
-    expect(input.value).toBe("-1");
-    vi.mocked(window.confirm).mockReturnValue(true);
-    fireEvent.click(tools.getByRole("button", { name: "Discard tool changes" }));
+    expect(document.getElementById(input.getAttribute("aria-describedby")!)?.textContent).toBe("Enter a number of 0 or more.");
+    expect(stored().inputValues.Water).toBe(2);
+    expect(recipe.getByText("10 g sugar: dissolve it in your 2 l of water (5 g for each litre of water).")).toBeTruthy();
+    fireEvent.blur(input);
     expect(input.value).toBe("2");
     expect(input.hasAttribute("aria-invalid")).toBe(false);
+    fireEvent.change(input, { target: { value: "3" } });
+    expect(stored().inputValues.Water).toBe(3);
+    expect(recipe.getByText("15 g sugar: dissolve it in your 3 l of water (5 g for each litre of water).")).toBeTruthy();
     const unload = new Event("beforeunload", { cancelable: true });
     window.dispatchEvent(unload);
     expect(unload.defaultPrevented).toBe(false);
-    expect(document.activeElement).toBe(tools.getByRole("button", { name: "Discard tool changes" }));
   });
 
   it("adds, renames, and removes a batch-local check", () => {
@@ -2169,34 +2099,30 @@ describe("batch workflow", () => {
     expect(screen.getByText("No recurring checks yet.")).toBeTruthy();
   });
 
-  it("keeps unset inputs, overrides, snapshots and observations intact across tool saves and discard", () => {
+  it("keeps unset inputs, snapshots and observations intact while the Recipe measurements change", () => {
     const today = localDateForTest();
-    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Flour", unit: "g" as const }], calculations: [{ name: "Water", unit: "g" as const, formula: "Flour * 0.5" }] };
+    const profile = { ...createProfileState().profiles[0], inputs: [{ name: "Flour", unit: "g" as const }], calculations: [{ name: "Water", unit: "g" as const, input: "Flour", amount: 0.5, per: 1, instruction: "Stir it into your {input} of flour.", reason: "Half the flour weight" }] };
     const batch = createBatch(profile, { id: "jar", startDate: today, inputValues: { Flour: 100 } });
     batch.timeline.push({ id: "note", kind: "note", date: today, text: "Saved preparation" });
     localStorage.setItem("fermentstation.batches", JSON.stringify(createBatchState([batch])));
     render(<App />);
-    const tools = within(openBatchTools());
-    const input = tools.getByLabelText("Flour (g)") as HTMLInputElement;
-    const override = tools.getByLabelText("Override Water");
+    fireEvent.click(screen.getByRole("button", { name: `Open ${batch.name}` }));
+    const recipe = within(screen.getByRole("region", { name: "Recipe" }));
+    const input = recipe.getByLabelText("Flour (g)") as HTMLInputElement;
     fireEvent.change(input, { target: { value: "" } });
-    fireEvent.click(tools.getByRole("button", { name: "Update inputs" }));
-    expect(tools.getByText(/Add the required inputs to calculate/)).toBeTruthy();
-    fireEvent.change(override, { target: { value: "60" } });
-    fireEvent.submit(override.closest("form")!);
-    fireEvent.change(input, { target: { value: "200" } });
-    fireEvent.click(tools.getByRole("button", { name: "Discard tool changes" }));
-    expect(input.value).toBe("");
-    const stored = JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0];
+    expect(recipe.getByText("Enter the flour to see how much water to use.")).toBeTruthy();
+    expect(recipe.getByRole("list", { name: "Amounts" }).textContent).toBe("—Water");
+    let stored = JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0];
     expect(stored.inputValues).toEqual({});
-    expect(stored.calculationValues.Water).toEqual({ suggested: null, override: 60 });
+    expect(stored.calculationValues.Water).toEqual({ suggested: null });
     expect(stored.profileSnapshot).toEqual(batch.profileSnapshot);
     expect(stored.timeline).toEqual(batch.timeline);
     fireEvent.change(input, { target: { value: "200" } });
-    fireEvent.click(tools.getByRole("button", { name: "Update inputs" }));
-    expect(tools.getByText(/No suggestion was available before this override/)).toBeTruthy();
-    expect(tools.queryByText(/Add the required inputs to calculate/)).toBeNull();
-    expect(tools.getByRole("status").textContent).toContain("Non-overridden suggestions recalculated");
+    expect(recipe.getByText("100 g water: stir it into your 200 g of flour (half the flour weight).")).toBeTruthy();
+    expect(recipe.queryByText("Enter the flour to see how much water to use.")).toBeNull();
+    stored = JSON.parse(localStorage.getItem("fermentstation.batches")!).batches[0];
+    expect(stored.calculationValues.Water).toEqual({ suggested: 100 });
+    expect(stored.timeline).toEqual(batch.timeline);
   });
 
   it("explains paused controls, scopes check errors and keeps draft creation recoverable", () => {

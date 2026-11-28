@@ -91,8 +91,6 @@ function richProfiles(): ProfileState {
     state = updateProfile(state, { ...byId(id), ...details });
   };
   enrich("starter-kimchi", {
-    inputs: [{ name: "cabbage", unit: "g", defaultValue: 2000 }, { name: "water", unit: "ml", defaultValue: 1000 }],
-    calculations: [{ name: "Salt", unit: "g", formula: "cabbage * 2%" }, { name: "Brine salt", unit: "g", formula: "water * 5%" }],
     checks: [{ name: "Burp the jar", intervalDays: 1 }, { name: "Check brine level", intervalDays: 2 }],
     phZones: [{ label: "optimal", min: 3.6, max: 4.29 }, { label: "safe", min: 4.3, max: 4.69 }, { label: "danger", min: 4.7, max: 14 }],
     temperatureMinC: 18,
@@ -100,8 +98,6 @@ function richProfiles(): ProfileState {
     expectedDurationDays: 5,
   });
   enrich("starter-kombucha-f1", {
-    inputs: [{ name: "water", unit: "ml", defaultValue: 2000 }],
-    calculations: [{ name: "Sugar", unit: "g", formula: "water / 20" }, { name: "Tea", unit: "g", formula: "water / 250" }],
     checks: [{ name: "Taste test", intervalDays: 3 }],
     phZones: [{ label: "danger", min: 4.21, max: 14 }, { label: "optimal", min: 2.5, max: 3.5 }],
     temperatureMinC: 22,
@@ -109,8 +105,6 @@ function richProfiles(): ProfileState {
     expectedDurationDays: 10,
   });
   enrich("starter-sauerkraut", {
-    inputs: [{ name: "cabbage", unit: "g", defaultValue: 1500 }],
-    calculations: [{ name: "Salt", unit: "g", formula: "cabbage * 2%" }],
     checks: [{ name: "Check brine level", intervalDays: 2 }, { name: "Skim the surface", intervalDays: 4 }],
     phZones: [{ label: "optimal", min: 3.1, max: 3.6 }, { label: "safe", min: 3.61, max: 4.6 }],
     temperatureMinC: 18,
@@ -118,7 +112,6 @@ function richProfiles(): ProfileState {
     expectedDurationDays: 21,
   });
   enrich("starter-sourdough", {
-    inputs: [{ name: "flour", unit: "g", defaultValue: 100 }, { name: "water", unit: "g", defaultValue: 100 }],
     checks: [{ name: "Feed the starter", intervalDays: 1 }],
   });
   state = addProfile(state, {
@@ -129,8 +122,8 @@ function richProfiles(): ProfileState {
       "Feed one spoon each of ginger and sugar every day until it fizzes when stirred.",
       "Use the strained liquid to start sodas; keep feeding the rest.",
     ],
-    inputs: [{ name: "water", unit: "ml", defaultValue: 500 }, { name: "ginger", unit: "g", defaultValue: 30 }],
-    calculations: [{ name: "Sugar", unit: "g", formula: "ginger * 100%" }],
+    inputs: [],
+    calculations: [],
     checks: [{ name: "Feed ginger and sugar", intervalDays: 1 }],
     phZones: [],
     temperatureMinC: 20,
@@ -141,8 +134,8 @@ function richProfiles(): ProfileState {
     id: "visual-water-kefir",
     name: "Water kefir",
     guidance: ["Dissolve sugar in water, add grains and a dried fig.", "Strain after 48 hours and bottle with fruit for a second ferment."],
-    inputs: [{ name: "water", unit: "ml", defaultValue: 1000 }],
-    calculations: [{ name: "Sugar", unit: "g", formula: "water * 6%" }],
+    inputs: [],
+    calculations: [],
     checks: [{ name: "Strain the grains", intervalDays: 2 }],
     phZones: [],
     expectedDurationDays: 3,
@@ -171,7 +164,7 @@ async function richBatches(profiles: ProfileState, today: string): Promise<Batch
   });
 
   // Active, one overdue and one due-today check, long pH/temperature history and a user photo.
-  let kimchi = createBatch(profile(profiles, "starter-kimchi"), { id: "visual-kimchi", name: "Napa cabbage kimchi", startDate: d(-4), inputValues: { cabbage: 2400 }, today });
+  let kimchi = createBatch(profile(profiles, "starter-kimchi"), { id: "visual-kimchi", name: "Napa cabbage kimchi", startDate: d(-4), inputValues: { "Vegetable weight": 2.4 }, today });
   kimchi = note(kimchi, d(-4), "Packed into the 2 L jar with gochugaru paste, spring onion and daikon. Brine covers everything.");
   kimchi = ph(kimchi, d(-4), 5.6);
   kimchi = temperature(kimchi, d(-3), 21.5);
@@ -186,7 +179,7 @@ async function richBatches(profiles: ProfileState, today: string): Promise<Batch
   kimchi = note(kimchi, d(-1), "Smells sour and garlicky, a little fizz when pressed down. Tasted a leaf: still crunchy, needs another day or two before it goes in the fridge.");
 
   // Active, nothing due; checks upcoming over the next days.
-  let kraut = createBatch(profile(profiles, "starter-sauerkraut"), { id: "visual-kraut", name: "Garden sauerkraut", startDate: d(-9), inputValues: { cabbage: 1800 }, today });
+  let kraut = createBatch(profile(profiles, "starter-sauerkraut"), { id: "visual-kraut", name: "Garden sauerkraut", startDate: d(-9), inputValues: { "Cabbage weight": 1.8 }, today });
   kraut = ph(kraut, d(-8), 5.8);
   for (const date of [d(-7), d(-5), d(-3), d(-1)]) kraut = complete(kraut, "Check brine level", date);
   kraut = complete(kraut, "Skim the surface", d(-5));

@@ -20,7 +20,7 @@ the React layer.
 The important phone gaps are:
 
 1. Settings is hidden from the phone navigation, so units, reminders, suggestions,
-   formula terms, trash recovery, and archive transfer are inaccessible in the
+   starter profile restore, trash recovery, and archive transfer are inaccessible in the
    normal Android UI.
 2. The phone's overflow/menu buttons are rendered but have no action.
 3. Check reminders are only a stored preference. No Android notification scheduling
@@ -106,7 +106,7 @@ features:
 - At `src/App.tsx:177`, the mobile `More options` button has no `onClick` handler.
 - At `src/App.tsx:1500`, the profile editor mobile menu button also has no action.
 - Settings contains the only visible controls for units, check reminders,
-  suggestions, formula terms, journal export, ZIP exchange, and recently deleted
+  suggestions, starter profile restore, journal export, ZIP exchange, and recently deleted
   batches (`src/App.tsx:431-529`).
 - The Android manifest only declares `INTERNET`; there is no notification permission
   or native media/storage integration (`android/app/src/main/AndroidManifest.xml`).

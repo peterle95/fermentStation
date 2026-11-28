@@ -71,12 +71,12 @@ function isProfileDetails(profile: Record<string, unknown>): boolean {
   return Array.isArray(inputs) && inputs.every((input) => {
     if (!input || typeof input !== "object") return false;
     const value = input as Record<string, unknown>;
-    return typeof value.name === "string" && ["g", "kg", "ml", "l"].includes(String(value.unit)) &&
-      (value.defaultValue === undefined || typeof value.defaultValue === "number");
+    return typeof value.name === "string" && ["g", "kg", "ml", "l"].includes(String(value.unit));
   }) && Array.isArray(calculations) && calculations.every((calculation) => {
     if (!calculation || typeof calculation !== "object") return false;
     const value = calculation as Record<string, unknown>;
-    return typeof value.name === "string" && typeof value.formula === "string" &&
+    return ["name", "input", "instruction", "reason"].every((key) => typeof value[key] === "string") &&
+      ["amount", "per"].every((key) => typeof value[key] === "number") &&
       ["g", "kg", "ml", "l"].includes(String(value.unit));
   }) && Array.isArray(checks) && checks.every((check) => {
     if (!check || typeof check !== "object") return false;
@@ -128,7 +128,7 @@ function normalizeBatch(batch: Batch): Batch {
     timeline: batch.timeline ?? [],
     timelineTrash: batch.timelineTrash ?? [],
     inputValues: batch.inputValues ?? Object.fromEntries(
-      profileSnapshot.inputs.map((input) => [input.name, input.defaultValue]),
+      profileSnapshot.inputs.map((input) => [input.name, undefined]),
     ),
     calculationValues: batch.calculationValues ?? {},
     checks: normalizeBatchChecks(batch.checks ?? [], `batch-check-${batch.id}`),

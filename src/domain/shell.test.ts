@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createShellState, defaultFormulaTerms, selectDestination } from "./shell";
+import { createShellState, selectDestination } from "./shell";
 
 describe("shell state", () => {
   it("selects a primary destination without mutating the previous state", () => {
@@ -8,10 +8,8 @@ describe("shell state", () => {
     const batches = selectDestination(today, "batches");
 
     expect(today.destination).toBe("today");
-    expect(today.formulaTerms).toEqual(defaultFormulaTerms);
     expect(batches).toEqual({
       destination: "batches",
-      formulaTerms: defaultFormulaTerms,
       units: "metric",
       notificationMode: "off",
       suggestions: true,

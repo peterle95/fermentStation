@@ -3,7 +3,8 @@
 The phone bottom bar (< 600 px) is a React Bits `PillNav` row on a React Bits `GlassSurface` pane. Content scrolls
 under the bar, and the pane bends what passes beneath its rim, as in the React Bits demo the user matched it to on
 2026-11-17. This note covers how the glass is built, which parts are ours and which are upstream's, the constraints it
-works inside, and the **Reduce glass** setting that replaces it with a dimmed pane.
+works inside, and the **Reduce glass** setting that replaces it with a dimmed pane. How the bar stays seated on the
+bottom edge in the installed iPhone app is covered in `ios-home-screen-layout.md`.
 
 Files:
 

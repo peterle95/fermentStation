@@ -67,7 +67,7 @@ Surfaces (`-s`):
 | `batch-picker` | "Choose a batch" sheet for the first upcoming-strip day that has several batches (ticket 14; no baseline) | Checks, then that day |
 | `profile-overview` | Kimchi profile overview dialog (ticket 14; no baseline) | Profiles, tap "View Kimchi guidance" |
 | `batch-dates` | "Batch dates" dialog for "Napa cabbage kimchi" (ticket 14; no baseline) | its card, then "View batch dates" |
-| `profile-inputs` | "Profile inputs" dialog for "Napa cabbage kimchi" (ticket 14; no baseline) | its card, then "See all" under Profile inputs |
+| `batch-recipe` | Recipe tab of "Napa cabbage kimchi" with its measurement fields, amounts and steps (2026-11-28; no baseline) | its card, then the Recipe tab |
 | `station-info` | "Your fermentation station" information dialog (ticket 14; no baseline) | the station logo: topbar (phone), rail avatar (tablet), the StaggeredMenu logo (desktop) |
 | `menu-open` | Desktop React Bits StaggeredMenu open, with full motion, after its GSAP animation has settled (2026-11-14; desktop viewports only; no baseline) | tap "Menu", wait until no inline style in `.app-menu` changes for 300 ms |
 
@@ -144,7 +144,7 @@ Findings on the baseline (60 captures, 0 failed):
 - Small targets: Settings segmented buttons, "On"/"Off" (39-41 px wide) at 768 px and wider, and the notification "All"/"Off" segment at 320 px.
 - Page errors: none.
 
-Surfaces added after the baseline have no baseline captures: `upcoming-strip` (ticket 11) and `trash`, `batch-picker`, `profile-overview`, `batch-dates`, `profile-inputs`, `station-info` (ticket 14), and `menu-open` (2026-11-14). The index shows only the current capture for them, and the end-of-run comparison skips them. Do not recapture the baseline to fill the gap.
+Surfaces added after the baseline have no baseline captures: `upcoming-strip` (ticket 11) and `trash`, `batch-picker`, `profile-overview`, `batch-dates`, `station-info` (ticket 14), `menu-open` (2026-11-14) and `batch-recipe` (2026-11-28). The index shows only the current capture for them, and the end-of-run comparison skips them. Do not recapture the baseline to fill the gap.
 
 ## Git
 
